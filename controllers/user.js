@@ -72,13 +72,16 @@ const loginUser = async (req, res) => {
 
             if (passwordMatch) {
                 req.session.user = user;
+                if (user.role === 'admin') {
+                    res.redirect('/admin');
+                }
                 res.redirect('/dashboard');
             } else {
-                req.flash('error', 'Invalid username/email or password');
+                req.flash('error', 'Invalid password');
                 res.redirect('/login');
             }
         } else {
-            req.flash('error', 'Invalid username/email or password');
+            req.flash('error', 'Invalid username/email');
             res.redirect('/login');
         }
     } catch (error) {
