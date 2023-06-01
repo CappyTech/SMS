@@ -1,0 +1,51 @@
+<h1>Create Invoice</h1>
+
+<form action="/invoices/create" method="POST">
+    <div>
+        <label for="invoiceNumber">Invoice Number:</label>
+        <input type="text" id="invoiceNumber" name="invoiceNumber" required>
+    </div>
+    <div>
+        <label for="kashflowNumber">Kashflow Number:</label>
+        <input type="text" id="kashflowNumber" name="kashflowNumber" required>
+    </div>
+    <div>
+        <label for="invoiceDate">Invoice Date:</label>
+        <input type="date" id="invoiceDate" name="invoiceDate" required>
+    </div>
+    <div>
+        <label for="remittanceDate">Remittance Date:</label>
+        <input type="date" id="remittanceDate" name="remittanceDate" required>
+    </div>
+    <div>
+        <label for="grossAmount">Gross Amount:</label>
+        <input type="number" id="grossAmount" name="grossAmount" required>
+    </div>
+    <div>
+        <label for="labourCost">Labour Cost:</label>
+        <input type="number" id="labourCost" name="labourCost" required>
+    </div>
+    <div>
+        <label for="materialCost">Material Cost:</label>
+        <input type="number" id="materialCost" name="materialCost" required>
+    </div>
+    <div>
+        <label for="cisAmount">CIS Amount:</label>
+        <input type="number" id="cisAmount" name="cisAmount" required>
+    </div>
+    <div>
+        <label for="netAmount">Net Amount:</label>
+        <input type="number" id="netAmount" name="netAmount" required>
+    </div>
+    <div>
+        <label for="submissionDate">Submission Date:</label>
+        <input type="date" id="submissionDate" name="submissionDate" required>
+    </div>
+    <div>
+        <label for="reverseChargeAmount">Reverse Charge Amount:</label>
+        <input type="number" id="reverseChargeAmount" name="reverseChargeAmount" required>
+    </div>
+    <div>
+        <input type="submit" value="Create Invoice">
+    </div>
+</form>
