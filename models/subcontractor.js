@@ -41,6 +41,16 @@ const Subcontractor = sequelize.define('Subcontractor', {
         allowNull: false,
         unique: true,
     },
+    onboarded: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+    onboardedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+    },
 }, {
     paranoid: true, // Add the paranoid option
 });
