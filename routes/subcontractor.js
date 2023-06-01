@@ -3,9 +3,11 @@
 const express = require('express');
 const router = express.Router();
 const {
-    renderProfile
+    submitOnboardingForm,
+    renderOnboardingForm
 } = require('../controllers/account');
 
-router.get('/profile', renderProfile);
+router.get('/onboarding', renderOnboardingForm);
+router.post('/onboarding', submitOnboardingForm);
 
 module.exports = router;
