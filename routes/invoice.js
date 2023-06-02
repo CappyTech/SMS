@@ -5,7 +5,7 @@ const router = express.Router();
 const {
     selectSubcontractor,
     renderInvoiceForm,
-    createInvoice,
+    submitInvoice,
     getAllInvoices
 } = require('../controllers/invoice');
 
@@ -16,7 +16,7 @@ router.get('/invoice/select', selectSubcontractor);
 router.get('/invoice/create/:selected', renderInvoiceForm);
 
 // Handle the submission of the invoice
-router.post('/invoice/create', createInvoice);
+router.post('/invoice/submit/:selected', submitInvoice);
 
 // Fetch all invoices
 router.get('/invoices', getAllInvoices);
