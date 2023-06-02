@@ -1,4 +1,13 @@
 <!-- views/index.ejs: -->
+
+<% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+<br>
+<div class="alert alert-success alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= successMessage %>
+</div>
+<% } %>
+
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -44,4 +53,13 @@
         </div>
     </div>
 </div>
+
+<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
+<br>
+<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <% errorMessages.forEach(errorMessage => { %>
+    <div><%= errorMessage %></div>
+    <% }) %>
 </div>
+<% } %>
