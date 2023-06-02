@@ -52,9 +52,9 @@ const Invoice = sequelize.define('Invoice', {
         type: DataTypes.DATE,
         allowNull: false,
     },
-    reverseChargeAmount: {
+    reverseCharge: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
     },
 }, {
     paranoid: true, // Add the paranoid option
