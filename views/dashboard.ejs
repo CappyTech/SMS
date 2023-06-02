@@ -17,30 +17,30 @@
 <a href="/register" class="btn btn-secondary mt-3">Register</a>
 <% } else { %>
 <ul class="list-group">
-    <% records.forEach(record => { %>
+    <% Invoice.forEach(Invoice => { %>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-        <a href="/view/<%= record.id %>" data-bs-toggle="tooltip" data-bs-placement="right"
-            data-bs-title="View Item: <%= record.id %>"><%= record.title %></a>
+        <a href="/view/<%= Invoice.id %>" data-bs-toggle="tooltip" data-bs-placement="right"
+            data-bs-title="View Item: <%= Invoice.id %>"><%= Invoice.title %></a>
         <div class="d-grid gap-2 d-md-block">
-            <div data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Edit Item: <%= record.id %>">
+            <div data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Edit Item: <%= Invoice.id %>">
                 <div>
-                    <a href="/edit/<%= record.id %>" class="btn btn-info btn-sm me-2"><i
+                    <a href="/edit/<%= Invoice.id %>" class="btn btn-info btn-sm me-2"><i
                             class="bi bi-pencil-fill"></i></a>
                 </div>
             </div>
-            <div data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Delete Item: <%= record.id %>">
+            <div data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Delete Item: <%= Invoice.id %>">
                 <a href="#" class="btn btn-danger btn-sm me-2" data-bs-toggle="modal"
-                    data-bs-target="#deleteModal<%= record.id %>" data-record-id="<%= record.id %>"><i
+                    data-bs-target="#deleteModal<%= Invoice.id %>" data-record-id="<%= Invoice.id %>"><i
                         class="bi bi-trash-fill"></i></a>
             </div>
         </div>
     </li>
-    <div class="modal fade" id="deleteModal<%= record.id %>" tabindex="-1"
-        aria-labelledby="deleteModalLabel<%= record.id %>" aria-hidden="true">
+    <div class="modal fade" id="deleteModal<%= Invoice.id %>" tabindex="-1"
+        aria-labelledby="deleteModalLabel<%= Invoice.id %>" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel<%= record.id %>"><i class="bi bi-heartbreak-fill"></i>
+                    <h5 class="modal-title" id="deleteModalLabel<%= Invoice.id %>"><i class="bi bi-heartbreak-fill"></i>
                         Are you
                         sure?
                     </h5>
@@ -50,23 +50,23 @@
                     <p>Are you sure you want to delete this record?</p>
                     <div class="mb-3">
                         <label for="title" class="form-label">Item ID:</label>
-                        <input type="text" class="form-control" id="id" name="id" value="<%= record.id %>" disabled>
+                        <input type="text" class="form-control" id="id" name="id" value="<%= Invoice.id %>" disabled>
                     </div>
                     <div class="mb-3">
                         <label for="title" class="form-label">Title:</label>
-                        <input type="text" class="form-control" id="title" name="title" value="<%= record.title %>"
+                        <input type="text" class="form-control" id="title" name="title" value="<%= Invoice.title %>"
                             disabled>
                     </div>
                     <div class="mb-3">
                         <label for="description" class="form-label">Description:</label>
                         <textarea class="form-control" id="description" name="description" rows="3"
-                            disabled><%= record.description %></textarea>
+                            disabled><%= Invoice.description %></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
                             class="bi bi-emoji-heart-eyes-fill"></i> Cancel</button>
-                    <form id="deleteForm<%= record.id %>" action="/delete/<%= record.id %>" method="POST">
+                    <form id="deleteForm<%= Invoice.id %>" action="/delete/<%= Invoice.id %>" method="POST">
                         <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Delete</button>
                     </form>
                 </div>
