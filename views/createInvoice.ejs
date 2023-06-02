@@ -1,51 +1,95 @@
+<!-- views/createInvoice.ejs: -->
 <h1>Create Invoice</h1>
 
-<form action="/invoices/create" method="POST">
-    <div>
-        <label for="invoiceNumber">Invoice Number:</label>
-        <input type="text" id="invoiceNumber" name="invoiceNumber" required>
-    </div>
-    <div>
-        <label for="kashflowNumber">Kashflow Number:</label>
-        <input type="text" id="kashflowNumber" name="kashflowNumber" required>
-    </div>
-    <div>
-        <label for="invoiceDate">Invoice Date:</label>
-        <input type="date" id="invoiceDate" name="invoiceDate" required>
-    </div>
-    <div>
-        <label for="remittanceDate">Remittance Date:</label>
-        <input type="date" id="remittanceDate" name="remittanceDate" required>
-    </div>
-    <div>
-        <label for="grossAmount">Gross Amount:</label>
-        <input type="number" id="grossAmount" name="grossAmount" required>
-    </div>
-    <div>
-        <label for="labourCost">Labour Cost:</label>
-        <input type="number" id="labourCost" name="labourCost" required>
-    </div>
-    <div>
-        <label for="materialCost">Material Cost:</label>
-        <input type="number" id="materialCost" name="materialCost" required>
-    </div>
-    <div>
-        <label for="cisAmount">CIS Amount:</label>
-        <input type="number" id="cisAmount" name="cisAmount" required>
-    </div>
-    <div>
-        <label for="netAmount">Net Amount:</label>
-        <input type="number" id="netAmount" name="netAmount" required>
-    </div>
-    <div>
-        <label for="submissionDate">Submission Date:</label>
-        <input type="date" id="submissionDate" name="submissionDate" required>
-    </div>
-    <div>
-        <label for="reverseChargeAmount">Reverse Charge Amount:</label>
-        <input type="number" id="reverseChargeAmount" name="reverseChargeAmount" required>
-    </div>
-    <div>
-        <input type="submit" value="Create Invoice">
-    </div>
+<form action="/invoice/create" method="POST" class="needs-validation">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><label for="subcontractorId">Subcontractor:</label></td>
+                <td>
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group">
+                                <select id="subcontractorId" name="subcontractorId" class="form-select" required>
+                                    <option value="<%= subcontractor.id %>"><%= subcontractor.name %></option>
+                                </select>
+                                <button id="addSubcontractorButton" type="button" class="btn btn-primary">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="invoiceNumber">Invoice Number:</label></td>
+                <td><input type="text" id="invoiceNumber" name="invoiceNumber" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="kashflowNumber">Kashflow Number:</label></td>
+                <td><input type="text" id="kashflowNumber" name="kashflowNumber" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="invoiceDate">Invoice Date:</label></td>
+                <td><input type="date" id="invoiceDate" name="invoiceDate" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="remittanceDate">Remittance Date:</label></td>
+                <td><input type="date" id="remittanceDate" name="remittanceDate" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="grossAmount">Gross Amount:</label></td>
+                <td><input type="number" id="grossAmount" name="grossAmount" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="labourCost">Labour Cost:</label></td>
+                <td><input type="number" id="labourCost" name="labourCost" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="materialCost">Material Cost:</label></td>
+                <td><input type="number" id="materialCost" name="materialCost" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="cisAmount">CIS Amount:</label></td>
+                <td><input type="number" id="cisAmount" name="cisAmount" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="netAmount">Net Amount:</label></td>
+                <td><input type="number" id="netAmount" name="netAmount" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="submissionDate">Submission Date:</label></td>
+                <td><input type="date" id="submissionDate" name="submissionDate" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="reverseChargeAmount">Reverse Charge Amount:</label></td>
+                <td><input type="number" id="reverseChargeAmount" name="reverseChargeAmount" class="form-control"
+                        required></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2">
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-file-earmark-plus"></i> Create Invoice
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
 </form>
+<script type="text/javascript">
+    const addSubcontractorButton = document.getElementById('addSubcontractorButton');
+
+    addSubcontractorButton.addEventListener('click', function () {
+        window.location.href = '/subcontractor/create';
+    });
+</script>
+
+</script>
