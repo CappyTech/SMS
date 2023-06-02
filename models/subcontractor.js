@@ -5,11 +5,19 @@ const {
 } = require('sequelize');
 const sequelize = require('../db');
 
-const Subcontractor = sequelize.define('Subcontractor', {
+const Subcontractors = sequelize.define('Subcontractor', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    company: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     line1: {
         type: DataTypes.STRING,
@@ -43,7 +51,7 @@ const Subcontractor = sequelize.define('Subcontractor', {
     },
     onboarded: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
         defaultValue: false,
     },
     onboardedAt: {
@@ -51,8 +59,13 @@ const Subcontractor = sequelize.define('Subcontractor', {
         allowNull: true,
         defaultValue: null,
     },
+    isGross: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
 }, {
-    paranoid: true, // Add the paranoid option
+    paranoid: true,
 });
 
-module.exports = Subcontractor;
+module.exports = Subcontractors;
