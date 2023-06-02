@@ -1,7 +1,15 @@
 <!-- views/createInvoice.ejs: -->
 <h1>Create Invoice</h1>
 
-<form action="/invoice/create" method="POST" class="needs-validation">
+<% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+<br>
+<div class="alert alert-success alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= successMessage %>
+</div>
+<% } %>
+
+<form action="/invoice/submit/<%= subcontractor.id %>" method="POST" class="needs-validation">
     <table class="table">
         <thead>
             <tr>
@@ -17,7 +25,8 @@
                         <div class="col">
                             <div class="input-group">
                                 <select id="subcontractorId" name="subcontractorId" class="form-select" required>
-                                    <option value="<%= subcontractor.id %>"><%= subcontractor.name %></option>
+                                    <option value="<%= subcontractor.id %>"><%= subcontractor.name %> /
+                                        <%= subcontractor.company %></option>
                                 </select>
                                 <button id="addSubcontractorButton" type="button" class="btn btn-primary">+</button>
                             </div>
@@ -27,48 +36,51 @@
             </tr>
             <tr>
                 <td><label for="invoiceNumber">Invoice Number:</label></td>
-                <td><input type="text" id="invoiceNumber" name="invoiceNumber" class="form-control" required></td>
+                <td><input type="text" id="invoiceNumber" name="invoiceNumber" class="form-control"></td>
             </tr>
             <tr>
                 <td><label for="kashflowNumber">Kashflow Number:</label></td>
-                <td><input type="text" id="kashflowNumber" name="kashflowNumber" class="form-control" required></td>
+                <td><input type="text" id="kashflowNumber" name="kashflowNumber" class="form-control"></td>
             </tr>
             <tr>
                 <td><label for="invoiceDate">Invoice Date:</label></td>
-                <td><input type="date" id="invoiceDate" name="invoiceDate" class="form-control" required></td>
+                <td><input type="date" id="invoiceDate" name="invoiceDate" class="form-control"></td>
             </tr>
             <tr>
                 <td><label for="remittanceDate">Remittance Date:</label></td>
-                <td><input type="date" id="remittanceDate" name="remittanceDate" class="form-control" required></td>
+                <td><input type="date" id="remittanceDate" name="remittanceDate" class="form-control"></td>
             </tr>
+            <!--
             <tr>
                 <td><label for="grossAmount">Gross Amount:</label></td>
-                <td><input type="number" id="grossAmount" name="grossAmount" class="form-control" required></td>
+                <td><input type="number" id="grossAmount" name="grossAmount" class="form-control"></td>
             </tr>
+            -->
             <tr>
                 <td><label for="labourCost">Labour Cost:</label></td>
-                <td><input type="number" id="labourCost" name="labourCost" class="form-control" required></td>
+                <td><input type="number" id="labourCost" name="labourCost" class="form-control"></td>
             </tr>
             <tr>
                 <td><label for="materialCost">Material Cost:</label></td>
-                <td><input type="number" id="materialCost" name="materialCost" class="form-control" required></td>
+                <td><input type="number" id="materialCost" name="materialCost" class="form-control"></td>
             </tr>
+            <!--
             <tr>
                 <td><label for="cisAmount">CIS Amount:</label></td>
-                <td><input type="number" id="cisAmount" name="cisAmount" class="form-control" required></td>
+                <td><input type="number" id="cisAmount" name="cisAmount" class="form-control"></td>
             </tr>
             <tr>
                 <td><label for="netAmount">Net Amount:</label></td>
-                <td><input type="number" id="netAmount" name="netAmount" class="form-control" required></td>
+                <td><input type="number" id="netAmount" name="netAmount" class="form-control"></td>
             </tr>
+            -->
             <tr>
                 <td><label for="submissionDate">Submission Date:</label></td>
-                <td><input type="date" id="submissionDate" name="submissionDate" class="form-control" required></td>
+                <td><input type="date" id="submissionDate" name="submissionDate" class="form-control"></td>
             </tr>
             <tr>
                 <td><label for="reverseChargeAmount">Reverse Charge Amount:</label></td>
-                <td><input type="number" id="reverseChargeAmount" name="reverseChargeAmount" class="form-control"
-                        required></td>
+                <td><input type="number" id="reverseChargeAmount" name="reverseChargeAmount" class="form-control"></td>
             </tr>
         </tbody>
         <tfoot>
@@ -91,5 +103,12 @@
         window.location.href = '/subcontractor/create';
     });
 </script>
-
-</script>
+<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
+<br>
+<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <% errorMessages.forEach(errorMessage => { %>
+    <div><%= errorMessage %></div>
+    <% }) %>
+</div>
+<% } %>
