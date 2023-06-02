@@ -1,18 +1,24 @@
+// routes/invoice.js
+
 const express = require('express');
 const router = express.Router();
 const {
+    selectSubcontractor,
     renderInvoiceForm,
     createInvoice,
     getAllInvoices
 } = require('../controllers/invoice');
 
-// Render the invoice creation form
-router.get('invoice/create', renderInvoiceForm);
+// Select the subcontractor
+router.get('/invoice/select', selectSubcontractor);
 
-// Handle the submission of the invoice creation form
-router.post('invoice/create', createInvoice);
+// Render the invoice
+router.get('/invoice/create/:selected', renderInvoiceForm);
+
+// Handle the submission of the invoice
+router.post('/invoice/create', createInvoice);
 
 // Fetch all invoices
-router.get('/dashboard', getAllInvoices);
+router.get('/invoices', getAllInvoices);
 
 module.exports = router;
