@@ -72,20 +72,31 @@ const loginUser = async (req, res) => {
 
             if (passwordMatch) {
                 req.session.user = user;
+                const userWithoutPassword = {
+                    user
+                };
+                delete userWithoutPassword.user.password;
+                const userJSON = JSON.stringify(userWithoutPassword);
                 if (user.role === 'admin') {
-                    res.redirect('/admin');
+                    console.log('User Logged in: \n' + userJSON);
+                    return res.redirect('/admin');
                 }
-                res.redirect('/dashboard');
+                if (user.role === 'subcontractor') {
+                    console.log('User Logged in: \n' + userJSON);
+                    return res.redirect('/subcontractor');
+                }
+                console.log('User Logged in: \n' + userJSON);
+                return res.redirect('/dashboard');
             } else {
                 req.flash('error', 'Invalid password');
-                res.redirect('/login');
+                return res.redirect('/login');
             }
         } else {
             req.flash('error', 'Invalid username/email');
-            res.redirect('/login');
+            return res.redirect('/login');
         }
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        return res.status(500).send('Error: ' + error.message);
     }
 };
 
