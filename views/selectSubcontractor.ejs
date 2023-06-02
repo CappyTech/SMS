@@ -1,0 +1,52 @@
+<!-- views/selectSubcontractor.ejs: -->
+<h1>Select Subcontractor</h1>
+
+<form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><label for="subcontractorId">Subcontractor:</label></td>
+                <td>
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group">
+                                <select id="subcontractorId" name="subcontractorId" class="form-select" required>
+                                    <option value="" selected disabled>Select Subcontractor</option>
+                                    <% for (const subcontractor of subcontractors) { %>
+                                    <option value="<%= subcontractor.id %>"><%= subcontractor.name %></option>
+                                    <% } %>
+                                </select>
+                                <button id="addSubcontractorButton" type="button" class="btn btn-primary">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+<script type="text/javascript">
+    const subcontractorIdSelect = document.getElementById('subcontractorId');
+
+    subcontractorIdSelect.addEventListener('change', function () {
+        const selectedSubcontractorId = subcontractorIdSelect.value;
+        if (selectedSubcontractorId) {
+            window.location.href = '/invoice/create/' + selectedSubcontractorId;
+        }
+    });
+
+    const addSubcontractorButton = document.getElementById('addSubcontractorButton');
+
+    addSubcontractorButton.addEventListener('click', function () {
+        window.location.href = '/subcontractor/create';
+    });
+</script>
+
+</script>
