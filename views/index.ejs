@@ -1,3 +1,4 @@
+<!-- views/index.ejs: -->
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -15,11 +16,14 @@
                 <p>SMS ensures accurate record-keeping, regulatory compliance, and
                     communication among project managers, enhancing overall subcontractor management
                     efficiency and transparency.</p>
+                <% if (typeof session.user === 'undefined') { %>
                 <div class="d-grid">
                     <a href="/register" class="btn btn-success" type="button"><i class="bi bi-book"></i>
                         Register</a>
                 </div>
+                <% } %>
                 <hr>
+                <% if (typeof session.user === 'undefined') { %>
                 <form action="/login" method="POST">
                     <h2>Login</h2>
                     <div class="mb-3">
@@ -35,6 +39,7 @@
                             Login</button>
                     </div>
                 </form>
+                <% } %>
             </div>
         </div>
     </div>
