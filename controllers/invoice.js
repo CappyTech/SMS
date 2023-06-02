@@ -1,9 +1,7 @@
 // controllers/invoice.js
 
 const packageJson = require('../package.json');
-const {
-    Invoice
-} = require('../models/invoice');
+const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 
 // Retrieve all subcontractors from the database
@@ -55,48 +53,45 @@ const renderInvoiceForm = async (req, res) => {
 
 
 // Handle the submission of the invoice creation form
-const createInvoice = async (req, res) => {
+const submitInvoice = async (req, res) => {
     try {
         const {
-            subcontractorId,
             invoiceNumber,
             kashflowNumber,
             invoiceDate,
             remittanceDate,
-            grossAmount,
             labourCost,
             materialCost,
-            netAmount,
             submissionDate,
-            reverseChargeAmount,
+            reverseCharge,
         } = req.body;
-
-        // Calculate the CIS amount based on the gross amount status
+        console.log(req.body);
         let cisAmount = 0;
-        const subcontractor = await Subcontractor.findByPk(subcontractorId);
+        let grossAmount = 0;
+        let netAmount = 0;
+        const subcontractor = await Subcontractor.findByPk(req.params.selected);
         if (subcontractor) {
             const {
                 isGross
             } = subcontractor;
             cisAmount = isGross ? 0 : labourCost * 0.2;
+            const grossAmount = 0;
+            const netAmount = labourCost + materialCost + cisAmount;
 
+            await Invoice.create({
+                invoiceNumber,
+                kashflowNumber,
+                invoiceDate,
+                remittanceDate,
+                grossAmount,
+                labourCost,
+                materialCost,
+                cisAmount,
+                netAmount,
+                submissionDate,
+                reverseCharge,
+            });
         }
-
-        // Create a new invoice in the database
-        await Invoice.create({
-            invoiceNumber,
-            kashflowNumber,
-            invoiceDate,
-            remittanceDate,
-            grossAmount,
-            labourCost,
-            materialCost,
-            cisAmount,
-            netAmount,
-            submissionDate,
-            reverseChargeAmount,
-        });
-
         res.send('Invoice created successfully');
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
@@ -122,6 +117,6 @@ const getAllInvoices = async (req, res) => {
 module.exports = {
     selectSubcontractor,
     renderInvoiceForm,
-    createInvoice,
+    submitInvoice,
     getAllInvoices,
 };
