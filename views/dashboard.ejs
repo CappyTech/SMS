@@ -1,6 +1,14 @@
 <!-- views/dashboard.ejs: -->
 <h1>Dashboard</h1>
 
+<% if (typeof message !== 'undefined' && message.length > 0) { %>
+<br>
+<div class="alert alert-infor alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= message %>
+</div>
+<% } %>
+
 <% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
 <br>
 <div class="alert alert-success alert-dismissible fade show p-3" role="alert">
@@ -20,7 +28,7 @@
     <% Invoice.forEach(Invoice => { %>
     <li class="list-group-item d-flex justify-content-between align-items-center">
         <a href="/view/<%= Invoice.id %>" data-bs-toggle="tooltip" data-bs-placement="right"
-            data-bs-title="View Item: <%= Invoice.id %>"><%= Invoice.title %></a>
+            data-bs-title="View Item: <%= Invoice.id %>"><%= Invoice.invoiceNumber %></a>
         <div class="d-grid gap-2 d-md-block">
             <div data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Edit Item: <%= Invoice.id %>">
                 <div>
@@ -49,18 +57,59 @@
                 <div class="modal-body">
                     <p>Are you sure you want to delete this record?</p>
                     <div class="mb-3">
-                        <label for="title" class="form-label">Item ID:</label>
-                        <input type="text" class="form-control" id="id" name="id" value="<%= Invoice.id %>" disabled>
-                    </div>
-                    <div class="mb-3">
-                        <label for="title" class="form-label">Title:</label>
-                        <input type="text" class="form-control" id="title" name="title" value="<%= Invoice.title %>"
+                        <label for="title" class="form-label">Invoice Number:</label>
+                        <input type="text" class="form-control" id="id" name="id" value="<%= Invoice.invoiceNumber %>"
                             disabled>
                     </div>
                     <div class="mb-3">
-                        <label for="description" class="form-label">Description:</label>
-                        <textarea class="form-control" id="description" name="description" rows="3"
-                            disabled><%= Invoice.description %></textarea>
+                        <label for="title" class="form-label">Kashflow Number:</label>
+                        <input type="text" class="form-control" id="id" name="id" value="<%= Invoice.kashflowNumber %>"
+                            disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Invoice Date:</label>
+                        <input type="text" class="form-control" id="id" name="id"
+                            value="<%= slimDateTime(Invoice.invoiceDate) %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Remittance Date:</label>
+                        <input type="text" class="form-control" id="id" name="id"
+                            value="<%= slimDateTime(Invoice.remittanceDate) %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Gross Amount:</label>
+                        <input type="text" class="form-control" id="id" name="id" value="<%= Invoice.grossAmount %>"
+                            disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Labour Cost:</label>
+                        <input type="text" class="form-control" id="id" name="id" value="<%= Invoice.labourCost %>"
+                            disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Material Cost:</label>
+                        <input type="text" class="form-control" id="id" name="id" value="<%= Invoice.materialCost %>"
+                            disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">CIS Amount:</label>
+                        <input type="text" class="form-control" id="id" name="id" value="<%= Invoice.cisAmount %>"
+                            disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">NET Amount:</label>
+                        <input type="text" class="form-control" id="id" name="id" value="<%= Invoice.netAmount %>"
+                            disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Submission Date:</label>
+                        <input type="text" class="form-control" id="id" name="id"
+                            value="<%= slimDateTime(Invoice.submissionDate) %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Reverse Charge Amount:</label>
+                        <input type="text" class="form-control" id="id" name="id"
+                            value="<%= Invoice.reverseChargeAmount %>" disabled>
                     </div>
                 </div>
                 <div class="modal-footer">
