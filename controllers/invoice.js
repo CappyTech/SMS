@@ -4,21 +4,15 @@ const packageJson = require('../package.json');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 
-// Retrieve all subcontractors from the database
-const getAllSubcontractors = async () => {
-    try {
-        const subcontractors = await Subcontractor.findAll();
-        return subcontractors;
-    } catch (error) {
-        throw new Error('Error retrieving subcontractors: ' + error.message);
-    }
-};
-
 // Display the invoice creation form
 const selectSubcontractor = async (req, res) => {
     try {
 
-        const subcontractors = await getAllSubcontractors();
+        const subcontractors = await Subcontractor.findAll();
+
+        if (subcontractors.length === 0) {
+            return res.redirect('/subcontractor/create?message=No subcontractors exist');
+        }
 
         res.render('selectSubcontractor', {
             errorMessages: req.flash('error'),
@@ -26,6 +20,7 @@ const selectSubcontractor = async (req, res) => {
             session: req.session,
             packageJson,
             subcontractors,
+            message: req.query.message || '',
         });
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
@@ -37,12 +32,16 @@ const renderInvoiceForm = async (req, res) => {
     try {
         if (req.params.selected) {
             const subcontractor = await Subcontractor.findByPk(req.params.selected);
-            return res.render('createInvoice', {
+            if (!subcontractor) {
+                return res.redirect('/subcontractor/create?message=No subcontractors exist');
+            }
+            res.render('createInvoice', {
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
                 session: req.session,
                 packageJson,
                 subcontractor,
+                message: req.query.message || '',
             });
         }
         return res.send('Subcontractor not found');
@@ -75,8 +74,8 @@ const submitInvoice = async (req, res) => {
                 isGross
             } = subcontractor;
             cisAmount = isGross ? 0 : labourCost * 0.2;
-            const grossAmount = 0;
-            const netAmount = labourCost + materialCost + cisAmount;
+            grossAmount = labourCost + materialCost + cisAmount;
+            netAmount = grossAmount;
 
             await Invoice.create({
                 invoiceNumber,
@@ -108,11 +107,13 @@ const getAllInvoices = async (req, res) => {
             successMessage: req.flash('success'),
             session: req.session,
             packageJson,
+            message: req.query.message || '',
         });
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
     }
 };
+
 
 module.exports = {
     selectSubcontractor,
