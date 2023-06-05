@@ -1,6 +1,14 @@
 <!-- views/createInvoice.ejs: -->
 <h1>Create Invoice</h1>
 
+<% if (typeof message !== 'undefined' && message.length > 0) { %>
+<br>
+<div class="alert alert-infor alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= message %>
+</div>
+<% } %>
+
 <% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
 <br>
 <div class="alert alert-success alert-dismissible fade show p-3" role="alert">
@@ -11,12 +19,6 @@
 
 <form action="/invoice/submit/<%= subcontractor.id %>" method="POST" class="needs-validation">
     <table class="table">
-        <thead>
-            <tr>
-                <th>Field</th>
-                <th>Value</th>
-            </tr>
-        </thead>
         <tbody>
             <tr>
                 <td><label for="subcontractorId">Subcontractor:</label></td>
