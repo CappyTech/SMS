@@ -28,7 +28,8 @@
                                 <select id="subcontractorId" name="subcontractorId" class="form-select" required>
                                     <option value="" selected disabled>Select Subcontractor</option>
                                     <% for (const subcontractor of subcontractors) { %>
-                                    <option value="<%= subcontractor.id %>"><%= subcontractor.name %></option>
+                                    <option value="<%= subcontractor.id %>"><%= subcontractor.name %> /
+                                        <%= subcontractor.company %></option>
                                     <% } %>
                                 </select>
                                 <button id="addSubcontractorButton" type="button" class="btn btn-primary">+</button>
