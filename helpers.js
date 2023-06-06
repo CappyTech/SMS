@@ -3,13 +3,12 @@
 function slimDateTime(dateString) {
     const date = new Date(dateString);
     const options = {
+        day: '2-digit',
+        month: '2-digit',
         year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric'
     };
-    return date.toLocaleString('en-GB', options);
+    const formattedDate = date.toLocaleDateString('en-GB', options);
+    return formattedDate.replace(/\//g, '/');
 }
 
 module.exports = {
