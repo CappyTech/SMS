@@ -1,0 +1,61 @@
+<h1>Invoices</h1>
+
+<% if (typeof message !== 'undefined' && message.length > 0) { %>
+<br>
+<div class="alert alert-infor alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= message %>
+</div>
+<% } %>
+
+<% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+<br>
+<div class="alert alert-success alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= successMessage %>
+</div>
+<% } %>
+
+<% subcontractors.forEach(subcontractor => { %>
+<h4><%= subcontractor.name %> <small>/</small> <%= subcontractor.company %>:</h4>
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Invoice Number</th>
+            <th>Kashflow Number</th>
+            <th>Labour Cost</th>
+            <th>Material Cost</th>
+            <th>Gross Amount</th>
+            <th>CIS Deduction</th>
+            <th>Net Amount</th>
+            <% if (subcontractor.isGross) { %>
+            <th>Reverse Charge</th>
+            <% } %>
+            <th>Submission Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% subcontractor.Invoices.forEach(invoice => { %>
+        <tr>
+            <td><%= invoice.invoiceNumber %></td>
+            <td><%= invoice.kashflowNumber %></td>
+            <td><%= invoice.labourCost !== null ? (invoice.labourCost !== 0 ? '£' + invoice.labourCost.toLocaleString('en-GB', { minimumFractionDigits: 2 }) : '£0.00') : '' %>
+            </td>
+            <td><%= invoice.materialCost !== null ? (invoice.materialCost !== 0 ? '£' + invoice.materialCost.toLocaleString('en-GB', { minimumFractionDigits: 2 }) : '£0.00') : '' %>
+            </td>
+            <td><%= invoice.grossAmount !== null ? (invoice.grossAmount !== 0 ? '£' + invoice.grossAmount.toLocaleString('en-GB', { minimumFractionDigits: 2 }) : '£0.00') : '' %>
+            </td>
+            <td><%= invoice.cisAmount !== null ? (invoice.cisAmount !== 0 ? '£' + invoice.cisAmount.toLocaleString('en-GB', { minimumFractionDigits: 2 }) : '£0.00') : '' %>
+            </td>
+            <td><%= invoice.netAmount !== null ? (invoice.netAmount !== 0 ? '£' + invoice.netAmount.toLocaleString('en-GB', { minimumFractionDigits: 2 }) : '£0.00') : '' %>
+            </td>
+            <% if (subcontractor.isGross) { %>
+            <td><%= invoice.reverseCharge !== null ? (invoice.reverseCharge !== 0 ? '£' + invoice.reverseCharge.toLocaleString('en-GB', { minimumFractionDigits: 2 }) : '£0.00') : '' %>
+            </td>
+            <% } %>
+            <td><%= slimDateTime(invoice.submissionDate) %></td>
+        </tr>
+        <% }) %>
+    </tbody>
+</table>
+<% }) %>
