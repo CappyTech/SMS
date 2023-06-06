@@ -6,7 +6,7 @@ const {
     selectSubcontractor,
     renderInvoiceForm,
     submitInvoice,
-    getAllInvoices
+    getAllInvoices,
 } = require('../controllers/invoice');
 
 // Select the subcontractor
@@ -18,7 +18,7 @@ router.get('/invoice/create/:selected', renderInvoiceForm);
 // Handle the submission of the invoice
 router.post('/invoice/submit/:selected', submitInvoice);
 
-// Fetch all invoices
+// Handle the submission of the invoice
 router.get('/invoices', getAllInvoices);
 
 module.exports = router;
