@@ -1,0 +1,50 @@
+<!-- views/enable2FA.ejs -->
+<h1>Enable 2FA</h1>
+
+<% if (typeof message !== 'undefined' && message.length > 0) { %>
+<br>
+<div class="alert alert-infor alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= message %>
+</div>
+<% } %>
+
+<% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+<br>
+<div class="alert alert-success alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= successMessage %>
+</div>
+<% } %>
+
+<p>Scan the QR code using an authenticator app or enter the code manually to enable 2FA.</p>
+
+<div class="mb-3 text-center">
+    <img src="<%= qrCodeDataURL %>" alt="QR Code" class="img-fluid">
+</div>
+
+<p>After scanning the QR code or entering the code manually, click the button to enable 2FA:</p>
+
+<form action="/account/enable2fa" method="POST">
+    <div class="mb-3">
+        <label for="otpCode" class="form-label">Authenticator Code:</label>
+        <input type="text" name="otpCode" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="manualCode" class="form-label">Manual Code:</label>
+        <input type="text" name="manualCode" class="form-control" value="<%= manualCode %>" readonly>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enable 2FA</button>
+</form>
+
+<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
+<br>
+<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <% errorMessages.forEach(errorMessage => { %>
+    <div><%= errorMessage %></div>
+    <% }) %>
+</div>
+<% } %>
