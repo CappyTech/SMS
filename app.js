@@ -98,6 +98,7 @@ app.use(
             imgSrc: [
                 "'self'",
                 "data:",
+                "otpauth:",
                 "https://i.creativecommons.org",
                 "https://licensebuttons.net",
             ],
@@ -105,6 +106,7 @@ app.use(
         },
     })
 );
+
 
 const {
     Op
@@ -144,9 +146,18 @@ const createDefaultAdmin = async () => {
 const User = require('./models/user');
 const Subcontractor = require('./models/subcontractor');
 const Invoice = require('./models/invoice');
-User.hasOne(Subcontractor);
-Subcontractor.hasMany(Invoice);
-Invoice.belongsTo(Subcontractor);
+User.hasMany(Subcontractor, {
+    foreignKey: 'userId',
+    allowNull: false,
+});
+Subcontractor.hasMany(Invoice, {
+    foreignKey: 'subcontractorId',
+    allowNull: false,
+});
+Invoice.belongsTo(Subcontractor, {
+    foreignKey: 'subcontractorId',
+    allowNull: false,
+});
 (async () => {
     try {
         await User.sync();
