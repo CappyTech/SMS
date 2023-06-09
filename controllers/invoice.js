@@ -8,6 +8,7 @@ const helpers = require('../helpers');
 // Display the invoice creation form
 const selectSubcontractor = async (req, res) => {
     try {
+        console.log(req.session);
         let subcontractors;
         if (req.session.user.role === 'admin') {
             subcontractors = await Subcontractor.findAll({});
@@ -40,6 +41,7 @@ const selectSubcontractor = async (req, res) => {
 // Display the invoice creation form
 const renderInvoiceForm = async (req, res) => {
     try {
+        console.log(req.session);
         if (req.params.selected) {
             const subcontractor = await Subcontractor.findByPk(req.params.selected);
             if (!subcontractor) {
@@ -83,20 +85,25 @@ const submitInvoice = async (req, res) => {
         }
 
         if (subcontractor.isGross) {
-            const cisAmount = 0;
-            const netAmount = labourCost + materialCost;
-            const grossAmount = labourCost + materialCost;
+            if (materialCost <= 0) {
+                const netAmount = labourCost;
+                const grossAmount = labourCost;
+            } else {
+                const cisAmount = 0;
+                const netAmount = labourCost + materialCost;
+                const grossAmount = labourCost + materialCost;
+            }
 
             const invoice = await Invoice.create({
                 invoiceNumber,
                 kashflowNumber,
                 invoiceDate,
                 remittanceDate,
-                grossAmount,
+                grossAmountDivided,
                 labourCost,
                 materialCost,
                 cisAmount,
-                netAmount,
+                netAmountDivided,
                 submissionDate,
                 SubcontractorId: subcontractor.id,
             });
@@ -106,9 +113,14 @@ const submitInvoice = async (req, res) => {
 
             return res.send('Invoice created successfully');
         } else {
-            const cisAmount = labourCost * 0.2;
-            const netAmount = labourCost + materialCost - cisAmount;
-            const grossAmount = labourCost + materialCost;
+            if (materialCost <= 0) {
+                const cisAmount = labourCost * 0.2;
+                const netAmount = labourCost - cisAmount;
+            } else {
+                const cisAmount = labourCost * 0.2;
+                const netAmount = labourCost + materialCost - cisAmount;
+                const grossAmount = labourCost + materialCost;
+            }
 
             const invoice = await Invoice.create({
                 invoiceNumber,
