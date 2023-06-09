@@ -18,41 +18,44 @@ const renderIndex = (req, res) => {
 
 const renderDashboard = async (req, res) => {
     try {
+        console.log(req.session);
         if (req.session.user) {
             const users = await User.findAll({
                 where: {
-                    id: req.session.user.id
-                }
+                    id: req.session.user.id,
+                },
             });
+
             const subcontractors = await Subcontractor.findAll({
                 where: {
-                    userId: req.session.user.id
-                }
+                    userId: req.session.user.id,
+                },
             });
 
-            const subcontractor = subcontractors[0];
-
-            if (subcontractor) {
-                const subcontractorId = subcontractor.userId;
+            if (subcontractors.length > 0) {
+                const subcontractorId = subcontractors[0].id; // Retrieve the correct subcontractorId
                 const invoices = await Invoice.findAll({
                     where: {
-                        subcontractorId: subcontractorId
-                    }
+                        subcontractorId: subcontractorId,
+                    },
                 });
+
                 const userCount = await User.count({
                     where: {
-                        id: req.session.user.id
-                    }
+                        id: req.session.user.id,
+                    },
                 });
+
                 const subcontractorCount = await Subcontractor.count({
                     where: {
-                        userId: req.session.user.id
-                    }
+                        userId: req.session.user.id,
+                    },
                 });
+
                 const invoiceCount = await Invoice.count({
                     where: {
-                        subcontractorId: subcontractorId
-                    }
+                        subcontractorId: subcontractorId,
+                    },
                 });
 
                 res.render('dashboard', {
