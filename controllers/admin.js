@@ -68,8 +68,7 @@ const deleteSubcontractor = async (req, res) => {
             return res.status(403).send('Access denied. Only admins can delete subcontractors.');
         }
 
-        const subcontractorId = req.params.id;
-        const subcontractor = await Subcontractor.findByPk(subcontractorId);
+        const subcontractor = await Subcontractor.findByPk(req.params.id);
 
         if (!subcontractor) {
             return res.status(404).send('Subcontractor not found');
@@ -85,19 +84,16 @@ const deleteSubcontractor = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const userId = req.params.id;
-
+        // Check if the user is an admin
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied. Only admins can delete users.');
+        }
         // Check if the user is trying to delete their own account
         if (req.session.user.id === userId) {
             return res.status(403).send('Access denied. You cannot delete your own account.');
         }
 
-        // Check if the user is an admin
-        if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can delete users.');
-        }
-
-        const user = await User.findByPk(userId);
+        const user = await User.findByPk(req.params.id);
 
         if (!user) {
             return res.status(404).send('User not found');
