@@ -1,17 +1,27 @@
 // controllers/onboarding.js
 const packageJson = require('../package.json');
 const {
+    User
+} = require('../models/user');
+const {
     Subcontractor
 } = require('../models/subcontractor');
 
-const renderOnboardingForm = (req, res) => {
-    res.render('onboarding', {
-        errorMessages: req.flash('error'),
-        successMessage: req.flash('success'),
-        session: req.session,
-        packageJson,
-        message: req.query.message || '',
-    });
+const renderOnboardingForm = async (req, res) => {
+    try {
+        console.log(req.session);
+        const sessionUser = await User.findByPk(req.session.user.id);
+        res.render('onboarding', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            message: req.query.message || '',
+            sessionUser,
+        });
+    } catch (error) {
+        res.status(500).send('Error: ' + error.message);
+    }
 };
 
 const submitOnboardingForm = async (req, res) => {
@@ -21,7 +31,11 @@ const submitOnboardingForm = async (req, res) => {
             utrNumber
         } = req.body;
 
-        const sessionUser = await Subcontractor.findByPk(req.session.user.id);
+        const sessionUser = await Subcontractor.findByPk({
+            where: {
+                UserId: req.session.user.id
+            }
+        });
         if (sessionUser) {
             sessionUser.cisNumber = cisNumber;
             sessionUser.utrNumber = utrNumber;
