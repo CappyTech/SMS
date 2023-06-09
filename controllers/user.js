@@ -4,6 +4,7 @@ const packageJson = require('../package.json');
 const {
     Op
 } = require("sequelize");
+const speakeasy = require('speakeasy');
 
 const renderRegistrationForm = (req, res) => {
     res.render('register', {
@@ -17,6 +18,9 @@ const renderRegistrationForm = (req, res) => {
 
 const registerUser = async (req, res) => {
     try {
+        const secret = speakeasy.generateSecret({
+            length: 20
+        });
         const {
             username,
             email,
@@ -30,6 +34,7 @@ const registerUser = async (req, res) => {
             email,
             password,
             role,
+            twoFactorSecret: secret.base32,
         });
 
         res.send('Registration successful');
@@ -52,7 +57,8 @@ const loginUser = async (req, res) => {
     try {
         const {
             usernameOrEmail,
-            password
+            password,
+            enteredCode
         } = req.body;
 
         // Find the user by username or email
@@ -73,22 +79,38 @@ const loginUser = async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, user.password);
 
             if (passwordMatch) {
-                req.session.user = user;
-                const userWithoutPassword = {
-                    user
-                };
-                delete userWithoutPassword.user.password;
-                const userJSON = JSON.stringify(userWithoutPassword);
-                if (user.role === 'admin') {
+                const speakeasy = require('speakeasy');
+
+                // Verify the entered code against the user's secret key
+                const verified = speakeasy.totp.verify({
+                    secret: user.twoFactorSecret,
+                    encoding: 'base32',
+                    token: enteredCode,
+                    window: 1,
+                });
+
+                if (verified || !user.twoFactorEnabled) {
+                    req.session.user = user;
+                    req.session.user.role = user.role;
+                    const userWithoutPassword = {
+                        user
+                    };
+                    delete userWithoutPassword.user.password;
+                    const userJSON = JSON.stringify(userWithoutPassword);
+                    if (user.role === 'admin') {
+                        console.log('Admin Logged in: \n' + userJSON);
+                        return res.redirect('/dashboard');
+                    }
+                    if (user.role === 'subcontractor') {
+                        console.log('Subcontractor Logged in: \n' + userJSON);
+                        return res.redirect('/dashboard');
+                    }
                     console.log('User Logged in: \n' + userJSON);
-                    return res.redirect('/admin');
+                    return res.redirect('/dashboard');
+                } else {
+                    req.flash('error', 'Invalid 2FA code.');
+                    return res.redirect('/login');
                 }
-                if (user.role === 'subcontractor') {
-                    console.log('User Logged in: \n' + userJSON);
-                    return res.redirect('/subcontractor');
-                }
-                console.log('User Logged in: \n' + userJSON);
-                return res.redirect('/dashboard');
             } else {
                 req.flash('error', 'Invalid password');
                 return res.redirect('/login');
