@@ -9,6 +9,7 @@ const helpers = require('../helpers');
 // Render the admin dashboard
 const renderAdminDashboard = async (req, res) => {
     try {
+        console.log(req.session);
         const userCount = await User.count();
         const subcontractorCount = await Subcontractor.count();
         const invoiceCount = await Invoice.count();
@@ -107,9 +108,59 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const assignUserToSubcontractor = async (req, res) => {
+    try {
+        const {
+            subcontractorId,
+            userId
+        } = req.body;
+
+        // Find the subcontractor and user based on their IDs
+        const subcontractor = await Subcontractor.findByPk(subcontractorId);
+        const user = await User.findByPk(userId);
+
+        if (!subcontractor || !user) {
+            return res.status(404).send('Subcontractor or user not found');
+        }
+
+        // Assign the user to the subcontractor
+        subcontractor.UserId = user.id;
+        await subcontractor.save();
+
+        res.redirect('/admin');
+    } catch (error) {
+        res.status(500).send('Error: ' + error.message);
+    }
+};
+
+const unassignUserFromSubcontractor = async (req, res) => {
+    try {
+        const {
+            subcontractorId
+        } = req.body;
+
+        // Find the subcontractor based on the ID
+        const subcontractor = await Subcontractor.findByPk(subcontractorId);
+
+        if (!subcontractor) {
+            return res.status(404).send('Subcontractor not found');
+        }
+
+        // Unassign the user from the subcontractor
+        subcontractor.UserId = null;
+        await subcontractor.save();
+
+        res.redirect('/admin');
+    } catch (error) {
+        res.status(500).send('Error: ' + error.message);
+    }
+};
+
 module.exports = {
     renderAdminDashboard,
     deleteInvoice,
     deleteSubcontractor,
     deleteUser,
+    assignUserToSubcontractor,
+    unassignUserFromSubcontractor,
 };
