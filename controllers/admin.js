@@ -9,6 +9,10 @@ const helpers = require('../helpers');
 // Render the admin dashboard
 const renderAdminDashboard = async (req, res) => {
     try {
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
+
         console.log(req.session);
         const userCount = await User.count();
         const subcontractorCount = await Subcontractor.count();
