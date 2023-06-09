@@ -5,13 +5,19 @@ const Subcontractor = require('../models/subcontractor');
 
 // Render the subcontractor creation form
 const renderSubcontractorForm = (req, res) => {
-    res.render('createSubcontractor', {
-        errorMessages: req.flash('error'),
-        successMessage: req.flash('success'),
-        session: req.session,
-        packageJson,
-        message: req.query.message || '',
-    });
+
+    if (req.session.user.role === 'admin') {
+
+        res.render('createSubcontractor', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            message: req.query.message || '',
+        });
+    } else {
+        return res.status(403).send('Access denied. Only admins can create subcontractors.');
+    }
 };
 
 // Handle the submission of the subcontractor creation form
