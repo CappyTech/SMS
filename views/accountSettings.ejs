@@ -1,18 +1,57 @@
 <!-- views/accountSettings.ejs -->
+
 <h1>Account Settings</h1>
+
+<% if (typeof message !== 'undefined' && message.length > 0) { %>
+<br>
+<div class="alert alert-infor alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= message %>
+</div>
+<% } %>
+
+<% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+<br>
+<div class="alert alert-success alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <%= successMessage %>
+</div>
+<% } %>
 
 <form action="/account/settings" method="POST">
     <div class="mb-3">
-        <label for="name" class="form-label">Username:</label>
-        <input type="text" class="form-control" name="username" value="<%= user.username %>" required>
+        <label for="username" class="form-label">Username:</label>
+        <input type="text" name="newUsername" value="<%= user.username %>" class="form-control" required>
     </div>
 
     <div class="mb-3">
         <label for="email" class="form-label">Email:</label>
-        <input type="email" class="form-control" name="email" value="<%= user.email %>" required>
+        <input type="email" name="newEmail" value="<%= user.email %>" class="form-control" required>
     </div>
 
     <!-- Add any other fields for account settings -->
 
-    <button type="submit" class="btn btn-primary">Update Settings</button>
+    <div class="mb-3 form-check">
+        <input type="checkbox" name="enable2FA" id="enable2FA" class="form-check-input"
+            <% if (user.twoFactorSecret) { %>checked<% } %>>
+        <label for="enable2FA" class="form-check-label">Enable 2FA</label>
+    </div>
+
+    <% if (!user.twoFactorSecret) { %>
+    <a href="/account/enable2fa" class="btn btn-primary">Setup 2FA</a>
+    <% } %>
+
+    <button type="submit"
+        class="btn <% if (!user.twoFactorSecret) { %>btn-secondary<% } else { %>btn-primary<% } %>">Update
+        Settings</button>
 </form>
+
+<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
+<br>
+<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <% errorMessages.forEach(errorMessage => { %>
+    <div><%= errorMessage %></div>
+    <% }) %>
+</div>
+<% } %>
