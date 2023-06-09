@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Subcontractor = require('../models/subcontractor');
 const bcrypt = require('bcrypt');
 const packageJson = require('../package.json');
 const {
@@ -7,6 +8,7 @@ const {
 const speakeasy = require('speakeasy');
 
 const renderRegistrationForm = (req, res) => {
+    console.log(req.session);
     res.render('register', {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
@@ -37,13 +39,14 @@ const registerUser = async (req, res) => {
             twoFactorSecret: secret.base32,
         });
 
-        res.send('Registration successful');
+        res.redirect('/onboarding')
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
     }
 };
 
 const renderLoginForm = (req, res) => {
+    console.log(req.session);
     res.render('login', {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
@@ -74,6 +77,12 @@ const loginUser = async (req, res) => {
             },
         });
 
+        const subcontractors = await Subcontractor.count({
+            where: {
+                userId: user.id,
+            },
+        });
+
         // If user is found, compare passwords
         if (user) {
             const passwordMatch = await bcrypt.compare(password, user.password);
@@ -91,7 +100,7 @@ const loginUser = async (req, res) => {
 
                 if (verified || !user.twoFactorEnabled) {
                     req.session.user = user;
-                    req.session.user.role = user.role;
+                    req.session.user.subcontractors = subcontractors;
                     const userWithoutPassword = {
                         user
                     };
