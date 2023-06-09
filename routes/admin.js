@@ -7,7 +7,9 @@ const {
     renderAdminDashboard,
     deleteInvoice,
     deleteSubcontractor,
-    deleteUser
+    deleteUser,
+    assignUserToSubcontractor,
+    unassignUserFromSubcontractor,
 } = require('../controllers/admin');
 
 
@@ -19,7 +21,10 @@ router.get('/invoice/delete/:id', deleteInvoice);
 router.get('/subcontractor/delete/:id', deleteSubcontractor);
 // Delete a user
 router.get('/user/delete/:id', deleteUser);
-
+// Handle user-subcontractor assignment
+router.post('/assign', assignUserToSubcontractor);
+// Handle user-subcontractor unassignment
+router.post('/unassign', unassignUserFromSubcontractor);
 
 
 module.exports = router;
