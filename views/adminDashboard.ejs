@@ -78,8 +78,8 @@
             <th>Name</th>
             <th>Company</th>
             <th>CIS Number</th>
-            <th>Actions</th>
             <th>User ID</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -101,6 +101,35 @@
                 </div>
             </td>
         </tr>
+        <!-- Invoices for the current subcontractor -->
+        <% const subcontractorInvoices = invoices.filter(invoice => invoice.subcontractorId === subcontractor.id); %>
+        <% subcontractorInvoices.forEach(invoice => { %>
+        <tr>
+            <td><%= invoice.id %></td>
+            <td><%= invoice.invoiceNumber %></td>
+            <td><%= invoice.kashflowNumber %></td>
+            <td><%= slimDateTime(invoice.invoiceDate) %></td>
+            <td><%= slimDateTime(invoice.remittanceDate) %></td>
+            <td><%= invoice.grossAmount %></td>
+            <td><%= invoice.labourCost %></td>
+            <td><%= invoice.materialCost %></td>
+            <td><%= invoice.cisAmount %></td>
+            <td><%= invoice.netAmount %></td>
+            <td><%= slimDateTime(invoice.submissionDate) %></td>
+            <td><%= invoice.reverseCharge %></td>
+            <td><%= invoice.subcontractorId %></td>
+            <td>
+                <div class="row">
+                    <div class="col">
+                        <a href="/admin/invoice/edit/<%= invoice.id %>" class="btn btn-primary">Edit</a>
+                    </div>
+                    <div class="col">
+                        <a href="/admin/invoice/delete/<%= invoice.id %>" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <% }); %>
         <% }); %>
     </tbody>
 </table>
@@ -122,8 +151,8 @@
             <th>Net Amount</th>
             <th>Submission Date</th>
             <th>Reverse Charge</th>
-            <th>Actions</th>
             <th>Subcontractor ID</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
