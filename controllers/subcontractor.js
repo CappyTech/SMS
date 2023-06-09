@@ -5,7 +5,7 @@ const Subcontractor = require('../models/subcontractor');
 
 // Render the subcontractor creation form
 const renderSubcontractorForm = (req, res) => {
-
+    console.log(req.session);
     if (req.session.user.role === 'admin') {
 
         res.render('createSubcontractor', {
