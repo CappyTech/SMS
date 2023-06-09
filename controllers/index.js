@@ -1,6 +1,7 @@
 // controllers/index.js
 
 const packageJson = require('../package.json');
+const User = require('../models/user');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const helpers = require('../helpers');
@@ -18,20 +19,59 @@ const renderIndex = (req, res) => {
 const renderDashboard = async (req, res) => {
     try {
         if (req.session.user) {
-
-            const subcontractors = await Subcontractor.findAll();
-            const invoices = await Invoice.findAll();
-
-            res.render('dashboard', {
-                errorMessages: req.flash('error'),
-                successMessage: req.flash('success'),
-                session: req.session,
-                packageJson,
-                message: req.query.message || '',
-                slimDateTime: helpers.slimDateTime,
-                Invoice: invoices,
-                Subcontractor: subcontractors,
+            const users = await User.findAll({
+                where: {
+                    id: req.session.user.id
+                }
             });
+            const subcontractors = await Subcontractor.findAll({
+                where: {
+                    userId: req.session.user.id
+                }
+            });
+
+            const subcontractor = subcontractors[0];
+
+            if (subcontractor) {
+                const subcontractorId = subcontractor.userId;
+                const invoices = await Invoice.findAll({
+                    where: {
+                        subcontractorId: subcontractorId
+                    }
+                });
+                const userCount = await User.count({
+                    where: {
+                        id: req.session.user.id
+                    }
+                });
+                const subcontractorCount = await Subcontractor.count({
+                    where: {
+                        userId: req.session.user.id
+                    }
+                });
+                const invoiceCount = await Invoice.count({
+                    where: {
+                        subcontractorId: subcontractorId
+                    }
+                });
+
+                res.render('dashboard', {
+                    userCount,
+                    subcontractorCount,
+                    invoiceCount,
+                    users,
+                    subcontractors,
+                    invoices,
+                    errorMessages: req.flash('error'),
+                    successMessage: req.flash('success'),
+                    session: req.session,
+                    packageJson,
+                    slimDateTime: helpers.slimDateTime,
+                    message: req.query.message || '',
+                });
+            } else {
+                res.redirect('/subcontractor/create');
+            }
         } else {
             res.redirect('/login');
         }
