@@ -8,11 +8,19 @@ const helpers = require('../helpers');
 // Display the invoice creation form
 const selectSubcontractor = async (req, res) => {
     try {
-
-        const subcontractors = await Subcontractor.findAll();
+        let subcontractors;
+        if (req.session.user.role === 'admin') {
+            subcontractors = await Subcontractor.findAll({});
+        } else {
+            subcontractors = await Subcontractor.findAll({
+                where: {
+                    userId: req.session.user.id
+                }
+            });
+        }
 
         if (subcontractors.length === 0) {
-            return res.redirect('/subcontractor/create?message=No subcontractors exist');
+            return res.redirect('/subcontractor/create?message=No subcontractors exist, Or you don\'t have access to any Subcontractors.');
         }
 
         res.render('selectSubcontractor', {
