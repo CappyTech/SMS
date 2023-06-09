@@ -1,0 +1,18 @@
+<!-- views/accountSettings.ejs -->
+<h1>Account Settings</h1>
+
+<form action="/account/settings" method="POST">
+    <div class="mb-3">
+        <label for="name" class="form-label">Username:</label>
+        <input type="text" class="form-control" name="username" value="<%= user.username %>" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email:</label>
+        <input type="email" class="form-control" name="email" value="<%= user.email %>" required>
+    </div>
+
+    <!-- Add any other fields for account settings -->
+
+    <button type="submit" class="btn btn-primary">Update Settings</button>
+</form>
