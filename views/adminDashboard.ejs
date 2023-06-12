@@ -71,53 +71,45 @@
 
 <!-- Subcontractors table -->
 <h2>Subcontractors</h2>
+<% subcontractors.forEach(subcontractor => { %>
+<h2><%= subcontractor.name %></h2>
 <table class="table table-striped table-hover">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Company</th>
-            <th>CIS Number</th>
-            <th>User ID</th>
+            <th>Invoice Number</th>
+            <th>Kashflow Number</th>
+            <th>Invoice Date</th>
+            <th>Remittance Date</th>
+            <th>Labour Cost</th>
+            <th>Material Cost</th>
+            <th>CIS Deduction</th>
+            <th>Gross Amount</th>
+            <th>Net Amount</th>
+            <% if (subcontractor.isGross) { %>
+            <th>Reverse Charge</th>
+            <% } %>
+            <th>Submission Date</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        <% subcontractors.forEach(subcontractor => { %>
-        <tr>
-            <td><%= subcontractor.id %></td>
-            <td><%= subcontractor.name %></td>
-            <td><%= subcontractor.company %></td>
-            <td><%= subcontractor.cisNumber %></td>
-            <td><%= subcontractor.userId %></td>
-            <td>
-                <div class="row">
-                    <div class="col">
-                        <a href="/admin/subcontractor/edit/<%= subcontractor.id %>" class="btn btn-primary">Edit</a>
-                    </div>
-                    <div class="col">
-                        <a href="/admin/subcontractor/delete/<%= subcontractor.id %>" class="btn btn-danger">Delete</a>
-                    </div>
-                </div>
-            </td>
-        </tr>
         <!-- Invoices for the current subcontractor -->
         <% const subcontractorInvoices = invoices.filter(invoice => invoice.subcontractorId === subcontractor.id); %>
         <% subcontractorInvoices.forEach(invoice => { %>
         <tr>
-            <td><%= invoice.id %></td>
             <td><%= invoice.invoiceNumber %></td>
             <td><%= invoice.kashflowNumber %></td>
             <td><%= slimDateTime(invoice.invoiceDate) %></td>
             <td><%= slimDateTime(invoice.remittanceDate) %></td>
-            <td><%= invoice.grossAmount %></td>
             <td><%= invoice.labourCost %></td>
             <td><%= invoice.materialCost %></td>
             <td><%= invoice.cisAmount %></td>
+            <td><%= invoice.grossAmount %></td>
             <td><%= invoice.netAmount %></td>
             <td><%= slimDateTime(invoice.submissionDate) %></td>
+            <% if (subcontractor.isGross) { %>
             <td><%= invoice.reverseCharge %></td>
-            <td><%= invoice.subcontractorId %></td>
+            <% } %>
             <td>
                 <div class="row">
                     <div class="col">
