@@ -86,8 +86,8 @@ const submitInvoice = async (req, res) => {
 
         if (subcontractor.isGross) {
             if (materialCost <= 0) {
-                const netAmount = labourCost;
-                const grossAmount = labourCost;
+                const netAmount = parseInt(labourCost);
+                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
 
                 const invoice = await Invoice.create({
                     invoiceNumber,
@@ -109,8 +109,8 @@ const submitInvoice = async (req, res) => {
 
             } else {
                 const cisAmount = 0;
-                const netAmount = labourCost + materialCost;
-                const grossAmount = labourCost + materialCost;
+                const netAmount = parseInt(labourCost) + parseInt(materialCost);
+                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
 
                 const invoice = await Invoice.create({
                     invoiceNumber,
@@ -133,8 +133,8 @@ const submitInvoice = async (req, res) => {
         } else {
             if (materialCost <= 0) {
                 const cisAmount = labourCost * 0.2;
-                const netAmount = labourCost - cisAmount;
-                const grossAmount = labourCost + materialCost;
+                const netAmount = parseInt(labourCost) - parseInt(cisAmount);
+                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
 
                 const invoice = await Invoice.create({
                     invoiceNumber,
@@ -157,8 +157,8 @@ const submitInvoice = async (req, res) => {
 
             } else {
                 const cisAmount = labourCost * 0.2;
-                const netAmount = labourCost + materialCost - cisAmount;
-                const grossAmount = labourCost + materialCost;
+                const netAmount = parseInt(labourCost) + parseInt(materialCost) - parseInt(cisAmount);
+                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
 
                 const invoice = await Invoice.create({
                     invoiceNumber,
