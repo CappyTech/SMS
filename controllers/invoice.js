@@ -87,8 +87,9 @@ const submitInvoice = async (req, res) => {
 
         if (subcontractor.isGross) {
                 const cisAmount = 0;
-                const netAmount = parseInt(labourCost);
+                const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
                 const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                const reverseChargeAmount = parseInt(grossAmount) * 0.2;
 
                 const invoice = await Invoice.create({
                     invoiceNumber,
@@ -101,6 +102,7 @@ const submitInvoice = async (req, res) => {
                     cisAmount,
                     netAmount,
                     submissionDate,
+                    reverseChargeAmount,
                     SubcontractorId: subcontractor.id,
                 });
 
@@ -109,9 +111,9 @@ const submitInvoice = async (req, res) => {
                 return res.send('Invoice created successfully');
         } else {
                 const cisAmount = parseInt(labourCost) * 0.2; 
-                const netAmount = parseInt(labourCost) - parseInt(cisAmount);
+                const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
                 const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-                const reverseChargeAmount = parseInt(netAmount) * 0.2;
+                const reverseChargeAmount = parseInt(grossAmount) * 0.2;
 
                 const invoice = await Invoice.create({
                     invoiceNumber,
