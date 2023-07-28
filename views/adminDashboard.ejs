@@ -86,7 +86,7 @@
             <th>Gross Amount</th>
             <th>Net Amount</th>
             <% if (subcontractor.isGross) { %>
-            <th>Reverse Charge</th>
+            <th>Reverse Charge Amount</th>
             <% } %>
             <th>Submission Date</th>
             <th>Actions</th>
@@ -106,10 +106,10 @@
             <td><%= invoice.cisAmount %></td>
             <td><%= invoice.grossAmount %></td>
             <td><%= invoice.netAmount %></td>
-            <td><%= slimDateTime(invoice.submissionDate) %></td>
             <% if (subcontractor.isGross) { %>
-            <td><%= invoice.reverseCharge %></td>
+            <td><%= invoice.reverseChargeAmount %></td>
             <% } %>
+            <td><%= slimDateTime(invoice.submissionDate) %></td>
             <td>
                 <div class="row">
                     <div class="col">
