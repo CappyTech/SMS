@@ -29,7 +29,7 @@
             <th>CIS Deduction</th>
             <th>Net Amount</th>
             <% if (subcontractor.isGross) { %>
-            <th>Reverse Charge</th>
+            <th>Reverse Charge Amount</th>
             <% } %>
             <th>Submission Date</th>
         </tr>
@@ -50,7 +50,7 @@
             <td><%= invoice.netAmount !== null ? (invoice.netAmount !== 0 ? '£' + invoice.netAmount.toLocaleString('en-GB', { minimumFractionDigits: 2 }) : '£0.00') : '' %>
             </td>
             <% if (subcontractor.isGross) { %>
-            <td><%= invoice.reverseCharge !== null ? (invoice.reverseCharge !== 0 ? '£' + invoice.reverseCharge.toLocaleString('en-GB', { minimumFractionDigits: 2 }) : '£0.00') : '' %>
+            <td><%= invoice.reverseChargeAmount !== null ? (invoice.reverseChargeAmount !== 0 ? '£' + invoice.reverseChargeAmount.toLocaleString('en-GB', { minimumFractionDigits: 2 }) : '£0.00') : '' %>
             </td>
             <% } %>
             <td><%= slimDateTime(invoice.submissionDate) %></td>
