@@ -11,15 +11,15 @@ const renderMonthlyReturns = async (req, res) => {
         // Retrieve monthly returns for each subcontractor
         const monthlyReturns = await Invoice.findAll({
             attributes: [
-                [Sequelize.fn('MONTH', Sequelize.col('invoiceDate')), 'month'],
-                [Sequelize.fn('YEAR', Sequelize.col('invoiceDate')), 'year'],
+                [Sequelize.fn('MONTH', Sequelize.col('submissionDate')), 'month'],
+                [Sequelize.fn('YEAR', Sequelize.col('submissionDate')), 'year'],
                 [Sequelize.literal('`Subcontractor`.`name`'), 'subcontractorName'],
                 [Sequelize.fn('SUM', Sequelize.col('netAmount')), 'totalnetAmount'],
                 [Sequelize.fn('SUM', Sequelize.col('grossAmount')), 'totalgrossAmount'],
                 [Sequelize.fn('SUM', Sequelize.col('labourCost')), 'totallabourCost'],
                 [Sequelize.fn('SUM', Sequelize.col('materialCost')), 'totalmaterialCost'],
                 [Sequelize.fn('SUM', Sequelize.col('cisAmount')), 'totalcisAmount'],
-                [Sequelize.fn('SUM', Sequelize.col('reverseCharge')), 'totalreverseCharge'],
+                [Sequelize.fn('SUM', Sequelize.col('reverseChargeAmount')), 'totalreverseChargeAmount'],
             ],
             include: [{
                 model: Subcontractor,
