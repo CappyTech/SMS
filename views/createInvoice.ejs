@@ -72,16 +72,16 @@
                 <td><label for="netAmount">Net Amount:</label></td>
                 <td><input type="number" id="netAmount" name="netAmount" class="form-control" disabled></td>
             </tr>
+            <% if (subcontractor.isGross) { %>
+                <tr>
+                    <td><label for="reverseChargeAmount">Reverse Charge Cost:</label></td>
+                    <td><input type="number" id="reverseChargeAmount" name="reverseChargeAmount" class="form-control" disabled></td>
+                </tr>
+            <% } %>
             <tr>
                 <td><label for="submissionDate">Submission Date:</label></td>
                 <td><input type="date" id="submissionDate" name="submissionDate" class="form-control"></td>
             </tr>
-            <% if (subcontractor.isGross) { %>
-            <tr>
-                <td><label for="reverseChargeAmount">Reverse Charge Cost:</label></td>
-                <td><input type="number" id="reverseChargeAmount" name="reverseChargeAmount" class="form-control"></td>
-            </tr>
-            <% } %>
         </tbody>
         <tfoot>
             <tr>
