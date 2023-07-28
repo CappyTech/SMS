@@ -11,8 +11,8 @@ const renderMonthlyReturns = async (req, res) => {
         // Retrieve monthly returns for each subcontractor
         const monthlyReturns = await Invoice.findAll({
             attributes: [
-                [Sequelize.fn('MONTH', Sequelize.col('submissionDate')), 'month'],
-                [Sequelize.fn('YEAR', Sequelize.col('submissionDate')), 'year'],
+                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
+                [Sequelize.literal("CASE WHEN MONTH(submissionDate) >= 4 THEN MONTH(submissionDate) - 3 ELSE MONTH(submissionDate) + 9 END"), 'month'],
                 [Sequelize.literal('`Subcontractor`.`name`'), 'subcontractorName'],
                 [Sequelize.fn('SUM', Sequelize.col('netAmount')), 'totalnetAmount'],
                 [Sequelize.fn('SUM', Sequelize.col('grossAmount')), 'totalgrossAmount'],
@@ -24,12 +24,11 @@ const renderMonthlyReturns = async (req, res) => {
             include: [{
                 model: Subcontractor,
                 attributes: [],
-            }, ],
+            }],
             group: ['year', 'month', 'subcontractorName'],
             order: ['year', 'month', 'subcontractorName'],
             raw: true,
         });
-
 
         // Render the monthly returns page
         res.render('monthlyReturns', {
