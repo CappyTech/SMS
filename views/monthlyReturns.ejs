@@ -6,7 +6,12 @@
                 <th>Month</th>
                 <th>Year</th>
                 <th>Subcontractor</th>
-                <th>Total Returns</th>
+                <th>Net</th>
+                <th>Gross</th>
+                <th>Labour</th>
+                <th>Material</th>
+                <th>CIS</th>
+                <th>Reverse Charge</th>
             </tr>
         </thead>
         <tbody>
@@ -16,6 +21,11 @@
                 <td><%= returnData.year %></td>
                 <td><%= returnData.subcontractorName %></td>
                 <td><%= returnData.totalnetAmount %></td>
+                <td><%= returnData.totalgrossAmount %></td>
+                <td><%= returnData.totallabourCost %></td>
+                <td><%= returnData.totalmaterialCost %></td>
+                <td><%= returnData.totalcisAmount %></td>
+                <td><%= returnData.totalreverseCharge %></td>
             </tr>
             <% }) %>
         </tbody>
