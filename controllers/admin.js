@@ -39,7 +39,9 @@ const renderAdminDashboard = async (req, res) => {
             message: req.query.message || '',
         });
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.header('Referer') || '/';
+        res.redirect(referrer);
     }
 };
 
@@ -55,14 +57,20 @@ const deleteInvoice = async (req, res) => {
         const invoice = await Invoice.findByPk(invoiceId);
 
         if (!invoice) {
-            return res.status(404).send('Invoice not found');
+            // res.status(404).send('Invoice not found');
+            return req.flash('error', 'Invoice not found');
         }
 
         await invoice.destroy();
 
         res.send('Invoice deleted successfully');
+        req.flash('success', 'Invoice deleted successfully');
+        const referrer = req.get('referer') || '/admin';
+        res.redirect(referrer);
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.header('Referer') || '/';
+        res.redirect(referrer);
     }
 };
 
@@ -76,14 +84,19 @@ const deleteSubcontractor = async (req, res) => {
         const subcontractor = await Subcontractor.findByPk(req.params.id);
 
         if (!subcontractor) {
-            return res.status(404).send('Subcontractor not found');
+            // res.status(404).send('Subcontractor not found');
+            return req.flash('error', 'Subcontractor not found');
         }
 
         await subcontractor.destroy();
 
-        res.send('Subcontractor deleted successfully');
+        req.flash('success', 'Subcontractor deleted successfully');
+        const referrer = req.get('referer') || '/admin';
+        res.redirect(referrer);
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/admin';
+        res.redirect(referrer);
     }
 };
 
@@ -101,14 +114,19 @@ const deleteUser = async (req, res) => {
         const user = await User.findByPk(req.params.id);
 
         if (!user) {
-            return res.status(404).send('User not found');
+            // res.status(404).send('User not found');
+            return req.flash('error', 'User not found');
         }
 
         await user.destroy();
 
-        res.send('User deleted successfully');
+        req.flash('success', 'User deleted successfully');
+        const referrer = req.get('referer') || '/admin';
+        res.redirect(referrer);
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/admin';
+        res.redirect(referrer);
     }
 };
 
@@ -124,16 +142,20 @@ const assignUserToSubcontractor = async (req, res) => {
         const user = await User.findByPk(userId);
 
         if (!subcontractor || !user) {
-            return res.status(404).send('Subcontractor or user not found');
+            // res.status(404).send('Subcontractor or user not found');
+            return req.flash('error', 'Subcontractor or user not found');
         }
 
         // Assign the user to the subcontractor
         subcontractor.UserId = user.id;
         await subcontractor.save();
 
-        res.redirect('/admin');
+        const referrer = req.get('referer') || '/admin';
+        res.redirect(referrer);
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/admin';
+        res.redirect(referrer);
     }
 };
 
@@ -147,16 +169,20 @@ const unassignUserFromSubcontractor = async (req, res) => {
         const subcontractor = await Subcontractor.findByPk(subcontractorId);
 
         if (!subcontractor) {
-            return res.status(404).send('Subcontractor not found');
+            // res.status(404).send('Subcontractor not found');
+            return req.flash('error', 'Subcontractor not found');
         }
 
         // Unassign the user from the subcontractor
         subcontractor.UserId = null;
         await subcontractor.save();
 
-        res.redirect('/admin');
+        const referrer = req.get('referer') || '/admin';
+        res.redirect(referrer);
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/admin';
+        res.redirect(referrer);
     }
 };
 
