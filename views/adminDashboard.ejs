@@ -1,15 +1,19 @@
 <!-- views/adminDashboard.ejs -->
 <h1>Admin Dashboard</h1>
 
-<% if (typeof message !== 'undefined' && message.length > 0) { %>
+<!-- Display error messages -->
+<% if (errorMessages.length > 0) { %>
 <br>
-<div class="alert alert-infor alert-dismissible fade show p-3" role="alert">
+<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    <%= message %>
+    <% errorMessages.forEach(errorMessage => { %>
+    <div><%= errorMessage %></div>
+    <% }) %>
 </div>
 <% } %>
 
-<% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+<!-- Display success message -->
+<% if (successMessage.length > 0) { %>
 <br>
 <div class="alert alert-success alert-dismissible fade show p-3" role="alert">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -177,12 +181,3 @@
         <% }); %>
     </tbody>
 </table>
-<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
-<br>
-<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    <% errorMessages.forEach(errorMessage => { %>
-    <div><%= errorMessage %></div>
-    <% }) %>
-</div>
-<% } %>
