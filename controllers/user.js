@@ -41,7 +41,9 @@ const registerUser = async (req, res) => {
 
         res.redirect('/onboarding')
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
@@ -129,7 +131,9 @@ const loginUser = async (req, res) => {
             return res.redirect('/login');
         }
     } catch (error) {
-        return res.status(500).send('Error: ' + error.message);
+        return req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
