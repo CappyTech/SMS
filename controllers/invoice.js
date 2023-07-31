@@ -34,7 +34,9 @@ const selectSubcontractor = async (req, res) => {
             slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
@@ -59,7 +61,9 @@ const renderInvoiceForm = async (req, res) => {
         }
         return res.send('Subcontractor not found');
     } catch (error) {
-        return res.status(500).send('Error: ' + error.message);
+        return req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
@@ -86,53 +90,53 @@ const submitInvoice = async (req, res) => {
         }
 
         if (subcontractor.isGross) {
-                const cisAmount = 0;
-                const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-                const reverseChargeAmount = parseInt(grossAmount) * 0.2;
+            const cisAmount = 0;
+            const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+            const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+            const reverseChargeAmount = parseInt(grossAmount) * 0.2;
 
-                const invoice = await Invoice.create({
-                    invoiceNumber,
-                    kashflowNumber,
-                    invoiceDate,
-                    remittanceDate,
-                    grossAmount,
-                    labourCost,
-                    materialCost,
-                    cisAmount,
-                    netAmount,
-                    submissionDate,
-                    reverseChargeAmount,
-                    SubcontractorId: subcontractor.id,
-                });
+            const invoice = await Invoice.create({
+                invoiceNumber,
+                kashflowNumber,
+                invoiceDate,
+                remittanceDate,
+                grossAmount,
+                labourCost,
+                materialCost,
+                cisAmount,
+                netAmount,
+                submissionDate,
+                reverseChargeAmount,
+                SubcontractorId: subcontractor.id,
+            });
 
-                await subcontractor.addInvoice(invoice);
+            await subcontractor.addInvoice(invoice);
 
-                return res.send('Invoice created successfully');
+            return res.send('Invoice created successfully');
         } else {
-                const cisAmount = parseInt(labourCost) * 0.2; 
-                const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-                const reverseChargeAmount = parseInt(grossAmount) * 0.2;
+            const cisAmount = parseInt(labourCost) * 0.2;
+            const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+            const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+            const reverseChargeAmount = parseInt(grossAmount) * 0.2;
 
-                const invoice = await Invoice.create({
-                    invoiceNumber,
-                    kashflowNumber,
-                    invoiceDate,
-                    remittanceDate,
-                    grossAmount,
-                    labourCost,
-                    materialCost,
-                    cisAmount,
-                    netAmount,
-                    submissionDate,
-                    reverseChargeAmount,
-                    SubcontractorId: subcontractor.id,
-                });
+            const invoice = await Invoice.create({
+                invoiceNumber,
+                kashflowNumber,
+                invoiceDate,
+                remittanceDate,
+                grossAmount,
+                labourCost,
+                materialCost,
+                cisAmount,
+                netAmount,
+                submissionDate,
+                reverseChargeAmount,
+                SubcontractorId: subcontractor.id,
+            });
 
-                await subcontractor.addInvoice(invoice);
+            await subcontractor.addInvoice(invoice);
 
-                return res.send('Invoice created successfully');
+            return res.send('Invoice created successfully');
         }
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
@@ -147,7 +151,9 @@ const submitInvoice = async (req, res) => {
             });
         }
         console.error('Error creating invoice:', error);
-        return res.status(500).send('Error: ' + error.message);
+        return req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
@@ -173,7 +179,9 @@ const getAllInvoices = async (req, res) => {
             slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
