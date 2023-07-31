@@ -1,0 +1,23 @@
+<!-- views/selectSubcontractor.ejs: -->
+
+<h1>View Invoice</h1>
+<div class="card">
+    <div class="card-header">
+        Invoice Details
+    </div>
+    <div class="card-body">
+        <p><strong>Invoice Number:</strong> <%= invoice.invoiceNumber %></p>
+        <p><strong>Kashflow Number:</strong> <%= invoice.kashflowNumber %></p>
+        <p><strong>Invoice Date:</strong> <%= invoice.invoiceDate %></p>
+        <p><strong>Remittance Date:</strong> <%= invoice.remittanceDate %></p>
+        <p><strong>Gross Amount:</strong> <%= invoice.grossAmount %></p>
+        <p><strong>Labour Cost:</strong> <%= invoice.labourCost %></p>
+        <p><strong>Material Cost:</strong> <%= invoice.materialCost %></p>
+        <p><strong>CIS Amount:</strong> <%= invoice.cisAmount %></p>
+        <p><strong>Net Amount:</strong> <%= invoice.netAmount %></p>
+        <p><strong>Submission Date:</strong> <%= invoice.submissionDate %></p>
+        <% if (invoice.reverseCharge !== null) { %>
+        <p><strong>Reverse Charge:</strong> <%= invoice.reverseCharge %></p>
+        <% } %>
+    </div>
+</div>
