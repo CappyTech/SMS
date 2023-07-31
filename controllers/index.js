@@ -79,7 +79,9 @@ const renderDashboard = async (req, res) => {
             res.redirect('/login');
         }
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
