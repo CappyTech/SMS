@@ -20,7 +20,9 @@ const renderOnboardingForm = async (req, res) => {
             sessionUser,
         });
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
@@ -47,7 +49,9 @@ const submitOnboardingForm = async (req, res) => {
             res.status(404).send('Subcontractor not found');
         }
     } catch (error) {
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
