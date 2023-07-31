@@ -1,0 +1,22 @@
+<h1>View Subcontractor</h1>
+<div class="card">
+    <div class="card-header">
+        Subcontractor Details
+    </div>
+    <div class="card-body">
+        <p><strong>Name:</strong> <%= subcontractor.name %></p>
+        <p><strong>Company:</strong> <%= subcontractor.company %></p>
+        <p><strong>Address Line 1:</strong> <%= subcontractor.line1 %></p>
+        <p><strong>Address Line 2:</strong> <%= subcontractor.line2 %></p>
+        <p><strong>City:</strong> <%= subcontractor.city %></p>
+        <p><strong>County:</strong> <%= subcontractor.county %></p>
+        <p><strong>Postal Code:</strong> <%= subcontractor.postalCode %></p>
+        <p><strong>CIS Number:</strong> <%= subcontractor.cisNumber %></p>
+        <p><strong>UTR Number:</strong> <%= subcontractor.utrNumber %></p>
+        <p><strong>Onboarded:</strong> <%= subcontractor.onboarded ? 'Yes' : 'No' %></p>
+        <% if (subcontractor.onboarded) { %>
+        <p><strong>Onboarded At:</strong> <%= subcontractor.onboardedAt %></p>
+        <% } %>
+        <p><strong>Is Gross:</strong> <%= subcontractor.isGross ? 'Yes' : 'No' %></p>
+    </div>
+</div>
