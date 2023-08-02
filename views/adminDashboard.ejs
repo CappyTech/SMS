@@ -1,5 +1,6 @@
 <!-- views/adminDashboard.ejs -->
 <h1>Admin Dashboard</h1>
+<small>[Users: <%= userCount %> | Subcontractors: <%= subcontractorCount %> | Invoices: <%= invoiceCount %> ]</small>
 
 <!-- Display error messages -->
 <% if (errorMessages.length > 0) { %>
@@ -21,60 +22,41 @@
 </div>
 <% } %>
 
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">User Count: <%= userCount %></h5>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">Subcontractor Count: <%= subcontractorCount %></h5>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">Invoice Count: <%= invoiceCount %></h5>
-    </div>
-</div>
-
 <!-- Users table -->
-<h2>Users</h2>
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% users.forEach(user => { %>
-        <tr>
-            <td><%= user.id %></td>
-            <td><%= user.username %></td>
-            <td><%= user.email %></td>
-            <td><%= user.role %></td>
-            <td>
-                <div class="row">
-                    <div class="col">
-                        <a href="/admin/user/edit/<%= user.id %>" class="btn btn-primary">Edit</a>
+<h2 class="text-center">Users</h2>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(user => { %>
+            <tr>
+                <td><%= user.id %></td>
+                <td><%= user.username %></td>
+                <td><%= user.email %></td>
+                <td><%= user.role %></td>
+                <td>
+                    <div class="row">
+                        <div class="col">
+                            <a href="/admin/user/edit/<%= user.id %>" class="btn btn-primary">Edit</a>
+                        </div>
                     </div>
-                    <div class="col">
-                        <a href="/admin/user/delete/<%= user.id %>" class="btn btn-danger">Delete</a>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <% }); %>
-    </tbody>
-</table>
+                </td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
 
 <!-- Subcontractors table -->
-<h2>Subcontractors</h2>
+<h2 class="text-center">Subcontractors</h2>
 <% subcontractors.forEach(subcontractor => { %>
 <h2><%= subcontractor.name %></h2>
 <table class="table table-striped table-hover">
@@ -90,7 +72,7 @@
             <th>Gross Amount</th>
             <th>Net Amount</th>
             <% if (subcontractor.isGross) { %>
-            <th>Reverse Charge Amount</th>
+            <th>Reverse Charge</th>
             <% } %>
             <th>Submission Date</th>
             <th>Actions</th>
@@ -102,16 +84,18 @@
         <% subcontractorInvoices.forEach(invoice => { %>
         <tr>
             <td><%= invoice.invoiceNumber %></td>
-            <td><%= invoice.kashflowNumber %></td>
+            <td><a
+                    href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>"><%= invoice.kashflowNumber %></a>
+            </td>
             <td><%= slimDateTime(invoice.invoiceDate) %></td>
             <td><%= slimDateTime(invoice.remittanceDate) %></td>
-            <td><%= invoice.labourCost %></td>
-            <td><%= invoice.materialCost %></td>
-            <td><%= invoice.cisAmount %></td>
-            <td><%= invoice.grossAmount %></td>
-            <td><%= invoice.netAmount %></td>
+            <td><%= formatCurrency(invoice.labourCost) %></td>
+            <td><%= formatCurrency(invoice.materialCost) %></td>
+            <td><%= formatCurrency(invoice.cisAmount) %></td>
+            <td><%= formatCurrency(invoice.grossAmount) %></td>
+            <td><%= formatCurrency(invoice.netAmount) %></td>
             <% if (subcontractor.isGross) { %>
-            <td><%= invoice.reverseChargeAmount %></td>
+            <td><%= formatCurrency(invoice.reverseCharge) %></td>
             <% } %>
             <td><%= slimDateTime(invoice.submissionDate) %></td>
             <td>
@@ -119,65 +103,10 @@
                     <div class="col">
                         <a href="/admin/invoice/edit/<%= invoice.id %>" class="btn btn-primary">Edit</a>
                     </div>
-                    <div class="col">
-                        <a href="/admin/invoice/delete/<%= invoice.id %>" class="btn btn-danger">Delete</a>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <% }); %>
-        <% }); %>
-    </tbody>
-</table>
-
-<!-- Invoices table -->
-<h2>Invoices</h2>
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Invoice Number</th>
-            <th>Kashflow Number</th>
-            <th>Invoice Date</th>
-            <th>Remittance Date</th>
-            <th>Gross Amount</th>
-            <th>Labour Cost</th>
-            <th>Material Cost</th>
-            <th>CIS Amount</th>
-            <th>Net Amount</th>
-            <th>Submission Date</th>
-            <th>Reverse Charge Amount</th>
-            <th>Subcontractor ID</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% invoices.forEach(invoice => { %>
-        <tr>
-            <td><%= invoice.id %></td>
-            <td><%= invoice.invoiceNumber %></td>
-            <td><%= invoice.kashflowNumber %></td>
-            <td><%= slimDateTime(invoice.invoiceDate) %></td>
-            <td><%= slimDateTime(invoice.remittanceDate) %></td>
-            <td><%= invoice.grossAmount %></td>
-            <td><%= invoice.labourCost %></td>
-            <td><%= invoice.materialCost %></td>
-            <td><%= invoice.cisAmount %></td>
-            <td><%= invoice.netAmount %></td>
-            <td><%= slimDateTime(invoice.submissionDate) %></td>
-            <td><%= invoice.reverseChargeAmount %></td>
-            <td><%= invoice.subcontractorId %></td>
-            <td>
-                <div class="row">
-                    <div class="col">
-                        <a href="/admin/invoice/edit/<%= invoice.id %>" class="btn btn-primary">Edit</a>
-                    </div>
-                    <div class="col">
-                        <a href="/admin/invoice/delete/<%= invoice.id %>" class="btn btn-danger">Delete</a>
-                    </div>
                 </div>
             </td>
         </tr>
         <% }); %>
     </tbody>
 </table>
+<% }); %>
