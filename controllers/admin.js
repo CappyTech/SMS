@@ -36,6 +36,7 @@ const renderAdminDashboard = async (req, res) => {
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
             message: req.query.message || '',
         });
     } catch (error) {
