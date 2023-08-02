@@ -79,7 +79,7 @@ const submitInvoice = async (req, res) => {
             labourCost,
             materialCost,
             submissionDate,
-            reverseChargeAmount,
+            reverseCharge,
         } = req.body;
         console.log(req.body);
 
@@ -93,7 +93,7 @@ const submitInvoice = async (req, res) => {
             const cisAmount = 0;
             const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
             const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-            const reverseChargeAmount = parseInt(grossAmount) * 0.2;
+            const reverseCharge = parseInt(grossAmount) * 0.2;
 
             const invoice = await Invoice.create({
                 invoiceNumber,
@@ -106,7 +106,7 @@ const submitInvoice = async (req, res) => {
                 cisAmount,
                 netAmount,
                 submissionDate,
-                reverseChargeAmount,
+                reverseCharge,
                 SubcontractorId: subcontractor.id,
             });
 
@@ -117,7 +117,7 @@ const submitInvoice = async (req, res) => {
             const cisAmount = parseInt(labourCost) * 0.2;
             const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
             const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-            const reverseChargeAmount = parseInt(grossAmount) * 0.2;
+            const reverseCharge = parseInt(grossAmount) * 0.2;
 
             const invoice = await Invoice.create({
                 invoiceNumber,
@@ -130,7 +130,7 @@ const submitInvoice = async (req, res) => {
                 cisAmount,
                 netAmount,
                 submissionDate,
-                reverseChargeAmount,
+                reverseCharge,
                 SubcontractorId: subcontractor.id,
             });
 
