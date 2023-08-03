@@ -1,0 +1,10 @@
+<!-- views/editSubcontractor.ejs -->
+<h1>Edit Subcontractor</h1>
+<form action="/admin/subcontractor/update/<%= subcontractor.id %>" method="POST">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" name="name" id="name" class="form-control" value="<%= subcontractor.name %>" required>
+    </div>
+    <!-- Add more input fields for editing subcontractor details here if needed -->
+    <button type="submit" class="btn btn-primary">Update Subcontractor</button>
+</form>
