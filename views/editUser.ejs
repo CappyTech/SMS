@@ -1,0 +1,15 @@
+<!-- views/editUser.ejs -->
+<h1>Edit User</h1>
+<form action="/admin/user/update/<%= user.id %>" method="POST">
+    <label for="username">Username</label>
+    <input type="text" name="username" id="username" value="<%= user.username %>" required>
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" value="<%= user.email %>" required>
+    <label for="role">Role</label>
+    <select name="role" id="role" required>
+        <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+        <option value="user" <%= user.role === 'user' ? 'selected' : '' %>>User</option>
+    </select>
+    <!-- You can add more user details to edit here if needed -->
+    <button type="submit">Update User</button>
+</form>
