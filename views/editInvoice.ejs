@@ -1,0 +1,8 @@
+<!-- views/editInvoice.ejs -->
+<h1>Edit Invoice</h1>
+<form action="/admin/invoice/update/<%= invoice.id %>" method="POST">
+    <label for="invoiceNumber">Invoice Number</label>
+    <input type="text" name="invoiceNumber" id="invoiceNumber" value="<%= invoice.invoiceNumber %>" required>
+    <!-- Add more input fields for editing invoice details here if needed -->
+    <button type="submit">Update Invoice</button>
+</form>
