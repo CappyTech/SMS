@@ -79,9 +79,11 @@ const submitInvoice = async (req, res) => {
             labourCost,
             materialCost,
             submissionDate,
-            reverseCharge,
         } = req.body;
         console.log(req.body);
+
+        // Convert submissionDate to null if it's '0000-00-00 00:00:00'
+        const convertedSubmissionDate = submissionDate === '0000-00-00 00:00:00' ? null : submissionDate;
 
         const subcontractor = await Subcontractor.findByPk(req.params.selected);
 
@@ -105,7 +107,7 @@ const submitInvoice = async (req, res) => {
                 materialCost,
                 cisAmount,
                 netAmount,
-                submissionDate,
+                convertedSubmissionDate,
                 reverseCharge,
                 SubcontractorId: subcontractor.id,
             });
@@ -129,7 +131,7 @@ const submitInvoice = async (req, res) => {
                 materialCost,
                 cisAmount,
                 netAmount,
-                submissionDate,
+                convertedSubmissionDate,
                 reverseCharge,
                 SubcontractorId: subcontractor.id,
             });
