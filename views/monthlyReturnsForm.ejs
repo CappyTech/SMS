@@ -1,0 +1,25 @@
+<!-- views/monthlyReturnsForm.ejs: -->
+<div class="container mt-4">
+    <h1>Filter Monthly Returns</h1>
+    <form action="/monthly/returns" method="get">
+        <div class="mb-3">
+            <label for="year" class="form-label">Select Year:</label>
+            <select id="year" name="year" class="form-select">
+                <!-- Populate options dynamically with available tax years -->
+                <% for (const year of taxYears) { %>
+                <option value="<%= year %>"><%= year %></option>
+                <% } %>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="subcontractor" class="form-label">Select Subcontractor:</label>
+            <select id="subcontractor" name="subcontractor" class="form-select">
+                <!-- Populate options dynamically with subcontractors -->
+                <% for (const subcontractor of subcontractors) { %>
+                <option value="<%= subcontractor.id %>"><%= subcontractor.name %></option>
+                <% } %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
