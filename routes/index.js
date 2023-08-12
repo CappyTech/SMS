@@ -13,8 +13,8 @@ const {
     getAccountPage,
     getAccountSettingsPage,
     updateAccountSettings,
-    generateQRCode, // Add this line to import the enable2FA route handler
-    submitEnable2FA, // Add this line to import the submitEnable2FA route handler
+    generateQRCode,
+    submitEnable2FA,
 } = require('../controllers/account');
 
 // Account page
@@ -24,11 +24,16 @@ router.get('/account', getAccountPage);
 router.get('/account/settings', getAccountSettingsPage);
 router.post('/account/settings', updateAccountSettings);
 router.get('/account/enable2fa', generateQRCode);
-router.post('/account/enable2fa', submitEnable2FA); // Add this line to handle the form submission for enabling 2FA
+router.post('/account/enable2fa', submitEnable2FA);
 
 const {
-    renderMonthlyReturns
+    renderFilteredMonthlyReturns,
+    renderMonthlyReturnsForm,
+    renderMonthlyReturns,
 } = require('../controllers/monthlyReturns');
 
-router.get('/monthly/returns', renderMonthlyReturns);
+router.get('/monthly/returns', renderFilteredMonthlyReturns);
+router.get('/monthly/returns/form', renderMonthlyReturnsForm);
+router.get('/monthly/returns/:year/:subcontractor', renderMonthlyReturns);
+
 module.exports = router;
