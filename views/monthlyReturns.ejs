@@ -1,33 +1,36 @@
+<!-- views/monthlyReturns.ejs: -->
 <div class="container mt-4">
-    <h1>Monthly Returns</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Month</th>
-                <th>Year</th>
-                <th>Subcontractor</th>
-                <th>Net</th>
-                <th>Gross</th>
-                <th>Labour</th>
-                <th>Material</th>
-                <th>CIS</th>
-                <th>Reverse Charge Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% monthlyReturns.forEach(returnData => { %>
-            <tr>
-                <td><%= returnData.month %></td>
-                <td><%= returnData.year %></td>
-                <td><%= returnData.subcontractorName %></td>
-                <td><%= returnData.totalnetAmount %></td>
-                <td><%= returnData.totalgrossAmount %></td>
-                <td><%= returnData.totallabourCost %></td>
-                <td><%= returnData.totalmaterialCost %></td>
-                <td><%= returnData.totalcisAmount %></td>
-                <td><%= returnData.totalreverseChargeAmount %></td>
-            </tr>
-            <% }) %>
-        </tbody>
-    </table>
+    <h1>Monthly Returns for <%= year %> - Subcontractor: <%= subcontractor.name %></h1>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Year</th>
+                    <th>Subcontractor</th>
+                    <th>Net</th>
+                    <th>Gross</th>
+                    <th>Labour</th>
+                    <th>Material</th>
+                    <th>CIS</th>
+                    <th>Reverse Charge</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% monthlyReturns.forEach(returnData => { %>
+                <tr>
+                    <td><%= returnData.month %></td>
+                    <td><%= returnData.year %></td>
+                    <td><%= returnData.subcontractorName %></td>
+                    <td><%= returnData.totalnetAmount %></td>
+                    <td><%= returnData.totalgrossAmount %></td>
+                    <td><%= returnData.totallabourCost %></td>
+                    <td><%= returnData.totalmaterialCost %></td>
+                    <td><%= returnData.totalcisAmount %></td>
+                    <td><%= returnData.totalreverseCharge %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
 </div>
