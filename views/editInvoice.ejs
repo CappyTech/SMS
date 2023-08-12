@@ -1,8 +1,72 @@
 <!-- views/editInvoice.ejs -->
+<style>
+    .invalid-date {
+        color: red;
+    }
+</style>
 <h1>Edit Invoice</h1>
 <form action="/admin/invoice/update/<%= invoice.id %>" method="POST">
-    <label for="invoiceNumber">Invoice Number</label>
-    <input type="text" name="invoiceNumber" id="invoiceNumber" value="<%= invoice.invoiceNumber %>" required>
-    <!-- Add more input fields for editing invoice details here if needed -->
-    <button type="submit">Update Invoice</button>
+    <div class="mb-3">
+        <label for="invoiceNumber" class="form-label">Invoice Number</label>
+        <input type="text" name="invoiceNumber" id="invoiceNumber" class="form-control"
+            value="<%= invoice.invoiceNumber %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="kashflowNumber" class="form-label">Kashflow Number</label>
+        <input type="text" name="kashflowNumber" id="kashflowNumber" class="form-control"
+            value="<%= invoice.kashflowNumber %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="invoiceDate" class="form-label">Invoice Date</label>
+        <input type="date" name="invoiceDate" id="invoiceDate" class="form-control" <% if (invoice.invoiceDate) { %>
+            value="<%= invoice.invoiceDate.toISOString().split('T')[0] %>" <% } %> required>
+    </div>
+    <div class="mb-3">
+        <label for="remittanceDate" class="form-label">Remittance Date</label>
+        <input type="date" name="remittanceDate" id="remittanceDate" class="form-control"
+            <% if (invoice.remittanceDate) { %> value="<%= invoice.remittanceDate.toISOString().split('T')[0] %>"
+            <% } %> required>
+    </div>
+    <div class="mb-3">
+        <label for="grossAmount" class="form-label">Gross Amount</label>
+        <input type="number" step="0.01" name="grossAmount" id="grossAmount" class="form-control"
+            value="<%= invoice.grossAmount %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="labourCost" class="form-label">Labour Cost</label>
+        <input type="number" step="0.01" name="labourCost" id="labourCost" class="form-control"
+            value="<%= invoice.labourCost %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="materialCost" class="form-label">Material Cost</label>
+        <input type="number" step="0.01" name="materialCost" id="materialCost" class="form-control"
+            value="<%= invoice.materialCost %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="cisAmount" class="form-label">CIS Amount</label>
+        <input type="number" step="0.01" name="cisAmount" id="cisAmount"
+            class="form-control <%= invoice.submissionDate === '1970-01-01' ? 'invalid-date' : '' %>"
+            value="<%= invoice.cisAmount %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="netAmount" class="form-label">Net Amount</label>
+        <input type="number" step="0.01" name="netAmount" id="netAmount" class="form-control"
+            value="<%= invoice.netAmount %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="submissionDate" class="form-label">Submission Date</label>
+        <input type="date" name="submissionDate" id="submissionDate" class="form-control"
+            <% if (invoice.submissionDate) { %> value="<%= invoice.submissionDate.toISOString().split('T')[0] %>"
+            <% } %> required>
+    </div>
+    <div class="mb-3">
+        <label for="reverseCharge" class="form-label">Reverse Charge</label>
+        <input type="number" step="0.01" name="reverseCharge" id="reverseCharge" class="form-control"
+            value="<%= invoice.reverseCharge %>" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Invoice</button>
+</form>
+<form action="/admin/invoice/delete/<%= invoice.id %>" method="POST"
+    onsubmit="return confirm('Are you sure you want to delete this Invoice?');">
+    <button type="submit" class="btn btn-danger mt-3">Delete Invoice</button>
 </form>
