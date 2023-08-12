@@ -5,6 +5,61 @@
         <label for="name" class="form-label">Name</label>
         <input type="text" name="name" id="name" class="form-control" value="<%= subcontractor.name %>" required>
     </div>
-    <!-- Add more input fields for editing subcontractor details here if needed -->
+    <div class="mb-3">
+        <label for="company" class="form-label">Company</label>
+        <input type="text" name="company" id="company" class="form-control" value="<%= subcontractor.company %>"
+            required>
+    </div>
+    <div class="mb-3">
+        <label for="line1" class="form-label">Address Line 1</label>
+        <input type="text" name="line1" id="line1" class="form-control" value="<%= subcontractor.line1 %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="line2" class="form-label">Address Line 2</label>
+        <input type="text" name="line2" id="line2" class="form-control" value="<%= subcontractor.line2 %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="city" class="form-label">City</label>
+        <input type="text" name="city" id="city" class="form-control" value="<%= subcontractor.city %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="county" class="form-label">County</label>
+        <input type="text" name="county" id="county" class="form-control" value="<%= subcontractor.county %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="postalCode" class="form-label">Postal Code</label>
+        <input type="text" name="postalCode" id="postalCode" class="form-control"
+            value="<%= subcontractor.postalCode %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="cisNumber" class="form-label">CIS Number</label>
+        <input type="text" name="cisNumber" id="cisNumber" class="form-control" value="<%= subcontractor.cisNumber %>"
+            required>
+    </div>
+    <div class="mb-3">
+        <label for="utrNumber" class="form-label">UTR Number</label>
+        <input type="text" name="utrNumber" id="utrNumber" class="form-control" value="<%= subcontractor.utrNumber %>"
+            required>
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" name="onboarded" id="onboarded" class="form-check-input"
+            <%= subcontractor.onboarded ? 'checked' : '' %>>
+        <label for="onboarded" class="form-check-label">Onboarded</label>
+    </div>
+    <div class="mb-3">
+        <label for="onboardedAt" class="form-label">Onboarded At</label>
+        <input type="date" name="onboardedAt" id="onboardedAt" class="form-control"
+            value="<%= subcontractor.onboardedAt ? subcontractor.onboardedAt.toISOString().split('T')[0] : '' %>">
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" name="isGross" id="isGross" class="form-check-input"
+            <%= subcontractor.isGross ? 'checked' : '' %>>
+        <label for="isGross" class="form-check-label">Is Gross</label>
+    </div>
+    <!-- Add more input fields for other details -->
     <button type="submit" class="btn btn-primary">Update Subcontractor</button>
+</form>
+<form action="/admin/subcontractor/delete/<%= subcontractor.id %>" method="POST"
+    onsubmit="return confirm('Are you sure you want to delete this Subcontractor?');">
+    <button type="submit" class="btn btn-danger mt-3">Delete Subcontractor</button>
 </form>
