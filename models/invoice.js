@@ -22,11 +22,11 @@ const Invoice = sequelize.define('Invoice', {
     },
     invoiceDate: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
     },
     remittanceDate: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
     },
     grossAmount: {
         type: DataTypes.FLOAT,
@@ -50,7 +50,7 @@ const Invoice = sequelize.define('Invoice', {
     },
     submissionDate: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
     },
     reverseCharge: {
         type: DataTypes.FLOAT,
