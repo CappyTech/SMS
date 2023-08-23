@@ -19,18 +19,18 @@
     <div class="mb-3">
         <label for="invoiceDate" class="form-label">Invoice Date</label>
         <input type="date" name="invoiceDate" id="invoiceDate" class="form-control" <% if (invoice.invoiceDate) { %>
-            value="<%= invoice.invoiceDate.toISOString().split('T')[0] %>" <% } %> required>
+            value="<%= invoice.invoiceDate.toISOString().split('T')[0] %>" <% } %>>
     </div>
     <div class="mb-3">
         <label for="remittanceDate" class="form-label">Remittance Date</label>
         <input type="date" name="remittanceDate" id="remittanceDate" class="form-control"
             <% if (invoice.remittanceDate) { %> value="<%= invoice.remittanceDate.toISOString().split('T')[0] %>"
-            <% } %> required>
+            <% } %>>
     </div>
     <div class="mb-3">
         <label for="grossAmount" class="form-label">Gross Amount</label>
         <input type="number" step="0.01" name="grossAmount" id="grossAmount" class="form-control"
-            value="<%= invoice.grossAmount %>" required>
+            value="<%= invoice.grossAmount %>" disabled>
     </div>
     <div class="mb-3">
         <label for="labourCost" class="form-label">Labour Cost</label>
@@ -46,23 +46,23 @@
         <label for="cisAmount" class="form-label">CIS Amount</label>
         <input type="number" step="0.01" name="cisAmount" id="cisAmount"
             class="form-control <%= invoice.submissionDate === '1970-01-01' ? 'invalid-date' : '' %>"
-            value="<%= invoice.cisAmount %>" required>
+            value="<%= invoice.cisAmount %>" disabled>
     </div>
     <div class="mb-3">
         <label for="netAmount" class="form-label">Net Amount</label>
         <input type="number" step="0.01" name="netAmount" id="netAmount" class="form-control"
-            value="<%= invoice.netAmount %>" required>
+            value="<%= invoice.netAmount %>" disabled>
     </div>
     <div class="mb-3">
         <label for="submissionDate" class="form-label">Submission Date</label>
         <input type="date" name="submissionDate" id="submissionDate" class="form-control"
             <% if (invoice.submissionDate) { %> value="<%= invoice.submissionDate.toISOString().split('T')[0] %>"
-            <% } %> required>
+            <% } %>>
     </div>
     <div class="mb-3">
         <label for="reverseCharge" class="form-label">Reverse Charge</label>
         <input type="number" step="0.01" name="reverseCharge" id="reverseCharge" class="form-control"
-            value="<%= invoice.reverseCharge %>" required>
+            value="<%= invoice.reverseCharge %>" disabled>
     </div>
     <button type="submit" class="btn btn-primary">Update Invoice</button>
 </form>
