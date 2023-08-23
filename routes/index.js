@@ -11,20 +11,14 @@ router.get('/dashboard', renderDashboard);
 
 const {
     getAccountPage,
-    getAccountSettingsPage,
     updateAccountSettings,
-    generateQRCode,
-    submitEnable2FA,
 } = require('../controllers/account');
 
 // Account page
 router.get('/account', getAccountPage);
 
 // Account settings
-router.get('/account/settings', getAccountSettingsPage);
 router.post('/account/settings', updateAccountSettings);
-router.get('/account/enable2fa', generateQRCode);
-router.post('/account/enable2fa', submitEnable2FA);
 
 const {
     renderFilteredMonthlyReturns,
