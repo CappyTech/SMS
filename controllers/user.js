@@ -56,8 +56,15 @@ const registerUser = async (req, res) => {
             role,
             twoFactorSecret: secret.base32,
         });
-
-        res.redirect('/dashbpard');
+        if (role === "admin") {
+            res.redirect('/account');
+        }
+        if (role === "subcontractor") {
+            res.redirect('/onboarding');
+        }
+        if (role === "user") {
+            res.redirect('/account');
+        }
     } catch (error) {
         req.flash('error', 'Error: ' + error.message);
         const referrer = req.get('referer') || '/';
@@ -131,7 +138,7 @@ const loginUser = async (req, res) => {
 
                 if (user.role === 'admin') {
                     console.log('Admin Logged in: \n' + userJSON);
-                    return res.redirect('/dashboard');
+                    return res.redirect('/admin');
                 }
                 if (user.role === 'subcontractor') {
                     console.log('Subcontractor Logged in: \n' + userJSON);
