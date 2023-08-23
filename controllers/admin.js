@@ -182,18 +182,102 @@ const viewUser = async (req, res) => {
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
     }
 };
 
+const renderSubcontractorCreateForm = (req, res) => {
+    console.log(req.session);
+    if (req.session.user.role === 'admin') {
+
+        res.render('createSubcontractor', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            message: req.query.message || '',
+        });
+    } else {
+        return res.status(403).send('Access denied.');
+    }
+};
+
+// Handle the submission of the subcontractor creation form
+async function createSubcontractor(req, res) {
+    try {
+
+        const {
+            name,
+            company,
+            line1,
+            line2,
+            city,
+            county,
+            postalCode,
+            cisNumber,
+            utrNumber,
+            isGross
+        } = req.body;
+
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
+
+        // Check if the subcontractor already exists by username or email
+        const existingSubcontractor = await Subcontractor.findOne({
+            where: {
+                [Op.or]: [{
+                    name
+                }, {
+                    company
+                }, {
+                    utrNumber
+                }, {
+                    cisNumber
+                }],
+            },
+        });
+
+        if (existingSubcontractor) {
+            req.flash('error', 'User with the same username or email already exists.');
+            return res.redirect('/admin'); // Redirect to the appropriate page
+        }
+
+        if (!name || !company || !line1 || !city || !county || !postalCode || !cisNumber || !utrNumber) {
+            return res.status(400).send('Incomplete form data');
+        }
+
+
+        await Subcontractor.create({
+            name,
+            company,
+            line1,
+            line2,
+            city,
+            county,
+            postalCode,
+            cisNumber,
+            utrNumber,
+            isGross
+        });
+
+        res.send('Subcontractor created successfully');
+    } catch (error) {
+        req.flash('error', 'Error creating subcontractor: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
+    }
+}
+
 // View a subcontractor
 const viewSubcontractor = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can view subcontractors.');
+            return res.status(403).send('Access denied.');
         }
 
         const subcontractorId = req.params.id;
@@ -208,6 +292,7 @@ const viewSubcontractor = async (req, res) => {
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
@@ -219,7 +304,7 @@ const viewInvoice = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can view invoices.');
+            return res.status(403).send('Access denied.');
         }
 
         const invoiceId = req.params.id;
@@ -234,6 +319,7 @@ const viewInvoice = async (req, res) => {
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
@@ -245,7 +331,7 @@ const renderUserEditForm = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can edit users.');
+            return res.status(403).send('Access denied.');
         }
 
         const userId = req.params.id;
@@ -260,6 +346,7 @@ const renderUserEditForm = async (req, res) => {
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
@@ -274,6 +361,11 @@ const updateUser = async (req, res) => {
             email,
             role
         } = req.body;
+
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
+
         const user = await User.findByPk(req.params.id);
 
         if (user) {
@@ -284,18 +376,18 @@ const updateUser = async (req, res) => {
             await user.save();
 
             req.flash('success', 'User updated.');
-            const referrer = req.get('referer') || '/';
+            const referrer = '/admin';
             res.redirect(referrer);
         } else {
             req.flash('error', 'User not found');
-            const referrer = req.get('referer') || '/';
+            const referrer = '/admin';
             res.redirect(referrer);
         }
     } catch (error) {
         // Handle error
         console.error('Error updating user:', error);
         req.flash('error', 'Error updating user: ' + error.message);
-        const referrer = req.get('referer') || '/';
+        const referrer = '/';
         res.redirect(referrer);
     }
 };
@@ -320,6 +412,7 @@ const renderSubcontractorEditForm = async (req, res) => {
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
@@ -363,18 +456,18 @@ const updateSubcontractor = async (req, res) => {
             await subcontractor.save();
 
             req.flash('success', 'Subcontractor updated.');
-            const referrer = req.get('referer') || '/';
+            const referrer = '/admin';
             res.redirect(referrer);
         } else {
             req.flash('error', 'Subcontractor not found');
-            const referrer = req.get('referer') || '/';
+            const referrer = '/admin';
             res.redirect(referrer);
         }
     } catch (error) {
         // Handle error
         console.error('Error updating subcontractor:', error);
         req.flash('error', 'Error updating subcontractor: ' + error.message);
-        const referrer = req.get('referer') || '/';
+        const referrer = '/admin';
         res.redirect(referrer);
     }
 };
@@ -387,8 +480,7 @@ const renderInvoiceEditForm = async (req, res) => {
             return res.status(403).send('Access denied. Only admins can edit invoices.');
         }
 
-        const invoiceId = req.params.id;
-        const invoice = await Invoice.findByPk(invoiceId);
+        const invoice = await Invoice.findByPk(req.params.id);
 
         if (!invoice) {
             return res.status(404).send('Invoice not found');
@@ -399,6 +491,7 @@ const renderInvoiceEditForm = async (req, res) => {
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         res.status(500).send('Error: ' + error.message);
@@ -413,45 +506,72 @@ const updateInvoice = async (req, res) => {
             kashflowNumber,
             invoiceDate,
             remittanceDate,
-            grossAmount,
             labourCost,
             materialCost,
-            cisAmount,
-            netAmount,
             submissionDate,
-            reverseCharge
         } = req.body;
         const invoice = await Invoice.findByPk(req.params.id);
 
         if (invoice) {
-            // Update invoice data based on the form submission
-            invoice.invoiceNumber = invoiceNumber;
-            invoice.kashflowNumber = kashflowNumber;
-            invoice.invoiceDate = invoiceDate;
-            invoice.remittanceDate = remittanceDate;
-            invoice.grossAmount = grossAmount;
-            invoice.labourCost = labourCost;
-            invoice.materialCost = materialCost;
-            invoice.cisAmount = cisAmount;
-            invoice.netAmount = netAmount;
-            invoice.submissionDate = submissionDate;
-            invoice.reverseCharge = reverseCharge;
-            // ... update other fields as needed ...
-            await invoice.save();
+            const subcontractor = await Subcontractor.findByPk(invoice.SubcontractorId);
 
-            req.flash('success', 'Invoice updated.');
-            const referrer = req.get('referer') || '/';
-            res.redirect(referrer);
+            if (subcontractor) {
+                if (subcontractor.isGross) {
+                    const cisAmount = 0;
+                    const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                    const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                    const reverseCharge = parseInt(grossAmount) * 0.2;
+
+                    invoice.invoiceNumber = invoiceNumber;
+                    invoice.kashflowNumber = kashflowNumber;
+                    invoice.invoiceDate = invoiceDate;
+                    invoice.remittanceDate = remittanceDate;
+                    invoice.grossAmount = grossAmount;
+                    invoice.labourCost = labourCost;
+                    invoice.materialCost = materialCost;
+                    invoice.cisAmount = cisAmount;
+                    invoice.netAmount = netAmount;
+                    invoice.submissionDate = submissionDate;
+                    invoice.reverseCharge = reverseCharge;
+                    await invoice.save();
+
+                    req.flash('success', 'Invoice updated.');
+                    const referrer = '/admin';
+                    res.redirect(referrer);
+                } else {
+                    const cisAmount = parseInt(labourCost) * 0.2;
+                    const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                    const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                    const reverseCharge = parseInt(grossAmount) * 0.2;
+
+                    invoice.invoiceNumber = invoiceNumber;
+                    invoice.kashflowNumber = kashflowNumber;
+                    invoice.invoiceDate = invoiceDate;
+                    invoice.remittanceDate = remittanceDate;
+                    invoice.grossAmount = grossAmount;
+                    invoice.labourCost = labourCost;
+                    invoice.materialCost = materialCost;
+                    invoice.cisAmount = cisAmount;
+                    invoice.netAmount = netAmount;
+                    invoice.submissionDate = submissionDate;
+                    invoice.reverseCharge = reverseCharge;
+                    await invoice.save();
+
+                    req.flash('success', 'Invoice updated.');
+                    const referrer = '/admin';
+                    res.redirect(referrer);
+                }
+            }
         } else {
             req.flash('error', 'Invoice not found');
-            const referrer = req.get('referer') || '/';
+            const referrer = '/admin';
             res.redirect(referrer);
         }
     } catch (error) {
         // Handle error
         console.error('Error updating invoice:', error);
         req.flash('error', 'Error updating invoice: ' + error.message);
-        const referrer = req.get('referer') || '/';
+        const referrer = '/admin';
         res.redirect(referrer);
     }
 };
@@ -523,8 +643,7 @@ const deleteInvoice = async (req, res) => {
             return res.status(403).send('Access denied. Only admins can delete invoices.');
         }
 
-        const invoiceId = req.params.id;
-        const invoice = await Invoice.findByPk(invoiceId);
+        const invoice = await Invoice.findByPk(req.params.id);
 
         if (!invoice) {
             // res.status(404).send('Invoice not found');
@@ -551,6 +670,8 @@ module.exports = {
     renderUserCreateForm,
     createUser,
     viewUser,
+    renderSubcontractorCreateForm,
+    createSubcontractor,
     viewSubcontractor,
     viewInvoice,
     renderUserEditForm,
