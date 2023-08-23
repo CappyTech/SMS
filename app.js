@@ -10,9 +10,14 @@ app.use(express.urlencoded({
 }));
 const bodyParser = require('body-parser');
 require('dotenv').config();
-
+const path = require('path');
 const helpers = require('./helpers');
 app.locals.slimDateTime = helpers.slimDateTime;
+// Set up static file serving for public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Set up static file serving for node_modules directory
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 
 app.use(bodyParser.urlencoded({
     extended: true
