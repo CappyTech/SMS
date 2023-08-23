@@ -49,7 +49,8 @@
     <div class="mb-3">
         <label for="onboardedAt" class="form-label">Onboarded At</label>
         <input type="date" name="onboardedAt" id="onboardedAt" class="form-control"
-            value="<%= subcontractor.onboardedAt ? subcontractor.onboardedAt.toISOString().split('T')[0] : '' %>">
+            <% if (subcontractor.onboardedAt) { %> value="<%= subcontractor.onboardedAt.toISOString().split('T')[0] %>"
+            <% } %>>
     </div>
     <div class="mb-3 form-check">
         <input type="checkbox" name="isGross" id="isGross" class="form-check-input"
