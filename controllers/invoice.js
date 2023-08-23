@@ -67,7 +67,6 @@ const renderInvoiceForm = async (req, res) => {
     }
 };
 
-
 // Handle the submission of the invoice creation form
 const submitInvoice = async (req, res) => {
     try {
@@ -153,13 +152,11 @@ const submitInvoice = async (req, res) => {
             });
         }
         console.error('Error creating invoice:', error);
-        return req.flash('error', 'Error: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
         const referrer = req.get('referer') || '/';
         res.redirect(referrer);
     }
 };
-
-
 
 // Fetch all invoices from the database
 const getAllInvoices = async (req, res) => {
@@ -186,7 +183,6 @@ const getAllInvoices = async (req, res) => {
         res.redirect(referrer);
     }
 };
-
 
 module.exports = {
     selectSubcontractor,
