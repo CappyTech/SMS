@@ -1,15 +1,8 @@
 <!-- views/dashboard.ejs: -->
 <h1>Dashboard</h1>
 
-<% if (typeof message !== 'undefined' && message.length > 0) { %>
-<br>
-<div class="alert alert-infor alert-dismissible fade show p-3" role="alert">
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    <%= message %>
-</div>
-<% } %>
-
-<% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+<!-- Display success message -->
+<% if (successMessage.length > 0) { %>
 <br>
 <div class="alert alert-success alert-dismissible fade show p-3" role="alert">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -17,13 +10,15 @@
 </div>
 <% } %>
 
-<% if (typeof session.user === 'undefined') { %>
-<li class="list-group-item d-flex justify-content-between align-items-center">
-    <p>You are not logged in.</p>
-</li>
-<a href="/login" class="btn btn-primary mt-3">Login</a>
-<a href="/register" class="btn btn-secondary mt-3">Register</a>
-<% } else { %>
+<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
+<br>
+<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <% errorMessages.forEach(errorMessage => { %>
+    <div><%= errorMessage %></div>
+    <% }) %>
+</div>
+<% } %>
 
 <!-- Subcontractors table -->
 <h3>Subcontractors (<%= subcontractorCount %>)</h3>
@@ -33,7 +28,6 @@
             <th>Name</th>
             <th>Company</th>
             <th>CIS Number</th>
-            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -42,16 +36,6 @@
             <td><%= subcontractor.name %></td>
             <td><%= subcontractor.company %></td>
             <td><%= subcontractor.cisNumber %></td>
-            <td>
-                <div class="row">
-                    <div class="col">
-                        <a href="/admin/subcontractor/edit/<%= subcontractor.id %>" class="btn btn-primary">Edit</a>
-                    </div>
-                    <div class="col">
-                        <a href="/admin/subcontractor/delete/<%= subcontractor.id %>" class="btn btn-danger">Delete</a>
-                    </div>
-                </div>
-            </td>
         </tr>
         <% }); %>
     </tbody>
@@ -73,7 +57,6 @@
             <th>Net Amount</th>
             <th>Submission Date</th>
             <th>Reverse Charge</th>
-            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -90,29 +73,7 @@
             <td><%= invoice.netAmount %></td>
             <td><%= slimDateTime(invoice.submissionDate) %></td>
             <td><%= invoice.reverseCharge %></td>
-            <td>
-                <div class="row">
-                    <div class="col">
-                        <a href="/dashboard/invoice/edit/<%= invoice.id %>" class="btn btn-primary">Edit</a>
-                    </div>
-                    <div class="col">
-                        <a href="/dashboard/invoice/delete/<%= invoice.id %>" class="btn btn-danger">Delete</a>
-                    </div>
-                </div>
-            </td>
         </tr>
         <% }); %>
     </tbody>
 </table>
-
-<% } %>
-
-<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
-<br>
-<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    <% errorMessages.forEach(errorMessage => { %>
-    <div><%= errorMessage %></div>
-    <% }) %>
-</div>
-<% } %>
