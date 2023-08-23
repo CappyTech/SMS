@@ -3,75 +3,75 @@
 <html lang="en">
 
 <head>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Subcontractor Management System</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous">
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-    rel="stylesheet">
+  <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 
-<body style="font-family: 'Roboto', sans-serif;">
-  <nav class="navbar navbar-expand navbar-dark bg-dark">
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" href="/">Subcontractor Management System</a>
-      <ul class="navbar-nav">
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        <img src="/favicon.png" alt="Favicon" class="mr-2">
+        <span class="d-none d-md-inline">Subcontractor Management System</span>
+      </a>
+      <ul class="navbar-nav hstack gap-3">
         <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
         <li class="nav-item">
-          <a class="nav-link" href="/admin">Admin Dashboard</a>
+          <a class="nav-link hcs-red-text" href="/admin"><i class="bi bi-speedometer"></i> Admin Dashboard</a>
         </li>
         <% } %>
         <% if (typeof session.user !== 'undefined') { %>
         <li class="nav-item">
-          <a class="nav-link" href="/dashboard">Dashboard</a>
+          <a class="nav-link hcs-green-text" href="/dashboard"><i class="bi bi-speedometer"></i> Dashboard</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/monthly/returns">Monthly Returns</a>
+          <a class="nav-link hcs-green-text" href="/monthly/returns/form"><i class="bi bi-file-spreadsheet-fill"></i>
+            Monthly Returns</a>
         </li>
         <% } else { %>
         <% } %>
       </ul>
-      <ul class="navbar-nav ml-auto hstack gap-3">
+    </div>
+  </nav>
+  <nav class="navbar navbar-expand-lg navbar-light bg-second-navbar">
+    <div class="container">
+      <ul class="navbar-nav hstack gap-3">
         <% if (typeof session.user === 'undefined') { %>
         <li class="nav-item">
           <a class="nav-link" href="/login"><i class="bi bi-box-arrow-in-right"></i> Login</a>
         </li>
-        <div class="vr"></div>
         <li class="nav-item">
           <a class="nav-link" href="/register"><i class="bi bi-book"></i> Register</a>
         </li>
         <% } else { %>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <a class="nav-link dropdown-toggle hcs-green-text" href="#" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
             <i class="bi bi-plus-circle-dotted"></i> Create
           </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/subcontractor/create"><i class="bi bi-person-plus"></i> New
-                Subcontractor</a></li>
-            <li><a class="dropdown-item" href="/subcontractor/select"><i class="bi bi-file-plus"></i> New Invoice</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person"></i> My Account
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/account"><i class="bi bi-person"></i> Account</a></li>
-            <li><a class="dropdown-item" href="/account/settings"><i class="bi bi-gear"></i> Settings</a>
+          <ul class="dropdown-menu dropdown-hcs-green">
+            <li><a class="dropdown-item" href="/admin/user/create"><i class="bi bi-person-plus"></i> New
+                User <i class="bi bi-box-arrow-in-up" style="font-size: 0.65rem;"></i></a></li>
+            <li><a class="dropdown-item" href="/admin/subcontractor/create"><i class="bi bi-person-plus"></i>
+                New
+                Subcontractor <i class="bi bi-box-arrow-in-up" style="font-size: 0.65rem;"></i></a></li>
+            <li><a class="dropdown-item" href="/subcontractor/select"><i class="bi bi-file-plus"></i> New
+                Invoice <i class="bi bi-box-arrow-in-up" style="font-size: 0.65rem;"></i></a>
             </li>
           </ul>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+          <a class="nav-link" href="/account">
+            <i class="bi bi-person"></i> My Account
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link hcs-red-text" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </li>
         <% } %>
       </ul>
@@ -82,16 +82,24 @@
     <%- body %>
   </main>
 
-  <footer class="bg-light text-center py-4">
-    <p><i class="bi bi-c-circle-fill"></i> 2023 <%= packageJson.author %> | <i class="bi bi-git"></i>
-      <%= packageJson.version %> </p>
-    <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">
-      <img alt="Creative Commons Licence" style="border-width:0"
-        src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" />
-    </a>
-    <br>
-    <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>
-  </footer>
+  <nav
+    class="navbar navbar-expand navbar-dark bg-dark text-white d-flex justify-content-center align-items-center mt-5 p-4">
+    <div class="stack-on-small">
+      <div>
+        <a href="/"><img src="/favicon.png" alt="HCS Logo"></a>
+        <a class="hcs-green-text" href="https://www.heroncs.co.uk">Heron Constructive Solutions Ltd.</a><br>
+        Copyright &copy; <u>2023-2023</u> All Rights Reserved.
+        <div>
+          VAT No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">252295994</a>
+          |
+          Company No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">09276951</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <script src="/node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
   <script>
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
