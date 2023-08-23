@@ -30,56 +30,60 @@
                                     <option value="<%= subcontractor.id %>"><%= subcontractor.name %> /
                                         <%= subcontractor.company %></option>
                                 </select>
-                                <button id="addSubcontractorButton" type="button" class="btn btn-primary">+</button>
+                                <button id="addSubcontractorButton" type="button" class="btn btn-hcs-green">+</button>
                             </div>
                         </div>
                     </div>
                 </td>
             </tr>
             <tr>
-                <td><label for="invoiceNumber">Invoice Number:</label></td>
+                <td><label for="invoiceNumber">Invoice <i class="bi bi-123"></label></td>
                 <td><input type="text" id="invoiceNumber" name="invoiceNumber" class="form-control"></td>
             </tr>
             <tr>
-                <td><label for="kashflowNumber">Kashflow Number:</label></td>
+                <td><label for="kashflowNumber">Kashflow <i class="bi bi-123"></label></td>
                 <td><input type="text" id="kashflowNumber" name="kashflowNumber" class="form-control"></td>
             </tr>
             <tr>
-                <td><label for="invoiceDate">Invoice Date:</label></td>
+                <td><label for="invoiceDate">Invoice <i class="bi bi-calendar2-date-fill"></label></td>
                 <td><input type="date" id="invoiceDate" name="invoiceDate" class="form-control"></td>
             </tr>
             <tr>
-                <td><label for="remittanceDate">Remittance Date:</label></td>
+                <td><label for="remittanceDate">Remittance <i class="bi bi-calendar2-date-fill"></label></td>
                 <td><input type="date" id="remittanceDate" name="remittanceDate" class="form-control"></td>
             </tr>
             <tr>
-                <td><label for="labourCost">Labour Cost:</label></td>
+                <td><label for="labourCost">Labour <i class="bi bi-currency-pound"></i></label></td>
                 <td><input type="number" id="labourCost" name="labourCost" class="form-control"></td>
             </tr>
             <tr>
-                <td><label for="materialCost">Material Cost:</label></td>
+                <td><label for="materialCost">Materials <i class="bi bi-currency-pound"></i></label></td>
                 <td><input type="number" id="materialCost" name="materialCost" class="form-control"></td>
             </tr>
             <tr>
-                <td><label for="grossAmount">Gross Amount:</label></td>
-                <td><input type="number" id="grossAmount" name="grossAmount" class="form-control" disabled></td>
+                <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
+                <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
+                        value="Labour x 20%"></td>
             </tr>
             <tr>
-                <td><label for="cisAmount">CIS Amount:</label></td>
-                <td><input type="number" id="cisAmount" name="cisAmount" class="form-control" disabled></td>
+                <td><label for="grossAmount">Gross <i class="bi bi-cash"></i></label></td>
+                <td><input type="text" id="grossAmount" name="grossAmount" class="form-control" disabled
+                        value="Labour + Materials"></td>
             </tr>
             <tr>
-                <td><label for="netAmount">Net Amount:</label></td>
-                <td><input type="number" id="netAmount" name="netAmount" class="form-control" disabled></td>
+                <td><label for="netAmount">Net <i class="bi bi-cash"></i></label></td>
+                <td><input type="text" id="netAmount" name="netAmount" class="form-control" disabled
+                        value="Labour + Materials - CIS Amount"></td>
             </tr>
             <% if (subcontractor.isGross) { %>
             <tr>
-                <td><label for="reverseCharge">Reverse Charge:</label></td>
-                <td><input type="number" id="reverseCharge" name="reverseCharge" class="form-control" disabled></td>
+                <td><label for="reverseCharge">Reverse Charge <i class="bi bi-wallet-fill"></i></label></td>
+                <td><input type="text" id="reverseCharge" name="reverseCharge" class="form-control" disabled
+                        value="Gross x 20%"></td>
             </tr>
             <% } %>
             <tr>
-                <td><label for="submissionDate">Submission Date:</label></td>
+                <td><label for="submissionDate">Submission <i class="bi bi-calendar2-date-fill"></label></td>
                 <td><input type="date" id="submissionDate" name="submissionDate" class="form-control"></td>
             </tr>
         </tbody>
@@ -87,7 +91,7 @@
             <tr>
                 <td colspan="2">
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-hcs-green">
                             <i class="bi bi-file-earmark-plus"></i> Create Invoice
                         </button>
                     </div>
