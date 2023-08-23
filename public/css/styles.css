@@ -1,0 +1,256 @@
+body {
+	font-family: 'Lato', sans-serif;
+}
+strong {
+	font-family: 'Lato:b', sans-serif;
+}
+.hcs-red {
+	background-color: #A0333D !important;
+}
+.hcs-green {
+	background-color: #8bc441 !important;
+}
+.hcs-black {
+	background-color: #4e4e4e !important;
+}
+.hcs-black.lighten-1 {
+	background-color: #818181 !important;
+}
+.hcs-black.lighten-2 {
+	background-color: #a7a9ac !important;
+}
+.hcs-black.lighten-3 {
+	background-color: #d1d3d4 !important;
+}
+.hcs-black.lighten-4 {
+	background-color: #e6e7e8 !important;
+}
+.hcs-red-text {
+	color: #A0333D !important;
+}
+.hcs-green-text {
+	color: #2B9E1B !important;
+}
+.hcs-black-text {
+	color: #4e4e4e !important;
+}
+.hcs-red-text:hover, .hcs-green-text:hover, .hcs-black-text:hover {
+	color: #a7a9ac !important;
+}
+.dropdown:hover .dropdown-menu {
+	display: block !important;
+}
+.dropdown-toggle::after {
+    display:none !important;
+}
+
+.dropdown .dropdown-menu.dropdown-hcs-red .dropdown-item:hover, .dropdown .dropdown-menu.dropdown-hcs-red .dropdown-item:active, .dropdown .dropdown-menu.dropdown-hcs-red .dropdown-item.active,
+.dropup .dropdown-menu.dropdown-hcs-red .dropdown-item:hover,.dropup .dropdown-menu.dropdown-hcs-red .dropdown-item:active,.dropup .dropdown-menu.dropdown-hcs-red .dropdown-item.active,
+.dropleft .dropdown-menu.dropdown-hcs-red .dropdown-item:hover,.dropleft .dropdown-menu.dropdown-hcs-red .dropdown-item:active,.dropleft .dropdown-menu.dropdown-hcs-red .dropdown-item.active,
+.dropright .dropdown-menu.dropdown-hcs-red .dropdown-item:hover,.dropright .dropdown-menu.dropdown-hcs-red .dropdown-item:active,.dropright .dropdown-menu.dropdown-hcs-red .dropdown-item.active {
+	background-color: #A0333D !important;
+	color: #fff;
+	-webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+	-webkit-border-radius: 0.125rem;
+	border-radius: 0.125rem;
+}
+
+.dropdown .dropdown-menu.dropdown-hcs-red .dropdown-item:hover.disabled, .dropdown .dropdown-menu.dropdown-hcs-red .dropdown-item:active.disabled, .dropdown .dropdown-menu.dropdown-hcs-red .dropdown-item.active.disabled,
+.dropup .dropdown-menu.dropdown-hcs-red .dropdown-item:hover.disabled,.dropup .dropdown-menu.dropdown-hcs-red .dropdown-item:active.disabled,.dropup .dropdown-menu.dropdown-hcs-red .dropdown-item.active.disabled,
+.dropleft .dropdown-menu.dropdown-hcs-red .dropdown-item:hover.disabled,.dropleft .dropdown-menu.dropdown-hcs-red .dropdown-item:active.disabled,.dropleft .dropdown-menu.dropdown-hcs-red .dropdown-item.active.disabled,
+.dropright .dropdown-menu.dropdown-hcs-red .dropdown-item:hover.disabled,.dropright .dropdown-menu.dropdown-hcs-red .dropdown-item:active.disabled,.dropright .dropdown-menu.dropdown-hcs-red .dropdown-item.active.disabled {
+	background-color: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.dropdown-hcs-red .dropdown-content li.active, .dropdown-hcs-red .dropdown-content li a, .dropdown-hcs-red .dropdown-content li span:hover {
+	background-color: #A0333D !important;
+}
+
+.dropdown-hcs-red .dropdown-content li.disabled.active {
+	background-color: transparent !important;
+	color: white;
+}
+
+.dropdown-hcs-red .search-wrap input:focus {
+	border-bottom: 1px solid #A0333D;
+	-webkit-box-shadow: 0 1px 0 0 #A0333D;
+	box-shadow: 0 1px 0 0 #A0333D;
+}
+
+/* Styles for dropdown with hcs-green background color */
+.dropdown .dropdown-menu.dropdown-hcs-green .dropdown-item:hover,
+.dropdown .dropdown-menu.dropdown-hcs-green .dropdown-item:active,
+.dropdown .dropdown-menu.dropdown-hcs-green .dropdown-item.active,
+.dropup .dropdown-menu.dropdown-hcs-green .dropdown-item:hover,
+.dropup .dropdown-menu.dropdown-hcs-green .dropdown-item:active,
+.dropup .dropdown-menu.dropdown-hcs-green .dropdown-item.active,
+.dropleft .dropdown-menu.dropdown-hcs-green .dropdown-item:hover,
+.dropleft .dropdown-menu.dropdown-hcs-green .dropdown-item:active,
+.dropleft .dropdown-menu.dropdown-hcs-green .dropdown-item.active,
+.dropright .dropdown-menu.dropdown-hcs-green .dropdown-item:hover,
+.dropright .dropdown-menu.dropdown-hcs-green .dropdown-item:active,
+.dropright .dropdown-menu.dropdown-hcs-green .dropdown-item.active {
+	background-color: #2B9E1B !important;
+	color: #fff;
+	-webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+	-webkit-border-radius: 0.125rem;
+	border-radius: 0.125rem;
+}
+
+/* Styles for disabled dropdown items with hcs-green background color */
+.dropdown .dropdown-menu.dropdown-hcs-green .dropdown-item:hover.disabled,
+.dropdown .dropdown-menu.dropdown-hcs-green .dropdown-item:active.disabled,
+.dropdown .dropdown-menu.dropdown-hcs-green .dropdown-item.active.disabled,
+.dropup .dropdown-menu.dropdown-hcs-green .dropdown-item:hover.disabled,
+.dropup .dropdown-menu.dropdown-hcs-green .dropdown-item:active.disabled,
+.dropup .dropdown-menu.dropdown-hcs-green .dropdown-item.active.disabled,
+.dropleft .dropdown-menu.dropdown-hcs-green .dropdown-item:hover.disabled,
+.dropleft .dropdown-menu.dropdown-hcs-green .dropdown-item:active.disabled,
+.dropleft .dropdown-menu.dropdown-hcs-green .dropdown-item.active.disabled,
+.dropright .dropdown-menu.dropdown-hcs-green .dropdown-item:hover.disabled,
+.dropright .dropdown-menu.dropdown-hcs-green .dropdown-item:active.disabled,
+.dropright .dropdown-menu.dropdown-hcs-green .dropdown-item.active.disabled {
+	background-color: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+/* Styles for active and hovered dropdown items with hcs-green background color */
+.dropdown-hcs-green .dropdown-content li.active,
+.dropdown-hcs-green .dropdown-content li a,
+.dropdown-hcs-green .dropdown-content li span:hover {
+	background-color: #2B9E1B !important;
+	color: white;
+}
+
+/* Styles for disabled active dropdown items with hcs-green background color */
+.dropdown-hcs-green .dropdown-content li.disabled.active {
+	background-color: transparent !important;
+	color: white;
+}
+
+/* Styles for search input focus in dropdown with hcs-green background color */
+.dropdown-hcs-green .search-wrap input:focus {
+	border-bottom: 1px solid #2B9E1B;
+	-webkit-box-shadow: 0 1px 0 0 #2B9E1B;
+	box-shadow: 0 1px 0 0 #2B9E1B;
+}
+
+/* Styles for dropdown with hcs-black background color */
+.dropdown .dropdown-menu.dropdown-hcs-black .dropdown-item:hover,
+.dropdown .dropdown-menu.dropdown-hcs-black .dropdown-item:active,
+.dropdown .dropdown-menu.dropdown-hcs-black .dropdown-item.active,
+.dropup .dropdown-menu.dropdown-hcs-black .dropdown-item:hover,
+.dropup .dropdown-menu.dropdown-hcs-black .dropdown-item:active,
+.dropup .dropdown-menu.dropdown-hcs-black .dropdown-item.active,
+.dropleft .dropdown-menu.dropdown-hcs-black .dropdown-item:hover,
+.dropleft .dropdown-menu.dropdown-hcs-black .dropdown-item:active,
+.dropleft .dropdown-menu.dropdown-hcs-black .dropdown-item.active,
+.dropright .dropdown-menu.dropdown-hcs-black .dropdown-item:hover,
+.dropright .dropdown-menu.dropdown-hcs-black .dropdown-item:active,
+.dropright .dropdown-menu.dropdown-hcs-black .dropdown-item.active {
+	background-color: #4e4e4e !important;
+	color: #fff;
+	-webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+	-webkit-border-radius: 0.125rem;
+	border-radius: 0.125rem;
+}
+
+/* Styles for disabled dropdown items with hcs-black background color */
+.dropdown .dropdown-menu.dropdown-hcs-black .dropdown-item:hover.disabled,
+.dropdown .dropdown-menu.dropdown-hcs-black .dropdown-item:active.disabled,
+.dropdown .dropdown-menu.dropdown-hcs-black .dropdown-item.active.disabled,
+.dropup .dropdown-menu.dropdown-hcs-black .dropdown-item:hover.disabled,
+.dropup .dropdown-menu.dropdown-hcs-black .dropdown-item:active.disabled,
+.dropup .dropdown-menu.dropdown-hcs-black .dropdown-item.active.disabled,
+.dropleft .dropdown-menu.dropdown-hcs-black .dropdown-item:hover.disabled,
+.dropleft .dropdown-menu.dropdown-hcs-black .dropdown-item:active.disabled,
+.dropleft .dropdown-menu.dropdown-hcs-black .dropdown-item.active.disabled,
+.dropright .dropdown-menu.dropdown-hcs-black .dropdown-item:hover.disabled,
+.dropright .dropdown-menu.dropdown-hcs-black .dropdown-item:active.disabled,
+.dropright .dropdown-menu.dropdown-hcs-black .dropdown-item.active.disabled {
+	background-color: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+/* Styles for active and hovered dropdown items with hcs-black background color */
+.dropdown-hcs-black .dropdown-content li.active,
+.dropdown-hcs-black .dropdown-content li a,
+.dropdown-hcs-black .dropdown-content li span:hover {
+	background-color: #4e4e4e !important;
+	color: white;
+}
+
+/* Styles for disabled active dropdown items with hcs-black background color */
+.dropdown-hcs-black .dropdown-content li.disabled.active {
+	background-color: transparent !important;
+	color: white;
+}
+
+/* Styles for search input focus in dropdown with hcs-black background color */
+.dropdown-hcs-black .search-wrap input:focus {
+	border-bottom: 1px solid #4e4e4e;
+	-webkit-box-shadow: 0 1px 0 0 #4e4e4e;
+	box-shadow: 0 1px 0 0 #4e4e4e;
+}
+
+a {
+	color: #A0333D;
+}
+a:hover {
+	color: #2B9E1B;
+}
+.sticky-bottom {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	z-index: 1000;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px;
+}
+.bg-second-navbar {
+	background-color: #e6e7e8;
+}
+
+/* Define your custom button classes */
+.btn-hcs-red {
+	background-color: #A0333D;
+	color: white;
+	border-color: #A0333D;
+  }
+  
+  .btn-hcs-green {
+	background-color: #2B9E1B;
+	color: white;
+	border-color: #2B9E1B;
+  }
+  
+  .btn-hcs-black {
+	background-color: #4e4e4e;
+	color: white;
+	border-color: #4e4e4e;
+  }
+  
+  /* Override Bootstrap styles for these custom buttons */
+  .btn-hcs-red:hover {
+	background-color: #a7a9ac;
+	border-color: #a7a9ac;
+  }
+  
+  .btn-hcs-green:hover {
+	background-color: #2B9E1B;
+	border-color: #2B9E1B;
+  }
+  
+  .btn-hcs-black:hover {
+	background-color: #818181;
+	border-color: #818181;
+  }
