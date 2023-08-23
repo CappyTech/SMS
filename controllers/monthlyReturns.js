@@ -1,7 +1,6 @@
 // controllers/monthlyReturns.js
 const packageJson = require('../package.json');
 const Sequelize = require('sequelize');
-const User = require('../models/user');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const helpers = require('../helpers');
@@ -170,6 +169,13 @@ const renderFilteredMonthlyReturns = async (req, res) => {
         // Retrieve selected tax year from query parameter or default to the first available year
         const selectedYear = year || (taxYears.length > 0 ? taxYears[0].year : null);
 
+        // Build the conditions for the query
+        const whereConditions = {
+            '$Invoice.deletedAt$': null,
+            '$SubcontractorId$': subcontractor,
+            '$YEAR(DATE_ADD(`Invoice`.`submissionDate`, INTERVAL 5 DAY))$': selectedYear,
+        };
+
         // Retrieve monthly returns for each subcontractor based on the selected tax year and subcontractor
         const monthlyReturns = await Invoice.findAll({
             attributes: [
@@ -177,17 +183,17 @@ const renderFilteredMonthlyReturns = async (req, res) => {
                 [Sequelize.literal("CASE WHEN MONTH(submissionDate) >= 4 THEN MONTH(submissionDate) - 3 ELSE MONTH(submissionDate) + 9 END"), 'month'],
                 [Sequelize.literal('`Subcontractor`.`name`'), 'subcontractorName'],
                 [Sequelize.fn('SUM', Sequelize.col('netAmount')), 'totalnetAmount'],
-                // ... other attributes ...
+                [Sequelize.fn('SUM', Sequelize.col('grossAmount')), 'totalgrossAmount'],
+                [Sequelize.fn('SUM', Sequelize.col('labourCost')), 'totallabourCost'],
+                [Sequelize.fn('SUM', Sequelize.col('materialCost')), 'totalmaterialCost'],
+                [Sequelize.fn('SUM', Sequelize.col('cisAmount')), 'totalcisAmount'],
+                [Sequelize.fn('SUM', Sequelize.col('reverseCharge')), 'totalreverseCharge'],
             ],
             include: [{
                 model: Subcontractor,
                 attributes: [],
             }],
-            where: Sequelize.and(
-                Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY'))), selectedYear, {
-                    SubcontractorId: subcontractor
-                } // Filter by selected subcontractor
-            ),
+            where: whereConditions,
             group: ['year', 'month', 'subcontractorName'],
             order: ['year', 'month', 'subcontractorName'],
             raw: true,
@@ -196,8 +202,6 @@ const renderFilteredMonthlyReturns = async (req, res) => {
         // Render the monthly returns page with the tax years, selected year, and filtered data
         res.render('monthlyReturns', {
             monthlyReturns,
-            year: year,
-            subcontractor: subcontractor,
             taxYears: taxYears.map(entry => entry.year),
             selectedYear,
             errorMessages: req.flash('error'),
