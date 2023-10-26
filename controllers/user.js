@@ -57,10 +57,10 @@ const registerUser = async (req, res) => {
             twoFactorSecret: secret.base32,
         });
         if (role === "admin") {
-            res.redirect('/account');
+            res.redirect('/admin');
         }
         if (role === "subcontractor") {
-            res.redirect('/onboarding');
+            res.redirect('/dashboard');
         }
         if (role === "user") {
             res.redirect('/account');
