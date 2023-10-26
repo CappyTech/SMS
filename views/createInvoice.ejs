@@ -17,7 +17,7 @@
 </div>
 <% } %>
 
-<form action="/invoice/submit" method="POST" class="needs-validation">
+<form action="/invoice/submit/<%= subcontractor.id %>" method="POST" class="needs-validation">
     <table class="table">
         <tbody>
             <tr>
@@ -60,11 +60,27 @@
                 <td><label for="materialCost">Materials <i class="bi bi-currency-pound"></i></label></td>
                 <td><input type="number" id="materialCost" name="materialCost" class="form-control"></td>
             </tr>
+            <% if (subcontractor.deduction === 0.3) { %>
             <tr>
                 <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
                 <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
-                        value="Labour x 20%"></td>
+                        value="Labour / 30%"></td>
             </tr>
+            <% } %>
+            <% if (subcontractor.deduction === 0.2) { %>
+            <tr>
+                <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
+                <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
+                        value="Labour / 20%"></td>
+            </tr>
+            <% } %>
+            <% if (subcontractor.deduction === 0) { %>
+            <tr>
+                <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
+                <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
+                        value="Labour / 0%"></td>
+            </tr>
+            <% } %>
             <tr>
                 <td><label for="grossAmount">Gross <i class="bi bi-cash"></i></label></td>
                 <td><input type="text" id="grossAmount" name="grossAmount" class="form-control" disabled
@@ -73,9 +89,9 @@
             <tr>
                 <td><label for="netAmount">Net <i class="bi bi-cash"></i></label></td>
                 <td><input type="text" id="netAmount" name="netAmount" class="form-control" disabled
-                        value="Labour + Materials - CIS Amount"></td>
+                        value="Labour + Materials - CIS Deduction"></td>
             </tr>
-            <% if (subcontractor.isGross) { %>
+            <% if (subcontractor.deduction === 0) { %>
             <tr>
                 <td><label for="reverseCharge">Reverse Charge <i class="bi bi-wallet-fill"></i></label></td>
                 <td><input type="text" id="reverseCharge" name="reverseCharge" class="form-control" disabled
