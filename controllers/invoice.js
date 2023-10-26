@@ -62,13 +62,11 @@ const renderInvoiceForm = async (req, res) => {
         return res.send('Subcontractor not found');
     } catch (error) {
         return req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
     }
 };
 
 // Handle the submission of the invoice creation form
-const submitInvoice = async (req, res) => {
+const createInvoice = async (req, res) => {
     try {
         const {
             invoiceNumber,
@@ -158,35 +156,8 @@ const submitInvoice = async (req, res) => {
     }
 };
 
-// Fetch all invoices from the database
-const getAllInvoices = async (req, res) => {
-    try {
-        const subcontractors = await Subcontractor.findAll({
-            include: {
-                all: true
-            }
-        });
-        console.log(subcontractors);
-        console.log(subcontractors.Invoices);
-        res.render('invoices', {
-            subcontractors,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            packageJson,
-            message: req.query.message || '',
-            slimDateTime: helpers.slimDateTime,
-        });
-    } catch (error) {
-        req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
-    }
-};
-
 module.exports = {
     selectSubcontractor,
     renderInvoiceForm,
-    submitInvoice,
-    getAllInvoices,
+    createInvoice
 };
