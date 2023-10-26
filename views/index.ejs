@@ -1,10 +1,12 @@
 <!-- views/index.ejs: -->
 
-<% if (typeof message !== 'undefined' && message.length > 0) { %>
+<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
 <br>
-<div class="alert alert-infor alert-dismissible fade show p-3" role="alert">
+<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    <%= message %>
+    <% errorMessages.forEach(errorMessage => { %>
+    <div><%= errorMessage %></div>
+    <% }) %>
 </div>
 <% } %>
 
@@ -35,7 +37,7 @@
                     efficiency and transparency.</p>
                 <% if (typeof session.user === 'undefined') { %>
                 <div class="d-grid">
-                    <a href="/register" class="btn btn-success" type="button"><i class="bi bi-book"></i>
+                    <a href="/register" class="btn btn-hcs-green" type="button"><i class="bi bi-book"></i>
                         Register</a>
                 </div>
                 <% } %>
@@ -52,7 +54,7 @@
                         <input type="password" id="password" name="password" class="form-control" required>
                     </div>
                     <div class="mb-3 d-grid">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-box-arrow-in-right"></i>
+                        <button type="submit" class="btn btn-hcs-red"><i class="bi bi-box-arrow-in-right"></i>
                             Login</button>
                     </div>
                 </form>
@@ -61,13 +63,3 @@
         </div>
     </div>
 </div>
-
-<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
-<br>
-<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    <% errorMessages.forEach(errorMessage => { %>
-    <div><%= errorMessage %></div>
-    <% }) %>
-</div>
-<% } %>
