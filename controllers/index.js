@@ -73,7 +73,7 @@ const renderDashboard = async (req, res) => {
                     message: req.query.message || '',
                 });
             } else {
-                res.redirect('/subcontractor/create');
+                res.redirect('/admin/subcontractor/create');
             }
         } else {
             res.redirect('/login');
