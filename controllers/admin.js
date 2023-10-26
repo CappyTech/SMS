@@ -5,6 +5,9 @@ const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const User = require('../models/user');
 const helpers = require('../helpers');
+const {
+    Op
+} = require('sequelize');
 
 // Render the admin dashboard
 const renderAdminDashboard = async (req, res) => {
@@ -264,7 +267,9 @@ async function createSubcontractor(req, res) {
             isGross
         });
 
-        res.send('Subcontractor created successfully');
+        req.flash('success', 'Subcontractor created.');
+        const referrer = '/admin';
+        res.redirect(referrer);
     } catch (error) {
         req.flash('error', 'Error creating subcontractor: ' + error.message);
         const referrer = req.get('referer') || '/';
@@ -568,7 +573,6 @@ const updateInvoice = async (req, res) => {
             res.redirect(referrer);
         }
     } catch (error) {
-        // Handle error
         console.error('Error updating invoice:', error);
         req.flash('error', 'Error updating invoice: ' + error.message);
         const referrer = '/admin';
@@ -652,7 +656,6 @@ const deleteInvoice = async (req, res) => {
 
         await invoice.destroy();
 
-        res.send('Invoice deleted successfully');
         req.flash('success', 'Invoice deleted successfully');
         const referrer = req.get('referer') || '/admin';
         res.redirect(referrer);
