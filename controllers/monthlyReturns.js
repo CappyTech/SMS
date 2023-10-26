@@ -11,7 +11,7 @@ const renderMonthlyReturns = async (req, res) => {
         // Retrieve available tax years
         const taxYears = await Invoice.findAll({
             attributes: [
-                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
+                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
             ],
             group: ['year'],
             order: ['year'],
@@ -24,8 +24,8 @@ const renderMonthlyReturns = async (req, res) => {
         // Retrieve monthly returns for each subcontractor based on the selected tax year
         const monthlyReturns = await Invoice.findAll({
             attributes: [
-                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
-                [Sequelize.literal("CASE WHEN MONTH(submissionDate) >= 4 THEN MONTH(submissionDate) - 3 ELSE MONTH(submissionDate) + 9 END"), 'month'],
+                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
+                [Sequelize.literal("CASE WHEN MONTH(remittanceDate) >= 4 THEN MONTH(remittanceDate) - 3 ELSE MONTH(remittanceDate) + 9 END"), 'month'],
                 [Sequelize.literal('`Subcontractor`.`name`'), 'subcontractorName'],
                 [Sequelize.fn('SUM', Sequelize.col('netAmount')), 'totalnetAmount'],
                 // ... other attributes ...
@@ -35,7 +35,7 @@ const renderMonthlyReturns = async (req, res) => {
                 attributes: [],
             }],
             where: Sequelize.and(
-                Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY'))), selectedYear
+                Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), selectedYear
             ),
             group: ['year', 'month', 'subcontractorName'],
             order: ['year', 'month', 'subcontractorName'],
@@ -71,8 +71,8 @@ const renderMonthlyReturns = async (req, res) => {
         // Retrieve monthly returns for the specified year and subcontractor
         const monthlyReturns = await Invoice.findAll({
             attributes: [
-                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
-                [Sequelize.literal("CASE WHEN MONTH(submissionDate) >= 4 THEN MONTH(submissionDate) - 3 ELSE MONTH(submissionDate) + 9 END"), 'month'],
+                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
+                [Sequelize.literal("CASE WHEN MONTH(remittanceDate) >= 4 THEN MONTH(remittanceDate) - 3 ELSE MONTH(remittanceDate) + 9 END"), 'month'],
                 [Sequelize.literal('`Subcontractor`.`name`'), 'subcontractorName'],
                 [Sequelize.fn('SUM', Sequelize.col('netAmount')), 'totalnetAmount'],
                 [Sequelize.fn('SUM', Sequelize.col('grossAmount')), 'totalgrossAmount'],
@@ -86,7 +86,7 @@ const renderMonthlyReturns = async (req, res) => {
                 attributes: [],
             }],
             where: Sequelize.and(
-                Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY'))), year,
+                Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), year,
                 Sequelize.where(Sequelize.col('SubcontractorId'), subcontractor)
             ),
             group: ['year', 'month', 'subcontractorName'],
@@ -123,7 +123,7 @@ const renderMonthlyReturnsForm = async (req, res) => {
         // Retrieve available tax years
         const taxYears = await Invoice.findAll({
             attributes: [
-                [Sequelize.fn('DISTINCT', Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY')))), 'year'],
+                [Sequelize.fn('DISTINCT', Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY')))), 'year'],
             ],
             raw: true,
         });
@@ -149,7 +149,7 @@ const renderMonthlyReturnsForm = async (req, res) => {
 };
 
 
-const renderFilteredMonthlyReturns = async (req, res) => {
+/*const renderFilteredMonthlyReturns = async (req, res) => {
     try {
         const {
             year,
@@ -162,14 +162,14 @@ const renderFilteredMonthlyReturns = async (req, res) => {
         // Retrieve available tax years
         const taxYears = await Invoice.findAll({
             attributes: [
-                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
+                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
             ],
             group: ['year'],
             order: ['year'],
             raw: true,
         });
 
-        const yearColumn = Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY')));
+        const yearColumn = Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY')));
 
         const selectedYear = year || (taxYears.length > 0 ? taxYears[0].year : null);
 
@@ -183,8 +183,8 @@ const renderFilteredMonthlyReturns = async (req, res) => {
         // Retrieve monthly returns for each subcontractor based on the selected tax year and subcontractor
         const monthlyReturns = await Invoice.findAll({
             attributes: [
-                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
-                [Sequelize.literal("CASE WHEN MONTH(submissionDate) >= 4 THEN MONTH(submissionDate) - 3 ELSE MONTH(submissionDate) + 9 END"), 'month'],
+                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
+                [Sequelize.literal("CASE WHEN MONTH(remittanceDate) >= 4 THEN MONTH(remittanceDate) - 3 ELSE MONTH(remittanceDate) + 9 END"), 'month'],
                 [Sequelize.literal('`Subcontractor`.`name`'), 'subcontractorName'],
                 [Sequelize.fn('SUM', Sequelize.col('netAmount')), 'totalnetAmount'],
                 [Sequelize.fn('SUM', Sequelize.col('grossAmount')), 'totalgrossAmount'],
@@ -219,7 +219,81 @@ const renderFilteredMonthlyReturns = async (req, res) => {
         console.error('Error retrieving filtered monthly returns:', error);
         res.status(500).send('Internal Server Error');
     }
+};*/
+
+const renderFilteredMonthlyReturns = async (req, res) => {
+    try {
+        const {
+            year,
+            subcontractor
+        } = req.query;
+
+        // Retrieve available tax years
+        const taxYears = await Invoice.findAll({
+            attributes: [
+                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
+            ],
+            group: ['year'],
+            order: ['year'],
+            raw: true,
+        });
+
+        const selectedYear = year || (taxYears.length > 0 ? taxYears[0].year : null);
+
+        // Construct the year condition using Sequelize.where
+        const yearCondition = Sequelize.where(Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), selectedYear);
+
+        // Build the conditions for the query
+        const whereConditions = {
+            '$Invoice.deletedAt$': null,
+            '$SubcontractorId$': subcontractor,
+        };
+
+        // Retrieve monthly returns for each subcontractor based on the selected tax year and subcontractor
+        const monthlyReturns = await Invoice.findAll({
+            attributes: [
+                [Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('remittanceDate'), Sequelize.literal('INTERVAL 5 DAY'))), 'year'],
+                [Sequelize.literal("CASE WHEN MONTH(remittanceDate) >= 4 THEN MONTH(remittanceDate) - 3 ELSE MONTH(remittanceDate) + 9 END"), 'month'],
+                [Sequelize.literal('`Subcontractor`.`name`'), 'subcontractorName'],
+                [Sequelize.fn('SUM', Sequelize.col('netAmount')), 'totalnetAmount'],
+                [Sequelize.fn('SUM', Sequelize.col('grossAmount')), 'totalgrossAmount'],
+                [Sequelize.fn('SUM', Sequelize.col('labourCost')), 'totallabourCost'],
+                [Sequelize.fn('SUM', Sequelize.col('materialCost')), 'totalmaterialCost'],
+                [Sequelize.fn('SUM', Sequelize.col('cisAmount')), 'totalcisAmount'],
+                [Sequelize.fn('SUM', Sequelize.col('reverseCharge')), 'totalreverseCharge'],
+            ],
+            include: [{
+                model: Subcontractor,
+                attributes: [],
+            }],
+            where: {
+                ...whereConditions,
+                ...selectedYear && yearCondition
+            },
+            group: ['year', 'month', 'subcontractorName'],
+            order: ['year', 'month', 'subcontractorName'],
+            raw: true,
+        });
+
+        // Render the monthly returns page with the tax years, selected year, and filtered data
+        res.render('monthlyReturns', {
+            monthlyReturns,
+            taxYears: taxYears.map(entry => entry.year),
+            selectedYear,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            message: req.query.message || '',
+            slimDateTime: helpers.slimDateTime,
+        });
+    } catch (error) {
+        console.error('Error retrieving filtered monthly returns:', error);
+        res.status(500).send('Internal Server Error');
+    }
 };
+
+
 
 
 
