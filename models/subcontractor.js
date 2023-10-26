@@ -49,20 +49,10 @@ const Subcontractors = sequelize.define('Subcontractor', {
         allowNull: false,
         unique: true,
     },
-    onboarded: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-        defaultValue: false,
-    },
-    onboardedAt: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        defaultValue: null,
-    },
-    isGross: {
-        type: DataTypes.BOOLEAN,
+    deduction: {
+        type: DataTypes.FLOAT,
         allowNull: false,
-        defaultValue: false,
+        defaultValue: 0.3,
     },
 }, {
     paranoid: true,
