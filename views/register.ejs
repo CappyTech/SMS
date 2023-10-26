@@ -1,10 +1,12 @@
 <!-- views/register.ejs: -->
 <h1>Register</h1>
-<% if (typeof message !== 'undefined' && message.length > 0) { %>
+<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
 <br>
-<div class="alert alert-infor alert-dismissible fade show p-3" role="alert">
+<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    <%= message %>
+    <% errorMessages.forEach(errorMessage => { %>
+    <div><%= errorMessage %></div>
+    <% }) %>
 </div>
 <% } %>
 
@@ -39,17 +41,6 @@
         </select>
     </div>
     <div class="mb-3">
-        <button type="submit" class="btn btn-primary">Register</button>
+        <button type="submit" class="btn btn-hcs-green">Register</button>
     </div>
 </form>
-
-
-<% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
-<br>
-<div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    <% errorMessages.forEach(errorMessage => { %>
-    <div><%= errorMessage %></div>
-    <% }) %>
-</div>
-<% } %>
