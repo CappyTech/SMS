@@ -156,6 +156,9 @@ const renderFilteredMonthlyReturns = async (req, res) => {
             subcontractor
         } = req.query;
 
+        console.log(subcontractor);
+        console.log(year);
+
         // Retrieve available tax years
         const taxYears = await Invoice.findAll({
             attributes: [
@@ -166,14 +169,15 @@ const renderFilteredMonthlyReturns = async (req, res) => {
             raw: true,
         });
 
-        // Retrieve selected tax year from query parameter or default to the first available year
+        const yearColumn = Sequelize.fn('YEAR', Sequelize.fn('DATE_ADD', Sequelize.col('submissionDate'), Sequelize.literal('INTERVAL 5 DAY')));
+
         const selectedYear = year || (taxYears.length > 0 ? taxYears[0].year : null);
 
         // Build the conditions for the query
         const whereConditions = {
             '$Invoice.deletedAt$': null,
             '$SubcontractorId$': subcontractor,
-            '$YEAR(DATE_ADD(`Invoice`.`submissionDate`, INTERVAL 5 DAY))$': selectedYear,
+            [yearColumn]: selectedYear,
         };
 
         // Retrieve monthly returns for each subcontractor based on the selected tax year and subcontractor
@@ -216,6 +220,8 @@ const renderFilteredMonthlyReturns = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
+
 
 module.exports = {
     renderFilteredMonthlyReturns,
