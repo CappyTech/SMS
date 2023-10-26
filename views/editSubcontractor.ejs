@@ -41,21 +41,13 @@
         <input type="text" name="utrNumber" id="utrNumber" class="form-control" value="<%= subcontractor.utrNumber %>"
             required>
     </div>
-    <div class="mb-3 form-check">
-        <input type="checkbox" name="onboarded" id="onboarded" class="form-check-input"
-            <%= subcontractor.onboarded ? 'checked' : '' %>>
-        <label for="onboarded" class="form-check-label">Onboarded</label>
-    </div>
     <div class="mb-3">
-        <label for="onboardedAt" class="form-label">Onboarded At</label>
-        <input type="date" name="onboardedAt" id="onboardedAt" class="form-control"
-            <% if (subcontractor.onboardedAt) { %> value="<%= subcontractor.onboardedAt.toISOString().split('T')[0] %>"
-            <% } %>>
-    </div>
-    <div class="mb-3 form-check">
-        <input type="checkbox" name="isGross" id="isGross" class="form-check-input"
-            <%= subcontractor.isGross ? 'checked' : '' %>>
-        <label for="isGross" class="form-check-label">Is Gross</label>
+        <label for="deduction" class="form-label">Deduction</label>
+        <select name="deduction" id="deduction" class="form-select">
+            <option value="0.3" <%= subcontractor.deduction === 0.3 ? 'selected' : '' %>>30%</option>
+            <option value="0.2" <%= subcontractor.deduction === 0.2 ? 'selected' : '' %>>20%</option>
+            <option value="0" <%= subcontractor.deduction === 0 ? 'selected' : '' %>>0%</option>
+        </select>
     </div>
     <!-- Add more input fields for other details -->
     <button type="submit" class="btn btn-primary">Update Subcontractor</button>
