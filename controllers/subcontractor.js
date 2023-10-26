@@ -21,7 +21,7 @@ const renderSubcontractorForm = (req, res) => {
 };
 
 // Handle the submission of the subcontractor creation form
-async function submitSubcontractorForm(req, res) {
+async function createSubcontractor(req, res) {
     try {
 
         const {
@@ -62,5 +62,5 @@ async function submitSubcontractorForm(req, res) {
 
 module.exports = {
     renderSubcontractorForm,
-    submitSubcontractorForm
+    createSubcontractor
 };
