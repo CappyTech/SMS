@@ -56,6 +56,18 @@ const Invoice = sequelize.define('Invoice', {
         type: DataTypes.FLOAT,
         allowNull: true,
     },
+    month: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+            min: 1,
+            max: 12
+        }
+    },
+    year: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
 }, {
     paranoid: true, // Add the paranoid option
 });
