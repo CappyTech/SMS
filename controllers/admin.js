@@ -514,57 +514,141 @@ const updateInvoice = async (req, res) => {
             labourCost,
             materialCost,
             submissionDate,
+            month,
+            year
         } = req.body;
-        const invoice = await Invoice.findByPk(req.params.id);
+        console.log(req.body);
 
+        const invoice = await Invoice.findByPk(req.params.id);
+        console.log('invoice found')
         if (invoice) {
             const subcontractor = await Subcontractor.findByPk(invoice.SubcontractorId);
-
+            console.log('subcontractor found')
             if (subcontractor) {
-                if (subcontractor.isGross) {
-                    const cisAmount = 0;
-                    const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-                    const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-                    const reverseCharge = parseInt(grossAmount) * 0.2;
+                if (submissionDate === '0000-00-00 00:00:00') {
+                    if (subcontractor.isGross) {
+                        console.log('subdate 0 and gross');
+                        const cisAmount = 0;
+                        const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                        const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                        const reverseCharge = parseInt(grossAmount) * 0.2;
 
-                    invoice.invoiceNumber = invoiceNumber;
-                    invoice.kashflowNumber = kashflowNumber;
-                    invoice.invoiceDate = invoiceDate;
-                    invoice.remittanceDate = remittanceDate;
-                    invoice.grossAmount = grossAmount;
-                    invoice.labourCost = labourCost;
-                    invoice.materialCost = materialCost;
-                    invoice.cisAmount = cisAmount;
-                    invoice.netAmount = netAmount;
-                    invoice.submissionDate = submissionDate;
-                    invoice.reverseCharge = reverseCharge;
-                    await invoice.save();
+                        const udpateinvoice = await Invoice.update({
+                            invoiceNumber: invoiceNumber,
+                            kashflowNumber: kashflowNumber,
+                            invoiceDate: invoiceDate,
+                            remittanceDate: remittanceDate,
+                            grossAmount: grossAmount,
+                            labourCost: labourCost,
+                            materialCost: materialCost,
+                            cisAmount: cisAmount,
+                            netAmount: netAmount,
+                            submissionDate: submissionDate,
+                            reverseCharge: reverseCharge,
+                            month: month,
+                            year: year
+                        }, {
+                            where: {
+                                id: req.params.id
+                            }
+                        });
 
-                    req.flash('success', 'Invoice updated.');
-                    const referrer = '/admin';
-                    res.redirect(referrer);
+                        req.flash('success', 'Invoice updated.');
+                        const referrer = '/admin';
+                        return res.redirect(referrer);
+                    } else {
+                        console.log('subdate 0 and not gross');
+                        const cisAmount = parseInt(labourCost) * 0.2;
+                        const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                        const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                        const reverseCharge = parseInt(grossAmount) * 0.2;
+
+                        const udpateinvoice = await Invoice.update({
+                            invoiceNumber: invoiceNumber,
+                            kashflowNumber: kashflowNumber,
+                            invoiceDate: invoiceDate,
+                            remittanceDate: remittanceDate,
+                            grossAmount: grossAmount,
+                            labourCost: labourCost,
+                            materialCost: materialCost,
+                            cisAmount: cisAmount,
+                            netAmount: netAmount,
+                            submissionDate: submissionDate,
+                            reverseCharge: reverseCharge,
+                            month: month,
+                            year: year
+                        }, {
+                            where: {
+                                id: req.params.id
+                            }
+                        });
+
+                        req.flash('success', 'Invoice updated.');
+                        const referrer = '/admin';
+                        return res.redirect(referrer);
+                    }
                 } else {
-                    const cisAmount = parseInt(labourCost) * 0.2;
-                    const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-                    const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-                    const reverseCharge = parseInt(grossAmount) * 0.2;
+                    if (subcontractor.isGross) {
+                        console.log('subdate something and gross');
+                        const cisAmount = 0;
+                        const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                        const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                        const reverseCharge = parseInt(grossAmount) * 0.2;
 
-                    invoice.invoiceNumber = invoiceNumber;
-                    invoice.kashflowNumber = kashflowNumber;
-                    invoice.invoiceDate = invoiceDate;
-                    invoice.remittanceDate = remittanceDate;
-                    invoice.grossAmount = grossAmount;
-                    invoice.labourCost = labourCost;
-                    invoice.materialCost = materialCost;
-                    invoice.cisAmount = cisAmount;
-                    invoice.netAmount = netAmount;
-                    invoice.submissionDate = submissionDate;
-                    invoice.reverseCharge = reverseCharge;
-                    await invoice.save();
+                        const udpateinvoice = await Invoice.update({
+                            invoiceNumber: invoiceNumber,
+                            kashflowNumber: kashflowNumber,
+                            invoiceDate: invoiceDate,
+                            remittanceDate: remittanceDate,
+                            grossAmount: grossAmount,
+                            labourCost: labourCost,
+                            materialCost: materialCost,
+                            cisAmount: cisAmount,
+                            netAmount: netAmount,
+                            submissionDate: submissionDate,
+                            reverseCharge: reverseCharge,
+                            month: month,
+                            year: year
+                        }, {
+                            where: {
+                                id: req.params.id
+                            }
+                        });
 
-                    req.flash('success', 'Invoice updated.');
-                    const referrer = '/admin';
-                    res.redirect(referrer);
+                        req.flash('success', 'Invoice updated.');
+                        const referrer = '/admin';
+                        return res.redirect(referrer);
+                    } else {
+                        console.log('subdate something and not gross');
+                        const cisAmount = parseInt(labourCost) * 0.2;
+                        const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                        const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                        const reverseCharge = parseInt(grossAmount) * 0.2;
+
+                        const udpateinvoice = await Invoice.update({
+                            invoiceNumber: invoiceNumber,
+                            kashflowNumber: kashflowNumber,
+                            invoiceDate: invoiceDate,
+                            remittanceDate: remittanceDate,
+                            grossAmount: grossAmount,
+                            labourCost: labourCost,
+                            materialCost: materialCost,
+                            cisAmount: cisAmount,
+                            netAmount: netAmount,
+                            submissionDate: submissionDate,
+                            reverseCharge: reverseCharge,
+                            month: month,
+                            year: year
+                        }, {
+                            where: {
+                                id: req.params.id
+                            }
+                        });
+
+                        req.flash('success', 'Invoice updated.');
+                        const referrer = '/admin';
+                        return res.redirect(referrer);
+                    }
                 }
             }
         } else {
