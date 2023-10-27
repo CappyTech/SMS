@@ -79,63 +79,113 @@ const createInvoice = async (req, res) => {
         } = req.body;
         console.log(req.body);
 
-        // Convert submissionDate to null if it's '0000-00-00 00:00:00'
-        const convertedSubmissionDate = submissionDate === '0000-00-00 00:00:00' ? null : submissionDate;
-
         const subcontractor = await Subcontractor.findByPk(req.params.selected);
 
         if (!subcontractor) {
-            return res.send('Subcontractor not found');
+            console.error('Subcontractor not found');
+            return req.flash('error', 'Subcontractor not found');
         }
 
-        if (subcontractor.isGross) {
-            const cisAmount = 0;
-            const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-            const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-            const reverseCharge = parseInt(grossAmount) * 0.2;
+        if (submissionDate === '0000-00-00') {
+            if (subcontractor.isGross) {
+                const cisAmount = 0;
+                const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                const reverseCharge = parseInt(grossAmount) * 0.2;
 
-            const invoice = await Invoice.create({
-                invoiceNumber,
-                kashflowNumber,
-                invoiceDate,
-                remittanceDate,
-                grossAmount,
-                labourCost,
-                materialCost,
-                cisAmount,
-                netAmount,
-                convertedSubmissionDate,
-                reverseCharge,
-                SubcontractorId: subcontractor.id,
-            });
+                const invoice = await Invoice.create({
+                    invoiceNumber,
+                    kashflowNumber,
+                    invoiceDate,
+                    remittanceDate,
+                    grossAmount,
+                    labourCost,
+                    materialCost,
+                    cisAmount,
+                    netAmount,
+                    submissionDate: null,
+                    reverseCharge,
+                    SubcontractorId: subcontractor.id,
+                });
 
-            await subcontractor.addInvoice(invoice);
+                await subcontractor.addInvoice(invoice);
+                console.log('Invoice was created with submission as null');
+                return req.flash('success', 'Invoice created successfully');
+            } else {
+                const cisAmount = parseInt(labourCost) * 0.2;
+                const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                const reverseCharge = parseInt(grossAmount) * 0.2;
 
-            return res.send('Invoice created successfully');
+                const invoice = await Invoice.create({
+                    invoiceNumber,
+                    kashflowNumber,
+                    invoiceDate,
+                    remittanceDate,
+                    grossAmount,
+                    labourCost,
+                    materialCost,
+                    cisAmount,
+                    netAmount,
+                    submissionDate: null,
+                    reverseCharge,
+                    SubcontractorId: subcontractor.id,
+                });
+
+                await subcontractor.addInvoice(invoice);
+                console.log('Invoice was created with submission as null');
+                return req.flash('success', 'Invoice created successfully');
+            }
         } else {
-            const cisAmount = parseInt(labourCost) * 0.2;
-            const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-            const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-            const reverseCharge = parseInt(grossAmount) * 0.2;
+            if (subcontractor.isGross) {
+                const cisAmount = 0;
+                const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                const reverseCharge = parseInt(grossAmount) * 0.2;
 
-            const invoice = await Invoice.create({
-                invoiceNumber,
-                kashflowNumber,
-                invoiceDate,
-                remittanceDate,
-                grossAmount,
-                labourCost,
-                materialCost,
-                cisAmount,
-                netAmount,
-                convertedSubmissionDate,
-                reverseCharge,
-                SubcontractorId: subcontractor.id,
-            });
+                const invoice = await Invoice.create({
+                    invoiceNumber,
+                    kashflowNumber,
+                    invoiceDate,
+                    remittanceDate,
+                    grossAmount,
+                    labourCost,
+                    materialCost,
+                    cisAmount,
+                    netAmount,
+                    submissionDate,
+                    reverseCharge,
+                    SubcontractorId: subcontractor.id,
+                });
 
-            await subcontractor.addInvoice(invoice);
+                await subcontractor.addInvoice(invoice);
+                console.log('Invoice was NOT created with submission as null');
+                return req.flash('success', 'Invoice created successfully');
+            } else {
+                const cisAmount = parseInt(labourCost) * 0.2;
+                const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
+                const grossAmount = parseInt(labourCost) + parseInt(materialCost);
+                const reverseCharge = parseInt(grossAmount) * 0.2;
 
-            return res.send('Invoice created successfully');
+                const invoice = await Invoice.create({
+                    invoiceNumber,
+                    kashflowNumber,
+                    invoiceDate,
+                    remittanceDate,
+                    grossAmount,
+                    labourCost,
+                    materialCost,
+                    cisAmount,
+                    netAmount,
+                    submissionDate,
+                    reverseCharge,
+                    SubcontractorId: subcontractor.id,
+                });
+
+                await subcontractor.addInvoice(invoice);
+                console.log('Invoice was NOT created with submission as null');
+                return req.flash('success', 'Invoice created successfully');
+            }
         }
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
