@@ -9,7 +9,7 @@ const {
 } = require('../controllers/invoice');
 
 // Select the subcontractor
-router.get('/subcontractor/select', selectSubcontractor);
+router.get('/subcontractor/select/', selectSubcontractor);
 
 // Render the invoice
 router.get('/invoice/create/:selected', renderInvoiceForm);
