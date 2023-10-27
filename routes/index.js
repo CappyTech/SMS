@@ -23,11 +23,9 @@ router.post('/account/settings', updateAccountSettings);
 const {
     renderFilteredMonthlyReturns,
     renderMonthlyReturnsForm,
-    renderMonthlyReturns,
 } = require('../controllers/monthlyReturns');
 
 router.get('/monthly/returns', renderFilteredMonthlyReturns);
 router.get('/monthly/returns/form', renderMonthlyReturnsForm);
-router.get('/monthly/returns/:year/:subcontractor', renderMonthlyReturns);
 
 module.exports = router;
