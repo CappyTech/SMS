@@ -2,15 +2,30 @@
 <div class="container mt-5">
     <h1 class="mb-4">Monthly Returns</h1>
     <div class="row row-cols-1 row-cols-md-2 g-4">
-        <% subcontractors.forEach(subcontractor => { %>
+        <% subcontractorsWithMonths.forEach(data => { %>
+        <% const subcontractor = data.subcontractor; %>
+        <% const years = data.years; %>
+        <% const invoicesByYear = data.invoicesByYear; %>
         <div class="col">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title"><%= subcontractor.name %></h5>
+                    <h5 class="card-title"><%= subcontractor.dataValues.name %></h5>
+                    <% let uniqueYears = []; %>
                     <ul class="list-group list-group-flush">
-                        <% if (subcontractor.invoices) { %>
-                        <% subcontractor.invoices.forEach(invoice => { %>
-                        <li class="list-group-item"><%= invoice.year %></li>
+                        <% if (subcontractor.dataValues.invoices && subcontractor.dataValues.invoices.length) { %>
+                        <% subcontractor.dataValues.invoices.forEach(invoiceData => { %>
+                        <% if (!uniqueYears.includes(invoiceData.year)) { %>
+                        <% uniqueYears.push(invoiceData.year); %>
+                        <li class="list-group-item">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#yearModal-<%= invoiceData.year %>">
+                                <%= invoiceData.year %>
+                            </a>
+                        </li>
+                        <% if (uniqueYears.length % 3 === 0) { %>
+                    </ul>
+                    <ul class="list-group list-group-flush">
+                        <% } %>
+                        <% } %>
                         <% }); %>
                         <% } else { %>
                         <li class="list-group-item">No invoices available</li>
@@ -22,3 +37,42 @@
         <% }); %>
     </div>
 </div>
+
+<!-- Modals for each year -->
+<% subcontractorsWithMonths.forEach(data => { %>
+<% const subcontractor = data.subcontractor; %>
+<% const years = data.years; %>
+<% const invoicesByYear = data.invoicesByYear; %>
+<% years.forEach(year => { %>
+<div class="modal fade" id="yearModal-<%= year %>" tabindex="-1" aria-labelledby="yearModalLabel-<%= year %>"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="yearModalLabel-<%= year %>">Invoices for <%= year %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>
+                        <a href="/yearly/returns/<%= year %>/<%= subcontractor.id %>">
+                            <%= year %> Yearly Report
+                        </a>
+                    </li>
+                    <% invoicesByYear[year].forEach(month => { %>
+                    <li>
+                        <a href="/monthly/returns/<%= month %>/<%= year %>/<%= subcontractor.id %>">
+                            <%= monthNames[month - 1] %> Monthly Report
+                        </a>
+                    </li>
+                    <% }) %>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<% }) %>
+<% }) %>
