@@ -162,6 +162,7 @@ User.hasMany(Subcontractor, {
 Subcontractor.hasMany(Invoice, {
     foreignKey: 'subcontractorId',
     allowNull: false,
+    as: 'invoices'
 });
 Invoice.belongsTo(Subcontractor, {
     foreignKey: 'subcontractorId',
