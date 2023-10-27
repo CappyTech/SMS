@@ -5,7 +5,6 @@ const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const helpers = require('../helpers');
 
-// Display the invoice creation form
 const selectSubcontractor = async (req, res) => {
     try {
         console.log(req.session);
@@ -76,6 +75,8 @@ const createInvoice = async (req, res) => {
             labourCost,
             materialCost,
             submissionDate,
+            month,
+            year
         } = req.body;
         console.log(req.body);
 
@@ -83,10 +84,12 @@ const createInvoice = async (req, res) => {
 
         if (!subcontractor) {
             console.error('Subcontractor not found');
-            return req.flash('error', 'Subcontractor not found');
+            req.flash('error', 'Subcontractor not found');
+            const referrer = req.get('referer') || '/';
+            res.redirect(referrer);
         }
 
-        if (submissionDate === '0000-00-00') {
+        if (submissionDate === '0000-00-00 00:00:00') {
             if (subcontractor.isGross) {
                 const cisAmount = 0;
                 const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
@@ -103,14 +106,18 @@ const createInvoice = async (req, res) => {
                     materialCost,
                     cisAmount,
                     netAmount,
-                    submissionDate: null,
+                    submissionDate,
                     reverseCharge,
+                    month,
+                    year,
                     SubcontractorId: subcontractor.id,
                 });
 
                 await subcontractor.addInvoice(invoice);
                 console.log('Invoice was created with submission as null');
-                return req.flash('success', 'Invoice created successfully');
+                req.flash('success', 'Invoice created successfully');
+                const referrer = req.get('referer') || '/';
+                res.redirect(referrer);
             } else {
                 const cisAmount = parseInt(labourCost) * 0.2;
                 const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
@@ -129,12 +136,16 @@ const createInvoice = async (req, res) => {
                     netAmount,
                     submissionDate: null,
                     reverseCharge,
+                    month,
+                    year,
                     SubcontractorId: subcontractor.id,
                 });
 
                 await subcontractor.addInvoice(invoice);
                 console.log('Invoice was created with submission as null');
-                return req.flash('success', 'Invoice created successfully');
+                req.flash('success', 'Invoice created successfully');
+                const referrer = req.get('referer') || '/';
+                res.redirect(referrer);
             }
         } else {
             if (subcontractor.isGross) {
@@ -155,12 +166,16 @@ const createInvoice = async (req, res) => {
                     netAmount,
                     submissionDate,
                     reverseCharge,
+                    month,
+                    year,
                     SubcontractorId: subcontractor.id,
                 });
 
                 await subcontractor.addInvoice(invoice);
                 console.log('Invoice was NOT created with submission as null');
-                return req.flash('success', 'Invoice created successfully');
+                req.flash('success', 'Invoice created successfully');
+                const referrer = req.get('referer') || '/';
+                res.redirect(referrer);
             } else {
                 const cisAmount = parseInt(labourCost) * 0.2;
                 const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
@@ -179,12 +194,16 @@ const createInvoice = async (req, res) => {
                     netAmount,
                     submissionDate,
                     reverseCharge,
+                    month,
+                    year,
                     SubcontractorId: subcontractor.id,
                 });
 
                 await subcontractor.addInvoice(invoice);
                 console.log('Invoice was NOT created with submission as null');
-                return req.flash('success', 'Invoice created successfully');
+                req.flash('success', 'Invoice created successfully');
+                const referrer = req.get('referer') || '/';
+                res.redirect(referrer);
             }
         }
     } catch (error) {
