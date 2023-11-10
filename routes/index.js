@@ -20,19 +20,4 @@ router.get('/account', getAccountPage);
 // Account settings
 router.post('/account/settings', updateAccountSettings);
 
-const {
-    renderFilteredMonthlyReturns,
-    renderMonthlyReturnsForm,
-    renderMonthlyReturns,
-} = require('../controllers/monthlyReturns');
-
-router.get('/monthly/returns', renderFilteredMonthlyReturns);
-router.get('/monthly/returns/form', renderMonthlyReturnsForm);
-router.get('/monthly/returns/:month/:year/:subcontractor', renderMonthlyReturns);
-
-const {
-    renderYearlyReturns
-} = require('../controllers/yearlyReturns');
-
-router.get('/yearly/returns/:year/:id', renderYearlyReturns);
 module.exports = router;

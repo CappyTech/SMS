@@ -49,62 +49,6 @@ const renderAdminDashboard = async (req, res) => {
     }
 };
 
-const assignUserToSubcontractor = async (req, res) => {
-    try {
-        const {
-            subcontractorId,
-            userId
-        } = req.body;
-
-        // Find the subcontractor and user based on their IDs
-        const subcontractor = await Subcontractor.findByPk(subcontractorId);
-        const user = await User.findByPk(userId);
-
-        if (!subcontractor || !user) {
-            // res.status(404).send('Subcontractor or user not found');
-            return req.flash('error', 'Subcontractor or user not found');
-        }
-
-        // Assign the user to the subcontractor
-        subcontractor.UserId = user.id;
-        await subcontractor.save();
-
-        const referrer = req.get('referer') || '/admin';
-        res.redirect(referrer);
-    } catch (error) {
-        req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/admin';
-        res.redirect(referrer);
-    }
-};
-
-const unassignUserFromSubcontractor = async (req, res) => {
-    try {
-        const {
-            subcontractorId
-        } = req.body;
-
-        // Find the subcontractor based on the ID
-        const subcontractor = await Subcontractor.findByPk(subcontractorId);
-
-        if (!subcontractor) {
-            // res.status(404).send('Subcontractor not found');
-            return req.flash('error', 'Subcontractor not found');
-        }
-
-        // Unassign the user from the subcontractor
-        subcontractor.UserId = null;
-        await subcontractor.save();
-
-        const referrer = req.get('referer') || '/admin';
-        res.redirect(referrer);
-    } catch (error) {
-        req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/admin';
-        res.redirect(referrer);
-    }
-};
-
 // Render the create form for a user
 const renderUserCreateForm = async (req, res) => {
     try {
@@ -503,164 +447,92 @@ const renderInvoiceEditForm = async (req, res) => {
     }
 };
 
-// Update Invoice
+const validateInvoiceData = (data) => {
+    const {
+        invoiceNumber,
+        kashflowNumber,
+        labourCost,
+        materialCost,
+        month,
+        year
+    } = data;
+
+    if (!invoiceNumber || !kashflowNumber || !labourCost || !materialCost || !month || !year) {
+        throw new Error('Missing required fields.');
+    }
+
+    if (month < 1 || month > 12) {
+        throw new Error('Month should be between 1 and 12.');
+    }
+
+    const currentYear = new Date().getFullYear();
+    const incorporationYear = parseInt(process.env.INCORPORATION_YEAR, 10);
+    if (year < incorporationYear || year > currentYear) {
+        throw new Error(`Year should be between ${incorporationYear} and ${currentYear}.`);
+    }
+};
+
+const calculateInvoiceAmounts = (labourCost, materialCost, cisNumber) => {
+    let cisRate = 0; // Default rate for VAT Registered companies
+
+    const isRegisteredForCIS = cisNumber && cisNumber.startsWith('V'); // Check if cisNumber starts with 'V'
+
+    // Check conditions for CIS deductions
+    if (!isRegisteredForCIS) {
+        cisRate = 0.3; // 30% for not verified or not provided correct name
+    } else if (isRegisteredForCIS) {
+        cisRate = 0.2; // 20% for CIS registered and verified
+    }
+
+    const cisAmount = parseFloat(labourCost) * cisRate;
+    const grossAmount = parseFloat(labourCost) + parseFloat(materialCost);
+    const netAmount = parseFloat(labourCost) - cisAmount + parseFloat(materialCost);
+    const reverseCharge = grossAmount * 0.2; // Assuming reverse charge remains 20% of gross
+
+    return {
+        cisAmount,
+        grossAmount,
+        netAmount,
+        reverseCharge
+    };
+};
+
+// TODO: In the future, consider implementing a check for 'providedCorrectName' 
+// to further refine the CIS deduction rate.
+
+
 const updateInvoice = async (req, res) => {
     try {
-        const {
-            invoiceNumber,
-            kashflowNumber,
-            invoiceDate,
-            remittanceDate,
-            labourCost,
-            materialCost,
-            submissionDate,
-            month,
-            year
-        } = req.body;
-        console.log(req.body);
+        validateInvoiceData(req.body);
 
         const invoice = await Invoice.findByPk(req.params.id);
-        console.log('invoice found')
-        if (invoice) {
-            const subcontractor = await Subcontractor.findByPk(invoice.SubcontractorId);
-            console.log('subcontractor found')
-            if (subcontractor) {
-                if (submissionDate === '0000-00-00 00:00:00') {
-                    if (subcontractor.isGross) {
-                        console.log('subdate 0 and gross');
-                        const cisAmount = 0;
-                        const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-                        const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-                        const reverseCharge = parseInt(grossAmount) * 0.2;
-
-                        const udpateinvoice = await Invoice.update({
-                            invoiceNumber: invoiceNumber,
-                            kashflowNumber: kashflowNumber,
-                            invoiceDate: invoiceDate,
-                            remittanceDate: remittanceDate,
-                            grossAmount: grossAmount,
-                            labourCost: labourCost,
-                            materialCost: materialCost,
-                            cisAmount: cisAmount,
-                            netAmount: netAmount,
-                            submissionDate: submissionDate,
-                            reverseCharge: reverseCharge,
-                            month: month,
-                            year: year
-                        }, {
-                            where: {
-                                id: req.params.id
-                            }
-                        });
-
-                        req.flash('success', 'Invoice updated.');
-                        const referrer = '/admin';
-                        return res.redirect(referrer);
-                    } else {
-                        console.log('subdate 0 and not gross');
-                        const cisAmount = parseInt(labourCost) * 0.2;
-                        const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-                        const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-                        const reverseCharge = parseInt(grossAmount) * 0.2;
-
-                        const udpateinvoice = await Invoice.update({
-                            invoiceNumber: invoiceNumber,
-                            kashflowNumber: kashflowNumber,
-                            invoiceDate: invoiceDate,
-                            remittanceDate: remittanceDate,
-                            grossAmount: grossAmount,
-                            labourCost: labourCost,
-                            materialCost: materialCost,
-                            cisAmount: cisAmount,
-                            netAmount: netAmount,
-                            submissionDate: submissionDate,
-                            reverseCharge: reverseCharge,
-                            month: month,
-                            year: year
-                        }, {
-                            where: {
-                                id: req.params.id
-                            }
-                        });
-
-                        req.flash('success', 'Invoice updated.');
-                        const referrer = '/admin';
-                        return res.redirect(referrer);
-                    }
-                } else {
-                    if (subcontractor.isGross) {
-                        console.log('subdate something and gross');
-                        const cisAmount = 0;
-                        const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-                        const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-                        const reverseCharge = parseInt(grossAmount) * 0.2;
-
-                        const udpateinvoice = await Invoice.update({
-                            invoiceNumber: invoiceNumber,
-                            kashflowNumber: kashflowNumber,
-                            invoiceDate: invoiceDate,
-                            remittanceDate: remittanceDate,
-                            grossAmount: grossAmount,
-                            labourCost: labourCost,
-                            materialCost: materialCost,
-                            cisAmount: cisAmount,
-                            netAmount: netAmount,
-                            submissionDate: submissionDate,
-                            reverseCharge: reverseCharge,
-                            month: month,
-                            year: year
-                        }, {
-                            where: {
-                                id: req.params.id
-                            }
-                        });
-
-                        req.flash('success', 'Invoice updated.');
-                        const referrer = '/admin';
-                        return res.redirect(referrer);
-                    } else {
-                        console.log('subdate something and not gross');
-                        const cisAmount = parseInt(labourCost) * 0.2;
-                        const netAmount = parseInt(labourCost) - parseInt(cisAmount) + parseInt(materialCost);
-                        const grossAmount = parseInt(labourCost) + parseInt(materialCost);
-                        const reverseCharge = parseInt(grossAmount) * 0.2;
-
-                        const udpateinvoice = await Invoice.update({
-                            invoiceNumber: invoiceNumber,
-                            kashflowNumber: kashflowNumber,
-                            invoiceDate: invoiceDate,
-                            remittanceDate: remittanceDate,
-                            grossAmount: grossAmount,
-                            labourCost: labourCost,
-                            materialCost: materialCost,
-                            cisAmount: cisAmount,
-                            netAmount: netAmount,
-                            submissionDate: submissionDate,
-                            reverseCharge: reverseCharge,
-                            month: month,
-                            year: year
-                        }, {
-                            where: {
-                                id: req.params.id
-                            }
-                        });
-
-                        req.flash('success', 'Invoice updated.');
-                        const referrer = '/admin';
-                        return res.redirect(referrer);
-                    }
-                }
-            }
-        } else {
-            req.flash('error', 'Invoice not found');
-            const referrer = '/admin';
-            res.redirect(referrer);
+        if (!invoice) {
+            throw new Error('Invoice not found.');
         }
+
+        const subcontractor = await Subcontractor.findByPk(invoice.SubcontractorId);
+        if (!subcontractor) {
+            throw new Error(`Subcontractor not found for the invoice with ID: ${req.params.id}`);
+        }
+
+        const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, req.body.submissionDate, subcontractor.isGross);
+
+        await Invoice.update({
+            ...req.body,
+            ...amounts
+        }, {
+            where: {
+                id: req.params.id
+            }
+        });
+
+        req.flash('success', 'Invoice updated.');
+        return res.redirect('/admin');
+
     } catch (error) {
-        console.error('Error updating invoice:', error);
-        req.flash('error', 'Error updating invoice: ' + error.message);
-        const referrer = '/admin';
-        res.redirect(referrer);
+        console.error('Error updating invoice:', error.message);
+        req.flash('error', `Error updating invoice with ID: ${req.params.id}. Details: ${error.message}`);
+        return res.redirect('/admin');
     }
 };
 
@@ -752,8 +624,6 @@ const deleteInvoice = async (req, res) => {
 
 module.exports = {
     renderAdminDashboard,
-    assignUserToSubcontractor,
-    unassignUserFromSubcontractor,
     renderUserCreateForm,
     createUser,
     viewUser,

@@ -1,8 +1,5 @@
 // controllers/monthlyReturns.js
 const packageJson = require('../package.json');
-const {
-    Op
-} = require('sequelize');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const helpers = require('../helpers');
@@ -63,81 +60,9 @@ const renderMonthlyReturnsForm = async (req, res) => {
         });
     } catch (error) {
         console.error("Error rendering the form:", error);
-        res.status(500).send('Failed to render the form.');
-    }
-};
-
-
-
-const renderFilteredMonthlyReturns = async (req, res) => {
-    const taxYear = parseInt(req.query.taxYear || new Date().getFullYear());
-
-    try {
-        const subcontractors = await Subcontractor.findAll({
-            include: {
-                model: Invoice,
-                where: {
-                    [Op.or]: [{
-                            year: taxYear,
-                            month: {
-                                [Op.gte]: 1
-                            }
-                        }, // From April of the taxYear
-                        {
-                            year: taxYear + 1,
-                            month: {
-                                [Op.lte]: 3
-                            }
-                        } // To March of the next year
-                    ]
-                },
-                order: [
-                    ['year', 'ASC'],
-                    ['month', 'ASC']
-                ]
-            }
-        });
-
-        const reports = subcontractors.map(subcontractor => {
-            const monthlyData = Array(12).fill(0).map((_, index) => {
-                const monthStart = new Date(taxYear, index + 3, 5);
-                const monthEnd = new Date(taxYear, index + 4, 5);
-                if (index === 11) monthEnd.setFullYear(taxYear + 1);
-
-                const monthlyInvoices = subcontractor.invoices.filter(invoice =>
-                    invoice.remittanceDate >= monthStart && invoice.remittanceDate < monthEnd
-                );
-
-                const totalGrossAmount = monthlyInvoices.reduce((sum, invoice) => sum + invoice.grossAmount, 0);
-                const totalLabourCost = monthlyInvoices.reduce((sum, invoice) => sum + invoice.labourCost, 0);
-                const totalMaterialCost = monthlyInvoices.reduce((sum, invoice) => sum + invoice.materialCost, 0);
-                const totalCisAmount = monthlyInvoices.reduce((sum, invoice) => sum + invoice.cisAmount, 0);
-                const totalNetAmount = monthlyInvoices.reduce((sum, invoice) => sum + invoice.netAmount, 0);
-                const totalReverseCharge = monthlyInvoices.reduce((sum, invoice) => sum + (invoice.reverseCharge || 0), 0);
-
-                return {
-                    month: monthStart.getMonth(),
-                    totalGrossAmount,
-                    totalLabourCost,
-                    totalMaterialCost,
-                    totalCisAmount,
-                    totalNetAmount,
-                    totalReverseCharge,
-                    invoices: monthlyInvoices
-                };
-            });
-
-            return {
-                subcontractor: subcontractor.name,
-                monthlyData
-            };
-        });
-
-        res.json(reports);
-    } catch (error) {
-        res.status(500).json({
-            error: 'Failed to generate the report.'
-        });
+        req.flash('error', 'Error: Unable to render monthly returns');
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
@@ -172,7 +97,7 @@ const renderMonthlyReturns = async (req, res) => {
         console.log('Subcontractors Data:', JSON.stringify(subcontractors, null, 2));
 
         if (subcontractors.length === 0 || subcontractors[0].invoices.length === 0) {
-            return res.render('monthReturns', {
+            return res.render('monthlyReturns', {
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
                 session: req.session,
@@ -186,7 +111,7 @@ const renderMonthlyReturns = async (req, res) => {
             });
         }
 
-        res.render('monthReturns', {
+        res.render('monthlyReturns', {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
@@ -199,14 +124,15 @@ const renderMonthlyReturns = async (req, res) => {
             formatCurrency: helpers.formatCurrency
         });
     } catch (error) {
-        console.error("Error rendering the filtered monthly returns:", error);
-        res.status(500).send("Internal Server Error");
+        console.error("Error rendering monthly returns:", error);
+        req.flash('error', 'Error: Unable to render monthly returns');
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
     }
 };
 
 
 module.exports = {
-    renderFilteredMonthlyReturns,
     renderMonthlyReturnsForm,
     renderMonthlyReturns,
 };

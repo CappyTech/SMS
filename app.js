@@ -120,6 +120,7 @@ app.use(
 const {
     Op
 } = require("sequelize");
+
 const createDefaultAdmin = async () => {
     try {
         const admin = await User.findOne({
@@ -184,11 +185,15 @@ const routesAdmin = require('./routes/admin');
 const routesIndex = require('./routes/index');
 const routesUser = require('./routes/user');
 const routesInvoice = require('./routes/invoice');
+const routesYearly = require('./routes/yearlyReturns');
+const routesMonthly = require('./routes/monthlyReturns');
 
 app.use('/admin', routesAdmin);
 app.use('/', routesIndex);
 app.use('/', routesUser);
 app.use('/', routesInvoice);
+app.use('/', routesYearly);
+app.use('/', routesMonthly);
 
 app.listen(3000, '0.0.0.0', () => {
     console.log('Server listening on 0.0.0.0:3000');

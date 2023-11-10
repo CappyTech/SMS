@@ -2,7 +2,6 @@
 const User = require('../models/user');
 const helpers = require('../helpers');
 const packageJson = require('../package.json');
-const speakeasy = require('speakeasy');
 
 // Update the account settings
 const updateAccountSettings = async (req, res) => {
@@ -14,8 +13,6 @@ const updateAccountSettings = async (req, res) => {
             }
         });
 
-        console.log('enable2FA:', req.body.enable2FA);
-
         if (!user) {
             return res.status(404).send('User not found');
         }
@@ -24,22 +21,6 @@ const updateAccountSettings = async (req, res) => {
         user.username = req.body.newUsername;
         user.email = req.body.newEmail;
         // Update any other fields as needed
-
-        // Check if 2FA is enabled
-        if (req.body.enable2FA === 'on') {
-            // Enable 2FA
-            const secret = speakeasy.generateSecret({
-                length: 20
-            });
-            user.twoFactorSecret = secret.base32;
-            user.twoFactorEnabled = true;
-        } else {
-            // Disable 2FA
-            user.twoFactorSecret = null;
-            user.twoFactorEnabled = false;
-        }
-
-        console.log('user:', user);
 
         await user.save();
 
@@ -51,8 +32,6 @@ const updateAccountSettings = async (req, res) => {
         res.redirect('/account');
     }
 };
-
-
 
 // Display the account page
 const getAccountPage = async (req, res) => {

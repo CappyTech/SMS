@@ -5,8 +5,6 @@ const router = express.Router();
 
 const {
     renderAdminDashboard,
-    assignUserToSubcontractor,
-    unassignUserFromSubcontractor,
     renderUserCreateForm,
     createUser,
     viewUser,
@@ -27,10 +25,6 @@ const {
 
 // Render the admin dashboard
 router.get('/', renderAdminDashboard);
-// Handle user-subcontractor assignment
-router.post('/assign', assignUserToSubcontractor);
-// Handle user-subcontractor unassignment
-router.post('/unassign', unassignUserFromSubcontractor);
 // Render form new user
 router.get('/user/create', renderUserCreateForm);
 // Handle the form submission for creating a new user
