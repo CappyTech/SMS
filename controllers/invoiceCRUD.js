@@ -265,8 +265,9 @@ const deleteInvoice = async (req, res) => {
     }
 };
 
-module.exports = {
-    viewInvoice,
-    updateInvoice,
-    deleteInvoice
-};
+router.post('/invoice/submit/:selected', createInvoice);
+router.get('/invoice/view/:id', viewInvoice);
+router.post('/invoice/update/:id', updateInvoice);
+router.get('/invoice/delete/:id', deleteInvoice);
+
+module.exports = router;
