@@ -180,14 +180,12 @@ Invoice.belongsTo(Subcontractor, {
     }
 })();
 
-const routesAdmin = require('./routes/admin');
 const routesIndex = require('./routes/index');
 const routesUser = require('./routes/user');
 const routesInvoice = require('./routes/invoice');
 const routesYearly = require('./routes/yearlyReturns');
 const routesMonthly = require('./routes/monthlyReturns');
 
-app.use('/admin', routesAdmin);
 app.use('/', routesIndex);
 app.use('/', routesUser);
 app.use('/', routesInvoice);
