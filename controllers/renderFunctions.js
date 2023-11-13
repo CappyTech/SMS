@@ -1,10 +1,16 @@
 // /controllers/renderfunctions.js
 
+const express = require('express');
+const router = express.Router();
+
 const packageJson = require('../package.json');
 const User = require('../models/user');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const helpers = require('../helpers');
+const {
+    Op
+} = require('sequelize');
 
 const renderAdminDashboard = async (req, res) => {
     try {
@@ -71,14 +77,14 @@ const renderSubcontractorCreateForm = (req, res) => {
             message: req.query.message || '',
         });
     } else {
-        return res.status(403).send('Access denied.');
+        return res.status(403).send('Access denied. Only admins can create subcontractors.');
     }
 };
-const renderUserEditForm = async (req, res) => {
+const renderUserUpdateForm = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            return res.status(403).send('Access denied. Only admins can update users.');
         }
 
         const userId = req.params.id;
@@ -88,7 +94,7 @@ const renderUserEditForm = async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        res.render('editUser', {
+        res.render('UpdateUser', {
             user,
             session: req.session,
             packageJson,
@@ -99,11 +105,11 @@ const renderUserEditForm = async (req, res) => {
         res.status(500).send('Error: ' + error.message);
     }
 };
-const renderSubcontractorEditForm = async (req, res) => {
+const renderSubcontractorUpdateForm = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            return res.status(403).send('Access denied. Only admins can update subcontractors.');
         }
 
         const subcontractorId = req.params.id;
@@ -113,7 +119,7 @@ const renderSubcontractorEditForm = async (req, res) => {
             return res.status(404).send('Subcontractor not found');
         }
 
-        res.render('editSubcontractor', {
+        res.render('UpdateSubcontractor', {
             subcontractor,
             session: req.session,
             packageJson,
@@ -124,11 +130,11 @@ const renderSubcontractorEditForm = async (req, res) => {
         res.status(500).send('Error: ' + error.message);
     }
 };
-const renderInvoiceEditForm = async (req, res) => {
+const renderInvoiceUpdateForm = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can edit invoices.');
+            return res.status(403).send('Access denied. Only admins can update invoices.');
         }
 
         const invoice = await Invoice.findByPk(req.params.id);
@@ -137,7 +143,7 @@ const renderInvoiceEditForm = async (req, res) => {
             return res.status(404).send('Invoice not found');
         }
 
-        res.render('editInvoice', {
+        res.render('UpdateInvoice', {
             invoice,
             session: req.session,
             packageJson,
@@ -149,11 +155,12 @@ const renderInvoiceEditForm = async (req, res) => {
     }
 };
 
-module.exports = {
-    renderAdminDashboard,
-    renderUserCreateForm,
-    renderSubcontractorCreateForm,
-    renderUserEditForm,
-    renderSubcontractorEditForm,
-    renderInvoiceEditForm
-};
+
+router.get('/admin', renderAdminDashboard);
+router.get('/user/create', renderUserCreateForm);
+router.get('/subcontractor/create', renderSubcontractorCreateForm);
+router.get('/user/update', renderUserUpdateForm);
+router.get('/subcontractor/update', renderSubcontractorUpdateForm);
+router.get('/invoice/update', renderInvoiceUpdateForm);
+
+module.exports = router;
