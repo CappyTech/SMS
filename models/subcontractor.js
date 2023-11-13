@@ -51,8 +51,7 @@ const Subcontractors = sequelize.define('Subcontractor', {
     },
     deduction: {
         type: DataTypes.FLOAT,
-        allowNull: false,
-        defaultValue: 0.3,
+        allowNull: false
     },
 }, {
     paranoid: true,
