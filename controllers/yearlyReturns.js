@@ -11,7 +11,6 @@ const {
 } = require('../helpers');
 
 const renderYearlyReturns = async (req, res) => {
-
     try {
         const {
             year,
