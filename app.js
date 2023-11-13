@@ -12,20 +12,15 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
-const bodyParser = require('body-parser');
 require('dotenv').config();
 const path = require('path');
 const helpers = require('./helpers');
 app.locals.slimDateTime = helpers.slimDateTime;
-// Set up static file serving for public directory
+app.locals.formatCurrency = helpers.formatCurrency;
+app.locals.packageJson = require('./package.json');
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Set up static file serving for node_modules directory
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
 app.set('view engine', 'ejs');
 app.set('layout', 'layout');
 
@@ -68,7 +63,7 @@ const sessionStore = new MySQLStore({
 });
 app.use(session({
     key: 'session_cookie_name',
-    secret: 'som4334ethinsdfsdfgso45dfgsdfme234234inthsdfsdfi43ngsecre2223t',
+    secret: process.env.SESSION_SECRET,
     store: sessionStore,
     resave: false,
     saveUninitialized: false
@@ -116,7 +111,6 @@ app.use(
     })
 );
 
-
 const {
     Op
 } = require("sequelize");
@@ -138,7 +132,7 @@ const createDefaultAdmin = async () => {
             await User.create({
                 username: 'admin',
                 email: 'admin@example.com',
-                password: 'adminpassword',
+                password: process.env.ADMIN_PASSWORD,
                 role: 'admin',
             }, {
                 fields: ['username', 'email', 'password', 'role']
@@ -152,6 +146,11 @@ const createDefaultAdmin = async () => {
         console.error('Error creating default admin:', error);
     }
 };
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
 
 const User = require('./models/user');
 const Subcontractor = require('./models/subcontractor');
