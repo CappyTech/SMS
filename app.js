@@ -3,10 +3,6 @@
 // npm install express body-parser express-session express-mysql-session express-flash dotenv helmet xss-clean express-rate-limit express-ejs-layouts
 
 const express = require('express');
-const https = require('https');
-const fs = require('fs');
-const devcert = require('devcert');
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({
@@ -191,6 +187,25 @@ app.use('/', routesUser);
 app.use('/', routesInvoice);
 app.use('/', routesYearly);
 app.use('/', routesMonthly);
+
+app.use((err, req, res, next) => {
+    const status = err.status || 500;
+    const errorViewPath = path.join(__dirname, 'views', `${status}.ejs`);
+
+    fs.access(errorViewPath, fs.constants.F_OK, (err) => {
+        if (err) { // If the error view doesn't exist, render the default view
+            res.status(status).render('error', {
+                message: err.message,
+                error: err
+            });
+        } else { // If the error view exists, render it
+            res.status(status).render(String(status), {
+                message: err.message,
+                error: err
+            });
+        }
+    });
+});
 
 app.listen(3000, '0.0.0.0', () => {
     console.log('Server listening on 0.0.0.0:3000');
