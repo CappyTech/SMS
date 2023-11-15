@@ -4,7 +4,7 @@
   "description": "SMS, developed by Heron CS LTD, is a comprehensive web-based application designed to streamline the management of subcontractors in construction projects. It facilitates efficient data entry, automates monthly returns for CIS/HMRC compliance, tracks payments, manages deductions, and enables subcontractor verification. SMS ensures accurate record-keeping, regulatory compliance, and effective communication among project stakeholders, enhancing overall subcontractor management efficiency and transparency.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "nodemon app.js -e ejs,js,css,html,jpg,png,scss"
   },
   "keywords": [
     "SMS, developed, Heron CS LTD, comprehensive, web-based application, streamline, management, subcontractors, construction projects, efficient, data entry, automates, monthly returns, CIS/HMRC compliance, tracks payments, manages deductions, subcontractor verification, accurate record-keeping, regulatory compliance, effective communication, project stakeholders, subcontractor management efficiency, transparency"
@@ -14,12 +14,8 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "bcrypt": "^5.1.1",
-    "body-parser": "^1.20.2",
     "bootstrap": "^5.3.1",
     "bootstrap-icons": "^1.10.5",
-    "csv-parser": "^3.0.0",
-    "csv-writer": "^1.6.0",
-    "devcert": "^1.2.2",
     "dotenv": "^16.1.0",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
@@ -31,13 +27,11 @@
     "helmet": "^7.0.0",
     "joi": "^17.11.0",
     "mysql2": "^3.3.3",
-    "qrcode": "^1.5.3",
     "sequelize": "^6.31.1",
     "speakeasy": "^2.0.0",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
-    "sequelize-cli": "^6.6.0",
-    "tailwindcss": "^3.3.3"
+    "sequelize-cli": "^6.6.0"
   }
 }
