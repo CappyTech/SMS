@@ -40,7 +40,7 @@
                 <tbody>
                     <% users.forEach(user => { %>
                     <tr>
-                        <td><a href="/admin/user/edit/<%= user.id %>"><%= user.username %><i class="bi bi-pencil-square"
+                        <td><a href="/user/update/<%= user.id %>"><%= user.username %><i class="bi bi-pencil-square"
                                     style="font-size: 0.65rem;"></i></a></td>
                         <td><%= user.email %></td>
                         <td><%= user.role %></td>
@@ -59,7 +59,7 @@
 <div class="card mt-2">
     <div class="card-body">
         <h3 class="card-title text-center">
-            <a href="/admin/subcontractor/edit/<%= subcontractor.id %>"><%= subcontractor.name %><i
+            <a href="/subcontractor/update/<%= subcontractor.id %>"><%= subcontractor.name %><i
                     class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></i>
         </h3>
         <h4 class="card-subtitle mb-2 text-body-secondary"></h4>
@@ -87,7 +87,7 @@
                     <% const subcontractorInvoices = invoices.filter(invoice => invoice.subcontractorId === subcontractor.id); %>
                     <% subcontractorInvoices.forEach(invoice => { %>
                     <tr>
-                        <td><a href="/admin/invoice/edit/<%= invoice.id %>"><%= invoice.invoiceNumber %><i
+                        <td><a href="/invoice/update/<%= invoice.id %>"><%= invoice.invoiceNumber %><i
                                     class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
                         <td><a href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>"><%= invoice.kashflowNumber %><i
                                     class="bi bi-box-arrow-up-right" style="font-size: 0.65rem;"></i></a></td>
