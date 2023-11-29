@@ -12,6 +12,80 @@ const {
     Op
 } = require('sequelize');
 
+const renderIndex = (req, res) => {
+    res.render('index', {
+        errorMessages: req.flash('error'),
+        successMessage: req.flash('success'),
+        session: req.session,
+        message: req.query.message || '',
+    });
+};
+const renderDashboard = async (req, res) => {
+    try {
+        console.log(req.session);
+        if (req.session.user) {
+            const users = await User.findAll({
+                where: {
+                    id: req.session.user.id,
+                },
+            });
+
+            const subcontractors = await Subcontractor.findAll({
+                where: {
+                    userId: req.session.user.id,
+                },
+            });
+
+            if (subcontractors.length > 0) {
+                const subcontractorId = subcontractors[0].id; // Retrieve the correct subcontractorId
+                const invoices = await Invoice.findAll({
+                    where: {
+                        subcontractorId: subcontractorId,
+                    },
+                });
+
+                const userCount = await User.count({
+                    where: {
+                        id: req.session.user.id,
+                    },
+                });
+
+                const subcontractorCount = await Subcontractor.count({
+                    where: {
+                        userId: req.session.user.id,
+                    },
+                });
+
+                const invoiceCount = await Invoice.count({
+                    where: {
+                        subcontractorId: subcontractorId,
+                    },
+                });
+
+                res.render('dashboard', {
+                    userCount,
+                    subcontractorCount,
+                    invoiceCount,
+                    users,
+                    subcontractors,
+                    invoices,
+                    errorMessages: req.flash('error'),
+                    successMessage: req.flash('success'),
+                    session: req.session,
+                    message: req.query.message || '',
+                });
+            } else {
+                res.redirect('/subcontractor/create');
+            }
+        } else {
+            res.redirect('/login');
+        }
+    } catch (error) {
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
+    }
+};
 const renderAdminDashboard = async (req, res) => {
     try {
         if (req.session.user.role !== 'admin') {
@@ -54,7 +128,7 @@ const renderUserCreateForm = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can create users.');
+            return res.status(403).send('Access denied.');
         }
 
         res.render('createUser', {
@@ -77,14 +151,39 @@ const renderSubcontractorCreateForm = (req, res) => {
             message: req.query.message || '',
         });
     } else {
-        return res.status(403).send('Access denied. Only admins can create subcontractors.');
+        return res.status(403).send('Access denied.');
+    }
+};
+const renderInvoiceCreateForm = async (req, res) => {
+    try {
+        console.log(req.session);
+        if (req.params.selected) {
+            const subcontractor = await Subcontractor.findByPk(req.params.selected);
+            if (!subcontractor) {
+                req.flash('error', 'Error: No Subcontractors exist.');
+                const referrer = '/subcontractor/create';
+                res.redirect(referrer);
+            }
+            return res.render('createInvoice', {
+                errorMessages: req.flash('error'),
+                successMessage: req.flash('success'),
+                session: req.session,
+                packageJson,
+                subcontractor,
+                message: req.query.message || '',
+                slimDateTime: helpers.slimDateTime,
+            });
+        }
+        return res.send('Subcontractor not found');
+    } catch (error) {
+        return req.flash('error', 'Error: ' + error.message);
     }
 };
 const renderUserUpdateForm = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can update users.');
+            return res.status(403).send('Access denied.');
         }
 
         const userId = req.params.id;
@@ -94,7 +193,7 @@ const renderUserUpdateForm = async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        res.render('UpdateUser', {
+        res.render('updateUser', {
             user,
             session: req.session,
             packageJson,
@@ -109,7 +208,7 @@ const renderSubcontractorUpdateForm = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can update subcontractors.');
+            return res.status(403).send('Access denied.');
         }
 
         const subcontractorId = req.params.id;
@@ -119,7 +218,7 @@ const renderSubcontractorUpdateForm = async (req, res) => {
             return res.status(404).send('Subcontractor not found');
         }
 
-        res.render('UpdateSubcontractor', {
+        res.render('updateSubcontractor', {
             subcontractor,
             session: req.session,
             packageJson,
@@ -134,7 +233,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can update invoices.');
+            return res.status(403).send('Access denied.');
         }
 
         const invoice = await Invoice.findByPk(req.params.id);
@@ -143,7 +242,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
             return res.status(404).send('Invoice not found');
         }
 
-        res.render('UpdateInvoice', {
+        res.render('updateInvoice', {
             invoice,
             session: req.session,
             packageJson,
@@ -154,13 +253,51 @@ const renderInvoiceUpdateForm = async (req, res) => {
         res.status(500).send('Error: ' + error.message);
     }
 };
+const selectSubcontractor = async (req, res) => {
+    try {
+        console.log(req.session);
+        let subcontractors;
+        if (req.session.user.role === 'admin') {
+            subcontractors = await Subcontractor.findAll({});
+        } else {
+            subcontractors = await Subcontractor.findAll({
+                where: {
+                    userId: req.session.user.id
+                }
+            });
+        }
 
+        if (subcontractors.length === 0) {
+            req.flash('error', 'Error: No Subcontractors exist, Or you don\'t have access to any Subcontractors.');
+            const referrer = '/subcontractor/create';
+            res.redirect(referrer);
+        }
 
+        res.render('selectSubcontractor', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            subcontractors,
+            message: req.query.message || '',
+            slimDateTime: helpers.slimDateTime,
+        });
+    } catch (error) {
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
+    }
+};
+
+router.get('/', renderIndex);
+router.get('/dashboard', renderDashboard);
 router.get('/admin', renderAdminDashboard);
 router.get('/user/create', renderUserCreateForm);
 router.get('/subcontractor/create', renderSubcontractorCreateForm);
-router.get('/user/update', renderUserUpdateForm);
-router.get('/subcontractor/update', renderSubcontractorUpdateForm);
-router.get('/invoice/update', renderInvoiceUpdateForm);
+router.get('/invoice/create', renderInvoiceCreateForm)
+router.get('/user/update/:id', renderUserUpdateForm);
+router.get('/subcontractor/update/:id', renderSubcontractorUpdateForm);
+router.get('/invoice/update/:id', renderInvoiceUpdateForm);
+router.get('/subcontractor/select', selectSubcontractor);
 
 module.exports = router;
