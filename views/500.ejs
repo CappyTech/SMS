@@ -1,0 +1,16 @@
+<div class="container mt-5">
+    <div class="text-center">
+        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 5rem;"></i>
+        <h1 class="mt-4">Internal Server Error</h1>
+        <p class="lead">We're sorry, but something went wrong. We're working to fix the issue as soon as possible.</p>
+
+        <!-- Optional: Additional information for debugging in development mode -->
+        <% if (process.env.NODE_ENV === 'development' && error) { %>
+            <div class="alert alert-warning">
+                <pre><code><%= error.stack %></code></pre>
+            </div>
+        <% } %>
+
+        <a href="/" class="btn btn-primary">Return to Home</a>
+    </div>
+</div>
