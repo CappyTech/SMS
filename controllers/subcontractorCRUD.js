@@ -79,7 +79,7 @@ const createSubcontractor = async (req, res) => {
         res.redirect(referrer);
     }
 };
-const viewSubcontractor = async (req, res) => {
+const readSubcontractor = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
@@ -181,9 +181,9 @@ const deleteSubcontractor = async (req, res) => {
     }
 };
 
-module.exports = {
-    createSubcontractor,
-    viewSubcontractor,
-    updateSubcontractor,
-    deleteSubcontractor
-};
+router.post('/subcontractor/create/', createSubcontractor);
+router.get('/subcontractor/read/:id', readSubcontractor);
+router.post('/subcontractor/update/:id', updateSubcontractor);
+router.get('/subcontractor/delete/:id', deleteSubcontractor);
+
+module.exports = router;
