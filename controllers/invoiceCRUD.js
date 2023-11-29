@@ -10,10 +10,11 @@ const {validateInvoiceData,calculateInvoiceAmounts, slimDateTime, formatCurrency
 const createInvoice = async (req, res) => {
     try {
         const validatedData = validateInvoiceData(req.body);
-        const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, req.params.id); // Adjust parameters as needed
+        const subcontractor = await Subcontractor.findByPk(req.params.id);
+        const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatnumber); // Adjust parameters as needed
 
         // Create invoice record
-        await Invoice.create({
+        const newInvoice = await Invoice.create({
             invoiceNumber: validatedData.invoiceNumber,
             kashflowNumber: validatedData.kashflowNumber,
             invoiceDate: validatedData.invoiceDate,
@@ -29,6 +30,9 @@ const createInvoice = async (req, res) => {
             year: validatedData.year,
             SubcontractorId: req.params.id
         });
+
+        res.redirect(`/invoice/read/${newInvoice.id}`);
+
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
             const errorMessages = error.errors.map((err) => err.message);
@@ -82,13 +86,13 @@ const updateInvoice = async (req, res) => {
             throw new Error('Invoice not found');
         }
 
-        if (!invoice.subcontractorId) {
+        if (!invoice.SubcontractorId) {
             throw new Error(`No subcontractorId associated with invoice ID: ${req.params.id}`);
         }
 
-        const subcontractor = await Subcontractor.findByPk(invoice.subcontractorId);
+        const subcontractor = await Subcontractor.findByPk(invoice.SubcontractorId);
         if (!subcontractor) {
-            throw new Error(`Subcontractor with ID: ${invoice.subcontractorId} not found for invoice ${req.params.id}`);
+            throw new Error(`Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.id}`);
         }
 
         const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, req.body.submissionDate, subcontractor.isGross);
@@ -133,6 +137,6 @@ const deleteInvoice = async (req, res) => {
 router.post('/invoice/create/:selected', createInvoice);
 router.get('/invoice/read/:id', readInvoice);
 router.post('/invoice/update/:id', updateInvoice);
-router.get('/invoice/delete/:id', deleteInvoice);
+router.post('/invoice/delete/:id', deleteInvoice);
 
 module.exports = router;
