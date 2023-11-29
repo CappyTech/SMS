@@ -8,7 +8,7 @@
 </div>
 <% } %>
 
-<form action="/admin/subcontractor/submit" method="POST">
+<form action="/subcontractor/create/" method="POST">
     <table class="table">
         <tbody>
             <tr>
@@ -46,6 +46,10 @@
             <tr>
                 <td><label for="utrNumber" class="form-label">UTR Number</label></td>
                 <td><input type="text" id="utrNumber" name="utrNumber" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><label for="vatNumber" class="form-label">VAT Number</label></td>
+                <td><input type="text" id="vatNumber" name="vatNumber" class="form-control" required></td>
             </tr>
             <tr>
                 <td><label for="deduction" class="form-check-label">Deduction</label></td>
