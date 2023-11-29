@@ -4,8 +4,6 @@ const express = require('express');
 const router = express.Router();
 
 const packageJson = require('../package.json');
-const User = require('../models/user');
-const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const helpers = require('../helpers');
 const {
@@ -116,14 +114,15 @@ const updateSubcontractor = async (req, res) => {
             postalCode,
             cisNumber,
             utrNumber,
-            onboarded,
-            onboardedAt,
-            isGross
+            isGross,
+            vatnumber,
+            deduction,
         } = req.body;
+
         const subcontractor = await Subcontractor.findByPk(req.params.id);
 
         if (subcontractor) {
-            // Update subcontractor data based on the form submission
+
             subcontractor.name = name;
             subcontractor.company = company;
             subcontractor.line1 = line1;
@@ -133,10 +132,10 @@ const updateSubcontractor = async (req, res) => {
             subcontractor.postalCode = postalCode;
             subcontractor.cisNumber = cisNumber;
             subcontractor.utrNumber = utrNumber;
-            subcontractor.onboarded = onboarded;
-            subcontractor.onboardedAt = onboardedAt;
             subcontractor.isGross = isGross;
-            // ... update other fields as needed ...
+            subcontractor.vatnumber = vatnumber;
+            subcontractor.deduction = deduction;
+
             await subcontractor.save();
 
             req.flash('success', 'Subcontractor updated.');
