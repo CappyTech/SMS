@@ -1,3 +1,18 @@
+#moveable{
+	-webkit-app-region: drag;
+}
+#moveable:hover {
+	cursor: move !important; /* This changes the cursor to a 'move' icon */
+}
+
+html[data-bs-theme='light'] {
+	/* Light theme styles */
+}
+
+html[data-bs-theme='dark'] {
+	/* Dark theme styles */
+}
+
 body {
 	font-family: 'Lato', sans-serif;
 }
