@@ -60,7 +60,7 @@ const createUser = async (req, res) => {
       res.redirect('/error');
     }
   };
-const viewUser = async (req, res) => {
+const readUser = async (req, res) => {
     try {
         const userId = req.params.id;
         const user = await User.findByPk(userId);
@@ -147,9 +147,9 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = {
-    createUser,
-    viewUser,
-    updateUser,
-    deleteUser
-};
+router.post('/user/create/:selected', createUser);
+router.get('/user/read/:id', readUser);
+router.post('/user/update/:id', updateUser);
+router.get('/user/delete/:id', deleteUser);
+
+module.exports = router;
