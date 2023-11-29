@@ -157,8 +157,8 @@ const renderSubcontractorCreateForm = (req, res) => {
 const renderInvoiceCreateForm = async (req, res) => {
     try {
         console.log(req.session);
-        if (req.params.selected) {
-            const subcontractor = await Subcontractor.findByPk(req.params.selected);
+        if (req.params.id) {
+            const subcontractor = await Subcontractor.findByPk(req.params.id);
             if (!subcontractor) {
                 req.flash('error', 'Error: No Subcontractors exist.');
                 const referrer = '/subcontractor/create';
@@ -294,7 +294,7 @@ router.get('/dashboard', renderDashboard);
 router.get('/admin', renderAdminDashboard);
 router.get('/user/create', renderUserCreateForm);
 router.get('/subcontractor/create', renderSubcontractorCreateForm);
-router.get('/invoice/create', renderInvoiceCreateForm)
+router.get('/invoice/create/:id', renderInvoiceCreateForm)
 router.get('/user/update/:id', renderUserUpdateForm);
 router.get('/subcontractor/update/:id', renderSubcontractorUpdateForm);
 router.get('/invoice/update/:id', renderInvoiceUpdateForm);
