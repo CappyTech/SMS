@@ -13,6 +13,7 @@
 </head>
 
 <body>
+  <nav id="moveable" class="navbar navbar-expand-lg navbar-dark bg-dark"></nav>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="/">
@@ -94,6 +95,7 @@
           |
           Company No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">09276951</a>
         </div>
+        <%= packageJson.version %>
       </div>
     </div>
   </nav>
@@ -105,6 +107,7 @@
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
   </script>
   <script src="/reload/reload.js"></script>
+  <script src="/renderer.js"></script>
 </body>
 
 </html>
