@@ -4,6 +4,7 @@
 
 const express = require('express');
 const app = express();
+const fs = require('fs');
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
@@ -68,6 +69,11 @@ sessionStore.onReady().then(() => {
     console.log('MySQLStore ready');
 }).catch(error => {
     console.error(error);
+});
+
+app.use((req, res, next) => {
+    res.locals.session = req.session;
+    next();
 });
 
 const flash = require('express-flash');
@@ -176,29 +182,45 @@ Invoice.belongsTo(Subcontractor, {
     }
 })();
 
-const routesIndex = require('./routes/index');
-const routesUser = require('./routes/user');
-const routesInvoice = require('./routes/invoice');
-const routesYearly = require('./routes/yearlyReturns');
-const routesMonthly = require('./routes/monthlyReturns');
+const renderFunctions = require('./controllers/renderFunctions');
 
-app.use('/', routesIndex);
-app.use('/', routesUser);
-app.use('/', routesInvoice);
-app.use('/', routesYearly);
-app.use('/', routesMonthly);
+const login = require('./controllers/login');
+const register = require('./controllers/register');
+const settings = require('./controllers/settings');
+
+const userCRUD = require('./controllers/userCRUD');
+const subcontractorCRUD = require('./controllers/subcontractorCRUD');
+const invoiceCRUD = require('./controllers/invoiceCRUD');
+
+const monthlyReturns = require('./controllers/monthlyReturns');
+const yearlyReturns = require('./controllers/yearlyReturns');
+
+app.use('/', renderFunctions);
+
+app.use('/', login);
+app.use('/', register);
+app.use('/', settings);
+
+app.use('/', userCRUD);
+app.use('/', subcontractorCRUD);
+app.use('/', invoiceCRUD);
+
+app.use('/', monthlyReturns);
+app.use('/', yearlyReturns);
 
 app.use((err, req, res, next) => {
+    console.error(err.stack);
     const status = err.status || 500;
     const errorViewPath = path.join(__dirname, 'views', `${status}.ejs`);
 
-    fs.access(errorViewPath, fs.constants.F_OK, (err) => {
-        if (err) { // If the error view doesn't exist, render the default view
+    // Use a different variable name for the error in fs.access callback
+    fs.access(errorViewPath, fs.constants.F_OK, (fsErr) => {
+        if (fsErr) {
             res.status(status).render('error', {
                 message: err.message,
                 error: err
             });
-        } else { // If the error view exists, render it
+        } else {
             res.status(status).render(String(status), {
                 message: err.message,
                 error: err
@@ -207,6 +229,7 @@ app.use((err, req, res, next) => {
     });
 });
 
+
 app.listen(3000, '0.0.0.0', () => {
-    console.log('Server listening on 0.0.0.0:3000');
+    console.log('Server listening on http://0.0.0.0:3000');
 });
