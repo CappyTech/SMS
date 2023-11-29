@@ -1,4 +1,8 @@
-// controllers/monthlyReturns.js
+// /controllers/monthlyReturns.js
+
+const express = require('express');
+const router = express.Router();
+
 const packageJson = require('../package.json');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
@@ -132,7 +136,7 @@ const renderMonthlyReturns = async (req, res) => {
 };
 
 
-module.exports = {
-    renderMonthlyReturnsForm,
-    renderMonthlyReturns,
-};
+router.get('/monthly/returns/form', renderMonthlyReturnsForm);
+router.get('/monthly/returns/:month/:year/:subcontractor', renderMonthlyReturns);
+
+module.exports = router;
