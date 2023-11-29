@@ -41,18 +41,23 @@ const Subcontractors = sequelize.define('Subcontractor', {
     },
     cisNumber: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
     },
     utrNumber: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
     },
     deduction: {
         type: DataTypes.FLOAT,
         allowNull: false
     },
+    vatnumber: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+    }
 }, {
     paranoid: true,
 });
