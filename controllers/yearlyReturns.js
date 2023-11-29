@@ -1,4 +1,8 @@
-// controllers/yearlyReturns.js
+// /controllers/yearlyReturns.js
+
+const express = require('express');
+const router = express.Router();
+
 const packageJson = require('../package.json');
 const {
     Op
@@ -82,6 +86,6 @@ const renderYearlyReturns = async (req, res) => {
 };
 
 
-module.exports = {
-    renderYearlyReturns,
-};
+router.get('/yearly/returns/:year/:id', renderYearlyReturns);
+
+module.exports = router;
