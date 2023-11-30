@@ -10,8 +10,8 @@ const {validateInvoiceData,calculateInvoiceAmounts, slimDateTime, formatCurrency
 const createInvoice = async (req, res) => {
     try {
         const validatedData = validateInvoiceData(req.body);
-        const subcontractor = await Subcontractor.findByPk(req.params.id);
-        const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatnumber); // Adjust parameters as needed
+        const subcontractor = await Subcontractor.findByPk(req.params.selected);
+        const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatnumber);
 
         // Create invoice record
         const newInvoice = await Invoice.create({
@@ -28,7 +28,7 @@ const createInvoice = async (req, res) => {
             reverseCharge: amounts.reverseCharge,
             month: validatedData.month,
             year: validatedData.year,
-            SubcontractorId: req.params.id
+            SubcontractorId: req.params.selected
         });
 
         res.redirect(`/invoice/read/${newInvoice.id}`);
