@@ -51,14 +51,20 @@
             required>
     </div>
     <div class="mb-3">
-        <label for="deduction" class="form-label">Deduction</label>
+        <label for="deduction" class="form-label">Deduction <pre>set as: <%= subcontractor.deduction %></pre></label>
         <select name="deduction" id="deduction" class="form-select">
             <option value="0.3" <%= subcontractor.deduction = 0.3 ? 'selected' : '' %>>30%</option>
             <option value="0.2" <%= subcontractor.deduction = 0.2 ? 'selected' : '' %>>20%</option>
             <option value="0" <%= subcontractor.deduction = 0 ? 'selected' : '' %>>0%</option>
         </select>
     </div>
-    <!-- Add more input fields for other details -->
+    <div class="mb-3">
+        <label for="isGross" class="form-label">isGross <pre>set as: <%= subcontractor.isGross %></pre></label>
+        <select id="isGross" name="isGross" class="form-control">
+            <option value="false" selected>False</option>
+            <option value="true">True</option>
+        </select>
+    </div>
     <button type="submit" class="btn btn-primary">Update Subcontractor</button>
 </form>
 <form action="/subcontractor/delete/<%= subcontractor.id %>" method="POST"
