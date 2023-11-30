@@ -84,7 +84,7 @@
                 </thead>
                 <tbody>
                     <!-- Invoices for the current subcontractor -->
-                    <% const subcontractorInvoices = invoices.filter(invoice => invoice.subcontractorId === subcontractor.id); %>
+                    <% const subcontractorInvoices = invoices.filter(invoice => invoice.SubcontractorId === subcontractor.id); %>
                     <% subcontractorInvoices.forEach(invoice => { %>
                     <tr>
                         <td><a href="/invoice/update/<%= invoice.id %>"><%= invoice.invoiceNumber %><i
