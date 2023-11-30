@@ -95,7 +95,7 @@ const updateInvoice = async (req, res) => {
             throw new Error(`Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.id}`);
         }
 
-        const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, req.body.submissionDate, subcontractor.isGross);
+        const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatnumber);
 
         await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.id } });
 
