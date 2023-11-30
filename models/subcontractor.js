@@ -57,7 +57,12 @@ const Subcontractors = sequelize.define('Subcontractor', {
         type: DataTypes.STRING,
         allowNull: true,
         unique: true,
-    }
+    },
+    isGross: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
 }, {
     paranoid: true,
 });
