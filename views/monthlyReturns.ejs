@@ -15,7 +15,15 @@
                     <%= subcontractor.city %>, <%= subcontractor.county %>, <%= subcontractor.postalCode %></p>
                 <p><strong>CIS Number:</strong> <%= subcontractor.cisNumber %></p>
                 <p><strong>UTR Number:</strong> <%= subcontractor.utrNumber %></p>
-                <p><strong>Deduction:</strong> <%= subcontractor.deduction %></p>
+                <p><strong>Deduction:</strong>
+                    <% if (subcontractor.deduction === 0.0) { %>
+                        0%
+                    <% } else if (subcontractor.deduction === 0.2) { %>
+                        20%
+                    <% } else if (subcontractor.deduction === 0.3) { %>
+                        30%
+                    <% } %>
+                </p>
             </div>
         </div>
 
