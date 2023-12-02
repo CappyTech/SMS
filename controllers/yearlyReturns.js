@@ -16,6 +16,10 @@ const {
 
 const renderYearlyReturns = async (req, res) => {
     try {
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
+
         const {
             year,
             id
