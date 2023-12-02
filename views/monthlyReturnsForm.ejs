@@ -17,7 +17,7 @@
                         <% if (!uniqueYears.includes(invoiceData.year)) { %>
                         <% uniqueYears.push(invoiceData.year); %>
                         <li class="list-group-item">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#yearModal-<%= invoiceData.year %>">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#yearModal-<%= invoiceData.year %>-<%= subcontractor.id %>">
                                 <%= invoiceData.year %>
                             </a>
                         </li>
@@ -44,7 +44,7 @@
 <% const years = data.years; %>
 <% const invoicesByYear = data.invoicesByYear; %>
 <% years.forEach(year => { %>
-<div class="modal fade" id="yearModal-<%= year %>" tabindex="-1" aria-labelledby="yearModalLabel-<%= year %>"
+<div class="modal fade" id="yearModal-<%= year %>-<%= subcontractor.id %>" tabindex="-1" aria-labelledby="yearModalLabel-<%= year %>"
     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
