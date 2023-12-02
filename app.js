@@ -132,8 +132,8 @@ const createDefaultAdmin = async () => {
         });
         if (!admin) {
             await User.create({
-                username: 'admin',
-                email: 'admin@example.com',
+                username: process.env.ADMIN_USERNAME,
+                email: process.env.ADMIN_EMAIL,
                 password: process.env.ADMIN_PASSWORD,
                 role: 'admin',
             }, {
@@ -175,7 +175,7 @@ Invoice.belongsTo(Subcontractor, {
         await User.sync();
         await Subcontractor.sync();
         await Invoice.sync();
-        await createDefaultAdmin();
+        //await createDefaultAdmin();
         console.log('Models synced with the database');
     } catch (error) {
         console.error('Error syncing models:', error);
