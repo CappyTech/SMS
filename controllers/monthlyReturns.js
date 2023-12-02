@@ -10,6 +10,10 @@ const helpers = require('../helpers');
 
 const renderMonthlyReturnsForm = async (req, res) => {
     try {
+        // Check if the user is an admin
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
         // Define the monthNames array starting with April as month 1
         const monthNames = [
             'April', 'May', 'June', 'July', 'August', 'September',
@@ -72,6 +76,10 @@ const renderMonthlyReturnsForm = async (req, res) => {
 
 const renderMonthlyReturns = async (req, res) => {
     try {
+        // Check if the user is an admin
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
         const {
             month,
             year,
