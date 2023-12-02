@@ -140,22 +140,30 @@ const renderUserCreateForm = async (req, res) => {
     }
 };
 const renderSubcontractorCreateForm = (req, res) => {
+    try {
     console.log(req.session);
-    if (req.session.user.role === 'admin') {
+        if (req.session.user.role === 'admin') {
 
-        res.render('createSubcontractor', {
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            packageJson,
-            message: req.query.message || '',
-        });
-    } else {
-        return res.status(403).send('Access denied.');
+            res.render('createSubcontractor', {
+                errorMessages: req.flash('error'),
+                successMessage: req.flash('success'),
+                session: req.session,
+                packageJson,
+                message: req.query.message || '',
+            });
+        } else {
+            return res.status(403).send('Access denied.');
+        }
+    } catch (error) {
+        return req.flash('error', 'Error: ' + error.message);
     }
 };
 const renderInvoiceCreateForm = async (req, res) => {
     try {
+        // Check if the user is an admin
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
         console.log(req.session);
         if (req.params.id) {
             const subcontractor = await Subcontractor.findByPk(req.params.id);
