@@ -13,7 +13,7 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark d-print-none">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="/">
         <img src="/favicon.png" alt="Favicon" class="mr-2">
@@ -38,7 +38,7 @@
       </ul>
     </div>
   </nav>
-  <nav class="navbar navbar-expand-lg navbar-light bg-second-navbar">
+  <nav class="navbar navbar-expand-lg navbar-light bg-second-navbar d-print-none">
     <div class="container">
       <ul class="navbar-nav hstack gap-3">
         <% if (typeof session.user === 'undefined') { %>
@@ -78,12 +78,10 @@
     </div>
   </nav>
 
-  <main class="container mt-4">
-    <%- body %>
-  </main>
+  <%- body %>
 
   <nav
-    class="navbar navbar-expand navbar-dark bg-dark text-white d-flex justify-content-center align-items-center mt-5 p-4">
+    class="navbar navbar-expand navbar-dark bg-dark text-white d-flex justify-content-center align-items-center mt-5 p-4 d-print-none">
     <div class="stack-on-small">
       <div>
         <a href="/"><img src="/favicon.png" alt="HCS Logo"></a>
@@ -104,7 +102,6 @@
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
   </script>
-  <script src="/reload/reload.js"></script>
 </body>
 
 </html>
