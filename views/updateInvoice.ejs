@@ -1,4 +1,5 @@
 <!-- views/updateInvoice.ejs -->
+<% function isValidDate(date) { return date instanceof Date && !isNaN(date); } %>
 <h1>Edit Invoice</h1>
 <form action="/invoice/update/<%= invoice.id %>" method="POST">
     <div class="mb-3">
@@ -13,14 +14,29 @@
     </div>
     <div class="mb-3">
         <label for="invoiceDate" class="form-label">Invoice Date</label>
-        <input type="date" name="invoiceDate" id="invoiceDate" class="form-control" <% if (invoice.invoiceDate) { %>
-            value="<%= invoice.invoiceDate.toISOString().split('T')[0] %>" <% } %>>
+        <input type="date" name="invoiceDate" id="invoiceDate" class="form-control <%= isValidDate(invoice.invoiceDate) ? '' : 'is-invalid' %>"
+        <% if (isValidDate(invoice.invoiceDate)) { %>
+               value="<%= invoice.invoiceDate.toISOString().split('T')[0] %>"
+                <% } %>
+               required>
+        <% if (!isValidDate(invoice.invoiceDate)) { %>
+            <div class="invalid-feedback">
+                Please provide a valid invoice date.
+            </div>
+        <% } %>
     </div>
     <div class="mb-3">
         <label for="remittanceDate" class="form-label">Remittance Date</label>
-        <input type="date" name="remittanceDate" id="remittanceDate" class="form-control"
-            <% if (invoice.remittanceDate) { %> value="<%= invoice.remittanceDate.toISOString().split('T')[0] %>"
-            <% } %>>
+        <input type="date" name="remittanceDate" id="remittanceDate" class="form-control <%= isValidDate(invoice.remittanceDate) ? '' : 'is-invalid' %>"
+        <% if (isValidDate(invoice.remittanceDate)) { %>
+               value="<%= invoice.remittanceDate.toISOString().split('T')[0] %>"
+                <% } %>
+               required>
+        <% if (!isValidDate(invoice.remittanceDate)) { %>
+            <div class="invalid-feedback">
+                Please provide a valid remittance date.
+            </div>
+        <% } %>
     </div>
     <div class="mb-3">
         <label for="grossAmount" class="form-label">Gross Amount</label>
@@ -50,9 +66,16 @@
     </div>
     <div class="mb-3">
         <label for="submissionDate" class="form-label">Submission Date</label>
-        <input type="date" name="submissionDate" id="submissionDate" class="form-control"
-            <% if (invoice.submissionDate) { %> value="<%= invoice.submissionDate.toISOString().split('T')[0] %>"
-            <% } %>>
+        <input type="date" name="submissionDate" id="submissionDate" class="form-control <%= isValidDate(invoice.submissionDate) ? '' : 'is-invalid' %>"
+        <% if (isValidDate(invoice.submissionDate)) { %>
+               value="<%= invoice.submissionDate.toISOString().split('T')[0] %>"
+                <% } %>
+               required>
+        <% if (!isValidDate(invoice.submissionDate)) { %>
+            <div class="invalid-feedback">
+                The time format is incorrect.
+            </div>
+        <% } %>
     </div>
     <div class="mb-3">
         <label for="reverseCharge" class="form-label">Reverse Charge</label>
