@@ -99,7 +99,7 @@ const renderAdminDashboard = async (req, res) => {
 
         const users = await User.findAll();
         const subcontractors = await Subcontractor.findAll();
-        const invoices = await Invoice.findAll();
+        const invoices = await Invoice.findAll({ order: [['invoiceNumber', 'ASC']] });
 
         //const user = await User.findByPk();
 
