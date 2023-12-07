@@ -17,7 +17,7 @@ const renderIndex = (req, res) => {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
         session: req.session,
-        message: req.query.message || '',
+        packageJson,
     });
 };
 const renderDashboard = async (req, res) => {
@@ -72,7 +72,7 @@ const renderDashboard = async (req, res) => {
                     errorMessages: req.flash('error'),
                     successMessage: req.flash('success'),
                     session: req.session,
-                    message: req.query.message || '',
+                    packageJson,
                 });
             } else {
                 res.redirect('/subcontractor/create');
@@ -116,7 +116,6 @@ const renderAdminDashboard = async (req, res) => {
             packageJson,
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
-            message: req.query.message || '',
         });
     } catch (error) {
         req.flash('error', 'Error: ' + error.message);
@@ -132,6 +131,8 @@ const renderUserCreateForm = async (req, res) => {
         }
 
         res.render('createUser', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
             session: req.session,
             packageJson,
         });
@@ -149,7 +150,6 @@ const renderSubcontractorCreateForm = (req, res) => {
                 successMessage: req.flash('success'),
                 session: req.session,
                 packageJson,
-                message: req.query.message || '',
             });
         } else {
             return res.status(403).send('Access denied.');
@@ -178,7 +178,6 @@ const renderInvoiceCreateForm = async (req, res) => {
                 session: req.session,
                 packageJson,
                 subcontractor,
-                message: req.query.message || '',
                 slimDateTime: helpers.slimDateTime,
             });
         }
@@ -203,6 +202,8 @@ const renderUserUpdateForm = async (req, res) => {
 
         res.render('updateUser', {
             user,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
@@ -228,6 +229,8 @@ const renderSubcontractorUpdateForm = async (req, res) => {
 
         res.render('updateSubcontractor', {
             subcontractor,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
@@ -252,6 +255,8 @@ const renderInvoiceUpdateForm = async (req, res) => {
 
         res.render('updateInvoice', {
             invoice,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
@@ -287,7 +292,6 @@ const selectSubcontractor = async (req, res) => {
             session: req.session,
             packageJson,
             subcontractors,
-            message: req.query.message || '',
             slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
