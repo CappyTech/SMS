@@ -43,8 +43,10 @@ const renderMonthlyReturnsForm = async (req, res) => {
                 if (!invoicesByYear[year]) {
                     invoicesByYear[year] = [];
                 }
+
                 if (!invoicesByYear[year].includes(month)) {
                     invoicesByYear[year].push(month);
+                    invoicesByYear[year].sort((a, b) => monthNames.indexOf(monthNames[a - 1]) - monthNames.indexOf(monthNames[b - 1]));
                 }
             });
 
