@@ -15,8 +15,7 @@ const renderLoginForm = (req, res) => {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
         session: req.session,
-        packageJson,
-        message: req.query.message || '',
+        packageJson
     });
 };
 
