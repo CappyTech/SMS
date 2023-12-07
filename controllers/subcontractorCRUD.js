@@ -93,6 +93,8 @@ const readSubcontractor = async (req, res) => {
 
         res.render('viewSubcontractor', {
             subcontractor,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
@@ -139,10 +141,12 @@ const updateSubcontractor = async (req, res) => {
             await subcontractor.save();
 
             req.flash('success', 'Subcontractor updated.');
+            console.log('Subcontractor updated.');
             const referrer = '/admin';
             res.redirect(referrer);
         } else {
-            req.flash('error', 'Subcontractor not found');
+            req.flash('error', 'Subcontractor not found.');
+            console.log('Subcontractor not found.');
             const referrer = '/admin';
             res.redirect(referrer);
         }
@@ -170,7 +174,8 @@ const deleteSubcontractor = async (req, res) => {
 
         await subcontractor.destroy();
 
-        req.flash('success', 'Subcontractor deleted successfully');
+        req.flash('success', 'Subcontractor deleted.');
+        console.log('Subcontractor deleted.');
         const referrer = req.get('referer') || '/admin';
         res.redirect(referrer);
     } catch (error) {
