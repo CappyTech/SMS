@@ -13,6 +13,10 @@ const createInvoice = async (req, res) => {
         const subcontractor = await Subcontractor.findByPk(req.params.selected);
         const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatnumber);
 
+        // If remittanceDate or submissionDate are not provided, set them to null
+        validatedData.remittanceDate = validatedData.remittanceDate || null;
+        validatedData.submissionDate = validatedData.submissionDate || null;
+
         // Create invoice record
         const newInvoice = await Invoice.create({
             invoiceNumber: validatedData.invoiceNumber,
