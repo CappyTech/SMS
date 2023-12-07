@@ -1,4 +1,7 @@
 <!-- views/updateUser.ejs -->
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+
 <div class="container mt-2">
     <h1>Edit User</h1>
     <form action="/user/update/<%= user.id %>" method="POST">
