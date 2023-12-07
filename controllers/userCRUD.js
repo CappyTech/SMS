@@ -71,8 +71,10 @@ const readUser = async (req, res) => {
     
         res.render('viewUser', {
           user,
-          session: req.session,
-          packageJson,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
           slimDateTime: helpers.slimDateTime,
           formatCurrency: helpers.formatCurrency,
         });
