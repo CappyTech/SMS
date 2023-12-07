@@ -1,4 +1,7 @@
 <!-- views/updateInvoice.ejs -->
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+
 <% function isValidDate(date) { return date instanceof Date && !isNaN(date); } %>
 <div class="container mt-2">
     <h1>Edit Invoice</h1>
