@@ -135,8 +135,7 @@ Invoice.belongsTo(Subcontractor);
 
 // Hook to hash the password before saving
 User.beforeCreate(async (user) => {
-    const hashedPassword = await bcrypt.hash(user.password, 10);
-    user.password = hashedPassword;
+    user.password = await bcrypt.hash(user.password, 10);
 });
 
 module.exports = {
