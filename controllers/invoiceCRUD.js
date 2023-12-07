@@ -42,7 +42,6 @@ const createInvoice = async (req, res) => {
                 successMessage: req.flash('success'),
                 session: req.session,
                 packageJson,
-                message: req.query.message || '',
             });
         }
         console.error('Error creating invoice:', error);
@@ -67,6 +66,8 @@ const readInvoice = async (req, res) => {
 
         res.render('viewInvoice', {
             invoice,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
             session: req.session,
             packageJson,
             slimDateTime: slimDateTime,
