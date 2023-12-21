@@ -1,95 +1,114 @@
 <!-- views/adminDashboard.ejs -->
-<div class="container text-center">
-    <h1>Admin Dashboard</h1>
-    <small>[Users: <%= userCount %> | Subcontractors: <%= subcontractorCount %> | Invoices: <%= invoiceCount %>
-        ]</small>
-</div>
-
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5 text-center">
 
-<!-- Users table -->
-<div class="card mt-2">
-    <div class="card-body">
-        <div class=" table-responsive">
-            <table class="table table-hover">
+            <h1 class="display-5 fw-bold">Admin Dashboard</h1>
+
+            <span class="badge rounded-pill text-bg-secondary">
+                Users
+                <span class="badge rounded-pill text-bg-dark">
+                    <%= userCount %>
+                </span>
+            </span>
+            <span class="badge rounded-pill text-bg-secondary">
+                Subcontractors
+                <span class="badge rounded-pill text-bg-dark">
+                    <%= subcontractorCount %>
+                </span>
+            </span>
+            <span class="badge rounded-pill text-bg-secondary">
+                Invoices
+                <span class="badge rounded-pill text-bg-dark">
+                    <%= invoiceCount %>
+                </span>
+            </span>
+
+
+            <table class="table table-borderless table-sm mt-2 mb-2">
                 <thead>
-                    <tr>
-                        <th>Username <i class="bi bi-person-fill"></i></th>
-                        <th>Email <i class="bi bi-envelope-fill"></i></th>
-                        <th>Role <i class="bi bi-person-fill-lock"></i></th>
-                    </tr>
-                </thead>
-                <tbody>
+                <tr>
+                    <th>Username <i class="bi bi-person-fill"></i></th>
                     <% users.forEach(user => { %>
-                    <tr>
-                        <td><a href="/user/update/<%= user.id %>"><%= user.username %><i class="bi bi-pencil-square"
-                                    style="font-size: 0.65rem;"></i></a></td>
+                        <td><a href="/user/update/<%= user.id %>"><%= user.username %><i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
+                    <% }); %>
+                </tr>
+                <tr>
+                    <th>Email <i class="bi bi-envelope-fill"></i></th>
+                    <% users.forEach(user => { %>
                         <td><%= user.email %></td>
+                    <% }); %>
+                </tr>
+                <tr>
+                    <th>Role <i class="bi bi-person-fill-lock"></i></th>
+                    <% users.forEach(user => { %>
                         <td><%= user.role %></td>
-                    </tr>
                     <% }); %>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<hr class="border border-secondary border-3">
-
-<!-- Subcontractors table -->
-<% subcontractors.forEach(subcontractor => { %>
-<div class="card mt-2">
-    <div class="card-body">
-        <h3 class="card-title text-center">
-            <a href="/subcontractor/update/<%= subcontractor.id %>"><%= subcontractor.name %><i
-                    class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></i>
-        </h3>
-        <h4 class="card-subtitle mb-2 text-body-secondary"></h4>
-        <div class=" table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Invoice <i class="bi bi-123"></i></th>
-                        <th>Kashflow <i class="bi bi-123"></i></th>
-                        <th>Invoice <i class="bi bi-calendar2-date-fill"></i></th>
-                        <th>Remittance <i class="bi bi-calendar2-date-fill"></i></th>
-                        <th>Labour <i class="bi bi-currency-pound"></i></th>
-                        <th>Material <i class="bi bi-currency-pound"></i></th>
-                        <th>CIS Deduction <i class="bi bi-bank2"></i></th>
-                        <th>Gross <i class="bi bi-cash"></i></th>
-                        <th>Net <i class="bi bi-piggy-bank-fill"></i></th>
-                        <% if (subcontractor.isGross) { %>
-                        <th>Reverse Charge <i class="bi bi-wallet-fill"></i></th>
-                        <% } %>
-                        <th>Submission <i class="bi bi-calendar2-date-fill"></i></th>
-                    </tr>
+                </tr>
                 </thead>
-                <tbody>
-                    <!-- Invoices for the current subcontractor -->
-                    <% const subcontractorInvoices = invoices.filter(invoice => invoice.SubcontractorId === subcontractor.id); %>
-                    <% subcontractorInvoices.forEach(invoice => { %>
-                    <tr>
-                        <td><a href="/invoice/update/<%= invoice.id %>"><%= invoice.invoiceNumber %><i
-                                    class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
-                        <td><a href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>"><%= invoice.kashflowNumber %><i
-                                    class="bi bi-box-arrow-up-right" style="font-size: 0.65rem;"></i></a></td>
-                        <td><%= slimDateTime(invoice.invoiceDate) %></td>
-                        <td><%= slimDateTime(invoice.remittanceDate) %></td>
-                        <td><%= formatCurrency(invoice.labourCost) %></td>
-                        <td><%= formatCurrency(invoice.materialCost) %></td>
-                        <td><%= formatCurrency(invoice.cisAmount) %></td>
-                        <td><%= formatCurrency(invoice.grossAmount) %></td>
-                        <td><%= formatCurrency(invoice.netAmount) %></td>
-                        <% if (subcontractor.isGross) { %>
-                        <td><%= formatCurrency(invoice.reverseCharge) %></td>
-                        <% } %>
-                        <td><%= slimDateTime(invoice.submissionDate) %></td>
-                    </tr>
-                    <% }); %>
-                </tbody>
             </table>
+
+            <hr>
+
+            <!-- Subcontractors table -->
+            <% subcontractors.forEach(subcontractor => { %>
+                <div class="card mt-2">
+                    <div class="card-body">
+                        <h3 class="card-title text-center">
+                            <a href="/subcontractor/update/<%= subcontractor.id %>"><%= subcontractor.name %><i
+                                        class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></i>
+                        </h3>
+                        <h4 class="card-subtitle mb-2 text-body-secondary"></h4>
+                        <div class=" table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Invoice <i class="bi bi-123"></i></th>
+                                    <th>Kashflow <i class="bi bi-123"></i></th>
+                                    <th>Invoice <i class="bi bi-calendar2-date-fill"></i></th>
+                                    <th>Remittance <i class="bi bi-calendar2-date-fill"></i></th>
+                                    <th>Labour <i class="bi bi-currency-pound"></i></th>
+                                    <th>Material <i class="bi bi-currency-pound"></i></th>
+                                    <th>CIS Deduction <i class="bi bi-bank2"></i></th>
+                                    <th>Gross <i class="bi bi-cash"></i></th>
+                                    <th>Net <i class="bi bi-piggy-bank-fill"></i></th>
+                                    <% if (subcontractor.isGross) { %>
+                                        <th>Reverse Charge <i class="bi bi-wallet-fill"></i></th>
+                                    <% } %>
+                                    <th>Submission <i class="bi bi-calendar2-date-fill"></i></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Invoices for the current subcontractor -->
+                                <% const subcontractorInvoices = invoices.filter(invoice => invoice.SubcontractorId === subcontractor.id); %>
+                                <% subcontractorInvoices.forEach(invoice => { %>
+                                    <tr>
+                                        <td><a href="/invoice/update/<%= invoice.id %>"><%= invoice.invoiceNumber %><i
+                                                        class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
+                                        <td><a href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>"><%= invoice.kashflowNumber %><i
+                                                        class="bi bi-box-arrow-up-right" style="font-size: 0.65rem;"></i></a></td>
+                                        <td><%= slimDateTime(invoice.invoiceDate) %></td>
+                                        <td><%= slimDateTime(invoice.remittanceDate) %></td>
+                                        <td><%= formatCurrency(invoice.labourCost) %></td>
+                                        <td><%= formatCurrency(invoice.materialCost) %></td>
+                                        <td><%= formatCurrency(invoice.cisAmount) %></td>
+                                        <td><%= formatCurrency(invoice.grossAmount) %></td>
+                                        <td><%= formatCurrency(invoice.netAmount) %></td>
+                                        <% if (subcontractor.isGross) { %>
+                                            <td><%= formatCurrency(invoice.reverseCharge) %></td>
+                                        <% } %>
+                                        <td><%= slimDateTime(invoice.submissionDate) %></td>
+                                    </tr>
+                                <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+
         </div>
     </div>
 </div>
-<% }); %>
