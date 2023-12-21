@@ -3,48 +3,84 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <div>
-                <h1 class="text-center">Subcontractor Management System</h1>
-                <small>Developed by Heron Constructive Solutions LTD,</small>
-                <hr>
-                <p>SMS is a comprehensive web-based application designed
-                    to streamline the
-                    management of subcontractors in construction projects.</p>
-                <p>It facilitates efficient data entry,
-                    automates monthly returns for CIS & HMRC compliance, tracks payments, manages deductions, and
-                    enables
-                    subcontractor verification.</p>
-                <p>SMS ensures accurate record-keeping, regulatory compliance, and
-                    communication among project managers, enhancing overall subcontractor management
-                    efficiency and transparency.</p>
-                <% if (typeof session.user === 'undefined') { %>
-                <div class="d-grid">
-                    <a href="/register" class="btn btn-hcs-green" type="button"><i class="bi bi-book"></i>
-                        Register</a>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5 text-center">
+            <h1 class="display-5 fw-bold">Subcontractor Management System<br>
+                <small class="lead fw-light text-body-secondary">Developed by Heron Constructive Solutions LTD</small>
+            </h1>
+            <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+                <div class="col">
+                    <div class="card h-100 d-flex flex-column">
+                        <div class="card-body">
+                            <h5 class="card-header-pills">Accurate Record-Keeping</h5>
+                            <p class="card-text">With features that facilitate efficient data entry and manage important details, the system ensures accurate and up-to-date record-keeping.</p>
+                        </div>
+                    </div>
                 </div>
-                <% } %>
-                <hr>
-                <% if (typeof session.user === 'undefined') { %>
-                <form action="/login" method="POST">
-                    <h2>Login</h2>
-                    <div class="mb-3">
-                        <label for="usernameOrEmail" class="form-label">Username or Email:</label>
-                        <input type="text" id="usernameOrEmail" name="usernameOrEmail" class="form-control" required>
+
+                <div class="col">
+                    <div class="card h-100 d-flex flex-column">
+                        <div class="card-body">
+                            <h5 class="card-header-pills">Regulatory Compliance</h5>
+                            <p class="card-text">SMS automates monthly returns, aiding in maintaining CIS & HMRC compliance. This feature aims to ease financial and tax reporting tasks, ensuring businesses stay within the law.</p>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password:</label>
-                        <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 d-flex flex-column">
+                        <div class="card-body">
+                            <h5 class="card-header-pills">Payment Tracking</h5>
+                            <p class="card-text">Detailed invoice records allow you to track payments and manage deductions effectively.</p>
+                        </div>
                     </div>
-                    <div class="mb-3 d-grid">
-                        <button type="submit" class="btn btn-hcs-red"><i class="bi bi-box-arrow-in-right"></i>
-                            Login</button>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 d-flex flex-column">
+                        <div class="card-body">
+                            <h5 class="card-header-pills">Subcontractor Verification</h5>
+                            <p class="card-text">The system can perform subcontractor verification, allowing only valid and vetted subcontractors to participate, thereby reducing project risks.</p>
+                        </div>
                     </div>
-                </form>
-                <% } %>
+                </div>
+                <!-- User Access Control Card -->
+                <div class="col">
+                    <div class="card h-100 d-flex flex-column">
+                        <div class="card-body">
+                            <h5 class="card-header-pills">User Access Control</h5>
+                            <p class="card-text">SMS supports the creation and management of user profiles. Admin and subcontractor roles allow for role-based access control ensuring more secure and efficient project management.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Effective Communication Card -->
+                <div class="col">
+                    <div class="card h-100 d-flex flex-column">
+                        <div class="card-body">
+                            <h5 class="card-header-pills">Effective Communication</h5>
+                            <p class="card-text">It enhances communication among project managers, ensuring that everyone is kept up-to-date on project developments.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Efficiency and Transparency Card -->
+                <div class="col">
+                    <div class="card h-100 d-flex flex-column">
+                        <div class="card-body">
+                            <h5 class="card-header-pills">Efficiency and Transparency</h5>
+                            <p class="card-text">Through structured and automated data handling, the system enhances the overall efficiency of subcontractor management, providing transparency for every stakeholder involved.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="d-grid gap-2 mt-4 ">
+                        <a class="btn btn-hcs-green btn-lg" type="button" href="/signin"><i class="bi bi-box-arrow-in-right"></i> Sign In</a>
+                        <a class="btn btn-tertiary btn-sm" type="button" href="/register"><i class="bi bi-book"></i> Create an account</a>
+                    </div>
+                </div>
             </div>
-        </div>
+            </div>
     </div>
 </div>
