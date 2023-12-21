@@ -84,8 +84,7 @@ const readSubcontractor = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const subcontractorId = req.params.id;
-        const subcontractor = await Subcontractor.findByPk(subcontractorId);
+        const subcontractor = await Subcontractor.findByPk(req.params.id);
 
         if (!subcontractor) {
             return res.status(404).send('Subcontractor not found');
