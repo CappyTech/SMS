@@ -1,25 +1,54 @@
 <!-- views/viewSubcontractor.ejs: -->
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
-<h1>Subcontractor</h1>
-<div class="card">
-    <div class="card-header">
-        Subcontractor Details
-    </div>
-    <div class="card-body">
-        <p><strong>Name:</strong> <%= subcontractor.name %></p>
-        <p><strong>Company:</strong> <%= subcontractor.company %></p>
-        <p><strong>Address Line 1:</strong> <%= subcontractor.line1 %></p>
-        <p><strong>Address Line 2:</strong> <%= subcontractor.line2 %></p>
-        <p><strong>City:</strong> <%= subcontractor.city %></p>
-        <p><strong>County:</strong> <%= subcontractor.county %></p>
-        <p><strong>Postal Code:</strong> <%= subcontractor.postalCode %></p>
-        <p><strong>CIS Number:</strong> <%= subcontractor.cisNumber %></p>
-        <p><strong>UTR Number:</strong> <%= subcontractor.utrNumber %></p>
-        <p><strong>Onboarded:</strong> <%= subcontractor.onboarded ? 'Yes' : 'No' %></p>
-        <% if (subcontractor.onboarded) { %>
-        <p><strong>Onboarded At:</strong> <%= subcontractor.onboardedAt %></p>
-        <% } %>
-        <p><strong>Is Gross:</strong> <%= subcontractor.isGross ? 'Yes' : 'No' %></p>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Subcontractor <%= subcontractor.company %></h1>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <span><%= subcontractor.name %></span>
+                    <a class="hcs-green-text" href="/subcontractor/read/<%= subcontractor.id %>">View Subcontractor</a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <ul class="list-group">
+                                <li class="list-group-item">Name</li>
+                                <li class="list-group-item">Company</li>
+                                <li class="list-group-item">Address Line 1</li>
+                                <li class="list-group-item">Address Line 2</li>
+                                <li class="list-group-item">City</li>
+                                <li class="list-group-item">County</li>
+                                <li class="list-group-item">Postal Code</li>
+                                <li class="list-group-item">CIS Number</li>
+                                <li class="list-group-item">UTR Number</li>
+                                <li class="list-group-item">VAT Number</li>
+                                <li class="list-group-item">IsGross</li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <ul class="list-group">
+                                <li class="list-group-item <%= subcontractor.name ? '' : 'list-group-item-warning' %>"><%= subcontractor.name ? subcontractor.name : 'N/A' %></li>
+                                <li class="list-group-item <%= subcontractor.company ? '' : 'list-group-item-warning' %>"><%= subcontractor.company ? subcontractor.company : 'N/A' %></li>
+                                <li class="list-group-item <%= subcontractor.line1 ? '' : 'list-group-item-warning' %>"><%= subcontractor.line1 ? subcontractor.line1 : 'N/A' %></li>
+                                <li class="list-group-item <%= subcontractor.line2 ? '' : 'list-group-item-warning' %>"><%= subcontractor.line2 ? subcontractor.line2 : 'N/A' %></li>
+                                <li class="list-group-item <%= subcontractor.city ? '' : 'list-group-item-warning' %>"><%= subcontractor.city ? subcontractor.city : 'N/A' %></li>
+                                <li class="list-group-item <%= subcontractor.county ? '' : 'list-group-item-warning' %>"><%= subcontractor.county ? subcontractor.county : 'N/A' %></li>
+                                <li class="list-group-item <%= subcontractor.postalCode ? '' : 'list-group-item-warning' %>"><%= subcontractor.postalCode ? subcontractor.postalCode : 'N/A' %></li>
+                                <li class="list-group-item <%= subcontractor.cisNumber ? '' : 'list-group-item-warning' %>"><%= subcontractor.cisNumber ? subcontractor.cisNumber : 'N/A' %></li>
+                                <li class="list-group-item <%= subcontractor.utrNumber ? '' : 'list-group-item-warning' %>"><%= subcontractor.utrNumber ? subcontractor.utrNumber : 'N/A' %></li>
+                                <li class="list-group-item <%= subcontractor.vatNumber ? '' : 'list-group-item-warning' %>"><%= subcontractor.vatNumber ? subcontractor.vatNumber : 'N/A' %></li>
+                                <li class="list-group-item"><%= subcontractor.isGross ? 'Yes' : 'No' %></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a type="button" class="btn btn-hcs-green btn-sm" href="/subcontractor/update/<%= subcontractor.id %>">Update Subcontractor</a>
+                    <span>Last Updated: <%= slimDateTime(subcontractor.updatedAt,true) %></span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
