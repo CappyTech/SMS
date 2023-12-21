@@ -56,13 +56,17 @@ const createInvoice = async (req, res) => {
 };
 const readInvoice = async (req, res) => {
     try {
-        // Check if the user is an admin
-        if (req.session.user.role !== 'admin') {
-            return res.status(403).json({ error: 'Access denied.' });
+        // Check if session exists and session user role is an admin
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/'); // Ensure to return here
         }
 
-        const invoiceId = req.params.id;
-        const invoice = await Invoice.findByPk(invoiceId);
+        const invoice = await Invoice.findByPk(req.params.id, {
+            include: [
+                { model: Subcontractor }
+            ]
+        });
 
         if (!invoice) {
             return res.status(404).json({ error: 'Invoice not found' });
