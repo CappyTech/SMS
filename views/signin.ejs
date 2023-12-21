@@ -1,0 +1,24 @@
+<!-- views/signin.ejs: -->
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Sign in</h1>
+            <form action="/login" method="POST">
+                <div class="form-floating mb-3">
+                    <input type="text" id="usernameOrEmail" name="usernameOrEmail" class="form-control" required>
+                    <label for="usernameOrEmail" class="form-label">Username:</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" id="password" name="password" class="form-control" required>
+                    <label for="password" class="form-label">Password:</label>
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                    <button class="btn btn-hcs-green btn-lg" type="submit" href="/signin"><i class="bi bi-box-arrow-in-right"></i> Sign in</button>
+                    <a class="btn btn-tertiary btn-sm" type="button" href="/register"><i class="bi bi-book"></i> Create an account</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
