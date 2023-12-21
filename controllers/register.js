@@ -25,8 +25,7 @@ const registerUser = async (req, res) => {
         const {
             username,
             email,
-            password,
-            role
+            password
         } = req.body;
 
         // Check if the email or username already exists
@@ -51,9 +50,7 @@ const registerUser = async (req, res) => {
         await User.create({
             username,
             email,
-            password,
-            role,
-            twoFactorSecret: secret.base32,
+            password
         });
         if (role === "admin") {
             res.redirect('/admin');
