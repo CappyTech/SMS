@@ -1,15 +1,15 @@
 <!-- views/monthlyReturnsForm.ejs: -->
 <div class="container mt-5">
     <h1 class="mb-4">Monthly Returns</h1>
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="row row-cols-1 row-cols-md-2 g-4 h-100">
         <% subcontractorsWithMonths.forEach(data => { %>
         <% const subcontractor = data.subcontractor; %>
         <% const years = data.years; %>
         <% const invoicesByYear = data.invoicesByYear; %>
-        <div class="col">
-            <div class="card h-100">
+            <div class="col">
+            <div class="card border-dark">
+                <h5 class="card-header"><%= subcontractor.dataValues.name %></h5>
                 <div class="card-body">
-                    <h5 class="card-title"><%= subcontractor.dataValues.name %></h5>
                     <% let uniqueYears = []; %>
                     <ul class="list-group list-group-flush">
                         <% if (subcontractor.dataValues.invoices && subcontractor.dataValues.invoices.length) { %>
@@ -17,7 +17,7 @@
                         <% if (!uniqueYears.includes(invoiceData.year)) { %>
                         <% uniqueYears.push(invoiceData.year); %>
                         <li class="list-group-item">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#yearModal-<%= invoiceData.year %>-<%= subcontractor.id %>">
+                            <a class="card-link" href="#" data-bs-toggle="modal" data-bs-target="#yearModal-<%= invoiceData.year %>-<%= subcontractor.id %>">
                                 <%= invoiceData.year %>
                             </a>
                         </li>
@@ -33,8 +33,89 @@
                     </ul>
                 </div>
             </div>
-        </div>
+            </div>
         <% }); %>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h1 class="mb-4">Monthly Returns</h1>
+    <div class="row row-cols-1 row-cols-md-2 g-4 h-100">
+        <% subcontractorsWithMonths.forEach(data => { %>
+            <% const subcontractor = data.subcontractor; %>
+            <% const years = data.years; %>
+            <div class="col">
+                <div class="card border-dark">
+                    <!-- Card Header with Navigation -->
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs">
+                            <% years.forEach((year, index) => { %>
+                                <li class="nav-item">
+                                    <a class="nav-link <%= index === 0 ? 'active' : '' %>" aria-current="page" href="#" data-bs-toggle="modal" data-bs-target="#yearModal-<%= year %>-<%= subcontractor.id %>">
+                                        <%= year %>
+                                    </a>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                    <!-- Card Body with Yearly Report Links -->
+                    <div class="card-body">
+                        <h5 class="card-title"><%= subcontractor.dataValues.name %></h5>
+                        <% years.forEach(year => { %>
+                            <div id="yearContent-<%= year %>-<%= subcontractor.id %>" class="year-content <%= year === years[0] ? '' : 'd-none' %>">
+                                <p class="card-text">
+                                    Click on the tabs to view reports for different years.
+                                </p>
+                                <a href="/yearly/returns/<%= year %>/<%= subcontractor.id %>" class="btn btn-primary">
+                                    <%= year %> Yearly Report
+                                </a>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h1 class="mb-4">Monthly Returns</h1>
+
+    <!-- Single Card Structure -->
+    <div class="card border-info">
+        <!-- Card Header with Subcontractor Navigation -->
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+                <% subcontractorsWithMonths.forEach((data, index) => { %>
+                    <% const subcontractor = data.subcontractor; %>
+                    <li class="nav-item">
+                        <a class="nav-link <%= index === 0 ? 'active' : '' %>" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#subcontractorContent-<%= subcontractor.id %>">
+                            <%= subcontractor.dataValues.name %>
+                        </a>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+
+        <!-- Card Body with Yearly Report Links for Each Subcontractor -->
+        <div class="card-body tab-content">
+            <% subcontractorsWithMonths.forEach((data, index) => { %>
+                <% const subcontractor = data.subcontractor; %>
+                <% const years = data.years; %>
+                <div id="subcontractorContent-<%= subcontractor.id %>" class="tab-pane <%= index === 0 ? 'active' : '' %>">
+                    <h5 class="card-title"><%= subcontractor.dataValues.name %>'s Reports</h5>
+                    <ul>
+                        <% years.forEach(year => { %>
+                            <li >
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#yearModal-<%= year %>-<%= subcontractor.id %>">
+                                    <%= year %> Yearly Report
+                                </a>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </div>
+            <% }); %>
+        </div>
     </div>
 </div>
 
