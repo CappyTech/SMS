@@ -6,7 +6,10 @@ const router = express.Router();
 const packageJson = require('../package.json');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
-const helpers = require('../helpers');
+const {
+    formatCurrency,
+    slimDateTime
+} = require('../helpers');
 
 const renderMonthlyReturnsForm = async (req, res) => {
     try {
@@ -63,8 +66,8 @@ const renderMonthlyReturnsForm = async (req, res) => {
             successMessage: req.flash('success'),
             session: req.session,
             packageJson,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            slimDateTime: slimDateTime,
+            formatCurrency: formatCurrency,
             subcontractorsWithMonths: subcontractorsWithMonths,
             monthNames: monthNames
         });
@@ -85,57 +88,48 @@ const renderMonthlyReturns = async (req, res) => {
         const {
             month,
             year,
-            subcontractor
+            id
         } = req.params;
 
-        if (!month || !year || !subcontractor) {
+        if (!month || !year || !id) {
+            console.log("Month, Year, and Subcontractor are required.");
             return res.status(400).send("Month, Year, and Subcontractor are required.");
         }
 
-        const subcontractors = await Subcontractor.findAll({
+        const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+
+        const subcontractor = await Subcontractor.findAll({
             where: {
-                id: subcontractor,
+                id: id,
                 deletedAt: null
             },
             include: {
                 model: Invoice,
                 as: 'invoices',
                 where: {
-                    month: month,
-                    year: year
+                    month: month
                 }
             }
         });
 
-        // Log the data for debugging
-        console.log('Subcontractors Data:', JSON.stringify(subcontractors, null, 2));
-
-        if (subcontractors.length === 0 || subcontractors[0].invoices.length === 0) {
-            return res.render('monthlyReturns', {
-                errorMessages: req.flash('error'),
-                successMessage: req.flash('success'),
-                session: req.session,
-                packageJson,
-                month: month,
-                year: year,
-                subcontractor: subcontractors[0] || null,
-                invoices: [],
-                slimDateTime: helpers.slimDateTime,
-                formatCurrency: helpers.formatCurrency,
-            });
-        }
+        console.log("Rendering monthly returns:", {
+            subcontractor: subcontractor,
+            month: month,
+            year: year
+        });
 
         res.render('monthlyReturns', {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
             packageJson,
+            slimDateTime: slimDateTime,
+            formatCurrency: formatCurrency,
             month: month,
             year: year,
-            subcontractor: subcontractors[0],
-            invoices: subcontractors[0].invoices,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency
+            subcontractor: subcontractor[0],
+            invoices: subcontractor[0].invoices,
+            monthNames: monthNames
         });
     } catch (error) {
         console.error("Error rendering monthly returns:", error);
@@ -147,6 +141,6 @@ const renderMonthlyReturns = async (req, res) => {
 
 
 router.get('/monthly/returns/form', renderMonthlyReturnsForm);
-router.get('/monthly/returns/:month/:year/:subcontractor', renderMonthlyReturns);
+router.get('/monthly/returns/:month/:year/:id', renderMonthlyReturns);
 
 module.exports = router;
