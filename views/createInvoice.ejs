@@ -1,135 +1,139 @@
 <!-- views/createInvoice.ejs: -->
-<h1>Create Invoice</h1>
-
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
-
-<form action="/invoice/create/<%= subcontractor.id %>" method="POST" class="needs-validation">
-    <table class="table">
-        <tbody>
-            <tr>
-                <td><label for="subcontractorId">Subcontractor:</label></td>
-                <td>
-                    <div class="row">
-                        <div class="col">
-                            <div class="input-group">
-                                <select id="subcontractorId" name="subcontractorId" class="form-select" required>
-                                    <option value="<%= subcontractor.id %>"><%= subcontractor.name %> /
-                                        <%= subcontractor.company %></option>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5 text-center">
+            <h1 class="display-5 fw-bold">Create Invoice</h1>
+            <form action="/invoice/create/<%= subcontractor.id %>" method="POST" class="needs-validation">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td><label for="subcontractorId">Subcontractor:</label></td>
+                            <td>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group">
+                                            <select id="subcontractorId" name="subcontractorId" class="form-select" required>
+                                                <option value="<%= subcontractor.id %>"><%= subcontractor.name %> /
+                                                    <%= subcontractor.company %></option>
+                                            </select>
+                                            <button id="addSubcontractorButton" type="button" class="btn btn-hcs-green">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="invoiceNumber">Invoice <i class="bi bi-123"></label></td>
+                            <td><input type="text" id="invoiceNumber" name="invoiceNumber" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="kashflowNumber">Kashflow <i class="bi bi-123"></label></td>
+                            <td><input type="text" id="kashflowNumber" name="kashflowNumber" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="invoiceDate">Invoice <i class="bi bi-calendar2-date-fill"></label></td>
+                            <td><input type="date" id="invoiceDate" name="invoiceDate" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="remittanceDate">Remittance <i class="bi bi-calendar2-date-fill"></label></td>
+                            <td><input type="date" id="remittanceDate" name="remittanceDate" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="labourCost">Labour <i class="bi bi-currency-pound"></i></label></td>
+                            <td><input type="text" id="labourCost" name="labourCost" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="materialCost">Materials <i class="bi bi-currency-pound"></i></label></td>
+                            <td><input type="text" id="materialCost" name="materialCost" class="form-control"></td>
+                        </tr>
+                        <% if (subcontractor.deduction === 0.3) { %>
+                        <tr>
+                            <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
+                            <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
+                                    value="Labour / 30%"></td>
+                        </tr>
+                        <% } %>
+                        <% if (subcontractor.deduction === 0.2) { %>
+                        <tr>
+                            <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
+                            <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
+                                    value="Labour / 20%"></td>
+                        </tr>
+                        <% } %>
+                        <% if (subcontractor.deduction === 0) { %>
+                        <tr>
+                            <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
+                            <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
+                                    value="Labour / 0%"></td>
+                        </tr>
+                        <% } %>
+                        <tr>
+                            <td><label for="grossAmount">Gross <i class="bi bi-cash"></i></label></td>
+                            <td><input type="text" id="grossAmount" name="grossAmount" class="form-control" disabled
+                                    value="Labour + Materials"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="netAmount">Net <i class="bi bi-cash"></i></label></td>
+                            <td><input type="text" id="netAmount" name="netAmount" class="form-control" disabled
+                                    value="Labour + Materials - CIS Deduction"></td>
+                        </tr>
+                        <% if (subcontractor.deduction === 0) { %>
+                        <tr>
+                            <td><label for="reverseCharge">Reverse Charge <i class="bi bi-wallet-fill"></i></label></td>
+                            <td><input type="text" id="reverseCharge" name="reverseCharge" class="form-control" disabled
+                                    value="Gross x 20%"></td>
+                        </tr>
+                        <% } %>
+                        <tr>
+                            <td><label for="submissionDate">Submission <i class="bi bi-calendar2-date-fill"></label></td>
+                            <td><input type="date" id="submissionDate" name="submissionDate" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="month">Tax Month <i class="bi bi-calendar2-date-fill"></i></label></td>
+                            <td>
+                                <select id="month" name="month" class="form-select" required>
+                                    <option value="1">1 | April</option>
+                                    <option value="2">2 | May</option>
+                                    <option value="3">3 | June</option>
+                                    <option value="4">4 | July</option>
+                                    <option value="5">5 | August</option>
+                                    <option value="6">6 | September</option>
+                                    <option value="7">7 | October</option>
+                                    <option value="8">8 | November</option>
+                                    <option value="9">9 | December</option>
+                                    <option value="10">10 | January</option>
+                                    <option value="11">11 | February</option>
+                                    <option value="12">12 | March</option>
                                 </select>
-                                <button id="addSubcontractorButton" type="button" class="btn btn-hcs-green">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td><label for="invoiceNumber">Invoice <i class="bi bi-123"></label></td>
-                <td><input type="text" id="invoiceNumber" name="invoiceNumber" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="kashflowNumber">Kashflow <i class="bi bi-123"></label></td>
-                <td><input type="text" id="kashflowNumber" name="kashflowNumber" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="invoiceDate">Invoice <i class="bi bi-calendar2-date-fill"></label></td>
-                <td><input type="date" id="invoiceDate" name="invoiceDate" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="remittanceDate">Remittance <i class="bi bi-calendar2-date-fill"></label></td>
-                <td><input type="date" id="remittanceDate" name="remittanceDate" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="labourCost">Labour <i class="bi bi-currency-pound"></i></label></td>
-                <td><input type="text" id="labourCost" name="labourCost" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="materialCost">Materials <i class="bi bi-currency-pound"></i></label></td>
-                <td><input type="text" id="materialCost" name="materialCost" class="form-control"></td>
-            </tr>
-            <% if (subcontractor.deduction === 0.3) { %>
-            <tr>
-                <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
-                <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
-                        value="Labour / 30%"></td>
-            </tr>
-            <% } %>
-            <% if (subcontractor.deduction === 0.2) { %>
-            <tr>
-                <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
-                <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
-                        value="Labour / 20%"></td>
-            </tr>
-            <% } %>
-            <% if (subcontractor.deduction === 0) { %>
-            <tr>
-                <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
-                <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
-                        value="Labour / 0%"></td>
-            </tr>
-            <% } %>
-            <tr>
-                <td><label for="grossAmount">Gross <i class="bi bi-cash"></i></label></td>
-                <td><input type="text" id="grossAmount" name="grossAmount" class="form-control" disabled
-                        value="Labour + Materials"></td>
-            </tr>
-            <tr>
-                <td><label for="netAmount">Net <i class="bi bi-cash"></i></label></td>
-                <td><input type="text" id="netAmount" name="netAmount" class="form-control" disabled
-                        value="Labour + Materials - CIS Deduction"></td>
-            </tr>
-            <% if (subcontractor.deduction === 0) { %>
-            <tr>
-                <td><label for="reverseCharge">Reverse Charge <i class="bi bi-wallet-fill"></i></label></td>
-                <td><input type="text" id="reverseCharge" name="reverseCharge" class="form-control" disabled
-                        value="Gross x 20%"></td>
-            </tr>
-            <% } %>
-            <tr>
-                <td><label for="submissionDate">Submission <i class="bi bi-calendar2-date-fill"></label></td>
-                <td><input type="date" id="submissionDate" name="submissionDate" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="month">Tax Month <i class="bi bi-calendar2-date-fill"></i></label></td>
-                <td>
-                    <select id="month" name="month" class="form-select" required>
-                        <option value="1">1 | April</option>
-                        <option value="2">2 | May</option>
-                        <option value="3">3 | June</option>
-                        <option value="4">4 | July</option>
-                        <option value="5">5 | August</option>
-                        <option value="6">6 | September</option>
-                        <option value="7">7 | October</option>
-                        <option value="8">8 | November</option>
-                        <option value="9">9 | December</option>
-                        <option value="10">10 | January</option>
-                        <option value="11">11 | February</option>
-                        <option value="12">12 | March</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td><label for="year">Tax Year <i class="bi bi-123"></label></td>
-                <td><input type="text" id="year" name="year" class="form-control"></td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="2">
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-hcs-green">
-                            <i class="bi bi-file-earmark-plus"></i> Create Invoice
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
-</form>
-<script type="text/javascript">
-    const addSubcontractorButton = document.getElementById('addSubcontractorButton');
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="year">Tax Year <i class="bi bi-123"></label></td>
+                            <td><input type="text" id="year" name="year" class="form-control"></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-hcs-green">
+                                        <i class="bi bi-file-earmark-plus"></i> Create Invoice
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+            <script type="text/javascript">
+                const addSubcontractorButton = document.getElementById('addSubcontractorButton');
 
-    addSubcontractorButton.addEventListener('click', function () {
-        window.location.href = '/subcontractor/create';
-    });
-</script>
+                addSubcontractorButton.addEventListener('click', function () {
+                    window.location.href = '/subcontractor/create';
+                });
+            </script>
