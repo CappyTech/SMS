@@ -44,10 +44,10 @@
             </li>
         <% } else { %>
             <li class="nav-item">
-              <a class="nav-link" href="/login"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+              <a class="nav-link" href="/signin"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/register"><i class="bi bi-book"></i> Register</a>
+              <a class="nav-link" href="/register"><i class="bi bi-book"></i> Create an account</a>
             </li>
         <% } %>
       </ul>
@@ -57,12 +57,6 @@
     <div class="container">
       <ul class="navbar-nav hstack gap-3">
         <% if (typeof session.user === 'undefined') { %>
-        <li class="nav-item">
-          <a class="nav-link" href="/login"><i class="bi bi-box-arrow-in-right"></i> Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/register"><i class="bi bi-book"></i> Register</a>
-        </li>
         <% } else { %>
 
             <li class="nav-item"><a class="nav-link" href="/user/create"><i class="bi bi-person-plus"></i> New
@@ -79,16 +73,16 @@
       </ul>
     </div>
   </nav>
-
+  <%- include('../partials/invoicesNotification.ejs') %>
   <%- body %>
 <footer class="footer mt-auto">
   <nav
-    class="navbar navbar-expand navbar-dark bg-dark text-white d-flex justify-content-center align-items-center mt-5 p-4 d-print-none">
+    class="navbar navbar-expand navbar-dark bg-dark text-white d-flex justify-content-center align-items-center mt-5 p-4 d-print-none text-center">
     <div class="stack-on-small">
       <div>
         <a href="/"><img src="/favicon.png" alt="HCS Logo"></a>
         <a class="hcs-green-text" href="https://www.heroncs.co.uk">Heron Constructive Solutions Ltd.</a><br>
-        Copyright &copy; <u>2023-2023</u> All Rights Reserved.
+        Copyright &copy; 2023 All Rights Reserved.
         <div>
           VAT No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">252295994</a>
           |
