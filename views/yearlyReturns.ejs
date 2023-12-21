@@ -26,7 +26,7 @@
     <% const hasInvoices = invoices.length > 0; %>
     <% if (hasInvoices) { %>
         <table class="table table-hover table-sm caption-top">
-            <caption><%= monthNames[monthIndex - 1] %> <%= year %></caption>
+            <caption class="text-start">Month: <%= monthKey %> (<%= monthNames[monthIndex - 1] %> <%= year %>)</caption>
             <thead>
                 <tr>
                     <th>
@@ -77,6 +77,12 @@
                         <span class="d-md-none">RC</span>
                     </th>
                     <% } %>
+                    <th>Month</th>
+                    <th>Year</th>
+                    <th>
+                        <span class="d-none d-md-table-cell">Submission Date</span>
+                        <span class="d-md-none">Submission</span>
+                    </th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -87,7 +93,6 @@
                 <% let totalNetAmount = 0; %>
                 <% let totalReverseCharge = 0; %>
                 <% invoices.forEach(invoice => { %>
-
                 <tr>
                     <td><%= invoice.invoiceNumber %></td>
                     <td><%= invoice.kashflowNumber %></td>
@@ -101,6 +106,9 @@
                     <% if (subcontractor.isGross) { %>
                     <td><%= formatCurrency(invoice.reverseCharge) %></td>
                     <% } %>
+                    <td><%= invoice.month %></td>
+                    <td><%= invoice.year %></td>
+                    <td><%= slimDateTime(invoice.submissionDate) %></td>
                 </tr>
                 <% totalGross += invoice.grossAmount; %>
                 <% totalLabourCost += invoice.labourCost; %>
@@ -120,9 +128,13 @@
                     <td><strong><%= formatCurrency(totalMaterialCost) %></strong></td>
                     <td><strong><%= formatCurrency(totalCISAmount) %></strong></td>
                     <td><strong><%= formatCurrency(totalNetAmount) %></strong></td>
+                    <td></td>
                     <% if (subcontractor.isGross) { %>
                     <td><strong><%= formatCurrency(totalReverseCharge) %></strong></td>
                     <% } %>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
