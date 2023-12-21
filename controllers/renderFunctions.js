@@ -301,6 +301,21 @@ const selectSubcontractor = async (req, res) => {
     }
 };
 
+const e500 = async (req, res) => {
+    try {
+        res.render('500', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+        });
+    } catch (error) {
+        req.flash('error', 'Error: ' + error.message);
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
+    }
+}
+
 router.get('/', renderIndex);
 router.get('/dashboard', renderDashboard);
 router.get('/admin', renderAdminDashboard);
@@ -311,5 +326,6 @@ router.get('/user/update/:id', renderUserUpdateForm);
 router.get('/subcontractor/update/:id', renderSubcontractorUpdateForm);
 router.get('/invoice/update/:id', renderInvoiceUpdateForm);
 router.get('/subcontractor/select', selectSubcontractor);
+router.get ('/500', e500)
 
 module.exports = router;
