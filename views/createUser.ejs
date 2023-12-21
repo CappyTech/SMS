@@ -1,50 +1,54 @@
 <!-- views/createUser.ejs -->
-<h1>Create User</h1>
-
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
-
-<form action="/user/create/" method="POST">
-    <table class="table">
-        <tbody>
-            <tr>
-                <td>
-                    <label for="username" class="form-label">Username</label>
-                </td>
-                <td>
-                    <input type="text" name="username" id="username" class="form-control" required>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="email" class="form-label">Email</label>
-                </td>
-                <td>
-                    <input type="email" name="email" id="email" class="form-control" required>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="password" class="form-label">Password</label>
-                </td>
-                <td>
-                    <input type="password" name="password" id="password" class="form-control" required>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="role" class="form-label">Role</label>
-                </td>
-                <td>
-                    <select name="role" id="role" class="form-select" required>
-                        <option value="admin">Admin</option>
-                        <option value="subcontractor">Subcontractor</option>
-                    </select>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div class="d-grid">
-        <button type="submit" class="btn btn-hcs-green"><i class="bi bi-person-plus"></i> Create User</button>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5 text-center">
+            <h1 class="display-5 fw-bold">Create User</h1>
+            <form action="/user/create/" method="POST">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <label for="username" class="form-label">Username</label>
+                            </td>
+                            <td>
+                                <input type="text" name="username" id="username" class="form-control" required>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="email" class="form-label">Email</label>
+                            </td>
+                            <td>
+                                <input type="email" name="email" id="email" class="form-control" required>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="password" class="form-label">Password</label>
+                            </td>
+                            <td>
+                                <input type="password" name="password" id="password" class="form-control" required>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="role" class="form-label">Role</label>
+                            </td>
+                            <td>
+                                <select name="role" id="role" class="form-select" required>
+                                    <option value="admin">Admin</option>
+                                    <option value="subcontractor">Subcontractor</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-hcs-green"><i class="bi bi-person-plus"></i> Create User</button>
+                </div>
+            </form>
+        </div>
     </div>
-</form>
+</div>
