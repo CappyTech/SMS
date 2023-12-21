@@ -1,13 +1,23 @@
 // helpers.js
 
-function slimDateTime(dateString) {
+function slimDateTime(dateString, includeTime = false) {
     const date = new Date(dateString);
-    const options = {
+    const dateOptions = {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
     };
-    const formattedDate = date.toLocaleDateString('en-GB', options);
+    const formattedDate = date.toLocaleDateString('en-GB', dateOptions);
+
+    if (includeTime) {
+        const timeOptions = {
+            hour: '2-digit',
+            minute: '2-digit',
+        };
+        const formattedTime = date.toLocaleTimeString('en-GB', timeOptions);
+        return formattedDate.replace(/\//g, '/') + ' ' + formattedTime;
+    }
+
     return formattedDate.replace(/\//g, '/');
 }
 
