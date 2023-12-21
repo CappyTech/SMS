@@ -154,6 +154,21 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
 });
 
+app.use(async (req, res, next) => {
+    try {
+        res.locals.invoicesWithoutSubmissionDate = await Invoice.findAll({
+            where: {
+                submissionDate: null
+            },
+            attributes: ['id', 'kashflowNumber']
+        });
+        next();
+    } catch (error) {
+        console.error('Error fetching invoices:', error);
+        next();
+    }
+});
+
 const User = require('./models/user');
 const Subcontractor = require('./models/subcontractor');
 const Invoice = require('./models/invoice');
@@ -208,6 +223,7 @@ app.use('/', invoiceCRUD);
 app.use('/', monthlyReturns);
 app.use('/', yearlyReturns);
 
+
 app.use((err, req, res, next) => {
     console.error(err.stack);
     const status = err.status || 500;
@@ -230,6 +246,6 @@ app.use((err, req, res, next) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, '0.0.0.0', () => {
-    console.log('Server listening...');
+app.listen(port, 'localhost', () => {
+    console.log('Server on http://localhost:3000');
 });
