@@ -1,31 +1,28 @@
 <!-- views/register.ejs: -->
-<h1>Register</h1>
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
-
-<form action="/register" method="POST">
-    <div class="mb-3">
-        <label for="username" class="form-label">Username:</label>
-        <input type="text" id="username" name="username" class="form-control" required>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Create an account</h1>
+            <form action="/register" method="POST">
+                <div class="form-floating mb-3">
+                    <input type="text" id="username" name="username" class="form-control" required>
+                    <label for="username" class="form-label">Username:</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="email" id="email" name="email" class="form-control" required>
+                    <label for="email" class="form-label">Email:</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" id="password" name="password" class="form-control" required>
+                    <label for="password" class="form-label">Password:</label>
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                    <button class="btn btn-hcs-green btn-lg" type="submit"><i class="bi bi-book"></i> Create an account</button>
+                    <a class="btn btn-tertiary btn-sm" type="button" href="/signin"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="email" class="form-label">Email:</label>
-        <input type="email" id="email" name="email" class="form-control" required>
-    </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Password:</label>
-        <input type="password" id="password" name="password" class="form-control" required>
-    </div>
-    <div class="mb-3">
-        <label for="role" class="form-label">Role:</label>
-        <select id="role" name="role" class="form-select">
-            <option value="subcontractor">Subcontractor</option>
-            <option disabled value="employee">Employee</option>
-            <option disabled value="accountant">Accountant</option>
-            <option disabled value="hmrc">HMRC</option>
-        </select>
-    </div>
-    <div class="mb-3">
-        <button type="submit" class="btn btn-hcs-green">Register</button>
-    </div>
-</form>
+</div>
