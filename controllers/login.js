@@ -9,9 +9,9 @@ const bcrypt = require("bcrypt");
 const speakeasy = require("speakeasy");
 
 
-const renderLoginForm = (req, res) => {
+const renderSigninForm = (req, res) => {
     console.log(req.session);
-    res.render('login', {
+    res.render('signin', {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
         session: req.session,
@@ -42,7 +42,7 @@ const loginUser = async (req, res) => {
 
         if (!user) {
             req.flash('error', 'Invalid username/email');
-            return res.redirect('/login');
+            return res.redirect('/signin');
         }
 
         const subcontractors = await Subcontractor.count({
@@ -84,11 +84,11 @@ const loginUser = async (req, res) => {
                 return res.redirect('/dashboard');
             } else {
                 req.flash('error', 'Invalid 2FA code.');
-                return res.redirect('/login');
+                return res.redirect('/signin');
             }
         } else {
             req.flash('error', 'Invalid password');
-            return res.redirect('/login');
+            return res.redirect('/signin');
         }
     } catch (error) {
         req.flash('error', 'Error: ' + error.message);
@@ -101,14 +101,16 @@ const logoutUser = (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error('Error logging out:', err);
-            res.redirect('/login');
+            req.flash('error', 'Error logging out: ' + err.message);
+            res.redirect('/signin');
         }
         console.log('Session destroyed');
-        res.redirect('/login');
+        req.flash('error', 'Session destroyed');
+        res.redirect('/signin');
     });
 };
 
-router.get('/login', renderLoginForm);
+router.get('/signin', renderSigninForm);
 router.post('/login', loginUser);
 router.get('/logout', logoutUser);
 
