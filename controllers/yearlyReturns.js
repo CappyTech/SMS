@@ -26,7 +26,7 @@ const renderYearlyReturns = async (req, res) => {
         } = req.params;
 
         if (!year || !id) {
-            console.log("Year and Subcontractor ID are required."); // Add a log statement
+            console.log("Year and Subcontractor ID are required.");
             return res.status(400).send("Year and Subcontractor ID are required.");
         }
 
@@ -37,6 +37,7 @@ const renderYearlyReturns = async (req, res) => {
         const subcontractor = await Subcontractor.findOne({
             where: {
                 id: id,
+                deletedAt: null
             },
             include: {
                 model: Invoice,
