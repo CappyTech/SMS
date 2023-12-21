@@ -101,11 +101,9 @@ const logoutUser = (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error('Error logging out:', err);
-            req.flash('error', 'Error logging out: ' + err.message);
             res.redirect('/signin');
         }
         console.log('Session destroyed');
-        req.flash('error', 'Session destroyed');
         res.redirect('/signin');
     });
 };
