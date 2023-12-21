@@ -33,15 +33,6 @@ const User = sequelize.define('User', {
         type: DataTypes.ENUM('subcontractor', 'employee', 'accountant', 'hmrc', 'admin'),
         defaultValue: 'subcontractor',
     },
-    twoFactorSecret: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    twoFactorEnabled: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
 }, {
     paranoid: true, // Add the paranoid option
 });
