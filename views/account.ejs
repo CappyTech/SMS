@@ -1,24 +1,25 @@
 <!-- views/account.ejs -->
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
-<div class="container">
-    <div class="card">
-        <div class="card-body">
-            <h1 class="card-title">Account Details</h1>
-            <div class="mb-3 row">
-                <label for="staticUsername" class="col-sm-2 col-form-label">Username:</label>
-                <div class="col-sm-10">
-                    <input type="text" readonly class="form-control-plaintext" id="staticUsername"
-                        value="<%= user.username %>">
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Account Details</h1>
+            <form>
+                <div class="form-floating mb-3">
+                    <input type="text" readonly class="form-control" value="<%= user.username %>">
+                    <label for="staticUsername" class="form-label">Username:</label>
                 </div>
-                <label for="staticEmail" class="col-sm-2 col-form-label">Email:</label>
-                <div class="col-sm-10">
-                    <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="<%= user.email %>">
+                <div class="form-floating mb-3">
+                    <input type="text" readonly class="form-control" value="<%= user.email %>">
+                    <label for="staticEmail" class="form-label">Email:</label>
                 </div>
-            </div>
-            <button type="button" class="btn btn-hcs-red" data-bs-toggle="modal" data-bs-target="#settingsModal">
-                Open Settings Modal
-            </button>
+                <div class="d-grid gap-2 mt-4">
+                    <button type="button" class="btn btn-hcs-red" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                        Change Details
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -27,28 +28,23 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="settingsModalLabel">Account Settings</h5>
+                <h5 class="modal-title" id="settingsModalLabel">Account Details</h5>
             </div>
             <div class="modal-body">
                 <form action="/account/settings" method="POST">
-                    <div class="mb-3">
+                    <div class="form-floating mb-3">
+                        <input type="text" name="newUsername" value="<%= user.username %>" class="form-control" required>
                         <label for="username" class="form-label">Username:</label>
-                        <label>
-                            <input type="text" name="newUsername" value="<%= user.username %>" class="form-control"
-                                required>
-                        </label>
-                    </div>
 
-                    <div class="mb-3">
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="email" name="newEmail" value="<%= user.email %>" class="form-control" required>
                         <label for="email" class="form-label">Email:</label>
-                        <label>
-                            <input type="email" name="newEmail" value="<%= user.email %>" class="form-control" required>
-                        </label>
                     </div>
 
                     <!-- Add any other fields for account settings -->
 
-                    <button type="submit" class="btn btn-hcs-red">Update Settings</button>
+                    <button type="submit" class="btn btn-hcs-red">Update Details</button>
                     <button type="button" class="btn btn-hcs-black" data-bs-dismiss="modal">Cancel</button>
                 </form>
             </div>
