@@ -21,27 +21,30 @@
       </a>
       <ul class="navbar-nav hstack gap-3">
         <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
-        <li class="nav-item">
-          <a class="nav-link hcs-red-text" href="/admin"><i class="bi bi-speedometer"></i> Admin Dashboard</a>
-        </li>
-        <% } %>
-        <% if (typeof session.user !== 'undefined') { %>
-        <li class="nav-item">
-          <a class="nav-link hcs-green-text" href="/dashboard"><i class="bi bi-speedometer"></i> Dashboard</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link hcs-green-text" href="/monthly/returns/form"><i class="bi bi-file-spreadsheet-fill"></i>
-            Monthly Returns</a>
-        </li>
-            <div class="vr"></div>
             <li class="nav-item">
-              <a class="nav-link" href="/account">
-                <i class="bi bi-person"></i> My Account
-              </a>
+              <a class="nav-link hcs-red-text" href="/admin"><i class="bi bi-speedometer"></i> Admin Dashboard</a>
+            </li>
+            <% } %>
+            <% if (typeof session.user !== 'undefined') { %>
+            <li class="nav-item">
+              <a class="nav-link hcs-green-text" href="/dashboard"><i class="bi bi-speedometer"></i> Dashboard</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link hcs-red-text" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+              <a class="nav-link hcs-green-text" href="/monthly/returns/form"><i class="bi bi-file-spreadsheet-fill"></i>
+                Monthly Returns</a>
             </li>
+                <div class="vr"></div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-hcs-black"><i class="bi bi-person"></i> My Account</button>
+                    <button type="button" class="btn btn-hcs-red dropdown-toggle dropdown-toggle-split" data-bs-theme="dark" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-arrow-bar-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li>
+                            <a class="dropdown-item hcs-red-text" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        </li>
+                    </ul>
+                </div>
         <% } else { %>
             <li class="nav-item">
               <a class="nav-link" href="/signin"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
@@ -58,17 +61,21 @@
       <ul class="navbar-nav hstack gap-3">
         <% if (typeof session.user === 'undefined') { %>
         <% } else { %>
-
-            <li class="nav-item"><a class="nav-link" href="/user/create"><i class="bi bi-person-plus"></i> New
-                User <i class="bi bi-box-arrow-in-up" style="font-size: 0.65rem;"></i></a></li>
-            <li class="nav-item"><a class="nav-link" href="/subcontractor/create"><i class="bi bi-person-plus"></i>
-                New
-                Subcontractor <i class="bi bi-box-arrow-in-up" style="font-size: 0.65rem;"></i></a></li>
-            <li class="nav-item"><a class="nav-link" href="/subcontractor/select"><i class="bi bi-file-plus"></i> New
-                Invoice <i class="bi bi-box-arrow-in-up" style="font-size: 0.65rem;"></i></a>
+          <div class="dropdown">
+              <button class="btn btn-hcs-green dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Actions <i class="bi bi-menu-down"></i>
+              </button>
+              <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/user/create"><i class="bi bi-person-plus"></i> Create
+                a User</a></li>
+            <li><a class="dropdown-item" href="/subcontractor/create"><i class="bi bi-person-plus"></i>
+                Create
+                a Subcontractor</a></li>
+            <li><a class="dropdown-item" href="/subcontractor/select"><i class="bi bi-file-plus"></i> Create
+                an Invoice</a>
             </li>
-
-
+              </ul>
+          </div>
         <% } %>
       </ul>
     </div>
