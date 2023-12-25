@@ -85,9 +85,9 @@
                                 <% const subcontractorInvoices = invoices.filter(invoice => invoice.SubcontractorId === subcontractor.id); %>
                                 <% subcontractorInvoices.forEach(invoice => { %>
                                     <tr>
-                                        <td><a href="/invoice/update/<%= invoice.id %>"><%= invoice.invoiceNumber %><i
+                                        <td><a href="/invoice/update/<%= invoice.id %>" target="_blank"><%= invoice.invoiceNumber %><i
                                                         class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
-                                        <td><a href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>"><%= invoice.kashflowNumber %><i
+                                        <td><a href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>" target="_blank"><%= invoice.kashflowNumber %><i
                                                         class="bi bi-box-arrow-up-right" style="font-size: 0.65rem;"></i></a></td>
                                         <td><%= slimDateTime(invoice.invoiceDate) %></td>
                                         <td><%= slimDateTime(invoice.remittanceDate) %></td>
