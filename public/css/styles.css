@@ -254,3 +254,8 @@ a:hover {
 	background-color: #818181;
 	border-color: #818181;
   }
+
+.form-check-input:checked {
+	background-color: #28a745;
+	border-color: #28a745;
+}
