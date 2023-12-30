@@ -1,33 +1,156 @@
-id="permission<%= permission %>True"
-value="true"
-<%= user['permission' + permission] ? 'checked' : '' %> >
-<label class="form-check-label" for="permission<%= permission %>True">
-    Enabled
-</label>
-</div>
-<div class="form-check">
-    <input class="form-check-input" type="radio"
-           name="permission<%= permission %>"
-           id="permission<%= permission %>False"
-           value="false"
-            <%= !user['permission' + permission] ? 'checked' : '' %> >
-    <label class="form-check-label" for="permission<%= permission %>False">
-        Disabled
-    </label>
-</div>
-</dd>
-</dl>
-<% }) %>
-</div>
-</div>
-<!-- Add more input fields here as per the User model -->
-<span class="d-flex justify-content-between mt-3">
+<div class="container mt-2">
+    <h1>Update User</h1>
+    <form action="/user/update/<%= user.id %>" method="POST">
+        <div class="form-floating mb-3">
+            <input type="text" name="username" id="username" class="form-control" value="<%= user.username %>" required>
+            <label for="username" class="form-label">Username</label>
+            <div class="form-text">
+                <p>
+                    <small>
+                        <%= user.username %>
+                    </small>
+                </p>
+            </div>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" name="email" id="email" class="form-control" value="<%= user.email %>"
+                   required>
+            <label for="email" class="form-label">Email</label>
+            <div class="form-text">
+                <p>
+                    <small>
+                        <%= user.email %>
+                    </small>
+                </p>
+            </div>
+        </div>
+        <div class="form-floating mb-3">
+            <select id="role" name="role" class="form-select">
+                <option value="subcontractor" <%= user.role === 'subcontractor' ? 'selected' : '' %>>Subcontractor</option>
+                <option value="employee" <%= user.role === 'employee' ? 'selected' : '' %>>Employee</option>
+                <option value="accountant" <%= user.role === 'accountant' ? 'selected' : '' %>>Accountant</option>
+                <option value="hmrc" <%= user.role === 'hmrc' ? 'selected' : '' %>>HMRC</option>
+                <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+            </select>
+            <label for="role" class="form-label">Role</label>
+            <div class="form-text">
+                <p>
+                    <small>
+                        <%= user.role %>
+                    </small>
+                </p>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-header">
+                User Permissions
+            </div>
+            <div class="card-body">
+                <% ['CreateUser', 'ReadUser', 'UpdateUser', 'DeleteUser'].forEach(permission => { %>
+                    <dl class="mb-3 row">
+                        <dt class="col"><%= permission %></dt>
+                        <dd class="col">
+                            <div id="permission<%= permission %>" class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="permission<%= permission %>"
+                                       id="permission<%= permission %>True"
+                                       value="true"
+                                        <%= user['permission' + permission] ? 'checked' : '' %> >
+                                <label class="form-check-label" for="permission<%= permission %>True">
+                                    Enabled
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="permission<%= permission %>"
+                                       id="permission<%= permission %>False"
+                                       value="false"
+                                        <%= !user['permission' + permission] ? 'checked' : '' %> >
+                                <label class="form-check-label" for="permission<%= permission %>False">
+                                    Disabled
+                                </label>
+                            </div>
+                        </dd>
+                    </dl>
+                <% }) %>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-header">
+                Subcontractor Permissions
+            </div>
+            <div class="card-body">
+                <% ['CreateSubcontractor', 'ReadSubcontractor', 'UpdateSubcontractor', 'DeleteSubcontractor'].forEach(permission => { %>
+                    <dl class="mb-3 row">
+                        <dt class="col"><%= permission %></dt>
+                        <dd class="col">
+                            <div id="permission<%= permission %>" class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="permission<%= permission %>"
+                                       id="permission<%= permission %>True"
+                                       value="true"
+                                        <%= user['permission' + permission] ? 'checked' : '' %> >
+                                <label class="form-check-label" for="permission<%= permission %>True">
+                                    Enabled
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="permission<%= permission %>"
+                                       id="permission<%= permission %>False"
+                                       value="false"
+                                        <%= !user['permission' + permission] ? 'checked' : '' %> >
+                                <label class="form-check-label" for="permission<%= permission %>False">
+                                    Disabled
+                                </label>
+                            </div>
+                        </dd>
+                    </dl>
+                <% }) %>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-header">
+                Invoice Permissions
+            </div>
+            <div class="card-body">
+                <% ['CreateInvoice', 'ReadInvoice', 'UpdateInvoice', 'DeleteInvoice'].forEach(permission => { %>
+                    <dl class="mb-3 row">
+                        <dt class="col"><%= permission %></dt>
+                        <dd class="col">
+                            <div id="permission<%= permission %>" class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="permission<%= permission %>"
+                                       id="permission<%= permission %>True"
+                                       value="true"
+                                        <%= user['permission' + permission] ? 'checked' : '' %> >
+                                <label class="form-check-label" for="permission<%= permission %>True">
+                                    Enabled
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="permission<%= permission %>"
+                                       id="permission<%= permission %>False"
+                                       value="false"
+                                        <%= !user['permission' + permission] ? 'checked' : '' %> >
+                                <label class="form-check-label" for="permission<%= permission %>False">
+                                    Disabled
+                                </label>
+                            </div>
+                        </dd>
+                    </dl>
+                <% }) %>
+            </div>
+        </div>
+        <!-- Add more input fields here as per the User model -->
+        <span class="d-flex justify-content-between mt-3">
             <button type="submit" class="btn btn-hcs-green">Update User</button>
             <a type="button" class="text-hcs-red" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
                 Delete User
             </a>
         </span>
-</form>
+    </form>
 </div>
 
 <!-- Modal for delete confirmation -->
