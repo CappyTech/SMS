@@ -74,8 +74,6 @@ const renderDashboard = async (req, res) => {
                     session: req.session,
                     packageJson,
                 });
-            } else {
-                res.redirect('/subcontractor/create');
             }
         } else {
             res.redirect('/login');
