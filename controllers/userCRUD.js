@@ -84,7 +84,23 @@ const readUser = async (req, res) => {
 };
 const updateUser = async (req, res) => {
   try {
-    const { username, email, role } = req.body;
+      const {
+          username,
+          email,
+          role,
+          permissionCreateUser,
+          permissionReadUser,
+          permissionUpdateUser,
+          permissionDeleteUser,
+          permissionCreateSubcontractor,
+          permissionReadSubcontractor,
+          permissionUpdateSubcontractor,
+          permissionDeleteSubcontractor,
+          permissionCreateInvoice,
+          permissionReadInvoice,
+          permissionUpdateInvoice,
+          permissionDeleteInvoice
+      } = req.body;
 
     // Input validation could be added here
 
@@ -100,6 +116,19 @@ const updateUser = async (req, res) => {
         user.username = username;
         user.email = email;
         user.role = role;
+        user.permissionCreateUser = permissionCreateUser;
+        user.permissionReadUser = permissionReadUser;
+        user.permissionUpdateUser = permissionUpdateUser;
+        user.permissionDeleteUser = permissionDeleteUser;
+        user.permissionCreateSubcontractor = permissionCreateSubcontractor;
+        user.permissionReadSubcontractor = permissionReadSubcontractor;
+        user.permissionUpdateSubcontractor = permissionUpdateSubcontractor;
+        user.permissionDeleteSubcontractor = permissionDeleteSubcontractor;
+        user.permissionCreateInvoice = permissionCreateInvoice;
+        user.permissionReadInvoice = permissionReadInvoice;
+        user.permissionUpdateInvoice = permissionUpdateInvoice;
+        user.permissionDeleteInvoice = permissionDeleteInvoice;
+
         await user.save();
         req.flash('success', message);
     } else {
@@ -109,11 +138,11 @@ const updateUser = async (req, res) => {
 
     const referrer = '/admin';
     res.status(status).redirect(referrer);
-} catch (error) {
+  } catch (error) {
     console.error('Error updating user:', error);
     req.flash('error', 'Error updating user: ' + error.message);
     res.status(500).redirect('/');
-}
+  }
 };
 const deleteUser = async (req, res) => {
   try {
@@ -121,9 +150,7 @@ const deleteUser = async (req, res) => {
         return res.status(403).send('Access denied. Only admins can delete users.');
     }
 
-    const userId = req.params.id;
-
-    if (req.session.user.id === userId) {
+    if (req.session.user.id === req.params.id) {
         return res.status(403).send('Access denied. You cannot delete your own account.');
     }
 
