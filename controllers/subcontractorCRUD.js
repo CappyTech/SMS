@@ -146,15 +146,15 @@ const updateSubcontractor = async (req, res) => {
         } else {
             req.flash('error', 'Subcontractor not found.');
             console.log('Subcontractor not found.');
-            const referrer = '/admin';
-            res.redirect(referrer);
+            const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+            res.redirect(referer);
         }
     } catch (error) {
         // Handle error
         console.error('Error updating subcontractor:', error);
         req.flash('error', 'Error updating subcontractor: ' + error.message);
-        const referrer = '/admin';
-        res.redirect(referrer);
+        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+        res.redirect(referer);
     }
 };
 const deleteSubcontractor = async (req, res) => {
@@ -175,12 +175,12 @@ const deleteSubcontractor = async (req, res) => {
 
         req.flash('success', 'Subcontractor deleted.');
         console.log('Subcontractor deleted.');
-        const referrer = req.get('referer') || '/admin';
-        res.redirect(referrer);
+        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+        res.redirect(referer);
     } catch (error) {
         req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/admin';
-        res.redirect(referrer);
+        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+        res.redirect(referer);
     }
 };
 
