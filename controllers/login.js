@@ -74,7 +74,7 @@ const loginUser = async (req, res) => {
 
                 if (user.role === 'admin') {
                     console.log('Admin Logged in: \n' + userJSON);
-                    return res.redirect('/admin');
+                    return res.redirect('/dashboard');
                 }
                 if (user.role === 'subcontractor') {
                     console.log('Subcontractor Logged in: \n' + userJSON);
