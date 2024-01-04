@@ -128,6 +128,17 @@ const updateUser = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
+        // Check if User exists and has an update method
+        if (!User || typeof User.update !== 'function') {
+            console.error('Error: User model or update method not found!');
+            return res.status(500).send('Server Error.');
+        }
+
+        // Verify if req.params and req.params.id exist
+        if (!req.params || !req.params.id) {
+            return res.status(400).send('Bad Request: Missing user id parameter.');
+        }
+
         // Then update the user data.
         const updatedUser = await User.update({
             username,
@@ -151,6 +162,18 @@ const updateUser = async (req, res) => {
 
         if (updatedUser[0] !== 0) {
             req.flash('success', 'User updated.');
+
+            // Check if the updated user is the same as the logged-in user
+            if (req.session.user.id === req.params.id) {
+                // Check for the existence of updatedUser[1][0].dataValues
+                if (updatedUser[1] && updatedUser[1][0] && updatedUser[1][0].dataValues) {
+                    // Then update the session user properties
+                    req.session.user = {
+                        ...req.session.user,
+                        ...updatedUser[1][0].dataValues
+                    }
+                }
+            }
         } else {
             req.flash('error', 'User not found.');
         }
