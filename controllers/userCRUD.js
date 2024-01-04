@@ -17,10 +17,21 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 
 const schema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(30).required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
-  role: Joi.string().valid('admin', 'user').required(),
+    username: Joi.string().min(1).required(),
+    email: Joi.string().email().required(),
+    role: Joi.string().valid('subcontractor', 'employee', 'accountant', 'hmrc', 'admin').required(),
+    permissionCreateUser: Joi.boolean(),
+    permissionReadUser: Joi.boolean(),
+    permissionUpdateUser: Joi.boolean(),
+    permissionDeleteUser: Joi.boolean(),
+    permissionCreateSubcontractor: Joi.boolean(),
+    permissionReadSubcontractor : Joi.boolean(),
+    permissionUpdateSubcontractor: Joi.boolean(),
+    permissionDeleteSubcontractor: Joi.boolean(),
+    permissionCreateInvoice: Joi.boolean(),
+    permissionReadInvoice: Joi.boolean(),
+    permissionUpdateInvoice: Joi.boolean(),
+    permissionDeleteInvoice: Joi.boolean(),
 });
 
 const createUser = async (req, res) => {
@@ -41,7 +52,7 @@ const createUser = async (req, res) => {
   
       if (existingUser) {
         req.flash('error', 'Registration failed.');
-        return res.redirect('/admin');
+        return res.redirect('/dashboard');
       }
   
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -54,7 +65,7 @@ const createUser = async (req, res) => {
       });
   
       req.flash('success', 'User created successfully.');
-      res.redirect('/admin');
+      res.redirect('/dashboard');
     } catch (error) {
       req.flash('error', 'An error occurred.');
       res.redirect('/error');
@@ -73,7 +84,7 @@ const readUser = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+          packageJson,
           slimDateTime: helpers.slimDateTime,
           formatCurrency: helpers.formatCurrency,
         });
@@ -83,70 +94,79 @@ const readUser = async (req, res) => {
       }
 };
 const updateUser = async (req, res) => {
-  try {
-      const {
-          username,
-          email,
-          role,
-          permissionCreateUser,
-          permissionReadUser,
-          permissionUpdateUser,
-          permissionDeleteUser,
-          permissionCreateSubcontractor,
-          permissionReadSubcontractor,
-          permissionUpdateSubcontractor,
-          permissionDeleteSubcontractor,
-          permissionCreateInvoice,
-          permissionReadInvoice,
-          permissionUpdateInvoice,
-          permissionDeleteInvoice
-      } = req.body;
+    try {
+        const { error } = schema.validate(req.body);
+        if (error) {
+            return res.status(400).send(error.details[0].message);
+        }
 
-    // Input validation could be added here
+        const {
+            username,
+            email,
+            role,
+            permissionCreateUser,
+            permissionReadUser,
+            permissionUpdateUser,
+            permissionDeleteUser,
+            permissionCreateSubcontractor,
+            permissionReadSubcontractor,
+            permissionUpdateSubcontractor,
+            permissionDeleteSubcontractor,
+            permissionCreateInvoice,
+            permissionReadInvoice,
+            permissionUpdateInvoice,
+            permissionDeleteInvoice
+        } = req.body;
 
-    if (req.session.user.role !== 'admin') {
-        return res.status(403).send('Access denied.');
+        // Validate the session user state
+        if (!req.session || !req.session.user) {
+            return res.status(403).send('Invalid session or user.');
+        }
+
+        // Check if the logged-in user is an admin and has the permission to create users.
+        if (req.session.user.role !== 'admin' && !req.session.user.permissionCreateUser) {
+            return res.status(403).send('Access denied.');
+        }
+
+        // Then update the user data.
+        const updatedUser = await User.update({
+            username,
+            email,
+            role,
+            permissionCreateUser,
+            permissionReadUser,
+            permissionUpdateUser,
+            permissionDeleteUser,
+            permissionCreateSubcontractor,
+            permissionReadSubcontractor,
+            permissionUpdateSubcontractor,
+            permissionDeleteSubcontractor,
+            permissionCreateInvoice,
+            permissionReadInvoice,
+            permissionUpdateInvoice,
+            permissionDeleteInvoice
+        },{
+            where: { id: req.params.id }
+        });
+
+        if (updatedUser[0] !== 0) {
+            req.flash('success', 'User updated.');
+        } else {
+            req.flash('error', 'User not found.');
+        }
+
+        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+        res.redirect(referer);
+
+    } catch (error) {
+        console.error('Error updating user:', error);
+        req.flash('error', 'Error updating user: ' + error.message);
+        res.status(500).redirect('/');
     }
-
-    const user = await User.findByPk(req.params.id);
-    let message = 'User updated.';
-    let status = 200;
-
-    if (user) {
-        user.username = username;
-        user.email = email;
-        user.role = role;
-        user.permissionCreateUser = permissionCreateUser;
-        user.permissionReadUser = permissionReadUser;
-        user.permissionUpdateUser = permissionUpdateUser;
-        user.permissionDeleteUser = permissionDeleteUser;
-        user.permissionCreateSubcontractor = permissionCreateSubcontractor;
-        user.permissionReadSubcontractor = permissionReadSubcontractor;
-        user.permissionUpdateSubcontractor = permissionUpdateSubcontractor;
-        user.permissionDeleteSubcontractor = permissionDeleteSubcontractor;
-        user.permissionCreateInvoice = permissionCreateInvoice;
-        user.permissionReadInvoice = permissionReadInvoice;
-        user.permissionUpdateInvoice = permissionUpdateInvoice;
-        user.permissionDeleteInvoice = permissionDeleteInvoice;
-
-        await user.save();
-        req.flash('success', message);
-    } else {
-        message = 'User not found';
-        req.flash('error', message);
-    }
-
-    const referrer = '/admin';
-    res.status(status).redirect(referrer);
-  } catch (error) {
-    console.error('Error updating user:', error);
-    req.flash('error', 'Error updating user: ' + error.message);
-    res.status(500).redirect('/');
-  }
-};
+}
 const deleteUser = async (req, res) => {
   try {
-    if (req.session.user.role !== 'admin') {
+    if (req.session.user.role !== 'admin' && !req.session.user.permissionDeleteUser) {
         return res.status(403).send('Access denied. Only admins can delete users.');
     }
 
@@ -155,23 +175,20 @@ const deleteUser = async (req, res) => {
     }
 
     const user = await User.findByPk(req.params.id);
-    let message = 'User deleted successfully';
-    let status = 200;
-
     if (!user) {
-        message = 'User not found';
-        status = 404;
-        req.flash('error', message);
+        req.flash('error', 'User not found');
     } else {
         await user.destroy();
-        req.flash('success', message);
+        req.flash('success', 'User deleted successfully');
     }
 
-    const referrer = req.get('referer') || '/admin';
-    res.status(status).redirect(referrer);
+      const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+    res.redirect(referer);
   } catch (error) {
+      console.error('Error deleting user:', error);
     req.flash('error', 'Error: ' + error.message);
-    res.status(500).redirect(req.get('referer') || '/admin');
+    const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+    res.status(500).redirect(referer);
   }
 };
 
