@@ -20,71 +20,8 @@ const renderIndex = (req, res) => {
         packageJson,
     });
 };
+
 const renderDashboard = async (req, res) => {
-    try {
-        console.log(req.session);
-        if (req.session.user) {
-            const users = await User.findAll({
-                where: {
-                    id: req.session.user.id,
-                },
-            });
-
-            const subcontractors = await Subcontractor.findAll({
-                where: {
-                    userId: req.session.user.id,
-                },
-            });
-
-            if (subcontractors.length > 0) {
-                const subcontractorId = subcontractors[0].id; // Retrieve the correct subcontractorId
-                const invoices = await Invoice.findAll({
-                    where: {
-                        subcontractorId: subcontractorId,
-                    },
-                });
-
-                const userCount = await User.count({
-                    where: {
-                        id: req.session.user.id,
-                    },
-                });
-
-                const subcontractorCount = await Subcontractor.count({
-                    where: {
-                        userId: req.session.user.id,
-                    },
-                });
-
-                const invoiceCount = await Invoice.count({
-                    where: {
-                        subcontractorId: subcontractorId,
-                    },
-                });
-
-                res.render('dashboard', {
-                    userCount,
-                    subcontractorCount,
-                    invoiceCount,
-                    users,
-                    subcontractors,
-                    invoices,
-                    errorMessages: req.flash('error'),
-                    successMessage: req.flash('success'),
-                    session: req.session,
-                    packageJson,
-                });
-            }
-        } else {
-            res.redirect('/login');
-        }
-    } catch (error) {
-        req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
-    }
-};
-const renderAdminDashboard = async (req, res) => {
     try {
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
@@ -316,7 +253,6 @@ const e500 = async (req, res) => {
 
 router.get('/', renderIndex);
 router.get('/dashboard', renderDashboard);
-router.get('/admin', renderAdminDashboard);
 router.get('/user/create', renderUserCreateForm);
 router.get('/subcontractor/create', renderSubcontractorCreateForm);
 router.get('/invoice/create/:id', renderInvoiceCreateForm)
