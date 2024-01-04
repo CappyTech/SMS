@@ -66,7 +66,9 @@ app.use(session({
     saveUninitialized: false
 }));
 sessionStore.onReady().then(() => {
-    console.log('MySQLStore ready');
+    if(process.env.DEBUG) {
+        console.log('MySQLStore ready');
+    }
 }).catch(error => {
     console.error(error);
 });
@@ -139,10 +141,14 @@ const createDefaultAdmin = async () => {
             }, {
                 fields: ['username', 'email', 'password', 'role']
             });
-            console.log('Default admin created.');
+            if(process.env.DEBUG) {
+                console.log('Default admin created.');
+            }
         }
         if (admin) {
-            console.log('Default admin already exists.');
+            if(process.env.DEBUG) {
+                console.log('Default admin already exists.');
+            }
         }
     } catch (error) {
         console.error('Error creating default admin:', error);
@@ -190,8 +196,12 @@ Invoice.belongsTo(Subcontractor, {
         await User.sync();
         await Subcontractor.sync();
         await Invoice.sync();
-        //await createDefaultAdmin();
-        console.log('Models synced with the database');
+        if(process.env.DEBUG) {
+            console.log('Models synced with the database');
+        };
+        if (process.env.DEV) {
+            await createDefaultAdmin();
+        }
     } catch (error) {
         console.error('Error syncing models:', error);
     }
