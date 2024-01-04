@@ -52,15 +52,8 @@ const registerUser = async (req, res) => {
             email,
             password
         });
-        if (role === "admin") {
-            res.redirect('/admin');
-        }
-        if (role === "subcontractor") {
-            res.redirect('/dashboard');
-        }
-        if (role === "user") {
-            res.redirect('/account');
-        }
+        res.redirect('/');
+
     } catch (error) {
         req.flash('error', 'Error: ' + error.message);
         const referrer = req.get('referer') || '/';
