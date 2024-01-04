@@ -109,7 +109,7 @@ const updateInvoice = async (req, res) => {
         await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.id } });
 
         req.flash('success', 'Invoice updated successfully');
-        return res.redirect('/admin'); // Ensure to return here
+        return res.redirect('/dashboard');
     } catch (error) {
         console.error('Error updating invoice:', error.message);
         req.flash('error', `Error updating invoice with ID: ${req.params.id}. Details: ${error.message}`);
@@ -134,12 +134,12 @@ const deleteInvoice = async (req, res) => {
         await invoice.destroy();
 
         req.flash('success', 'Invoice deleted successfully');
-        const referrer = req.get('referer') || '/admin';
-        res.redirect(referrer);
+        const referer = req.get('referer') || '/dashboard';
+        res.redirect(referer);
     } catch (error) {
         req.flash('error', 'Error: ' + error.message);
-        const referrer = req.header('Referer') || '/';
-        res.redirect(referrer);
+        const referer = req.header('Referer') || '/';
+        res.redirect(referer);
     }
 };
 
