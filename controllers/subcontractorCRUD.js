@@ -47,7 +47,7 @@ const createSubcontractor = async (req, res) => {
 
         if (existingSubcontractor) {
             req.flash('error', 'User with the same username or email already exists.');
-            return res.redirect('/admin'); // Redirect to the appropriate page
+            return res.redirect('/dashboard'); // Redirect to the appropriate page
         }
 
         if (!name || !company || !line1 || !city || !county || !postalCode || !cisNumber || !utrNumber) {
@@ -69,7 +69,7 @@ const createSubcontractor = async (req, res) => {
         });
 
         req.flash('success', 'Subcontractor created.');
-        const referrer = '/admin';
+        const referrer = '/dashboard';
         res.redirect(referrer);
     } catch (error) {
         req.flash('error', 'Error creating subcontractor: ' + error.message);
@@ -141,7 +141,7 @@ const updateSubcontractor = async (req, res) => {
 
             req.flash('success', 'Subcontractor updated.');
             console.log('Subcontractor updated.');
-            const referrer = '/admin';
+            const referrer = '/dashboard';
             res.redirect(referrer);
         } else {
             req.flash('error', 'Subcontractor not found.');
