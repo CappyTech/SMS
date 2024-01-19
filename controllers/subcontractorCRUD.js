@@ -23,6 +23,8 @@ const createSubcontractor = async (req, res) => {
             postalCode,
             cisNumber,
             utrNumber,
+            vatNumber,
+            deduction,
             isGross
         } = req.body;
 
@@ -34,13 +36,13 @@ const createSubcontractor = async (req, res) => {
         const existingSubcontractor = await Subcontractor.findOne({
             where: {
                 [Op.or]: [{
-                    name
-                }, {
                     company
                 }, {
                     utrNumber
                 }, {
                     cisNumber
+                },{
+                    vatNumber
                 }],
             },
         });
@@ -50,7 +52,7 @@ const createSubcontractor = async (req, res) => {
             return res.redirect('/dashboard'); // Redirect to the appropriate page
         }
 
-        if (!name || !company || !line1 || !city || !county || !postalCode || !cisNumber || !utrNumber) {
+        if (!name || !company || !line1 || !city || !county || !postalCode || !cisNumber || !utrNumber || !vatNumber || !deduction) {
             return res.status(400).send('Incomplete form data');
         }
 
@@ -65,6 +67,8 @@ const createSubcontractor = async (req, res) => {
             postalCode,
             cisNumber,
             utrNumber,
+            vatNumber,
+            deduction,
             isGross
         });
 
