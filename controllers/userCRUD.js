@@ -39,7 +39,7 @@ const createUser = async (req, res) => {
       const { error, value } = schema.validate(req.body);
       if (error) {
         req.flash('error', 'Invalid input.');
-        return res.redirect('/admin');
+        return res.redirect('/dashboard');
       }
   
       const { username, email, password, role } = value;
