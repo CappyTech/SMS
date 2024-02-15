@@ -49,7 +49,8 @@ const createSubcontractor = async (req, res) => {
         }
 
         if (!name || !company || !line1 || !city || !county || !postalCode || !cisNumber || !utrNumber || !vatNumber || !deduction) {
-            return res.status(400).send('Incomplete form data');
+            req.flash('error', 'Incomplete form data.');
+            return res.redirect('/subcontractor/create'); // Redirect to the appropriate page
         }
 
 
