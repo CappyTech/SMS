@@ -37,34 +37,37 @@ const createSubcontractor = async (req, res) => {
             where: {
                 [Op.or]: [{
                     utrNumber
-                },{
-                    vatNumber
                 }],
             },
         });
 
         if (existingSubcontractor) {
-            req.flash('error', 'User with the same username or email already exists.');
-            return res.redirect('/dashboard'); // Redirect to the appropriate page
+            req.flash('error', 'User with the same UTR already exists.');
+            return res.redirect('/subcontractor/create'); // Redirect to the appropriate page
         }
 
-        if (!name || !company || !line1 || !city || !county || !postalCode || !cisNumber || !utrNumber || !vatNumber || !deduction) {
+        if (!company || !line1 || !city || !county || !postalCode || !cisNumber || !utrNumber || !deduction) {
             req.flash('error', 'Incomplete form data.');
             return res.redirect('/subcontractor/create'); // Redirect to the appropriate page
         }
 
+        const nullCheckname = name || null;
+        const nullCheckline2 = line2 || null;
+        const nullCheckcisNumber = cisNumber || null;
+        const nullCheckutrNumber = utrNumber || null;
+        const nullCheckvatNumber = vatNumber || null;
 
         await Subcontractor.create({
-            name,
+            name: nullCheckname,
             company,
             line1,
-            line2,
+            line2: nullCheckline2,
             city,
             county,
             postalCode,
-            cisNumber,
-            utrNumber,
-            vatNumber,
+            cisNumber: nullCheckcisNumber,
+            utrNumber: nullCheckutrNumber,
+            vatNumber: nullCheckvatNumber,
             deduction,
             isGross
         });
