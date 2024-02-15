@@ -36,11 +36,7 @@ const createSubcontractor = async (req, res) => {
         const existingSubcontractor = await Subcontractor.findOne({
             where: {
                 [Op.or]: [{
-                    company
-                }, {
                     utrNumber
-                }, {
-                    cisNumber
                 },{
                     vatNumber
                 }],
