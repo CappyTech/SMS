@@ -12,6 +12,10 @@ const {
 
 const createSubcontractor = async (req, res) => {
     try {
+        // Check if the user has permissions
+        if (!req.session.user.permissionCreateSubcontractor) {
+            return res.status(403).send('Access denied.');
+        }
 
         const {
             name,
@@ -28,10 +32,6 @@ const createSubcontractor = async (req, res) => {
             isGross
         } = req.body;
 
-        if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
-        }
-
         // Check if the subcontractor already exists by username or email
         const existingSubcontractor = await Subcontractor.findOne({
             where: {
@@ -46,17 +46,22 @@ const createSubcontractor = async (req, res) => {
             return res.redirect('/subcontractor/create'); // Redirect to the appropriate page
         }
 
-        if (!company || !line1 || !city || !county || !postalCode || !cisNumber || !utrNumber || !deduction) {
-            req.flash('error', 'Incomplete form data.');
-            return res.redirect('/subcontractor/create'); // Redirect to the appropriate page
+        const requiredFields = [company, line1, city, county, postalCode, cisNumber, utrNumber, deduction];
+        if (requiredFields.some(field => !field)) {
+            req.flash('error', 'Incomplete required form data.');
+            return res.redirect('/subcontractor/create');
         }
 
-        const nullCheckname = name || null;
-        const nullCheckline2 = line2 || null;
-        const nullCheckcisNumber = cisNumber || null;
-        const nullCheckutrNumber = utrNumber || null;
-        const nullCheckvatNumber = vatNumber || null;
+        // Null checks for specific fields
+        const nullCheckFields = ['name', 'line2', 'cisNumber', 'utrNumber', 'vatNumber'];
+        const sanitizedData = Object.fromEntries(
+            Object.entries(req.body).map(([key, value]) => [
+                key,
+                nullCheckFields.includes(key) ? value || null : value,
+            ])
+        );
 
+        /*
         await Subcontractor.create({
             name: nullCheckname,
             company,
@@ -71,20 +76,23 @@ const createSubcontractor = async (req, res) => {
             deduction,
             isGross
         });
+        */
+
+        await Subcontractor.create(sanitizedData);
 
         req.flash('success', 'Subcontractor created.');
-        const referrer = '/dashboard';
-        res.redirect(referrer);
+        const referer = '/dashboard';
+        res.redirect(referer);
     } catch (error) {
         req.flash('error', 'Error creating subcontractor: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        const referer = req.get('referer') || '/';
+        res.redirect(referer);
     }
 };
 const readSubcontractor = async (req, res) => {
     try {
-        // Check if the user is an admin
-        if (req.session.user.role !== 'admin') {
+        // Check if the user has permissions
+        if (!req.session.user.permissionReadSubcontractor) {
             return res.status(403).send('Access denied.');
         }
 
@@ -109,6 +117,11 @@ const readSubcontractor = async (req, res) => {
 };
 const updateSubcontractor = async (req, res) => {
     try {
+        // Check if the user has permissions
+        if (!req.session.user.permissionUpdateSubcontractor) {
+            return res.status(403).send('Access denied.');
+        }
+
         const {
             name,
             company,
@@ -163,9 +176,9 @@ const updateSubcontractor = async (req, res) => {
 };
 const deleteSubcontractor = async (req, res) => {
     try {
-        // Check if the user is an admin
-        if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can delete subcontractors.');
+        // Check if the user has permissions
+        if (!req.session.user.permissionDeleteSubcontractor) {
+            return res.status(403).send('Access denied.');
         }
 
         const subcontractor = await Subcontractor.findByPk(req.params.id);
