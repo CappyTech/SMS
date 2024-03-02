@@ -73,6 +73,21 @@ const createUser = async (req, res) => {
   };
 const readUser = async (req, res) => {
     try {
+        // Validate the session user state
+        if (!req.session || !req.session.user) {
+            return res.status(403).send('Invalid session or user.');
+        }
+
+        // Check if the logged-in user has permissions.
+        if (!req.session.user.permissionReadUser) {
+            return res.status(403).send('Access denied.');
+        }
+
+        // Verify if req.params and req.params.id exist
+        if (!req.params || !req.params.id) {
+            return res.status(400).send('Bad Request: Missing user id parameter.');
+        }
+
         const user = await User.findByPk(req.params.id);
     
         if (!user) {
@@ -95,6 +110,27 @@ const readUser = async (req, res) => {
 };
 const updateUser = async (req, res) => {
     try {
+        // Validate the session user state
+        if (!req.session || !req.session.user) {
+            return res.status(403).send('Invalid session or user.');
+        }
+
+        // Check if the logged-in user has permissions.
+        if (!req.session.user.permissionUpdateUser) {
+            return res.status(403).send('Access denied.');
+        }
+
+        // Check if User exists and has an update method
+        if (!User || typeof User.update !== 'function') {
+            console.error('Error: User model or update method not found!');
+            return res.status(500).send('Server Error.');
+        }
+
+        // Verify if req.params and req.params.id exist
+        if (!req.params || !req.params.id) {
+            return res.status(400).send('Bad Request: Missing user id parameter.');
+        }
+
         const { error } = schema.validate(req.body);
         if (error) {
             return res.status(400).send(error.details[0].message);
@@ -117,27 +153,6 @@ const updateUser = async (req, res) => {
             permissionUpdateInvoice,
             permissionDeleteInvoice
         } = req.body;
-
-        // Validate the session user state
-        if (!req.session || !req.session.user) {
-            return res.status(403).send('Invalid session or user.');
-        }
-
-        // Check if the logged-in user is an admin and has the permission to create users.
-        if (req.session.user.role !== 'admin' && !req.session.user.permissionCreateUser) {
-            return res.status(403).send('Access denied.');
-        }
-
-        // Check if User exists and has an update method
-        if (!User || typeof User.update !== 'function') {
-            console.error('Error: User model or update method not found!');
-            return res.status(500).send('Server Error.');
-        }
-
-        // Verify if req.params and req.params.id exist
-        if (!req.params || !req.params.id) {
-            return res.status(400).send('Bad Request: Missing user id parameter.');
-        }
 
         // Then update the user data.
         const updatedUser = await User.update({
