@@ -78,7 +78,7 @@
             <% if (isValidDate(invoice.submissionDate)) { %>
                    value="<%= invoice.submissionDate.toISOString().split('T')[0] %>"
                     <% } %>
-                   required>
+                   >
             <% if (!isValidDate(invoice.submissionDate)) { %>
                 <div class="invalid-feedback">
                     The time format is incorrect.
