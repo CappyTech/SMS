@@ -252,13 +252,21 @@ const e500 = async (req, res) => {
 }
 
 // Display form to create a new submission
-const renderSubmissionCreateForm = (req, res) => {
-    res.render('createSubmission', {
-        errorMessages: req.flash('error'),
-        successMessage: req.flash('success'),
-        session: req.session,
-        packageJson
-    });
+const renderSubmissionCreateForm = async (req, res) => {
+    try {
+        const invoices = await Invoice.findAll({ where: { submissionDate: null } });
+        res.render('createSubmission', {
+            invoices: invoices,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson
+        });
+    } catch (error) {
+        console.error('Error rendering submission create form:', error);
+        req.flash('error', 'An error occurred while rendering the submission form.');
+        res.redirect('/submission/create');
+    }
 };
 
 router.get('/', renderIndex);

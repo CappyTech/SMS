@@ -1,11 +1,90 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
-<h1>Create Submission</h1>
-<form action="/submissions" method="POST">
-    <label for="month">Month:</label>
-    <input type="number" id="month" name="month" required>
-    <label for="year">Year:</label>
-    <input type="number" id="year" name="year" required>
-    <button type="submit">Submit</button>
-</form>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5 text-center">
+            <h1 class="display-5 fw-bold">Update Invoice Submission</h1>
+            <form action="/updateSubmission" method="POST">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Invoice Number</th>
+                            <th>Paid Date</th>
+                            <th>Month</th>
+                            <th>Year</th>
+                            <th>Submission Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% invoices.forEach(invoice => { %>
+                            <tr class="invoice-row" data-invoice-id="<%= invoice.id %>">
+                                <td><input type="checkbox" name="selectedInvoices[]" value="<%= invoice.id %>"></td>
+                                <td><%= invoice.invoiceNumber %></td>
+                                <td><%= slimDateTime(invoice.remittanceDate) %></td>
+                                <td><input type="number" class="form-control monthInput" value="<%= invoice.month %>"></td>
+                                <td><input type="number" class="form-control yearInput" value="<%= invoice.year %>"></td>
+                                <td><input type="date" id="submissionDate" name="submissionDate" class="form-control" value="<%= invoice.submissionDate ? invoice.submissionDate.toDateString() : '' %>"></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+                <div class="d-grid">
+                    <a type="button" class="select-all-btn" style="width: 40%"><i class="bi bi-square"></i> Select All</a>
+                    <button type="submit" class="btn btn-primary" style="width: 60%"><i class="bi bi-cloud-upload"></i> Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let previousRow = null;
+        const invoiceRows = document.querySelectorAll(".invoice-row");
+
+        invoiceRows.forEach(row => {
+            row.addEventListener("click", function(event) {
+                const targetTagName = event.target.tagName.toLowerCase();
+                if (targetTagName !== 'input' || !event.target.classList.contains('form-control')) {
+                    const checkbox = row.querySelector("input[type='checkbox']");
+                    if (event.shiftKey && previousRow) {
+                        const currentIndex = Array.from(invoiceRows).indexOf(row);
+                        const previousIndex = Array.from(invoiceRows).indexOf(previousRow);
+                        const startIndex = Math.min(currentIndex, previousIndex);
+                        const endIndex = Math.max(currentIndex, previousIndex);
+                        invoiceRows.forEach((r, index) => {
+                            const rowCheckbox = r.querySelector("input[type='checkbox']");
+                            if (index >= startIndex && index <= endIndex) {
+                                rowCheckbox.checked = true;
+                            } else {
+                                rowCheckbox.checked = false;
+                            }
+                        });
+                    } else {
+                        checkbox.checked = !checkbox.checked;
+                    }
+                    previousRow = row;
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    document.querySelector('.select-all-btn').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.invoice-row input[type="checkbox"]');
+        const selectAllIcon = document.querySelector('.select-all-btn i');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !checkbox.checked;
+        });
+
+        // Toggle icon
+        if (selectAllIcon.classList.contains('bi-square')) {
+            selectAllIcon.classList.replace('bi-square', 'bi-check-square');
+        } else {
+            selectAllIcon.classList.replace('bi-check-square', 'bi-square');
+        }
+    });
+</script>

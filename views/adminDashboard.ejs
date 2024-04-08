@@ -1,7 +1,7 @@
 <!-- views/adminDashboard.ejs -->
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
-<div class="container py-4">
+<div class="container-fluid py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5 text-center">
 
@@ -32,7 +32,7 @@
                 <tr>
                     <th>Username <i class="bi bi-person-fill"></i></th>
                     <% users.forEach(user => { %>
-                        <td><a href="/user/update/<%= user.id %>"><%= user.username %><i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
+                        <td><a href="/user/read/<%= user.id %>"><%= user.username %><i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
                     <% }); %>
                 </tr>
                 <tr>
@@ -57,7 +57,7 @@
                 <div class="card mt-2">
                     <div class="card-body">
                         <h3 class="card-title text-center">
-                            <a href="/subcontractor/update/<%= subcontractor.id %>"><%= subcontractor.company %><i
+                            <a href="/subcontractor/read/<%= subcontractor.id %>"><%= subcontractor.company %><i
                                         class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></i>
                         </h3>
                         <h4 class="card-subtitle mb-2 text-body-secondary"></h4>
@@ -78,6 +78,8 @@
                                         <th>Reverse Charge <i class="bi bi-wallet-fill"></i></th>
                                     <% } %>
                                     <th>Submission <i class="bi bi-calendar2-date-fill"></i></th>
+                                    <th>Month <i class="bi bi-calendar2-date-fill"></i></th>
+                                    <th>Year <i class="bi bi-calendar2-date-fill"></i></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -85,7 +87,7 @@
                                 <% const subcontractorInvoices = invoices.filter(invoice => invoice.SubcontractorId === subcontractor.id); %>
                                 <% subcontractorInvoices.forEach(invoice => { %>
                                     <tr>
-                                        <td><a href="/invoice/update/<%= invoice.id %>" target="_blank"><%= invoice.invoiceNumber %><i
+                                        <td><a href="/invoice/read/<%= invoice.id %>" target="_blank"><%= invoice.invoiceNumber %><i
                                                         class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
                                         <td><a href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>" target="_blank"><%= invoice.kashflowNumber %><i
                                                         class="bi bi-box-arrow-up-right" style="font-size: 0.65rem;"></i></a></td>
@@ -100,6 +102,8 @@
                                             <td><%= formatCurrency(invoice.reverseCharge) %></td>
                                         <% } %>
                                         <td><%= slimDateTime(invoice.submissionDate) %></td>
+                                        <td><%= invoice.month %></td>
+                                        <td><%= invoice.year %></td>
                                     </tr>
                                 <% }); %>
                                 </tbody>

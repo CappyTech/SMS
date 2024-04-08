@@ -2,11 +2,11 @@
 
 const express = require('express');
 const router = express.Router();
-
 const packageJson = require('../package.json');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
-const {validateInvoiceData,calculateInvoiceAmounts, slimDateTime, formatCurrency} = require('../helpers');
+const { validateInvoiceData, calculateInvoiceAmounts, slimDateTime, formatCurrency } = require('../helpers');
+
 const createInvoice = async (req, res) => {
     try {
         const validatedData = validateInvoiceData(req.body);
@@ -54,6 +54,7 @@ const createInvoice = async (req, res) => {
         res.redirect(referrer);
     }
 };
+
 const readInvoice = async (req, res) => {
     try {
         // Check if session exists and session user role is an admin
@@ -86,6 +87,46 @@ const readInvoice = async (req, res) => {
         res.status(500).json({ error: 'Error: ' + error.message });
     }
 };
+
+const readInvoices = async (req, res) => {
+    try {
+        // Check if session exists and session user role is an admin
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/'); // Ensure to return here
+        }
+
+        // Get the subcontractor ID from the request parameters or query string
+        const subcontractorId = req.params.id;
+
+        const invoices = await Invoice.findAll({
+            include: [
+                {
+                    model: Subcontractor,
+                    where: { id: subcontractorId }
+                }
+            ]
+        });
+
+        if (!invoices) {
+            return res.status(404).json({ error: 'Invoices not found' });
+        }
+
+        res.render('viewInvoices', {
+            invoices,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            slimDateTime: slimDateTime,
+            formatCurrency: formatCurrency,
+        });
+    } catch (error) {
+        console.error('Error viewing invoices:', error);
+        res.status(500).json({ error: 'Error: ' + error.message });
+    }
+};
+
 const updateInvoice = async (req, res) => {
     try {
         validateInvoiceData(req.body);
@@ -145,6 +186,7 @@ const deleteInvoice = async (req, res) => {
 
 router.post('/invoice/create/:selected', createInvoice);
 router.get('/invoice/read/:id', readInvoice);
+router.get('/invoices/read/:id', readInvoices);
 router.post('/invoice/update/:id', updateInvoice);
 router.post('/invoice/delete/:id', deleteInvoice);
 
