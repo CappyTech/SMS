@@ -251,6 +251,16 @@ const e500 = async (req, res) => {
     }
 }
 
+// Display form to create a new submission
+const renderSubmissionCreateForm = (req, res) => {
+    res.render('createSubmission', {
+        errorMessages: req.flash('error'),
+        successMessage: req.flash('success'),
+        session: req.session,
+        packageJson
+    });
+};
+
 router.get('/', renderIndex);
 router.get('/dashboard', renderDashboard);
 router.get('/user/create', renderUserCreateForm);
@@ -260,6 +270,7 @@ router.get('/user/update/:id', renderUserUpdateForm);
 router.get('/subcontractor/update/:id', renderSubcontractorUpdateForm);
 router.get('/invoice/update/:id', renderInvoiceUpdateForm);
 router.get('/subcontractor/select', selectSubcontractor);
-router.get ('/500', e500)
+router.get('/500', e500)
+router.get('/submission/create', renderSubmissionCreateForm);
 
 module.exports = router;

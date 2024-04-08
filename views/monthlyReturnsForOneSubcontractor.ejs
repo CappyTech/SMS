@@ -1,5 +1,5 @@
 <div class="text-center mt-4">
-    <h1 class="mb-4"><%= monthNames[month - 1] %> Monthly Returns Report</h1>
+    <h1 class="mb-4"><%= monthNames[month - 1] %> Monthly Returns</h1>
     <%= subcontractor.name %> | <%= subcontractor.company %> @ <% if (subcontractor.deduction === 0.0) { %>
         0%
     <% } else if (subcontractor.deduction === 0.2) { %>
@@ -24,7 +24,7 @@
     <% const hasInvoices = invoices.length > 0; %>
     <% if (hasInvoices) { %>
         <table class="table table-hover table-sm caption-top">
-            <caption class="text-start">Month: <%= month %> (<%= monthNames[month - 1] %> <%= year %>)</caption>
+            <caption class="text-start">Month <%= month %></caption>
             <thead>
                 <tr>
                     <th>

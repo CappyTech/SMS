@@ -1,0 +1,12 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<h1>Update Submission</h1>
+<form action="/submissions/<%= submission.id %>" method="POST">
+    <label for="month">Month:</label>
+    <input type="number" id="month" name="month" value="<%= submission.month %>" required>
+    <label for="year">Year:</label>
+    <input type="number" id="year" name="year" value="<%= submission.year %>" required>
+    <button type="submit">Update</button>
+    <!-- Include a delete button if you want to provide the option to delete the submission -->
+    <!-- <button type="button" onclick="deleteSubmission()">Delete</button> -->
+</form>

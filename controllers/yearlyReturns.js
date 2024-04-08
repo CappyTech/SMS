@@ -30,7 +30,6 @@ const renderYearlyReturns = async (req, res) => {
             return res.status(400).send("Year and Subcontractor ID are required.");
         }
 
-
         const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
 
         // Fetch subcontractor data for the given year and ID
@@ -89,7 +88,6 @@ const renderYearlyReturns = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
-
 
 router.get('/yearly/returns/:year/:id', renderYearlyReturns);
 

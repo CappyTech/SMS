@@ -69,19 +69,25 @@
                         a User</a>
                     </li>
                   <% } else {} %>
-                      <% if (session.user.permissionCreateSubcontractor) { %>
+                  <% if (session.user.permissionCreateSubcontractor) { %>
                     <li>
                         <a class="dropdown-item" href="/subcontractor/create"><i class="bi bi-person-plus"></i>
                         Create
                         a Subcontractor</a>
                     </li>
-                      <% } else {} %>
-                          <% if (session.user.permissionCreateInvoice) { %>
+                  <% } else {} %>
+                  <% if (session.user.permissionCreateInvoice) { %>
                     <li>
                         <a class="dropdown-item" href="/subcontractor/select"><i class="bi bi-file-plus"></i> Create
                         an Invoice</a>
                     </li>
-                      <% } else {} %>
+                  <% } else {} %>
+                  <% if (session.user.permissionCreateInvoice) { %>
+                    <li>
+                        <a class="dropdown-item" href="/submissions/create"><i class="bi bi-file-plus"></i> Create
+                        a Submission</a>
+                    </li>
+                  <% } else {} %>
               </ul>
           </div>
         <% } %>
@@ -97,7 +103,7 @@
       <div>
         <a href="/"><img src="/favicon.png" alt="HCS Logo"></a>
         <a class="hcs-green-text" href="https://www.heroncs.co.uk">Heron Constructive Solutions Ltd.</a><br>
-        Copyright &copy; 2023 All Rights Reserved.
+        Copyright &copy; 2023 - 2024 All Rights Reserved.
         <div>
           VAT No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">252295994</a>
           |

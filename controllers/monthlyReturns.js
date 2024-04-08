@@ -79,7 +79,7 @@ const renderMonthlyReturnsForm = async (req, res) => {
     }
 };
 
-const renderMonthlyReturns = async (req, res) => {
+const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
     try {
         // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
@@ -118,7 +118,7 @@ const renderMonthlyReturns = async (req, res) => {
             year: year
         });
 
-        res.render('monthlyReturns', {
+        res.render('monthlyReturnsForOneSubcontractor', {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
@@ -139,8 +139,65 @@ const renderMonthlyReturns = async (req, res) => {
     }
 };
 
+const renderMonthlyReturnsForAll = async (req, res) => {
+    try {
+        // Check if the user is an admin
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
+        const {
+            month,
+            year
+        } = req.params;
+
+        if (!month || !year) {
+            console.log("Month and Year are required.");
+            return res.status(400).send("Month and Year are required.");
+        }
+
+        const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+
+        const subcontractors = await Subcontractor.findAll({
+            where: {
+                deletedAt: null
+            },
+            include: {
+                model: Invoice,
+                as: 'invoices',
+                where: {
+                    month: month
+                }
+            }
+        });
+
+        console.log("Rendering monthly returns:", {
+            subcontractors: subcontractors,
+            month: month,
+            year: year
+        });
+
+        res.render('monthlyReturnsForAll', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            slimDateTime: slimDateTime,
+            formatCurrency: formatCurrency,
+            month: month,
+            year: year,
+            subcontractors: subcontractors,
+            monthNames: monthNames
+        });
+    } catch (error) {
+        console.error("Error rendering monthly returns:", error);
+        req.flash('error', 'Error: Unable to render monthly returns');
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
+    }
+};
 
 router.get('/monthly/returns/form', renderMonthlyReturnsForm);
-router.get('/monthly/returns/:month/:year/:id', renderMonthlyReturns);
+router.get('/monthly/returns/:year/:month', renderMonthlyReturnsForAll);
+router.get('/monthly/returns/:month/:year/:id', renderMonthlyReturnsForOneSubcontactor);
 
 module.exports = router;

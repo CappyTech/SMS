@@ -1,0 +1,11 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<h1>Create Submission</h1>
+<form action="/submissions" method="POST">
+    <label for="month">Month:</label>
+    <input type="number" id="month" name="month" required>
+    <label for="year">Year:</label>
+    <input type="number" id="year" name="year" required>
+    <button type="submit">Submit</button>
+</form>
+
