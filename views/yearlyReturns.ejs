@@ -120,7 +120,7 @@
 
                 <tr>
                     <!-- Display the totals for the invoices in this month -->
-                    <td colspan="2"><strong>Total:</strong></td>
+                    <td colspan="2"><strong>Calculated Total:</strong></td>
                     <td></td>
                     <td></td>
                     <td><strong><%= formatCurrency(totalGross) %></strong></td>
@@ -128,6 +128,37 @@
                     <td><strong><%= formatCurrency(totalMaterialCost) %></strong></td>
                     <td><strong><%= formatCurrency(totalCISAmount) %></strong></td>
                     <td><strong><%= formatCurrency(totalNetAmount) %></strong></td>
+                    <td></td>
+                    <% if (subcontractor.isGross) { %>
+                    <td><strong><%= formatCurrency(totalReverseCharge) %></strong></td>
+                    <% } %>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <!-- Display the totals for the invoices in this month -->
+                    <td colspan="2"><strong>Submission Total:</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <strong><%= formatCurrency(rounding(totalGross,false)) %></strong>
+                        <br><small><pre>- rounded down</pre></small>
+                    </td>
+                    <td>
+                        <strong><%= formatCurrency(rounding(totalLabourCost,false)) %></strong>
+                        <br><small><pre>- rounded down</pre></small>
+                    </td>
+                    <td>
+                        <strong><%= formatCurrency(rounding(totalMaterialCost,false)) %></strong>
+                        <br><small><pre>- rounded down</pre></small>
+                    </td>
+                    <td>
+                        <strong><%= formatCurrency(totalCISAmount) %></strong>
+                    </td>
+                    <td>
+                        <strong><%= formatCurrency(totalNetAmount) %></strong>
+                    </td>
                     <td></td>
                     <% if (subcontractor.isGross) { %>
                     <td><strong><%= formatCurrency(totalReverseCharge) %></strong></td>

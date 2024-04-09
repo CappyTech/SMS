@@ -11,6 +11,7 @@ const helpers = require('../helpers');
 const {
     Op
 } = require('sequelize');
+const Submission = require('../models/submission');
 
 const renderIndex = (req, res) => {
     res.render('index', {
@@ -269,6 +270,24 @@ const renderSubmissionCreateForm = async (req, res) => {
     }
 };
 
+// Display form to update a new submission
+const renderSubmissionUpdateForm = async (req, res) => {
+    try {
+        const submission = await Submission.findByPk({ where: { id: req.params.id } });
+        res.render('updateSubmission', {
+            submission,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson
+        });
+    } catch (error) {
+        console.error('Error rendering submission update form:', error);
+        req.flash('error', 'An error occurred while rendering the submission form.');
+        res.redirect('/submission');
+    }
+};
+
 router.get('/', renderIndex);
 router.get('/dashboard', renderDashboard);
 router.get('/user/create', renderUserCreateForm);
@@ -280,5 +299,6 @@ router.get('/invoice/update/:id', renderInvoiceUpdateForm);
 router.get('/subcontractor/select', selectSubcontractor);
 router.get('/500', e500)
 router.get('/submission/create', renderSubmissionCreateForm);
+router.get('/submission/update/:id', renderSubmissionUpdateForm);
 
 module.exports = router;

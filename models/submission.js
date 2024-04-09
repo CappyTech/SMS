@@ -1,13 +1,37 @@
-// models/submissions.js
+// models/submission.js
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
-const Invoice = require('./invoice'); // Assuming the file path is correct
 
-const Submissions = sequelize.define('Submission', {
+const Submission = sequelize.define('Submission', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
+    },
+    grossTotal: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    labourTotal: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    materialTotal: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    cisTotal: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    netTotal: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    comments: {
+        type: DataTypes.TEXT,
+        allowNull: true,
     },
     month: {
         type: DataTypes.INTEGER,
@@ -19,16 +43,8 @@ const Submissions = sequelize.define('Submission', {
     },
     year: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: false
     },
-}, {});
+});
 
-Submissions.associate = (models) => {
-    Submissions.belongsToMany(Invoice, {
-        through: 'SubmissionInvoices',
-        foreignKey: 'submissionId',
-        otherKey: 'invoiceId',
-    });
-};
-
-module.exports = Submissions;
+module.exports = Submission;

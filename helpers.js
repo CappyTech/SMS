@@ -104,11 +104,19 @@ function calculateInvoiceAmounts(labourCost, materialCost, isGross, cisNumber, v
     };
 }
 
+function rounding(number, up) {
+    if (up) {
+        return Math.ceil(number);
+    } else {
+        return Math.floor(number);
+    }
+}
 
 module.exports = {
     slimDateTime,
     formatCurrency,
     isAdmin,
     validateInvoiceData,
-    calculateInvoiceAmounts
+    calculateInvoiceAmounts,
+    rounding
 };

@@ -11,7 +11,8 @@ const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const {
     formatCurrency,
-    slimDateTime
+    slimDateTime,
+    rounding
 } = require('../helpers');
 
 const renderYearlyReturns = async (req, res) => {
@@ -78,6 +79,7 @@ const renderYearlyReturns = async (req, res) => {
             packageJson,
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
+            rounding: rounding,
             subcontractor: subcontractor,
             year: year,
             invoicesByMonth: invoicesByMonth,

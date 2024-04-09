@@ -102,7 +102,7 @@ const deleteSubmission = async (req, res) => {
     }
 };
 
-router.post('/submissions', createSubmission);
+router.post('/submission', createSubmission);
 router.get('/submissions/:id', viewSubmission);
 router.get('/submissions/:id/edit', displayUpdateSubmissionForm);
 router.put('/submissions/:id', updateSubmission);
