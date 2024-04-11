@@ -96,14 +96,13 @@ const readInvoices = async (req, res) => {
             return res.redirect('/'); // Ensure to return here
         }
 
-        // Get the subcontractor ID from the request parameters or query string
-        const subcontractorId = req.params.id;
+        const subcontractor = await Subcontractor.findByPk(req.params.id);
 
         const invoices = await Invoice.findAll({
             include: [
                 {
                     model: Subcontractor,
-                    where: { id: subcontractorId }
+                    where: { id: req.params.id }
                 }
             ]
         });
@@ -113,6 +112,7 @@ const readInvoices = async (req, res) => {
         }
 
         res.render('viewInvoices', {
+            subcontractor,
             invoices,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
