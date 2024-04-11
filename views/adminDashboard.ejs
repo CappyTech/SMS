@@ -1,12 +1,9 @@
-<!-- views/adminDashboard.ejs -->
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
-<div class="container-fluid py-4">
+<div class="">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-        <div class="container-fluid py-5 text-center">
-
+        <div class="py-5 text-center">
             <h1 class="display-5 fw-bold">Dashboard</h1>
-
             <span class="badge rounded-pill text-bg-secondary">
                 Users
                 <span class="badge rounded-pill text-bg-dark">
@@ -25,8 +22,6 @@
                     <%= invoiceCount %>
                 </span>
             </span>
-
-
             <table class="table table-borderless table-sm mt-2 mb-2">
                 <thead>
                 <tr>
@@ -49,10 +44,79 @@
                 </tr>
                 </thead>
             </table>
-
             <hr>
-
-            <!-- Subcontractors table -->
+            <div class="card border-info">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <% subcontractors.forEach((subcontractor,index) => { %>
+                            <li class="nav-item">
+                                <a class="nav-link <%= index === 0 ? 'active' : '' %>" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#subcontractorContent-<%= subcontractor.id %>">
+                                    <%= subcontractor.company %>
+                                </a>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </div>
+                <div class="card-body tab-content">
+                    <% subcontractors.forEach((subcontractor,index) => { %>
+                        <div id="subcontractorContent-<%= subcontractor.id %>" class="tab-pane <%= index === 0 ? 'active' : '' %>">
+                            <div class=" table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Invoice</th>
+                                            <th>Kashflow</th>
+                                            <th>Invoiced</th>
+                                            <th>Paid</th>
+                                            <th>Labour</th>
+                                            <th>Materials</th>
+                                            <th>CIS</th>
+                                            <th>Gross</th>
+                                            <th>Net</th>
+                                            <% if (subcontractor.isGross) { %>
+                                                <th>Reverse Charge</th>
+                                            <% } %>
+                                            <th>Submission</th>
+                                            <th>Tax Month</th>
+                                            <th>Tax Year</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <% const subcontractorInvoices = invoices.filter(invoice => invoice.SubcontractorId === subcontractor.id); %>
+                                    <% subcontractorInvoices.forEach(invoice => { %>
+                                        <tr>
+                                            <td>
+                                                <a href="/invoice/read/<%= invoice.id %>" target="_blank">
+                                                    <%= invoice.invoiceNumber %>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>" target="_blank">
+                                                    <%= invoice.kashflowNumber %>
+                                                </a>
+                                            </td>
+                                            <td><%= slimDateTime(invoice.invoiceDate) %></td>
+                                            <td><%= slimDateTime(invoice.remittanceDate) %></td>
+                                            <td><%= formatCurrency(invoice.labourCost) %></td>
+                                            <td><%= formatCurrency(invoice.materialCost) %></td>
+                                            <td><%= formatCurrency(invoice.cisAmount) %></td>
+                                            <td><%= formatCurrency(invoice.grossAmount) %></td>
+                                            <td><%= formatCurrency(invoice.netAmount) %></td>
+                                            <% if (subcontractor.isGross) { %>
+                                                <td><%= formatCurrency(invoice.reverseCharge) %></td>
+                                            <% } %>
+                                            <td><%= slimDateTime(invoice.submissionDate) %></td>
+                                            <td><%= invoice.month %></td>
+                                            <td><%= invoice.year %></td>
+                                        </tr>
+                                    <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
             <% subcontractors.forEach(subcontractor => { %>
                 <div class="card mt-2">
                     <div class="card-body">
@@ -65,21 +129,21 @@
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
-                                    <th>Invoice <i class="bi bi-123"></i></th>
-                                    <th>Kashflow <i class="bi bi-123"></i></th>
-                                    <th>Invoice <i class="bi bi-calendar2-date-fill"></i></th>
-                                    <th>Remittance <i class="bi bi-calendar2-date-fill"></i></th>
-                                    <th>Labour <i class="bi bi-currency-pound"></i></th>
-                                    <th>Material <i class="bi bi-currency-pound"></i></th>
-                                    <th>CIS Deduction <i class="bi bi-bank2"></i></th>
-                                    <th>Gross <i class="bi bi-cash"></i></th>
-                                    <th>Net <i class="bi bi-piggy-bank-fill"></i></th>
+                                    <th>Invoice</th>
+                                    <th>Kashflow</th>
+                                    <th>Invoiced</th>
+                                    <th>Paid</th>
+                                    <th>Labour</th>
+                                    <th>Materials</th>
+                                    <th>CIS</th>
+                                    <th>Gross</th>
+                                    <th>Net</th>
                                     <% if (subcontractor.isGross) { %>
-                                        <th>Reverse Charge <i class="bi bi-wallet-fill"></i></th>
+                                        <th>Reverse Charge</th>
                                     <% } %>
-                                    <th>Submission <i class="bi bi-calendar2-date-fill"></i></th>
-                                    <th>Month <i class="bi bi-calendar2-date-fill"></i></th>
-                                    <th>Year <i class="bi bi-calendar2-date-fill"></i></th>
+                                    <th>Submission</th>
+                                    <th>Tax Month</th>
+                                    <th>Tax Year</th>
                                 </tr>
                                 </thead>
                                 <tbody>
