@@ -166,8 +166,10 @@ const renderMonthlyReturnsForAll = async (req, res) => {
                 as: 'invoices',
                 where: {
                     month: month
-                }
-            }
+                },
+                order: [['invoiceNumber', 'ASC']]
+            },
+            order: [['name', 'ASC']]
         });
 
         console.log("Rendering monthly returns:", {
