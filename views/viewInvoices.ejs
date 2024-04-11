@@ -3,11 +3,11 @@
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold text-center"><%= invoices.Subcontractor.name %> Invoices</h1>
+            <h1 class="display-5 fw-bold text-center"><%= subcontractor.company %> Invoices</h1>
             <% invoices.forEach(invoice => { %>
             <div class="card mb-3">
                 <div class="card-header d-flex justify-content-between">
-                    <span><%= invoice.invoiceNumber %></span>
+                    <span>Invoices</span>
                     <a class="hcs-green-text" href="/invoice/read/<%= invoice.id %>">View Invoice</a>
                 </div>
                 <div class="card-body">
@@ -26,8 +26,8 @@
                                 <% if (invoice.Subcontractor.isGross) { %>
                                 <li class="list-group-item">Reverse Charge</li>
                                 <% } %>
-                                <li class="list-group-item">Month</li>
-                                <li class="list-group-item">Year</li>
+                                <li class="list-group-item">Tax Month</li>
+                                <li class="list-group-item">Tax Year</li>
                                 <li class="list-group-item">Submission Date</li>
                             </ul>
                         </div>
