@@ -4,9 +4,10 @@
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center"><%= subcontractor.company %></h1>
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
-                    Subcontractor
+                    <span>Subcontractor</span>
                     <a class="hcs-green-text" href="/invoices/read/<%= subcontractor.id %>">View Invoices</a>
                 </div>
                 <div class="card-body">
