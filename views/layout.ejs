@@ -1,7 +1,6 @@
 <!-- views/layout.ejs: -->
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" data-bs-theme="light">
 <head>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <meta charset="UTF-8">
@@ -22,26 +21,32 @@
       <ul class="navbar-nav hstack gap-3">
         <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
             <li class="nav-item">
-              <a class="nav-link hcs-red-text" href="/dashboard"><i class="bi bi-speedometer"></i> Dashboard</a>
+              <a class="nav-link hcs-white-text" href="/dashboard"><i class="bi bi-speedometer"></i> Dashboard</a>
             </li>
             <% } %>
             <% if (typeof session.user !== 'undefined') { %>
             <li class="nav-item">
-              <a class="nav-link hcs-green-text" href="/monthly/returns/form"><i class="bi bi-file-spreadsheet-fill"></i>
-                Monthly Returns</a>
+              <a class="nav-link hcs-white-text" href="/monthly/returns/form">
+                <i class="bi bi-file-spreadsheet-fill"></i>
+                Monthly Returns
+              </a>
             </li>
-                <div class="vr"></div>
-                <div class="btn-group">
-                    <a type="button" class="btn btn-hcs-black" href="/account"><i class="bi bi-person"></i> My Account</a>
-                    <a type="button" class="btn btn-hcs-red dropdown-toggle dropdown-toggle-split" data-bs-theme="dark" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-arrow-bar-down"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                        <li>
-                            <a class="dropdown-item hcs-red-text" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
-                        </li>
-                    </ul>
-                </div>
+              <div class="vr"></div>
+            <li class="nav-item">
+              <a class="nav-link hcs-green-text" href="/account">
+                <i class="bi bi-person"></i>
+                Account
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link hcs-red-text" href="/logout">
+                <i class="bi bi-box-arrow-right"></i>
+                Logout
+              </a>
+            </li>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="darkModeToggle">
+            </div>
         <% } else { %>
             <li class="nav-item">
               <a class="nav-link" href="/signin"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
@@ -49,6 +54,10 @@
             <li class="nav-item">
               <a class="nav-link" href="/register"><i class="bi bi-book"></i> Create an account</a>
             </li>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="darkModeToggle">
+              <label class="form-check-label" for="darkModeToggle" id="darkModeToggleLabel">Switch to Night Mode</label>
+            </div>
         <% } %>
       </ul>
     </div>
@@ -60,32 +69,39 @@
         <% } else { %>
           <div class="dropdown">
               <button class="btn btn-hcs-green dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Actions <i class="bi bi-menu-down"></i>
+                  Create <i class="bi bi-menu-down"></i>
               </button>
               <ul class="dropdown-menu">
                   <% if (session.user.permissionCreateUser) { %>
                     <li>
-                        <a class="dropdown-item" href="/user/create"><i class="bi bi-person-plus"></i> Create
-                        a User</a>
+                        <a class="dropdown-item" href="/user/create">
+                          <i class="bi bi-person-plus"></i>
+                          User
+                        </a>
                     </li>
                   <% } else {} %>
                   <% if (session.user.permissionCreateSubcontractor) { %>
                     <li>
-                        <a class="dropdown-item" href="/subcontractor/create"><i class="bi bi-person-plus"></i>
-                        Create
-                        a Subcontractor</a>
+                        <a class="dropdown-item" href="/subcontractor/create">
+                          <i class="bi bi-person-plus"></i>
+                         Subcontractor
+                        </a>
                     </li>
                   <% } else {} %>
                   <% if (session.user.permissionCreateInvoice) { %>
                     <li>
-                        <a class="dropdown-item" href="/subcontractor/select"><i class="bi bi-file-plus"></i> Create
-                        an Invoice</a>
+                        <a class="dropdown-item" href="/subcontractor/select">
+                          <i class="bi bi-file-plus"></i>
+                          Invoice
+                        </a>
                     </li>
                   <% } else {} %>
                   <% if (session.user.permissionCreateInvoice) { %>
                     <li>
-                        <a class="dropdown-item" href="/submission/create"><i class="bi bi-file-plus"></i> Create
-                        a Submission</a>
+                        <a class="dropdown-item" href="/submission/create">
+                          <i class="bi bi-file-plus"></i>
+                          Submission
+                        </a>
                     </li>
                   <% } else {} %>
               </ul>
@@ -96,30 +112,99 @@
   </nav>
   <%- include('../partials/invoicesNotification.ejs') %>
   <%- body %>
-<footer class="footer mt-auto">
-  <nav
-    class="navbar navbar-expand navbar-dark bg-dark text-white d-flex justify-content-center align-items-center mt-5 p-4 d-print-none text-center">
-    <div class="stack-on-small">
-      <div>
-        <a href="/"><img src="/favicon.png" alt="HCS Logo"></a>
-        <a class="hcs-green-text" href="https://www.heroncs.co.uk">Heron Constructive Solutions Ltd.</a><br>
-        Copyright &copy; 2023 - 2024 All Rights Reserved.
+  <footer class="footer mt-auto">
+    <nav
+      class="navbar navbar-expand navbar-dark bg-dark text-white d-flex justify-content-center align-items-center mt-5 p-4 d-print-none text-center">
+      <div class="stack-on-small">
         <div>
-          VAT No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">252295994</a>
-          |
-          Company No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">09276951</a>
+          <a href="/"><img src="/favicon.png" alt="HCS Logo"></a>
+          <a class="hcs-green-text" href="https://www.heroncs.co.uk">Heron Constructive Solutions Ltd.</a><br>
+          Copyright &copy; 2023 - 2024 All Rights Reserved.
+          <div>
+            VAT No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">252295994</a>
+            |
+            Company No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">09276951</a>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
-</footer>
-
+    </nav>
+  </footer>
   <script src="/node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
   <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
   <script>
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
   </script>
-</body>
+  <script>
+    (() => {
+      'use strict';
 
+      const getStoredTheme = () => localStorage.getItem('theme');
+      const setStoredTheme = theme => localStorage.setItem('theme', theme);
+
+      const getPreferredTheme = () => {
+        const storedTheme = getStoredTheme();
+        if (storedTheme) {
+          return storedTheme;
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+
+      const setTheme = theme => {
+        if (theme === 'auto') {
+          document.documentElement.setAttribute('data-bs-theme', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        } else {
+          document.documentElement.setAttribute('data-bs-theme', theme);
+        }
+      };
+
+      setTheme(getPreferredTheme());
+
+      const showActiveTheme = (theme, focus = false) => {
+        const themeSwitcher = document.querySelector('#darkModeToggleLabel');
+
+        if (!themeSwitcher) {
+          return;
+        }
+
+        if (focus) {
+          themeSwitcher.focus();
+        }
+      };
+
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        const storedTheme = getStoredTheme();
+        if (storedTheme !== 'light' && storedTheme !== 'dark') {
+          setTheme(getPreferredTheme());
+        }
+      });
+
+      window.addEventListener('DOMContentLoaded', () => {
+        showActiveTheme(getPreferredTheme());
+
+        document.getElementById('darkModeToggle').addEventListener('change', () => {
+          toggleDarkMode();
+        });
+      });
+
+      const toggleDarkMode = () => {
+        const currentTheme = getStoredTheme();
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setStoredTheme(newTheme);
+        setTheme(newTheme);
+        showActiveTheme(newTheme, true);
+      };
+    })();
+
+    // new
+    const triggerTabList = document.querySelectorAll('[data-bs-toggle="tab"]')
+    triggerTabList.forEach(triggerEl => {
+        const tabTrigger = new bootstrap.Tab(triggerEl)
+        triggerEl.addEventListener('click', event => {
+            event.preventDefault()
+            tabTrigger.show()
+        })
+    })
+</script>
+</body>
 </html>
