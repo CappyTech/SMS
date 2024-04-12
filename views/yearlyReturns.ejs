@@ -1,3 +1,41 @@
+<style>
+    @media print {
+        @page {
+            margin: 1cm;
+            @bottom-center {
+                content: counter(page);
+            }
+        }
+
+        body {
+            padding-bottom: 50px;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    }
+</style>
+<script>
+    window.onload = function() {
+        updatePageNumbers();
+    };
+
+    window.onafterprint = function() {
+        updatePageNumbers();
+    };
+
+    function updatePageNumbers() {
+        var pageCount = document.querySelectorAll('.content > *').length;
+        for (var i = 0; i < pageCount; i++) {
+            var pageNumber = i + 1;
+            var element = document.createElement('div');
+            element.className = 'page-number';
+            element.textContent = pageNumber;
+            document.body.appendChild(element);
+        }
+    }
+</script>
 <div class="mt-4">
     <h1 class="mb-4 display-3 text-center"><%= year %> Yearly Returns</h1>
     <div class="row justify-content-evenly">
