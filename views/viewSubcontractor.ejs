@@ -24,7 +24,8 @@
                                 <li class="list-group-item">CIS Number</li>
                                 <li class="list-group-item">UTR Number</li>
                                 <li class="list-group-item">VAT Number</li>
-                                <li class="list-group-item">IsGross</li>
+                                <li class="list-group-item">Gross</li>
+                                <li class="list-group-item">Reverse Charge</li>
                             </ul>
                         </div>
                         <div class="col-6">
@@ -40,6 +41,7 @@
                                 <li class="list-group-item <%= subcontractor.utrNumber ? '' : 'list-group-item-warning' %>"><%= subcontractor.utrNumber ? subcontractor.utrNumber : 'N/A' %></li>
                                 <li class="list-group-item <%= subcontractor.vatNumber ? '' : 'list-group-item-warning' %>"><%= subcontractor.vatNumber ? subcontractor.vatNumber : 'N/A' %></li>
                                 <li class="list-group-item"><%= subcontractor.isGross ? 'Yes' : 'No' %></li>
+                                <li class="list-group-item"><%= subcontractor.isReverseCharge ? 'Yes' : 'No' %></li>
                             </ul>
                         </div>
                     </div>
