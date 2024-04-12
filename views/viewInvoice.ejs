@@ -23,7 +23,7 @@
                                 <li class="list-group-item">Material Cost</li>
                                 <li class="list-group-item">CIS Amount</li>
                                 <li class="list-group-item">Net Amount</li>
-                                <% if (invoice.Subcontractor.isGross) { %>
+                                <% if (invoice.Subcontractor.isReverseCharge) { %>
                                     <li class="list-group-item">Reverse Charge</li>
                                 <% } %>
                                 <li class="list-group-item">Tax Month</li>
@@ -42,7 +42,7 @@
                                 <li class="list-group-item"><%= formatCurrency(invoice.materialCost) %></li>
                                 <li class="list-group-item"><%= formatCurrency(invoice.cisAmount) %></li>
                                 <li class="list-group-item"><%= formatCurrency(invoice.netAmount) %></li>
-                                <% if (invoice.Subcontractor.isGross) { %>
+                                <% if (invoice.Subcontractor.isReverseCharge) { %>
                                     <li class="list-group-item"><%= formatCurrency(invoice.reverseCharge) %></li>
                                 <% } %>
                                 <li class="list-group-item"><%= invoice.month %></li>
