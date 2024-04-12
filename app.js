@@ -95,7 +95,11 @@ app.use(
                 "https://cdn.jsdelivr.net",
                 "https://fonts.googleapis.com",
             ],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                "https://cdn.jsdelivr.net",
+            ],
             fontSrc: [
                 "'self'",
                 "'unsafe-inline'",
