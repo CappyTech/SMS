@@ -53,7 +53,7 @@ const Subcontractors = sequelize.define('Subcontractor', {
         type: DataTypes.FLOAT,
         allowNull: false
     },
-    vatnumber: {
+    vatNumber: {
         type: DataTypes.STRING,
         allowNull: true,
         unique: true,
@@ -63,6 +63,16 @@ const Subcontractors = sequelize.define('Subcontractor', {
         allowNull: false,
         defaultValue: false
     },
+    isCIS: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    isReverseCharge: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    }
 }, {
     paranoid: true,
 });
