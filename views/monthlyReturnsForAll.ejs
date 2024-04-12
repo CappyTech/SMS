@@ -65,7 +65,7 @@
                                 <span class="d-none d-md-table-cell">Net</span>
                                 <span class="d-md-none">Net</span>
                             </th>
-                            <% if (subcontractor.isGross) { %>
+                            <% if (subcontractor.isReverseCharge) { %>
                                 <th>
                                     <span class="d-none d-md-table-cell">Reverse Charge</span>
                                     <span class="d-md-none">RC</span>
@@ -97,7 +97,7 @@
                             <td><%= formatCurrency(invoice.materialCost) %></td>
                             <td><%= formatCurrency(invoice.cisAmount) %></td>
                             <td><%= formatCurrency(invoice.netAmount) %></td>
-                            <% if (subcontractor.isGross) { %>
+                            <% if (subcontractor.isReverseCharge) { %>
                                 <td><%= formatCurrency(invoice.reverseCharge) %></td>
                             <% } %>
                             <td><%= invoice.month %></td>
@@ -121,7 +121,7 @@
                             <td><strong><%= formatCurrency(totalCISAmount) %></strong></td>
                             <td><strong><%= formatCurrency(totalNetAmount) %></strong></td>
                             <td></td>
-                            <% if (subcontractor.isGross) { %>
+                            <% if (subcontractor.isReverseCharge) { %>
                                 <td><strong><%= formatCurrency(totalReverseCharge) %></strong></td>
                             <% } %>
                             <td></td>
