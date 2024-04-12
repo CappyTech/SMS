@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn('Subcontractors', 'vatnumber', {
+    await queryInterface.addColumn('Subcontractors', 'vatNumber', {
       type: Sequelize.STRING,
       allowNull: true,
       unique: true,
@@ -10,6 +10,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeColumn('Subcontractors', 'vatnumber');
+    await queryInterface.removeColumn('Subcontractors', 'vatNumber');
   }
 };
