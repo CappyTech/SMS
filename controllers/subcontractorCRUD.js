@@ -133,7 +133,7 @@ const updateSubcontractor = async (req, res) => {
             cisNumber,
             utrNumber,
             isGross,
-            vatnumber,
+            vatNumber,
             deduction,
         } = req.body;
 
@@ -151,7 +151,7 @@ const updateSubcontractor = async (req, res) => {
             subcontractor.cisNumber = cisNumber;
             subcontractor.utrNumber = utrNumber;
             subcontractor.isGross = isGross;
-            subcontractor.vatnumber = vatnumber;
+            subcontractor.vatNumber = vatNumber;
             subcontractor.deduction = deduction;
 
             await subcontractor.save();
