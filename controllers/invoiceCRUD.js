@@ -11,7 +11,7 @@ const createInvoice = async (req, res) => {
     try {
         const validatedData = validateInvoiceData(req.body);
         const subcontractor = await Subcontractor.findByPk(req.params.selected);
-        const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatnumber);
+        const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatNumber);
 
         // If remittanceDate or submissionDate are not provided, set them to null
         validatedData.remittanceDate = validatedData.remittanceDate || null;
@@ -145,7 +145,7 @@ const updateInvoice = async (req, res) => {
             throw new Error(`Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.id}`);
         }
 
-        const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatnumber);
+        const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatNumber);
 
         await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.id } });
 
