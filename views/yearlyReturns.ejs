@@ -1,46 +1,8 @@
-<style>
-    @media print {
-        @page {
-            margin: 1cm;
-            @bottom-center {
-                content: counter(page);
-            }
-        }
-
-        body {
-            padding-bottom: 50px;
-        }
-
-        .page-break {
-            page-break-before: always;
-        }
-    }
-</style>
-<script>
-    window.onload = function() {
-        updatePageNumbers();
-    };
-
-    window.onafterprint = function() {
-        updatePageNumbers();
-    };
-
-    function updatePageNumbers() {
-        var pageCount = document.querySelectorAll('.content > *').length;
-        for (var i = 0; i < pageCount; i++) {
-            var pageNumber = i + 1;
-            var element = document.createElement('div');
-            element.className = 'page-number';
-            element.textContent = pageNumber;
-            document.body.appendChild(element);
-        }
-    }
-</script>
 <div class="mt-4">
     <h1 class="mb-4 display-3 text-center"><%= year %> Yearly Returns</h1>
     <div class="row justify-content-evenly">
-        <div class="col-6 ms-auto">
-            <p class="display-5 text-center">
+        <div class="col-6 ms-auto text-center">
+            <p class="display-5">
                 Subcontractor
             </p>
             <%= subcontractor.company %>
@@ -48,9 +10,9 @@
                 <br>
                 UTR: <%= subcontractor.utrNumber %>
             <% } %>
-            <% if (subcontractor.vatnumber) { %>
+            <% if (subcontractor.vatNumber) { %>
                 <br>
-                VAT: <%= subcontractor.vatnumber %>
+                VAT: <%= subcontractor.vatNumber %>
             <% } %>
             <% if (subcontractor.cisNumber) { %>
                 <br>
@@ -65,8 +27,8 @@
                 <%= subcontractor.postalCode %>.
             </address>
         </div>
-        <div class="col-6">
-            <p class="display-5 text-center">
+        <div class="col-6 text-center">
+            <p class="display-5">
                 Contractor
             </p>
             Heron Constructive Solutions LTD
@@ -84,158 +46,210 @@
         </div>
     </div>
 </div>
-    <% for (let monthIndex = 1; monthIndex <= 12; monthIndex++) { %>
-    <% const monthKey = monthIndex.toString(); %>
-    <% const invoices = invoicesByMonth[monthKey] || []; %>
-    <% const hasInvoices = invoices.length > 0; %>
-    <% if (hasInvoices) { %>
-        <table class="table table-hover table-sm caption-top page-break">
-            <caption class="text-start">Month <%= monthKey %></caption>
-            <thead>
-                <tr>
-                    <th>
-                        <span class="d-none d-md-table-cell">Invoice</span>
-                        <span class="d-md-none">Inv</span>
-                    </th>
-                    <th>
-                        <span class="d-none d-md-table-cell">Kashflow</span>
-                        <span class="d-md-none">KF</span>
-                    </th>
-                    <th>
-                        <span class="d-none d-md-table-cell">Invoiced</span>
-                        <span class="d-md-none">Invoiced</span>
-                    </th>
-                    <th>
-                        <span class="d-none d-md-table-cell">Paid</span>
-                        <span class="d-md-none">Paid</span>
-                    </th>
-                    <th>
-                        <span class="d-none d-md-table-cell">Gross</span>
-                        <span class="d-md-none">Gross</span>
-                    </th>
-                    <th>
-                        <span class="d-none d-md-table-cell">Labour</span>
-                        <span class="d-md-none">Labour</span>
-                    </th>
-                    <th>
-                        <span class="d-none d-md-table-cell">Material</span>
-                        <span class="d-md-none">Material</span>
-                    </th>
-                    <th>
-                        <span class="d-none d-md-table-cell">CIS @ <% if (subcontractor.deduction === 0.0) { %>
-                                0%
-                            <% } else if (subcontractor.deduction === 0.2) { %>
-                                20%
-                            <% } else if (subcontractor.deduction === 0.3) { %>
-                                30%
-                            <% } %></span>
-                        <span class="d-md-none">CIS</span>
-                    </th>
-                    <th>
-                        <span class="d-none d-md-table-cell">Net</span>
-                        <span class="d-md-none">Net</span>
-                    </th>
-                    <% if (subcontractor.isGross) { %>
-                    <th>
-                        <span class="d-none d-md-table-cell">Reverse Charge</span>
-                        <span class="d-md-none">RC</span>
-                    </th>
-                    <% } %>
-                    <th>Month</th>
-                    <th>Year</th>
-                    <th>
-                        <span class="d-none d-md-table-cell">Submission Date</span>
-                        <span class="d-md-none">Submission</span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="table-group-divider">
-                <% let totalGross = 0; %>
-                <% let totalLabourCost = 0; %>
-                <% let totalMaterialCost = 0; %>
-                <% let totalCISAmount = 0; %>
-                <% let totalNetAmount = 0; %>
-                <% let totalReverseCharge = 0; %>
-                <% invoices.forEach(invoice => { %>
-                <tr>
-                    <td><%= invoice.invoiceNumber %></td>
-                    <td><%= invoice.kashflowNumber %></td>
-                    <td><%= slimDateTime(invoice.invoiceDate) %></td>
-                    <td><%= slimDateTime(invoice.remittanceDate) %></td>
-                    <td><%= formatCurrency(invoice.grossAmount) %></td>
-                    <td><%= formatCurrency(invoice.labourCost) %></td>
-                    <td><%= formatCurrency(invoice.materialCost) %></td>
-                    <td><%= formatCurrency(invoice.cisAmount) %></td>
-                    <td><%= formatCurrency(invoice.netAmount) %></td>
-                    <% if (subcontractor.isGross) { %>
-                    <td><%= formatCurrency(invoice.reverseCharge) %></td>
-                    <% } %>
-                    <td><%= invoice.month %></td>
-                    <td><%= invoice.year %></td>
-                    <td><%= slimDateTime(invoice.submissionDate) %></td>
-                </tr>
-                <% totalGross += invoice.grossAmount; %>
-                <% totalLabourCost += invoice.labourCost; %>
-                <% totalMaterialCost += invoice.materialCost; %>
-                <% totalCISAmount += invoice.cisAmount; %>
-                <% totalNetAmount += invoice.netAmount; %>
-                <% totalReverseCharge += invoice.reverseCharge; %>
-                <% }); %>
-
-                <tr>
-                    <!-- Display the totals for the invoices in this month -->
-                    <td colspan="2"><strong>Calculated Total:</strong></td>
-                    <td></td>
-                    <td></td>
-                    <td><strong><%= formatCurrency(totalGross) %></strong></td>
-                    <td><strong><%= formatCurrency(totalLabourCost) %></strong></td>
-                    <td><strong><%= formatCurrency(totalMaterialCost) %></strong></td>
-                    <td><strong><%= formatCurrency(totalCISAmount) %></strong></td>
-                    <td><strong><%= formatCurrency(totalNetAmount) %></strong></td>
-                    <td></td>
-                    <% if (subcontractor.isGross) { %>
-                    <td><strong><%= formatCurrency(totalReverseCharge) %></strong></td>
-                    <% } %>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <!-- Display the totals for the invoices in this month -->
-                    <td colspan="2"><strong>Submission Total:</strong></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <strong><%= formatCurrency(rounding(totalGross,false)) %></strong>
-                        <br><small><pre>- rounded down</pre></small>
-                    </td>
-                    <td>
-                        <strong><%= formatCurrency(rounding(totalLabourCost,false)) %></strong>
-                        <br><small><pre>- rounded down</pre></small>
-                    </td>
-                    <td>
-                        <strong><%= formatCurrency(rounding(totalMaterialCost,false)) %></strong>
-                        <br><small><pre>- rounded down</pre></small>
-                    </td>
-                    <td>
-                        <strong><%= formatCurrency(totalCISAmount) %></strong>
-                    </td>
-                    <td>
-                        <strong><%= formatCurrency(totalNetAmount) %></strong>
-                    </td>
-                    <td></td>
-                    <% if (subcontractor.isGross) { %>
-                    <td><strong><%= formatCurrency(totalReverseCharge) %></strong></td>
-                    <% } %>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+<% for (let monthIndex = 1; monthIndex <= 12; monthIndex++) { %>
+<% const monthKey = monthIndex.toString(); %>
+<% const invoices = invoicesByMonth[monthKey] || []; %>
+<% const hasInvoices = invoices.length > 0; %>
+<% if (hasInvoices) { %>
+    <% if (monthKey == 3 || monthKey == 5 || monthKey == 8 || monthKey == 11) { %>
+        <table class="table table-hover table-sm caption-top page-break d-print-table">
     <% } else { %>
-        <p class="text-muted text-center">
-            No invoices available for <%= monthNames[monthIndex - 1] %> <%= year %>.
-        </p>
+    <table class="table table-hover table-sm caption-top d-print-table">
     <% } %>
+        <caption class="text-center">Month <%= monthKey %> (<%= monthNames[monthIndex - 1] %> <%= year %>)</caption>
+        <thead>
+            <tr>
+                <th>
+                    <span class="d-none d-md-table-cell">Invoice</span>
+                    <span class="d-md-none">Inv</span>
+                </th>
+                <th>
+                    <span class="d-none d-md-table-cell">Kashflow</span>
+                    <span class="d-md-none">KF</span>
+                </th>
+                <th>
+                    <span class="d-none d-md-table-cell">Invoiced</span>
+                    <span class="d-md-none">Invoiced</span>
+                </th>
+                <th>
+                    <span class="d-none d-md-table-cell">Paid</span>
+                    <span class="d-md-none">Paid</span>
+                </th>
+                <th>
+                    <span class="d-none d-md-table-cell">Gross</span>
+                    <span class="d-md-none">Gross</span>
+                </th>
+                <th>
+                    <span class="d-none d-md-table-cell">Labour</span>
+                    <span class="d-md-none">Labour</span>
+                </th>
+                <th>
+                    <span class="d-none d-md-table-cell">Material</span>
+                    <span class="d-md-none">Material</span>
+                </th>
+                <th>
+                    <span class="d-none d-md-table-cell">CIS @ <% if (subcontractor.deduction === 0.0) { %>
+                            0%
+                        <% } else if (subcontractor.deduction === 0.2) { %>
+                            20%
+                        <% } else if (subcontractor.deduction === 0.3) { %>
+                            30%
+                        <% } %></span>
+                    <span class="d-md-none">CIS</span>
+                </th>
+                <th>
+                    <span class="d-none d-md-table-cell">Net</span>
+                    <span class="d-md-none">Net</span>
+                </th>
+                <% if (subcontractor.isReverseCharge) { %>
+                <th>
+                    <span class="d-none d-md-table-cell">Reverse Charge</span>
+                    <span class="d-md-none">RC</span>
+                </th>
+                <% } %>
+                <th>
+                    <span class="d-none d-md-table-cell">Submission Date</span>
+                    <span class="d-md-none">Submission</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            <% let totalGross = 0; %>
+            <% let totalLabourCost = 0; %>
+            <% let totalMaterialCost = 0; %>
+            <% let totalCISAmount = 0; %>
+            <% let totalNetAmount = 0; %>
+            <% let totalReverseCharge = 0; %>
+            <% invoices.forEach(invoice => { %>
+            <tr class="d-print-table-row">
+                <td class="d-print-table-cell"><%= invoice.invoiceNumber %></td>
+                <td class="d-print-table-cell"><%= invoice.kashflowNumber %></td>
+                <td class="d-print-table-cell"><%= slimDateTime(invoice.invoiceDate) %></td>
+                <td class="d-print-table-cell"><%= slimDateTime(invoice.remittanceDate) %></td>
+                <td class="d-print-table-cell"><%= formatCurrency(invoice.grossAmount) %></td>
+                <td class="d-print-table-cell"><%= formatCurrency(invoice.labourCost) %></td>
+                <td class="d-print-table-cell"><%= formatCurrency(invoice.materialCost) %></td>
+                <td class="d-print-table-cell"><%= formatCurrency(invoice.cisAmount) %></td>
+                <td class="d-print-table-cell"><%= formatCurrency(invoice.netAmount) %></td>
+                <% if (subcontractor.isReverseCharge) { %>
+                <td class="d-print-table-cell"><%= formatCurrency(invoice.reverseCharge) %></td>
+                <% } %>
+                <td class="d-print-table-cell"><%= slimDateTime(invoice.submissionDate) %></td>
+            </tr>
+            <% totalGross += invoice.grossAmount; %>
+            <% totalLabourCost += invoice.labourCost; %>
+            <% totalMaterialCost += invoice.materialCost; %>
+            <% totalCISAmount += invoice.cisAmount; %>
+            <% totalNetAmount += invoice.netAmount; %>
+            <% totalReverseCharge += invoice.reverseCharge; %>
+            <% }); %>
+
+            <tr class="d-print-table-row">
+                <!-- Display the totals for the invoices in this month -->
+                <td class="d-print-table-cell" colspan="2"><strong>Month <%= monthKey %>:</strong></td>
+                <td class="d-print-table-cell"></td>
+                <td class="d-print-table-cell"></td>
+                <td class="d-print-table-cell"><strong><%= formatCurrency(totalGross) %></strong></td>
+                <td class="d-print-table-cell"><strong><%= formatCurrency(totalLabourCost) %></strong></td>
+                <td class="d-print-table-cell"><strong><%= formatCurrency(totalMaterialCost) %></strong></td>
+                <td class="d-print-table-cell"><strong><%= formatCurrency(totalCISAmount) %></strong></td>
+                <td class="d-print-table-cell"><strong><%= formatCurrency(totalNetAmount) %></strong></td>
+                <td class="d-print-table-cell"></td>
+                <% if (subcontractor.isReverseCharge) { %>
+                <td class="d-print-table-cell"><strong><%= formatCurrency(totalReverseCharge) %></strong></td>
+                <% } %>
+                <td class="d-print-table-cell"></td>
+            </tr>
+            <tr class="d-print-table-row">
+                <!-- Display the totals for the invoices in this month -->
+                <td class="d-print-table-cell" colspan="2"><strong>Submission:</strong></td>
+                <td class="d-print-table-cell"></td>
+                <td class="d-print-table-cell"></td>
+                <td class="d-print-table-cell">
+                    <strong><%= formatCurrency(rounding(totalGross,false)) %></strong>
+                    
+                </td>
+                <td class="d-print-table-cell">
+                    <strong><%= formatCurrency(rounding(totalLabourCost,false)) %></strong>
+                    
+                </td>
+                <td class="d-print-table-cell">
+                    <strong><%= formatCurrency(rounding(totalMaterialCost,false)) %></strong>
+                    
+                </td>
+                <td class="d-print-table-cell">
+                    <strong><%= formatCurrency(totalCISAmount) %></strong>
+                </td>
+                <td class="d-print-table-cell">
+                    <strong><%= formatCurrency(totalNetAmount) %></strong>
+                </td>
+                <td class="d-print-table-cell"></td>
+                <% if (subcontractor.isReverseCharge) { %>
+                <td class="d-print-table-cell"><strong><%= formatCurrency(totalReverseCharge) %></strong></td>
+                <% } %>
+                <td class="d-print-table-cell"></td>
+            </tr>
+        </tbody>
+    </table>
+<% } else { %>
+    <p class="text-muted text-center">
+        No invoices available for <%= monthNames[monthIndex - 1] %> <%= year %>.
+    </p>
 <% } %>
+<% } %>
+<style>
+    @media print {
+        @page {
+            @top-right {
+                content: counter(page);
+            }
+        }
+
+        body {
+            padding-top: 50px; /* Adjust as needed */
+        }
+
+        .page-number {
+            position: fixed;
+            top: 10px; /* Adjust as needed */
+            right: 10px; /* Adjust as needed */
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+    }
+</style>
+<script>
+    window.onload = function() {
+        console.log("Window loaded");
+        updatePageNumbers();
+    };
+
+    window.onafterprint = function() {
+        console.log("After print event");
+        updatePageNumbers();
+    };
+
+    function updatePageNumbers() {
+        console.log("Updating page numbers");
+        // Remove existing page numbers before updating
+        var existingPageNumbers = document.querySelectorAll('.page-number');
+        console.log("Existing page numbers:", existingPageNumbers.length);
+        existingPageNumbers.forEach(function(pageNumber) {
+            pageNumber.remove();
+        });
+
+        // Add the page number at the top-right corner of each page
+        var pageCount = document.querySelectorAll('body').length;
+        console.log("Page count:", pageCount);
+        for (var i = 0; i < pageCount; i++) {
+            var pageNumber = i + 1;
+            var element = document.createElement('div');
+            element.className = 'page-number';
+            element.textContent = pageNumber;
+            document.body.appendChild(element);
+        }
+        console.log("Page numbers updated");
+    }
+</script>
