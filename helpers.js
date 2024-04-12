@@ -74,7 +74,7 @@ function validateInvoiceData(data) {
 }
 
 
-function calculateInvoiceAmounts(labourCost, materialCost, isGross, cisNumber, vatNumber) {
+function calculateInvoiceAmounts(labourCost, materialCost, isGross, cisNumber) {
     labourCost = parseFloat(labourCost);
     materialCost = parseFloat(materialCost);
 
@@ -82,19 +82,16 @@ function calculateInvoiceAmounts(labourCost, materialCost, isGross, cisNumber, v
     let cisRate, reverseCharge;
 
     // Determine the CIS rate based on the subcontractor's status
-    if (isGross == 1) {
+    if (isGross) {
         cisRate = 0.0; // 0% for gross subcontractors
-    } else if (cisNumber == 0.2) {
+    } else if (cisNumber) {
         cisRate = 0.2; // 20% for subcontractors with a CIS number
     } else {
         cisRate = 0.3; // 30% if CIS number is null
     }
 
-
     const cisAmount = labourCost * cisRate;
     const netAmount = grossAmount - cisAmount;
-
-    // Calculate Reverse Charge only if VAT number is present
     reverseCharge = grossAmount * 0.2; // 20% Reverse Charge
 
     return {
