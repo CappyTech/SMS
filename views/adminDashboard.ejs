@@ -73,7 +73,7 @@
                                             <th>CIS</th>
                                             <th>Gross</th>
                                             <th>Net</th>
-                                            <% if (subcontractor.isGross) { %>
+                                            <% if (subcontractor.isReverseCharge) { %>
                                                 <th>Reverse Charge</th>
                                             <% } %>
                                             <th>Submission</th>
@@ -102,7 +102,7 @@
                                             <td><%= formatCurrency(invoice.cisAmount) %></td>
                                             <td><%= formatCurrency(invoice.grossAmount) %></td>
                                             <td><%= formatCurrency(invoice.netAmount) %></td>
-                                            <% if (subcontractor.isGross) { %>
+                                            <% if (subcontractor.isReverseCharge) { %>
                                                 <td><%= formatCurrency(invoice.reverseCharge) %></td>
                                             <% } %>
                                             <td><%= slimDateTime(invoice.submissionDate) %></td>
@@ -138,7 +138,7 @@
                                     <th>CIS</th>
                                     <th>Gross</th>
                                     <th>Net</th>
-                                    <% if (subcontractor.isGross) { %>
+                                    <% if (subcontractor.isReverseCharge) { %>
                                         <th>Reverse Charge</th>
                                     <% } %>
                                     <th>Submission</th>
@@ -162,7 +162,7 @@
                                         <td><%= formatCurrency(invoice.cisAmount) %></td>
                                         <td><%= formatCurrency(invoice.grossAmount) %></td>
                                         <td><%= formatCurrency(invoice.netAmount) %></td>
-                                        <% if (subcontractor.isGross) { %>
+                                        <% if (subcontractor.isReverseCharge) { %>
                                             <td><%= formatCurrency(invoice.reverseCharge) %></td>
                                         <% } %>
                                         <td><%= slimDateTime(invoice.submissionDate) %></td>
