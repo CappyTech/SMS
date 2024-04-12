@@ -107,12 +107,12 @@
             </div>
         </div>
         <div class="form-floating mb-3">
-            <input type="text" name="vatNumber" id="vatNumber" class="form-control" value="<%= subcontractor.vatnumber %>">
+            <input type="text" name="vatNumber" id="vatNumber" class="form-control" value="<%= subcontractor.vatNumber %>">
             <label for="vatNumber" class="form-label">VAT Number</label>
             <div class="form-text">
                 <p>
                     <small>
-                        <a href="https://find-and-update.company-information.service.gov.uk/company/<%= subcontractor.vatnumber %>"><%= subcontractor.vatnumber %></a>
+                        <a href="https://find-and-update.company-information.service.gov.uk/company/<%= subcontractor.vatNumber %>"><%= subcontractor.vatNumber %></a>
                     </small>
                 </p>
             </div>
@@ -137,11 +137,25 @@
                 <option value="false" <%= subcontractor.isGross === false ? 'selected' : '' %>>False</option>
                 <option value="true" <%= subcontractor.isGross === true ? 'selected' : '' %>>True</option>
             </select>
-            <label for="isGross" class="form-label">isGross</label>
+            <label for="isGross" class="form-label">Gross</label>
             <div class="form-text">
                 <p>
                     <small>
                         <%= subcontractor.isGross %>
+                    </small>
+                </p>
+            </div>
+        </div>
+        <div class="form-floating mb-3">
+            <select id="isReverseCharge" name="isReverseCharge" class="form-select">
+                <option value="false" <%= subcontractor.isReverseCharge === false ? 'selected' : '' %>>False</option>
+                <option value="true" <%= subcontractor.isReverseCharge === true ? 'selected' : '' %>>True</option>
+            </select>
+            <label for="isReverseCharge" class="form-label">Reverse Charge</label>
+            <div class="form-text">
+                <p>
+                    <small>
+                        <%= subcontractor.isReverseCharge %>
                     </small>
                 </p>
             </div>
