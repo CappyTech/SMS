@@ -74,7 +74,7 @@ function validateInvoiceData(data) {
 }
 
 
-function calculateInvoiceAmounts(labourCost, materialCost, isGross, cisNumber) {
+function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber) {
     labourCost = parseFloat(labourCost);
     materialCost = parseFloat(materialCost);
 
@@ -82,13 +82,15 @@ function calculateInvoiceAmounts(labourCost, materialCost, isGross, cisNumber) {
     let cisRate, reverseCharge;
 
     // Determine the CIS rate based on the subcontractor's status
-    if (isGross) {
-        cisRate = 0.0; // 0% for gross subcontractors
-    } else if (cisNumber) {
-        cisRate = 0.2; // 20% for subcontractors with a CIS number
+    if (deduction == 0) {
+        cisRate = 0.0; // 0%
+    };
+    
+    if (cisNumber && deduction == 0.2) {
+        cisRate = 0.2; // 20%
     } else {
-        cisRate = 0.3; // 30% if CIS number is null
-    }
+        cisRate = 0.3; // 30%
+    };
 
     const cisAmount = labourCost * cisRate;
     const netAmount = grossAmount - cisAmount;
