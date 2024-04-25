@@ -145,16 +145,16 @@ const updateInvoice = async (req, res) => {
             throw new Error(`Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.id}`);
         }
 
-        const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatNumber);
+        const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
 
         await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.id } });
 
         req.flash('success', 'Invoice updated successfully');
-        return res.redirect('/dashboard');
+        return res.redirect(`/invoice/read/${req.params.id}`);
     } catch (error) {
         console.error('Error updating invoice:', error.message);
         req.flash('error', `Error updating invoice with ID: ${req.params.id}. Details: ${error.message}`);
-        return res.redirect(req.get('referer') || '/'); // Ensure to return here
+        return res.redirect(`/invoice/read/${req.params.id}`);
     }
 };
 
@@ -164,7 +164,7 @@ const deleteInvoice = async (req, res) => {
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied. Only admins can delete invoices.');
         }
-
+        // TODO: Add SubcontractorId to the invoice model and refer back to the /invoices/read/:id route
         const invoice = await Invoice.findByPk(req.params.id);
 
         if (!invoice) {
@@ -179,7 +179,7 @@ const deleteInvoice = async (req, res) => {
         res.redirect(referer);
     } catch (error) {
         req.flash('error', 'Error: ' + error.message);
-        const referer = req.header('Referer') || '/';
+        const referer = req.get('referer') || '/';
         res.redirect(referer);
     }
 };
