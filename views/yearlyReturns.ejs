@@ -1,3 +1,4 @@
+<div class="page-number">Heron Constructive Solutions LTD | <%= year %> Yearly Returns</div>
 <div class="mt-4">
     <h1 class="mb-4 display-3 text-center"><%= year %> Yearly Returns</h1>
     <div class="row justify-content-evenly">
@@ -51,7 +52,7 @@
 <% const invoices = invoicesByMonth[monthKey] || []; %>
 <% const hasInvoices = invoices.length > 0; %>
 <% if (hasInvoices) { %>
-    <% if (monthKey == 3 || monthKey == 5 || monthKey == 8 || monthKey == 11) { %>
+    <% if (false) { %>
         <table class="table table-hover table-sm caption-top page-break d-print-table">
     <% } else { %>
     <table class="table table-hover table-sm caption-top d-print-table">
@@ -193,7 +194,7 @@
     </table>
 <% } else { %>
     <p class="text-muted text-center">
-        No invoices available for <%= monthNames[monthIndex - 1] %> <%= year %>.
+        No invoices for Month <%= monthKey %> (<%= monthNames[monthIndex - 1] %> <%= year %>).
     </p>
 <% } %>
 <% } %>
@@ -206,12 +207,12 @@
         }
 
         body {
-            padding-top: 50px; /* Adjust as needed */
+            padding: 50px; /* Adjust as needed */
         }
 
         .page-number {
             position: fixed;
-            top: 10px; /* Adjust as needed */
+            bottom: 10px; /* Adjust as needed */
             right: 10px; /* Adjust as needed */
         }
 
@@ -220,36 +221,3 @@
         }
     }
 </style>
-<script>
-    window.onload = function() {
-        console.log("Window loaded");
-        updatePageNumbers();
-    };
-
-    window.onafterprint = function() {
-        console.log("After print event");
-        updatePageNumbers();
-    };
-
-    function updatePageNumbers() {
-        console.log("Updating page numbers");
-        // Remove existing page numbers before updating
-        var existingPageNumbers = document.querySelectorAll('.page-number');
-        console.log("Existing page numbers:", existingPageNumbers.length);
-        existingPageNumbers.forEach(function(pageNumber) {
-            pageNumber.remove();
-        });
-
-        // Add the page number at the top-right corner of each page
-        var pageCount = document.querySelectorAll('body').length;
-        console.log("Page count:", pageCount);
-        for (var i = 0; i < pageCount; i++) {
-            var pageNumber = i + 1;
-            var element = document.createElement('div');
-            element.className = 'page-number';
-            element.textContent = pageNumber;
-            document.body.appendChild(element);
-        }
-        console.log("Page numbers updated");
-    }
-</script>
