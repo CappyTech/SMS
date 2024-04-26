@@ -32,7 +32,7 @@ const createSubcontractor = async (req, res) => {
             isGross
         } = req.body;
 
-        // Check if the subcontractor already exists by username or email
+        // Check if the subcontractor already exists
         const existingSubcontractor = await Subcontractor.findOne({
             where: {
                 [Op.or]: [{
@@ -46,14 +46,14 @@ const createSubcontractor = async (req, res) => {
             return res.redirect('/subcontractor/create'); // Redirect to the appropriate page
         }
 
-        const requiredFields = [company, line1, city, county, postalCode, cisNumber, utrNumber, deduction];
+        const requiredFields = [company, utrNumber];
         if (requiredFields.some(field => !field)) {
             req.flash('error', 'Incomplete required form data.');
             return res.redirect('/subcontractor/create');
         }
 
         // Null checks for specific fields
-        const nullCheckFields = ['name', 'line2', 'cisNumber', 'utrNumber', 'vatNumber'];
+        const nullCheckFields = ['company', 'utrNumber'];
         const sanitizedData = Object.fromEntries(
             Object.entries(req.body).map(([key, value]) => [
                 key,
