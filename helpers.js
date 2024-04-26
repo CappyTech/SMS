@@ -82,11 +82,11 @@ function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber)
     let cisRate, reverseCharge;
 
     // Determine the CIS rate based on the subcontractor's status
-    if (deduction == 0) {
+    if (deduction === 0) {
         cisRate = 0.0; // 0%
     };
     
-    if (cisNumber && deduction == 0.2) {
+    if (cisNumber && deduction === 0.2) {
         cisRate = 0.2; // 20%
     } else {
         cisRate = 0.3; // 30%
@@ -97,6 +97,7 @@ function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber)
     reverseCharge = grossAmount * 0.2; // 20% Reverse Charge
 
     return {
+        cisRate,
         grossAmount: grossAmount.toFixed(2),
         cisAmount: cisAmount.toFixed(2),
         netAmount: netAmount.toFixed(2),
