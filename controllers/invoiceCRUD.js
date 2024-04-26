@@ -11,7 +11,7 @@ const createInvoice = async (req, res) => {
     try {
         const validatedData = validateInvoiceData(req.body);
         const subcontractor = await Subcontractor.findByPk(req.params.selected);
-        const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.isGross, subcontractor.cisNumber, subcontractor.vatNumber);
+        const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
 
         // If remittanceDate or submissionDate are not provided, set them to null
         validatedData.remittanceDate = validatedData.remittanceDate || null;
