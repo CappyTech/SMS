@@ -30,7 +30,7 @@ app.use(xss());
 const rateLimit = require('express-rate-limit');
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 1500,
 });
 app.use(limiter);
 
@@ -83,7 +83,6 @@ const flash = require('express-flash');
 app.use(flash());
 
 const helmet = require('helmet');
-
 app.use(helmet());
 app.use(
     helmet.contentSecurityPolicy({
