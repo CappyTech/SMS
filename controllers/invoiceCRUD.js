@@ -66,7 +66,8 @@ const readInvoice = async (req, res) => {
         const invoice = await Invoice.findByPk(req.params.id, {
             include: [
                 { model: Subcontractor }
-            ]
+            ],
+            order: [['invoiceNumber', 'ASC']]
         });
 
         if (!invoice) {
@@ -104,7 +105,8 @@ const readInvoices = async (req, res) => {
                     model: Subcontractor,
                     where: { id: req.params.id }
                 }
-            ]
+            ],
+            order: [['invoiceNumber', 'ASC']]
         });
 
         if (!invoices) {
