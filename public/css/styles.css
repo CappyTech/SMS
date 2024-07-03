@@ -259,3 +259,7 @@ a:hover {
 	background-color: #28a745;
 	border-color: #28a745;
 }
+.scrollable-list {
+	max-height: 70vh; /* Set a fixed height */
+	overflow-y: auto; /* Enable vertical scrolling */
+}
