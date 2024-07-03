@@ -107,7 +107,8 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
                 model: Invoice,
                 as: 'invoices',
                 where: {
-                    month: month
+                    month: month,
+                    year: year
                 }
             }
         });
@@ -198,8 +199,65 @@ const renderMonthlyReturnsForAll = async (req, res) => {
     }
 };
 
+const renderMonthlyReturnsYear = async (req, res) => {
+    try {
+        // Check if the user is an admin
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
+        const {
+            year
+        } = req.params;
+
+        if (!year) {
+            console.log("Year is required.");
+            return res.status(400).send("Year is required.");
+        }
+
+        const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+
+        const subcontractors = await Subcontractor.findAll({
+            where: {
+                deletedAt: null
+            },
+            include: {
+                model: Invoice,
+                as: 'invoices',
+                where: {
+                    year: year
+                },
+                order: [['invoiceNumber', 'ASC']]
+            },
+            order: [['name', 'ASC']]
+        });
+
+        console.log("Rendering monthly returns:", {
+            year: year
+        });
+
+        res.render('renderMonthlyReturnsYear', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            slimDateTime: slimDateTime,
+            formatCurrency: formatCurrency,
+            year: year,
+            subcontractors,
+            invoices: subcontractors.invoices,
+            monthNames: monthNames
+        });
+    } catch (error) {
+        console.error("Error rendering monthly returns:", error);
+        req.flash('error', 'Error: Unable to render monthly returns');
+        const referrer = req.get('referer') || '/';
+        res.redirect(referrer);
+    }
+};
+
 router.get('/monthly/returns/form', renderMonthlyReturnsForm);
-router.get('/monthly/returns/:year/:month', renderMonthlyReturnsForAll);
 router.get('/monthly/returns/:month/:year/:id', renderMonthlyReturnsForOneSubcontactor);
+router.get('/monthly/returns/:year/:month', renderMonthlyReturnsForAll);
+router.get('/monthly/returns/:year', renderMonthlyReturnsYear);
 
 module.exports = router;
