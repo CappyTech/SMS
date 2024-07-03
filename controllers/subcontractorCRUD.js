@@ -204,6 +204,6 @@ const deleteSubcontractor = async (req, res) => {
 router.post('/subcontractor/create/', createSubcontractor);
 router.get('/subcontractor/read/:id', readSubcontractor);
 router.post('/subcontractor/update/:id', updateSubcontractor);
-router.get('/subcontractor/delete/:id', deleteSubcontractor);
+router.post('/subcontractor/delete/:id', deleteSubcontractor);
 
 module.exports = router;
