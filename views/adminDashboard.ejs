@@ -4,179 +4,67 @@
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="py-5 text-center">
             <h1 class="display-5 fw-bold">Dashboard</h1>
-            <span class="badge rounded-pill text-bg-secondary">
+            <span class="badge rounded-pill text-bg-primary">
                 Users
                 <span class="badge rounded-pill text-bg-dark">
                     <%= userCount %>
                 </span>
             </span>
-            <span class="badge rounded-pill text-bg-secondary">
+            <span class="badge rounded-pill text-bg-warning">
                 Subcontractors
                 <span class="badge rounded-pill text-bg-dark">
                     <%= subcontractorCount %>
                 </span>
             </span>
-            <span class="badge rounded-pill text-bg-secondary">
+            <span class="badge rounded-pill text-bg-info">
                 Invoices
                 <span class="badge rounded-pill text-bg-dark">
                     <%= invoiceCount %>
                 </span>
             </span>
-            <table class="table table-borderless table-sm mt-2 mb-2">
-                <thead>
-                <tr>
-                    <th>Username <i class="bi bi-person-fill"></i></th>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <h3>Users</h3>
+                <ul class="list-group">
                     <% users.forEach(user => { %>
-                        <td><a href="/user/read/<%= user.id %>"><%= user.username %><i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
+                        <a href="/user/read/<%= user.id %>" class="list-group-item list-group-item-action">
+                            <%= user.username %>
+                            <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
+                        </a>
                     <% }); %>
-                </tr>
-                <tr>
-                    <th>Email <i class="bi bi-envelope-fill"></i></th>
-                    <% users.forEach(user => { %>
-                        <td><%= user.email %></td>
-                    <% }); %>
-                </tr>
-                <tr>
-                    <th>Role <i class="bi bi-person-fill-lock"></i></th>
-                    <% users.forEach(user => { %>
-                        <td><%= user.role %></td>
-                    <% }); %>
-                </tr>
-                </thead>
-            </table>
-            <hr>
-            <div class="card border-info">
-                <div class="card-header">
-                    <ul class="nav nav-tabs card-header-tabs">
-                        <% subcontractors.forEach((subcontractor,index) => { %>
-                            <li class="nav-item">
-                                <a class="nav-link <%= index === 0 ? 'active' : '' %>" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#subcontractorContent-<%= subcontractor.id %>">
-                                    <%= subcontractor.company %>
-                                </a>
-                            </li>
-                        <% }); %>
-                    </ul>
-                </div>
-                <div class="card-body tab-content">
-                    <% subcontractors.forEach((subcontractor,index) => { %>
-                        <div id="subcontractorContent-<%= subcontractor.id %>" class="tab-pane <%= index === 0 ? 'active' : '' %>">
-                            <div class=" table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Invoice</th>
-                                            <th>Kashflow</th>
-                                            <th>Invoiced</th>
-                                            <th>Paid</th>
-                                            <th>Labour</th>
-                                            <th>Materials</th>
-                                            <th>CIS</th>
-                                            <th>Gross</th>
-                                            <th>Net</th>
-                                            <% if (subcontractor.isReverseCharge) { %>
-                                                <th>Reverse Charge</th>
-                                            <% } %>
-                                            <th>Submission</th>
-                                            <th>Tax Month</th>
-                                            <th>Tax Year</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    <% const subcontractorInvoices = invoices.filter(invoice => invoice.SubcontractorId === subcontractor.id); %>
-                                    <% subcontractorInvoices.forEach(invoice => { %>
-                                        <tr>
-                                            <td>
-                                                <a href="/invoice/read/<%= invoice.id %>" >
-                                                    <%= invoice.invoiceNumber %>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>" >
-                                                    <%= invoice.kashflowNumber %>
-                                                </a>
-                                            </td>
-                                            <td><%= slimDateTime(invoice.invoiceDate) %></td>
-                                            <td><%= slimDateTime(invoice.remittanceDate) %></td>
-                                            <td><%= formatCurrency(invoice.labourCost) %></td>
-                                            <td><%= formatCurrency(invoice.materialCost) %></td>
-                                            <td><%= formatCurrency(invoice.cisAmount) %></td>
-                                            <td><%= formatCurrency(invoice.grossAmount) %></td>
-                                            <td><%= formatCurrency(invoice.netAmount) %></td>
-                                            <% if (subcontractor.isReverseCharge) { %>
-                                                <td><%= formatCurrency(invoice.reverseCharge) %></td>
-                                            <% } %>
-                                            <td><%= slimDateTime(invoice.submissionDate) %></td>
-                                            <td><%= invoice.month %></td>
-                                            <td><%= invoice.year %></td>
-                                        </tr>
-                                    <% }); %>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    <% }); %>
-                </div>
+                </ul>
             </div>
-            <% subcontractors.forEach(subcontractor => { %>
-                <div class="card mt-2">
-                    <div class="card-body">
-                        <h3 class="card-title text-center">
-                            <a href="/subcontractor/read/<%= subcontractor.id %>"><%= subcontractor.company %><i
-                                        class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></i>
-                        </h3>
-                        <h4 class="card-subtitle mb-2 text-body-secondary"></h4>
-                        <div class=" table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                <tr>
-                                    <th>Invoice</th>
-                                    <th>Kashflow</th>
-                                    <th>Invoiced</th>
-                                    <th>Paid</th>
-                                    <th>Labour</th>
-                                    <th>Materials</th>
-                                    <th>CIS</th>
-                                    <th>Gross</th>
-                                    <th>Net</th>
-                                    <% if (subcontractor.isReverseCharge) { %>
-                                        <th>Reverse Charge</th>
-                                    <% } %>
-                                    <th>Submission</th>
-                                    <th>Tax Month</th>
-                                    <th>Tax Year</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <!-- Invoices for the current subcontractor -->
-                                <% const subcontractorInvoices = invoices.filter(invoice => invoice.SubcontractorId === subcontractor.id); %>
-                                <% subcontractorInvoices.forEach(invoice => { %>
-                                    <tr>
-                                        <td><a href="/invoice/read/<%= invoice.id %>" ><%= invoice.invoiceNumber %><i
-                                                        class="bi bi-pencil-square" style="font-size: 0.65rem;"></i></a></td>
-                                        <td><a href="https://app.kashflow.com/#purchases/<%= invoice.kashflowNumber %>" ><%= invoice.kashflowNumber %><i
-                                                        class="bi bi-box-arrow-up-right" style="font-size: 0.65rem;"></i></a></td>
-                                        <td><%= slimDateTime(invoice.invoiceDate) %></td>
-                                        <td><%= slimDateTime(invoice.remittanceDate) %></td>
-                                        <td><%= formatCurrency(invoice.labourCost) %></td>
-                                        <td><%= formatCurrency(invoice.materialCost) %></td>
-                                        <td><%= formatCurrency(invoice.cisAmount) %></td>
-                                        <td><%= formatCurrency(invoice.grossAmount) %></td>
-                                        <td><%= formatCurrency(invoice.netAmount) %></td>
-                                        <% if (subcontractor.isReverseCharge) { %>
-                                            <td><%= formatCurrency(invoice.reverseCharge) %></td>
-                                        <% } %>
-                                        <td><%= slimDateTime(invoice.submissionDate) %></td>
-                                        <td><%= invoice.month %></td>
-                                        <td><%= invoice.year %></td>
-                                    </tr>
-                                <% }); %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-6">
+                <h3>Subcontractors</h3>
+                <ul class="list-group">
+                    <% subcontractors.forEach(subcontractor => { %>
+                    <a href="/subcontractor/read/<%= subcontractor.id %>" class="list-group-item list-group-item-action">
+                        <%= subcontractor.company %>
+                        <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
+                    </a>
+                    <% }); %>
+                </ul>
+            </div>
+        </div>
+        <h3>Users</h3>
+        <ul class="list-group">
+            <% users.forEach(user => { %>
+                <a href="/user/read/<%= user.id %>" class="list-group-item list-group-item-action">
+                    <%= user.username %>
+                    <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
+                </a>
             <% }); %>
-
+        </ul>
+        <h3>Subcontractors</h3>
+        <ul class="list-group">
+            <% subcontractors.forEach(subcontractor => { %>
+            <a href="/subcontractor/read/<%= subcontractor.id %>" class="list-group-item list-group-item-action">
+                <%= subcontractor.company %>
+                <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
+            </a>
+            <% }); %>
+        </ul>
         </div>
     </div>
 </div>
