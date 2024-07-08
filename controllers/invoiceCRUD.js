@@ -106,7 +106,7 @@ const readInvoices = async (req, res) => {
                     where: { id: req.params.id }
                 }
             ],
-            order: [['invoiceNumber', 'ASC']]
+            order: [['invoiceNumber', 'DESC']]
         });
 
         if (!invoices) {
