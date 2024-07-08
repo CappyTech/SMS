@@ -29,10 +29,6 @@ const Submission = sequelize.define('Submission', {
         type: DataTypes.FLOAT,
         allowNull: false,
     },
-    comments: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-    },
     month: {
         type: DataTypes.INTEGER,
         allowNull: false,
