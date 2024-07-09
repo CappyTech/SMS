@@ -2,6 +2,31 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
 <div class="container py-4">
+    <div class="card">
+        <div class="card-header text-center text-bg-secondary">
+            <h1 class="display-5 fw-bold">Select Subcontractor</h1>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <% for (const subcontractor of subcontractors) { %>
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <h5 class="card-title"><%= subcontractor.name %></h5>
+                            <p class="card-text"><%= subcontractor.company %></p>
+                            <button class="btn btn-outline-primary selectSubcontractorButton" data-id="<%= subcontractor.id %>">Select</button>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+            <div class="text-center mt-4">
+                <button id="addSubcontractorButton" type="button" class="btn btn-hcs-green">Add New Subcontractor</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5 text-center">
             <h1 class="display-5 fw-bold">Select Subcontractor</h1>
@@ -34,19 +59,19 @@
         </div>
     </div>
 </div>
-            <script type="text/javascript">
-                const subcontractorIdSelect = document.getElementById('subcontractorId');
+<script type="text/javascript">
+    const subcontractorIdSelect = document.getElementById('subcontractorId');
 
-                subcontractorIdSelect.addEventListener('change', function () {
-                    const selectedSubcontractorId = subcontractorIdSelect.value;
-                    if (selectedSubcontractorId) {
-                        window.location.href = '/invoice/create/' + selectedSubcontractorId;
-                    }
-                });
+    subcontractorIdSelect.addEventListener('change', function () {
+        const selectedSubcontractorId = subcontractorIdSelect.value;
+        if (selectedSubcontractorId) {
+            window.location.href = '/invoice/create/' + selectedSubcontractorId;
+        }
+    });
 
-                const addSubcontractorButton = document.getElementById('addSubcontractorButton');
+    const addSubcontractorButton = document.getElementById('addSubcontractorButton');
 
-                addSubcontractorButton.addEventListener('click', function () {
-                    window.location.href = '/subcontractor/create/';
-                });
-            </script>
+    addSubcontractorButton.addEventListener('click', function () {
+        window.location.href = '/subcontractor/create/';
+    });
+</script>
