@@ -6,7 +6,7 @@
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Invoice <%= invoice.invoiceNumber %></h1>
             <div class="card">
-                <div class="card-header d-flex justify-content-between">
+                <div class="card-header d-flex justify-content-between text-bg-secondary">
                     <span><%= invoice.Subcontractor.company %></span>
                     <a class="hcs-green-text" href="/subcontractor/read/<%= invoice.Subcontractor.id %>">View Subcontractor</a>
                 </div>
