@@ -1,4 +1,4 @@
-// helpers.js
+const moment = require('moment');
 
 function slimDateTime(dateString, includeTime = false) {
     const date = new Date(dateString);
@@ -22,12 +22,9 @@ function slimDateTime(dateString, includeTime = false) {
 }
 
 function formatCurrency(amount) {
-    // Check if the amount is a number
     if (typeof amount !== 'number') {
         throw new Error('Invalid input. Amount must be a number.');
     }
-
-    // Format the amount with two decimal places and add £ symbol
     return '£' + amount.toFixed(2);
 }
 
@@ -36,13 +33,10 @@ const isAdmin = (req, res, next) => {
       return res.status(403).send('Access denied.');
     }
     next();
-  };
-
+};
 
 function validateInvoiceData(data) {
     const errors = [];
-
-    // Define required fields and their validation rules
     const validations = {
         invoiceNumber: value => value && value.trim() !== '',
         kashflowNumber: value => value && value.trim() !== '',
@@ -51,17 +45,15 @@ function validateInvoiceData(data) {
         labourCost: value => !isNaN(value) && Number(value) >= 0,
         materialCost: value => !isNaN(value) && Number(value) >= 0,
         month: value => !isNaN(value) && Number(value) >= 1 && Number(value) <= 12,
-        year: value => !isNaN(value) && Number(value) >= 2000 // Assuming year 2000 as the earliest acceptable year
+        year: value => !isNaN(value) && Number(value) >= 2000
     };
 
-    // Perform the validations
     Object.keys(validations).forEach(field => {
         if (!validations[field](data[field])) {
             errors.push(`Invalid or missing value for ${field}`);
         }
     });
 
-    // Special handling for submissionDate
     if (data.submissionDate === '0000-00-00 00:00:00' || !data.submissionDate) {
         data.submissionDate = null;
     }
@@ -70,9 +62,8 @@ function validateInvoiceData(data) {
         throw new Error(errors.join(', '));
     }
 
-    return data; // Return the validated data
+    return data;
 }
-
 
 function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber) {
     labourCost = parseFloat(labourCost);
@@ -81,20 +72,17 @@ function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber)
     const grossAmount = labourCost + materialCost;
     let cisRate, reverseCharge;
 
-    // Determine the CIS rate based on the subcontractor's status
     if (deduction === 0) {
-        cisRate = 0.0; // 0%
-    };
-    
-    if (cisNumber && deduction === 0.2) {
-        cisRate = 0.2; // 20%
+        cisRate = 0.0;
+    } else if (cisNumber && deduction === 0.2) {
+        cisRate = 0.2;
     } else {
-        cisRate = 0.3; // 30%
-    };
+        cisRate = 0.3;
+    }
 
     const cisAmount = labourCost * cisRate;
     const netAmount = grossAmount - cisAmount;
-    reverseCharge = grossAmount * 0.2; // 20% Reverse Charge
+    reverseCharge = grossAmount * 0.2;
 
     return {
         cisRate,
@@ -106,11 +94,55 @@ function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber)
 }
 
 function rounding(number, up) {
-    if (up) {
-        return Math.ceil(number);
-    } else {
-        return Math.floor(number);
+    return up ? Math.ceil(number) : Math.floor(number);
+}
+
+function getCurrentTaxYear() {
+    const today = moment();
+    const startOfTaxYear = moment({ month: 3, day: 6 }); // April 6th
+    if (today.isBefore(startOfTaxYear)) {
+        return startOfTaxYear.subtract(1, 'years').year();
     }
+    return startOfTaxYear.year();
+}
+
+function getTaxYearStartEnd() {
+    const currentTaxYearStart = moment({ month: 3, day: 6 }); // 6th April
+    const currentTaxYearEnd = moment(currentTaxYearStart).add(1, 'years').subtract(1, 'days'); // 5th April of the next year
+    if (moment().isBefore(currentTaxYearStart)) {
+        currentTaxYearStart.subtract(1, 'years');
+        currentTaxYearEnd.subtract(1, 'years');
+    }
+    return {
+        start: currentTaxYearStart.format('Do MMMM YYYY'),
+        end: currentTaxYearEnd.format('Do MMMM YYYY')
+    };
+}
+
+function getCurrentMonthlyReturn() {
+    const today = moment();
+    console.log(today)
+    const startOfCurrentPeriod = moment({ month: today.month(), day: 6 }); // 6th of the current month
+
+    if (today.isBefore(startOfCurrentPeriod)) {
+        startOfCurrentPeriod.subtract(1, 'months');
+    }
+
+    const endOfCurrentPeriod = moment(startOfCurrentPeriod).subtract(1, 'days');
+    const submissionDeadline = moment(endOfCurrentPeriod).add(6, 'days'); // 11th of the current month
+    const hmrcUpdateDate = moment(endOfCurrentPeriod).add(12, 'days'); // 17th of the current month
+    const submissionDeadlineInDays = submissionDeadline.diff(today, 'days');
+    const hmrcUpdateDateInDays = hmrcUpdateDate.diff(today, 'days');
+
+    return {
+        today,
+        periodStart: startOfCurrentPeriod.format('Do MMMM YYYY'),
+        periodEnd: endOfCurrentPeriod.format('Do MMMM YYYY'),
+        submissionDeadline: submissionDeadline.format('Do MMMM YYYY'),
+        hmrcUpdateDate: hmrcUpdateDate.format('Do MMMM YYYY'),
+        submissionDeadlineInDays,
+        hmrcUpdateDateInDays
+    };
 }
 
 module.exports = {
@@ -119,5 +151,8 @@ module.exports = {
     isAdmin,
     validateInvoiceData,
     calculateInvoiceAmounts,
-    rounding
+    rounding,
+    getCurrentTaxYear,
+    getTaxYearStartEnd,
+    getCurrentMonthlyReturn
 };
