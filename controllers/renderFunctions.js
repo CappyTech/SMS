@@ -7,6 +7,7 @@ const packageJson = require('../package.json');
 const User = require('../models/user');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
+const moment = require('moment');
 const helpers = require('../helpers');
 const {
     Op
@@ -22,36 +23,37 @@ const renderIndex = (req, res) => {
     });
 };
 
-const renderDashboard = async (req, res) => {
+const renderadminDashboard = async (req, res) => {
     try {
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
         console.log(req.session);
-        const userCount = await User.count();
-        const subcontractorCount = await Subcontractor.count();
-        const invoiceCount = await Invoice.count();
-
-        const users = await User.findAll();
         const subcontractors = await Subcontractor.findAll();
-        const invoices = await Invoice.findAll({ order: [['invoiceNumber', 'ASC']] });
+        const invoices = await Invoice.findAll({ order: [['updatedAt', 'ASC']] });
 
-        //const user = await User.findByPk();
+        const currentTaxYear = helpers.getCurrentTaxYear();;
+        const taxYear = helpers.getTaxYearStartEnd();
+        const currentMonthlyReturn = helpers.getCurrentMonthlyReturn();
+
+        // Filter subcontractors and invoices for the current tax year
+        const filteredSubcontractors = subcontractors.filter(sub => moment(sub.date).year() === currentTaxYear);
+        const filteredInvoices = invoices.filter(invoice => moment(invoice.remittanceDate).isBetween(currentMonthlyReturn.periodStart, currentMonthlyReturn.periodEnd, null, '[]'));
 
         res.render('adminDashboard', {
-            userCount,
-            subcontractorCount,
-            invoiceCount,
-            users,
-            subcontractors,
-            invoices,
+            subcontractorCount: filteredSubcontractors.length,
+            invoiceCount: filteredInvoices.length,
+            subcontractors: filteredSubcontractors,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
+            currentTaxYear,
+            taxYear,
+            currentMonthlyReturn
         });
     } catch (error) {
         req.flash('error', 'Error: ' + error.message);
@@ -289,7 +291,7 @@ const renderSubmissionUpdateForm = async (req, res) => {
 };
 
 router.get('/', renderIndex);
-router.get('/dashboard', renderDashboard);
+router.get('/dashboard', renderadminDashboard);
 router.get('/user/create', renderUserCreateForm);
 router.get('/subcontractor/create', renderSubcontractorCreateForm);
 router.get('/invoice/create/:id', renderInvoiceCreateForm)
