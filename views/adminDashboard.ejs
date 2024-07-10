@@ -24,7 +24,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4>Current Tax Year</h4>
-                    <p class="display-4"><%= currentTaxYear %> - <%= currentTaxYear + 1 %></p>
+                    <p><%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></p>
                     <p><%= taxYear.start %> - <%= taxYear.end %></p>
                     <h4>Current Monthly Return</h4>
                     <p><%= currentMonthlyReturn.periodStart %> - <%= currentMonthlyReturn.periodEnd %></p>
@@ -53,6 +53,19 @@
                 <% subcontractors.forEach(subcontractor => { %>
                 <a href="/subcontractor/read/<%= subcontractor.id %>" class="list-group-item list-group-item-action">
                     <%= subcontractor.company %>
+                    <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
+                </a>
+                <% }); %>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <h3>Invoices</h3>
+            <ul class="list-group">
+                <% invoices.forEach(invoice => { %>
+                <a href="/invoice/read/<%= invoice.id %>" class="list-group-item list-group-item-action">
+                    <%= invoice.kashflowNumber %> | <%= invoice.invoiceNumber %>
                     <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
                 </a>
                 <% }); %>
