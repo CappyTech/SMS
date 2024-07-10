@@ -106,38 +106,34 @@ function getCurrentTaxYear() {
     return startOfTaxYear.year();
 }
 
-function getTaxYearStartEnd() {
-    const currentTaxYearStart = moment({ month: 3, day: 6 }); // 6th April
-    const currentTaxYearEnd = moment(currentTaxYearStart).add(1, 'years').subtract(1, 'days'); // 5th April of the next year
-    if (moment().isBefore(currentTaxYearStart)) {
-        currentTaxYearStart.subtract(1, 'years');
-        currentTaxYearEnd.subtract(1, 'years');
-    }
+function getTaxYearStartEnd(year) {
+    const startOfTaxYear = moment({ year, month: 3, day: 6 }); // 6th April of the specified year
+    const endOfTaxYear = moment(startOfTaxYear).add(1, 'years').subtract(1, 'days'); // 5th April of the next year
     return {
-        start: currentTaxYearStart.format('Do MMMM YYYY'),
-        end: currentTaxYearEnd.format('Do MMMM YYYY')
+        start: startOfTaxYear.format('Do MMMM YYYY'),
+        end: endOfTaxYear.format('Do MMMM YYYY')
     };
 }
 
-function getCurrentMonthlyReturn() {
+function getCurrentMonthlyReturn(year, month) {
     const today = moment();
-    console.log(today)
-    const startOfCurrentPeriod = moment({ month: today.month(), day: 6 }); // 6th of the current month
+    let startOfCurrentPeriod = moment({ year, month, day: 6 }); // 6th of the specified month
 
     if (today.isBefore(startOfCurrentPeriod)) {
         startOfCurrentPeriod.subtract(1, 'months');
     }
 
-    const endOfCurrentPeriod = moment(startOfCurrentPeriod).subtract(1, 'days');
+    const endOfCurrentPeriod = moment(startOfCurrentPeriod).add(1, 'months').subtract(1, 'days');
     const submissionDeadline = moment(endOfCurrentPeriod).add(6, 'days'); // 11th of the current month
-    const hmrcUpdateDate = moment(endOfCurrentPeriod).add(12, 'days'); // 17th of the current month
+    const hmrcUpdateDate = moment(endOfCurrentPeriod).add(11, 'days'); // 17th of the current month
     const submissionDeadlineInDays = submissionDeadline.diff(today, 'days');
     const hmrcUpdateDateInDays = hmrcUpdateDate.diff(today, 'days');
 
     return {
-        today,
-        periodStart: startOfCurrentPeriod.format('Do MMMM YYYY'),
-        periodEnd: endOfCurrentPeriod.format('Do MMMM YYYY'),
+        periodStart: startOfCurrentPeriod.format('YYYY-MM-DD'),
+        periodEnd: endOfCurrentPeriod.format('YYYY-MM-DD'),
+        periodStartDisplay: startOfCurrentPeriod.format('Do MMMM YYYY'),
+        periodEndDisplay: endOfCurrentPeriod.format('Do MMMM YYYY'),
         submissionDeadline: submissionDeadline.format('Do MMMM YYYY'),
         hmrcUpdateDate: hmrcUpdateDate.format('Do MMMM YYYY'),
         submissionDeadlineInDays,
