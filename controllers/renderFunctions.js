@@ -28,30 +28,44 @@ const renderadminDashboard = async (req, res) => {
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
-
         console.log(req.session);
+
+        // Fetch the specified tax year from the URL parameter or use the current tax year
+        const specifiedYear = req.params.year ? parseInt(req.params.year) : helpers.getCurrentTaxYear();
+
+        // Fetch all subcontractors and invoices
         const subcontractors = await Subcontractor.findAll();
         const invoices = await Invoice.findAll({ order: [['updatedAt', 'ASC']] });
 
-        const currentTaxYear = helpers.getCurrentTaxYear();;
-        const taxYear = helpers.getTaxYearStartEnd();
+        // Determine the start and end of the specified tax year
+        const taxYear = helpers.getTaxYearStartEnd(specifiedYear);
         const currentMonthlyReturn = helpers.getCurrentMonthlyReturn();
 
-        // Filter subcontractors and invoices for the current tax year
-        const filteredSubcontractors = subcontractors.filter(sub => moment(sub.date).year() === currentTaxYear);
-        const filteredInvoices = invoices.filter(invoice => moment(invoice.remittanceDate).isBetween(currentMonthlyReturn.periodStart, currentMonthlyReturn.periodEnd, null, '[]'));
+        // Filter invoices for the current monthly return period
+        const filteredInvoices = invoices.filter(invoice =>
+            moment(invoice.remittanceDate).isBetween(currentMonthlyReturn.periodStart, currentMonthlyReturn.periodEnd, null, '[]')
+        );
+
+        // Extract the SubcontractorId from the filtered invoices
+        const subcontractorIds = filteredInvoices.map(invoice => invoice.SubcontractorId);
+
+        // Filter subcontractors based on the SubcontractorId in the filtered invoices
+        const filteredSubcontractors = subcontractors.filter(sub =>
+            subcontractorIds.includes(sub.id)
+        );
+
 
         res.render('adminDashboard', {
             subcontractorCount: filteredSubcontractors.length,
             invoiceCount: filteredInvoices.length,
             subcontractors: filteredSubcontractors,
+            invoices: filteredInvoices,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
             packageJson,
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
-            currentTaxYear,
             taxYear,
             currentMonthlyReturn
         });
@@ -291,7 +305,7 @@ const renderSubmissionUpdateForm = async (req, res) => {
 };
 
 router.get('/', renderIndex);
-router.get('/dashboard', renderadminDashboard);
+router.get('/dashboard/:year?', renderadminDashboard);
 router.get('/user/create', renderUserCreateForm);
 router.get('/subcontractor/create', renderSubcontractorCreateForm);
 router.get('/invoice/create/:id', renderInvoiceCreateForm)
