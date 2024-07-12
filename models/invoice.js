@@ -3,7 +3,7 @@
 const {
     DataTypes
 } = require('sequelize');
-const sequelize = require('../db');
+const sequelize = require('../db.js');
 
 const Invoice = sequelize.define('Invoice', {
     id: {
