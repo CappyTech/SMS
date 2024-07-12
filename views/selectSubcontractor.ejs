@@ -14,7 +14,7 @@
                         <div class="card-body text-center">
                             <h5 class="card-title"><%= subcontractor.name %></h5>
                             <p class="card-text"><%= subcontractor.company %></p>
-                            <button class="btn btn-outline-primary selectSubcontractorButton" data-id="<%= subcontractor.id %>">Select</button>
+                            <a class="btn btn-outline-primary selectSubcontractorButton" href="/invoice/create/<%= subcontractor.id %>">Select</a>
                         </div>
                     </div>
                 </div>

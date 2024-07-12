@@ -169,7 +169,8 @@ app.use(async (req, res, next) => {
             where: {
                 submissionDate: null
             },
-            attributes: ['id', 'kashflowNumber']
+            attributes: ['id', 'kashflowNumber'],
+            order: [['kashflowNumber', 'ASC']]
         });
         next();
     } catch (error) {
