@@ -1,7 +1,7 @@
 // models/submission.js
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const sequelize = require('../db.js');
 
 const Submission = sequelize.define('Submission', {
     id: {
