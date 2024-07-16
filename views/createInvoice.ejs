@@ -1,139 +1,159 @@
-<!-- views/createInvoice.ejs: -->
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-        <div class="container-fluid py-5 text-center">
-            <h1 class="display-5 fw-bold">Create Invoice</h1>
+        <h1 class="display-5">New Invoice</h1>
+        <div class="container-fluid text-center">
             <form action="/invoice/create/<%= subcontractor.id %>" method="POST" class="needs-validation">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <td><label for="subcontractorId">Subcontractor:</label></td>
-                            <td>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="input-group">
-                                            <select id="subcontractorId" name="subcontractorId" class="form-select" required>
-                                                <option value="<%= subcontractor.id %>"><%= subcontractor.name %> /
-                                                    <%= subcontractor.company %></option>
-                                            </select>
-                                            <button id="addSubcontractorButton" type="button" class="btn btn-hcs-green">+</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="invoiceNumber">Invoice <i class="bi bi-123"></label></td>
-                            <td><input type="text" id="invoiceNumber" name="invoiceNumber" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="kashflowNumber">Kashflow <i class="bi bi-123"></label></td>
-                            <td><input type="text" id="kashflowNumber" name="kashflowNumber" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="invoiceDate">Invoice <i class="bi bi-calendar2-date-fill"></label></td>
-                            <td><input type="date" id="invoiceDate" name="invoiceDate" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="remittanceDate">Remittance <i class="bi bi-calendar2-date-fill"></label></td>
-                            <td><input type="date" id="remittanceDate" name="remittanceDate" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="labourCost">Labour <i class="bi bi-currency-pound"></i></label></td>
-                            <td><input type="text" id="labourCost" name="labourCost" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="materialCost">Materials <i class="bi bi-currency-pound"></i></label></td>
-                            <td><input type="text" id="materialCost" name="materialCost" class="form-control"></td>
-                        </tr>
-                        <% if (subcontractor.deduction === 0.3) { %>
-                        <tr>
-                            <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
-                            <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
-                                    value="Labour / 30%"></td>
-                        </tr>
-                        <% } %>
-                        <% if (subcontractor.deduction === 0.2) { %>
-                        <tr>
-                            <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
-                            <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
-                                    value="Labour / 20%"></td>
-                        </tr>
-                        <% } %>
-                        <% if (subcontractor.deduction === 0) { %>
-                        <tr>
-                            <td><label for="cisAmount">CIS Deduction <i class="bi bi-bank2"></i></label></td>
-                            <td><input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled
-                                    value="Labour / 0%"></td>
-                        </tr>
-                        <% } %>
-                        <tr>
-                            <td><label for="grossAmount">Gross <i class="bi bi-cash"></i></label></td>
-                            <td><input type="text" id="grossAmount" name="grossAmount" class="form-control" disabled
-                                    value="Labour + Materials"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="netAmount">Net <i class="bi bi-cash"></i></label></td>
-                            <td><input type="text" id="netAmount" name="netAmount" class="form-control" disabled
-                                    value="Labour + Materials - CIS Deduction"></td>
-                        </tr>
-                        <% if (subcontractor.deduction === 0) { %>
-                        <tr>
-                            <td><label for="reverseCharge">Reverse Charge <i class="bi bi-wallet-fill"></i></label></td>
-                            <td><input type="text" id="reverseCharge" name="reverseCharge" class="form-control" disabled
-                                    value="Gross x 20%"></td>
-                        </tr>
-                        <% } %>
-                        <tr>
-                            <td><label for="submissionDate">Submission <i class="bi bi-calendar2-date-fill"></label></td>
-                            <td><input type="date" id="submissionDate" name="submissionDate" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="month">Tax Month <i class="bi bi-calendar2-date-fill"></i></label></td>
-                            <td>
-                                <select id="month" name="month" class="form-select" required>
-                                    <option value="1">1 | April</option>
-                                    <option value="2">2 | May</option>
-                                    <option value="3">3 | June</option>
-                                    <option value="4">4 | July</option>
-                                    <option value="5">5 | August</option>
-                                    <option value="6">6 | September</option>
-                                    <option value="7">7 | October</option>
-                                    <option value="8">8 | November</option>
-                                    <option value="9">9 | December</option>
-                                    <option value="10">10 | January</option>
-                                    <option value="11">11 | February</option>
-                                    <option value="12">12 | March</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="year">Tax Year <i class="bi bi-123"></label></td>
-                            <td><input type="text" id="year" name="year" class="form-control"></td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="2">
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-hcs-green">
-                                        <i class="bi bi-file-earmark-plus"></i> Create Invoice
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div class="row mb-3">
+                    <label for="subcontractorId" class="col-sm-3 col-form-label">Subcontractor:</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <select id="subcontractorId" name="subcontractorId" class="form-select" required>
+                                <option value="<%= subcontractor.id %>"><%= subcontractor.name %> / <%= subcontractor.company %></option>
+                            </select>
+                            <button id="addSubcontractorButton" type="button" class="btn btn-hcs-green">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="invoiceNumber" class="col-sm-3 col-form-label">Invoice <i class="bi bi-123"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="invoiceNumber" name="invoiceNumber" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="kashflowNumber" class="col-sm-3 col-form-label">Kashflow <i class="bi bi-123"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="kashflowNumber" name="kashflowNumber" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="invoiceDate" class="col-sm-3 col-form-label">Invoice <i class="bi bi-calendar2-date-fill"></i></label>
+                    <div class="col-sm-9">
+                        <input type="date" id="invoiceDate" name="invoiceDate" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="remittanceDate" class="col-sm-3 col-form-label">Remittance <i class="bi bi-calendar2-date-fill"></i></label>
+                    <div class="col-sm-9">
+                        <input type="date" id="remittanceDate" name="remittanceDate" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="labourCost" class="col-sm-3 col-form-label">Labour <i class="bi bi-currency-pound"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="labourCost" name="labourCost" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="materialCost" class="col-sm-3 col-form-label">Materials <i class="bi bi-currency-pound"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="materialCost" name="materialCost" class="form-control">
+                    </div>
+                </div>
+
+                <% if (subcontractor.deduction === 0.3) { %>
+                <div class="row mb-3">
+                    <label for="cisAmount" class="col-sm-3 col-form-label">CIS Deduction <i class="bi bi-bank2"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled value="Labour / 30%">
+                    </div>
+                </div>
+                <% } %>
+                <% if (subcontractor.deduction === 0.2) { %>
+                <div class="row mb-3">
+                    <label for="cisAmount" class="col-sm-3 col-form-label">CIS Deduction <i class="bi bi-bank2"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled value="Labour / 20%">
+                    </div>
+                </div>
+                <% } %>
+                <% if (subcontractor.deduction === 0) { %>
+                <div class="row mb-3">
+                    <label for="cisAmount" class="col-sm-3 col-form-label">CIS Deduction <i class="bi bi-bank2"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="cisAmount" name="cisAmount" class="form-control" disabled value="Labour / 0%">
+                    </div>
+                </div>
+                <% } %>
+
+                <div class="row mb-3">
+                    <label for="grossAmount" class="col-sm-3 col-form-label">Gross <i class="bi bi-cash"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="grossAmount" name="grossAmount" class="form-control" disabled value="Labour + Materials">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="netAmount" class="col-sm-3 col-form-label">Net <i class="bi bi-cash"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="netAmount" name="netAmount" class="form-control" disabled value="Labour + Materials - CIS Deduction">
+                    </div>
+                </div>
+
+                <% if (subcontractor.deduction === 0) { %>
+                <div class="row mb-3">
+                    <label for="reverseCharge" class="col-sm-3 col-form-label">Reverse Charge <i class="bi bi-wallet-fill"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="reverseCharge" name="reverseCharge" class="form-control" disabled value="Gross x 20%">
+                    </div>
+                </div>
+                <% } %>
+
+                <div class="row mb-3">
+                    <label for="submissionDate" class="col-sm-3 col-form-label">Submission <i class="bi bi-calendar2-date-fill"></i></label>
+                    <div class="col-sm-9">
+                        <input type="date" id="submissionDate" name="submissionDate" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="month" class="col-sm-3 col-form-label">Tax Month <i class="bi bi-calendar2-date-fill"></i></label>
+                    <div class="col-sm-9">
+                        <select id="month" name="month" class="form-select" required>
+                            <option value="1">1 | April</option>
+                            <option value="2">2 | May</option>
+                            <option value="3">3 | June</option>
+                            <option value="4">4 | July</option>
+                            <option value="5">5 | August</option>
+                            <option value="6">6 | September</option>
+                            <option value="7">7 | October</option>
+                            <option value="8">8 | November</option>
+                            <option value="9">9 | December</option>
+                            <option value="10">10 | January</option>
+                            <option value="11">11 | February</option>
+                            <option value="12">12 | March</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="year" class="col-sm-3 col-form-label">Tax Year <i class="bi bi-123"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="year" name="year" class="form-control">
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-hcs-green">
+                        <i class="bi bi-file-earmark-plus"></i> New Invoice
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 </div>
-            <script type="text/javascript">
-                const addSubcontractorButton = document.getElementById('addSubcontractorButton');
+<script type="text/javascript">
+    const addSubcontractorButton = document.getElementById('addSubcontractorButton');
 
-                addSubcontractorButton.addEventListener('click', function () {
-                    window.location.href = '/subcontractor/create';
-                });
-            </script>
+    addSubcontractorButton.addEventListener('click', function () {
+        window.location.href = '/subcontractor/create';
+    });
+</script>
