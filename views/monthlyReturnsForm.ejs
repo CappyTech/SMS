@@ -1,79 +1,65 @@
-<!-- views/monthlyReturnsForm.ejs: -->
-<div class="container mt-5">
-    <h1 class="mb-4">Monthly Returns</h1>
-    <div class="row row-cols-1 row-cols-md-2 g-4 h-100">
-        <% subcontractorsWithMonths.forEach(data => { %>
-            <% const subcontractor = data.subcontractor; %>
-            <% const years = data.years; %>
-            <div class="col">
-                <div class="card border-dark">
-                    <!-- Card Header with Navigation -->
-                    <div class="card-header">
-                        <ul class="nav nav-tabs card-header-tabs">
-                            <% years.forEach((year, index) => { %>
-                                <li class="nav-item">
-                                    <a class="nav-link <%= index === 0 ? 'active' : '' %>" aria-current="page" href="#" data-bs-toggle="modal" data-bs-target="#yearModal-<%= year %>-<%= subcontractor.id %>">
-                                        <%= year %>
-                                    </a>
-                                </li>
-                            <% }); %>
-                        </ul>
-                    </div>
-                    <!-- Card Body with Yearly Report Links -->
-                    <div class="card-body">
-                        <h5 class="card-title"><%= subcontractor.dataValues.name %></h5>
-                        <% years.forEach(year => { %>
-                            <div id="yearContent-<%= year %>-<%= subcontractor.id %>" class="year-content <%= year === years[0] ? '' : 'd-none' %>">
-                                <p class="card-text"><b>
-                                    Click on the tabs to view reports for different years.</b>
-                                </p>
-                                <a href="/yearly/returns/<%= year %>/<%= subcontractor.id %>" class="btn btn-primary">
-                                    <%= year %> Yearly Report
-                                </a>
+<div class="container py-4">
+    <div class="card">
+        <div class="card-header text-center text-bg-secondary">
+            <h1 class="display-5">Monthly Returns</h1>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <% subcontractorsWithMonths.forEach(data => { %>
+                    <% const subcontractor = data.subcontractor; %>
+                    <% const years = data.years; %>
+                    <% const invoicesByYear = data.invoicesByYear; %>
+                    <div class="col-3 p-1">
+                        <div class="card">
+                            <!-- Card Header -->
+                            <div class="card-header">
+                                <h5 class="card-title"><%= subcontractor.dataValues.company %></h5>
                             </div>
-                        <% }); %>
+                            <!-- Card Body with Flex Layout -->
+                            <div class="card-body d-flex">
+                                <!-- Vertical Navigation Tabs -->
+                                <ul class="nav flex-column nav-underline" id="nav-tab-<%= subcontractor.id %>" role="tablist">
+                                    <% years.forEach((year, index) => { %>
+                                        <li class="mt-2">
+                                            <a 
+                                                class="btn btn-outline-primary <%= index === 0 ? 'active' : '' %>" 
+                                                id="tab-<%= year %>-<%= subcontractor.id %>" 
+                                                data-bs-toggle="pill" 
+                                                data-bs-target="#content-<%= year %>-<%= subcontractor.id %>"  
+                                                role="tab" 
+                                                aria-controls="content-<%= year %>-<%= subcontractor.id %>" 
+                                                aria-selected="<%= index === 0 %>">
+                                                <%= year %>
+                                        </a>
+                                        </li>
+                                    <% }); %>
+                                </ul>
+                                <!-- Tab Content -->
+                                <div class="tab-content flex-grow-1" id="nav-tabContent-<%= subcontractor.id %>">
+                                    <% years.forEach((year, index) => { %>
+                                        <div class="tab-pane fade <%= index === 0 ? 'show active' : '' %>" id="content-<%= year %>-<%= subcontractor.id %>" role="tabpanel" aria-labelledby="tab-<%= year %>-<%= subcontractor.id %>">
+                                            <ul>
+                                                <li>
+                                                    <a href="/yearly/returns/<%= year %>/<%= subcontractor.id %>">
+                                                        <%= year %>
+                                                    </a>
+                                                </li>
+                                                <% invoicesByYear[year].forEach(month => { %>
+                                                <li>
+                                                    <a href="/monthly/returns/<%= month %>/<%= year %>/<%= subcontractor.id %>">
+                                                        <%= monthNames[month - 1] %>
+                                                    </a>
+                                                </li>
+                                                <% }) %>
+                                            </ul>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        <% }); %>
-    </div>
-</div>
-
-<!-- Modals for each year -->
-<% subcontractorsWithMonths.forEach(data => { %>
-<% const subcontractor = data.subcontractor; %>
-<% const years = data.years; %>
-<% const invoicesByYear = data.invoicesByYear; %>
-<% years.forEach(year => { %>
-<div class="modal fade" id="yearModal-<%= year %>-<%= subcontractor.id %>" tabindex="-1" aria-labelledby="yearModalLabel-<%= year %>"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="yearModalLabel-<%= year %>">Invoices for <%= year %></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <ul>
-                    <li>
-                        <a href="/yearly/returns/<%= year %>/<%= subcontractor.id %>">
-                            <%= year %> Yearly Report
-                        </a>
-                    </li>
-                    <% invoicesByYear[year].forEach(month => { %>
-                    <li>
-                        <a href="/monthly/returns/<%= month %>/<%= year %>/<%= subcontractor.id %>">
-                            <%= monthNames[month - 1] %> Monthly Report
-                        </a>
-                    </li>
-                    <% }) %>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <% }); %>
             </div>
         </div>
     </div>
 </div>
-<% }) %>
-<% }) %>
