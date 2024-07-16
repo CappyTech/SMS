@@ -16,7 +16,8 @@ sequelize
         }
     })
     .catch((error) => {
-        console.error('Unable to connect to the database:', error);
+        console.error('Unable to connect to the database:', error.message);
+        console.error('Details:', error);
     });
 
 module.exports = sequelize;
