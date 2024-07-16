@@ -31,7 +31,7 @@
                 Monthly Returns
               </a>
             </li>
-              <div class="vr"></div>
+            <div class="vr"></div>
             <li class="nav-item">
               <a class="nav-link hcs-green-text" href="/account">
                 <i class="bi bi-person"></i>
@@ -62,59 +62,66 @@
       </ul>
     </div>
   </nav>
-  <nav class="navbar navbar-expand-lg navbar-light bg-second-navbar d-print-none">
+  <nav class="navbar navbar-expand-lg navbar-light bg-grey d-print-none">
     <div class="container">
       <ul class="navbar-nav hstack gap-3">
         <% if (typeof session.user === 'undefined') { %>
         <% } else { %>
+          <!--
           <div class="dropdown">
               <button class="btn btn-hcs-green dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Create <i class="bi bi-menu-down"></i>
               </button>
               <ul class="dropdown-menu">
-                  <% if (session.user.permissionCreateUser) { %>
-                    <li>
-                        <a class="dropdown-item" href="/user/create">
-                          <i class="bi bi-person-plus"></i>
-                          User
-                        </a>
-                    </li>
-                  <% } else {} %>
-                  <% if (session.user.permissionCreateSubcontractor) { %>
-                    <li>
-                        <a class="dropdown-item" href="/subcontractor/create">
-                          <i class="bi bi-person-plus"></i>
-                         Subcontractor
-                        </a>
-                    </li>
-                  <% } else {} %>
+                -->
                   <% if (session.user.permissionCreateInvoice) { %>
-                    <li>
-                        <a class="dropdown-item" href="/subcontractor/select">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/subcontractor/select">
                           <i class="bi bi-file-plus"></i>
                           Invoice
                         </a>
                     </li>
                   <% } else {} %>
+                  <% if (session.user.permissionCreateSubcontractor) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/subcontractor/create">
+                          <i class="bi bi-person-plus"></i>
+                         Subcontractor
+                        </a>
+                    </li>
+                  <% } else {} %>
+                  <% if (session.user.permissionCreateUser) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/create">
+                          <i class="bi bi-person-plus"></i>
+                          User
+                        </a>
+                    </li>
+                  <% } else {} %>
+                  <!--
                   <% if (session.user.permissionCreateInvoice) { %>
-                    <li>
-                        <a class="dropdown-item" href="/submission/create">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/submission/create">
                           <i class="bi bi-file-plus"></i>
                           Submission
                         </a>
                     </li>
                   <% } else {} %>
+                  -->
               </ul>
-          </div>
+          <!--
+          </div> 
+          -->
         <% } %>
       </ul>
     </div>
   </nav>
   <%- include('../partials/invoicesNotification.ejs') %>
-  <%- body %>
+  <div class="content">
+    <%- body %>
+  </div>
   <footer class="footer mt-auto d-print-none">
-    <nav
-      class="navbar navbar-expand navbar-dark bg-dark text-white d-flex justify-content-center align-items-center mt-5 p-4 text-center">
+    <nav class="navbar navbar-expand d-flex justify-content-center align-items-center mt-5 p-4 text-center">
       <div class="stack-on-small">
         <div>
           <a href="/"><img src="/favicon.png" alt="HCS Logo"></a>
