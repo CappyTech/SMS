@@ -1,10 +1,9 @@
-// /controllers/submissionCRUD.js
-
 const express = require('express');
 const router = express.Router();
 const packageJson = require('../package.json');
 const Submission = require('../models/submission');
 const Invoice = require('../models/invoice');
+const logger = require('../logger'); // Import the logger
 
 // Create a new submission
 const createSubmission = async (req, res) => {
@@ -73,11 +72,10 @@ const createSubmission = async (req, res) => {
 
         res.redirect('/submission/' + newSubmission.id);
     } catch (error) {
-        console.error('Error creating submission:', error);
+        logger.error('Error creating submission:', error.message);
         res.status(500).send('Error creating submission');
     }
 };
-
 
 // View a specific submission
 const viewSubmission = async (req, res) => {
@@ -95,10 +93,11 @@ const viewSubmission = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson, submission
+            packageJson,
+            submission
         });
     } catch (error) {
-        console.error('Error viewing submission:', error);
+        logger.error('Error viewing submission:', error.message);
         res.status(500).send('Error viewing submission');
     }
 };
@@ -120,7 +119,7 @@ const displayUpdateSubmissionForm = async (req, res) => {
             submission
         });
     } catch (error) {
-        console.error('Error displaying update form:', error);
+        logger.error('Error displaying update form:', error.message);
         res.status(500).send('Error displaying update form');
     }
 };
@@ -138,7 +137,7 @@ const updateSubmission = async (req, res) => {
         await submission.update(updatedSubmissionData);
         res.redirect('/submission/' + submissionId);
     } catch (error) {
-        console.error('Error updating submission:', error);
+        logger.error('Error updating submission:', error.message);
         res.status(500).send('Error updating submission');
     }
 };
@@ -155,7 +154,7 @@ const deleteSubmission = async (req, res) => {
         await submission.destroy();
         res.redirect('/submissions'); // Redirect to a page listing all submissions
     } catch (error) {
-        console.error('Error deleting submission:', error);
+        logger.error('Error deleting submission:', error.message);
         res.status(500).send('Error deleting submission');
     }
 };
@@ -179,11 +178,10 @@ const viewSubmissions = async (req, res) => {
             submissions
         });
     } catch (error) {
-        console.error('Error viewing submissions:', error);
+        logger.error('Error viewing submissions:', error.message);
         res.status(500).send('Error viewing submissions');
     }
 };
-
 
 router.post('/submission', createSubmission);
 router.get('/submission/:id', viewSubmission);
@@ -191,6 +189,5 @@ router.get('/submission/:id/edit', displayUpdateSubmissionForm);
 router.post('/submission/:id', updateSubmission);
 router.delete('/submission/:id', deleteSubmission);
 router.get('/submissions', viewSubmissions);
-
 
 module.exports = router;

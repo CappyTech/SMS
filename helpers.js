@@ -1,36 +1,31 @@
 const moment = require('moment');
+const logger = require('./logger');
 
 function slimDateTime(dateString, includeTime = false) {
-    const date = new Date(dateString);
-    const dateOptions = {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-    };
-    const formattedDate = date.toLocaleDateString('en-GB', dateOptions);
+    const date = moment.utc(dateString);
+    const formattedDate = date.format('DD/MM/YYYY');
 
     if (includeTime) {
-        const timeOptions = {
-            hour: '2-digit',
-            minute: '2-digit',
-        };
-        const formattedTime = date.toLocaleTimeString('en-GB', timeOptions);
-        return formattedDate.replace(/\//g, '/') + ' ' + formattedTime;
+        const formattedTime = date.format('HH:mm');
+        return `${formattedDate} ${formattedTime}`;
     }
 
-    return formattedDate.replace(/\//g, '/');
+    return formattedDate;
 }
 
 function formatCurrency(amount) {
     if (typeof amount !== 'number') {
-        throw new Error('Invalid input. Amount must be a number.');
+        const errorMessage = 'Invalid input. Amount must be a number.';
+        logger.error(errorMessage);
+        throw new Error(errorMessage);
     }
     return '£' + amount.toFixed(2);
 }
 
 const isAdmin = (req, res, next) => {
     if (req.session.user.role !== 'admin') {
-      return res.status(403).send('Access denied.');
+        logger.warn(`Access denied for user role: ${req.session.user.role}`);
+        return res.status(403).send('Access denied.');
     }
     next();
 };
@@ -59,7 +54,9 @@ function validateInvoiceData(data) {
     }
 
     if (errors.length > 0) {
-        throw new Error(errors.join(', '));
+        const errorMessage = errors.join(', ');
+        logger.error(`Validation errors: ${errorMessage}`);
+        throw new Error(errorMessage);
     }
 
     return data;
@@ -98,8 +95,8 @@ function rounding(number, up) {
 }
 
 function getCurrentTaxYear() {
-    const today = moment();
-    const startOfTaxYear = moment({ month: 3, day: 6 }); // April 6th
+    const today = moment.utc();
+    const startOfTaxYear = moment.utc({ month: 3, day: 6 }); // April 6th
     if (today.isBefore(startOfTaxYear)) {
         return startOfTaxYear.subtract(1, 'years').year();
     }
@@ -107,8 +104,8 @@ function getCurrentTaxYear() {
 }
 
 function getTaxYearStartEnd(year) {
-    const startOfTaxYear = moment({ year, month: 3, day: 6 }); // 6th April of the specified year
-    const endOfTaxYear = moment(startOfTaxYear).add(1, 'years').subtract(1, 'days'); // 5th April of the next year
+    const startOfTaxYear = moment.utc({ year, month: 3, day: 6 }); // 6th April of the specified year
+    const endOfTaxYear = moment.utc(startOfTaxYear).add(1, 'years').subtract(1, 'days'); // 5th April of the next year
     return {
         start: startOfTaxYear.format('Do MMMM YYYY'),
         end: endOfTaxYear.format('Do MMMM YYYY')
@@ -116,16 +113,16 @@ function getTaxYearStartEnd(year) {
 }
 
 function getCurrentMonthlyReturn(year, month) {
-    const today = moment();
-    let startOfCurrentPeriod = moment({ year, month, day: 6 }); // 6th of the specified month
+    const today = moment.utc();
+    let startOfCurrentPeriod = moment.utc({ year, month, day: 6 }); // 6th of the specified month
 
     if (today.isBefore(startOfCurrentPeriod)) {
         startOfCurrentPeriod.subtract(1, 'months');
     }
 
-    const endOfCurrentPeriod = moment(startOfCurrentPeriod).add(1, 'months').subtract(1, 'days');
-    const submissionDeadline = moment(endOfCurrentPeriod).add(6, 'days'); // 11th of the current month
-    const hmrcUpdateDate = moment(endOfCurrentPeriod).add(11, 'days'); // 17th of the current month
+    const endOfCurrentPeriod = moment.utc(startOfCurrentPeriod).add(1, 'months').subtract(1, 'days');
+    const submissionDeadline = moment.utc(endOfCurrentPeriod).add(6, 'days'); // 11th of the current month
+    const hmrcUpdateDate = moment.utc(endOfCurrentPeriod).add(11, 'days'); // 17th of the current month
     const submissionDeadlineInDays = submissionDeadline.diff(today, 'days');
     const hmrcUpdateDateInDays = hmrcUpdateDate.diff(today, 'days');
 

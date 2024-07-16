@@ -1,18 +1,12 @@
-// /controllers/userCRUD.js
-
 const express = require('express');
 const router = express.Router();
 
 const packageJson = require('../package.json');
 const User = require('../models/user');
-const Invoice = require('../models/invoice');
-const Subcontractor = require('../models/subcontractor');
 const helpers = require('../helpers');
+const logger = require('../logger'); // Import the logger
 
-const {
-  Op
-} = require('sequelize');
-
+const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 
@@ -25,7 +19,7 @@ const schema = Joi.object({
     permissionUpdateUser: Joi.boolean(),
     permissionDeleteUser: Joi.boolean(),
     permissionCreateSubcontractor: Joi.boolean(),
-    permissionReadSubcontractor : Joi.boolean(),
+    permissionReadSubcontractor: Joi.boolean(),
     permissionUpdateSubcontractor: Joi.boolean(),
     permissionDeleteSubcontractor: Joi.boolean(),
     permissionCreateInvoice: Joi.boolean(),
@@ -36,41 +30,43 @@ const schema = Joi.object({
 
 const createUser = async (req, res) => {
     try {
-      const { error, value } = schema.validate(req.body);
-      if (error) {
-        req.flash('error', 'Invalid input.');
-        return res.redirect('/dashboard');
-      }
-  
-      const { username, email, password, role } = value;
-  
-      const existingUser = await User.findOne({
-        where: {
-          [Op.or]: [{ username }, { email }],
-        },
-      });
-  
-      if (existingUser) {
-        req.flash('error', 'Registration failed.');
-        return res.redirect('/dashboard');
-      }
-  
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      const newUser = await User.create({
-        username,
-        email,
-        password: hashedPassword,
-        role,
-      });
-  
-      req.flash('success', 'User created successfully.');
-      res.redirect('/dashboard');
+        const { error, value } = schema.validate(req.body);
+        if (error) {
+            req.flash('error', 'Invalid input.');
+            return res.redirect('/dashboard');
+        }
+
+        const { username, email, password, role } = value;
+
+        const existingUser = await User.findOne({
+            where: {
+                [Op.or]: [{ username }, { email }],
+            },
+        });
+
+        if (existingUser) {
+            req.flash('error', 'Registration failed.');
+            return res.redirect('/dashboard');
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await User.create({
+            username,
+            email,
+            password: hashedPassword,
+            role,
+        });
+
+        req.flash('success', 'User created successfully.');
+        res.redirect('/dashboard');
     } catch (error) {
-      req.flash('error', 'An error occurred.');
-      res.redirect('/error');
+        logger.error('Error creating user:', error.message);
+        req.flash('error', 'An error occurred.');
+        res.redirect('/error');
     }
-  };
+};
+
 const readUser = async (req, res) => {
     try {
         // Validate the session user state
@@ -89,25 +85,26 @@ const readUser = async (req, res) => {
         }
 
         const user = await User.findByPk(req.params.id);
-    
+
         if (!user) {
-          return res.status(404).send('User not found');
+            return res.status(404).send('User not found');
         }
-    
+
         res.render('viewUser', {
-          user,
+            user,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-          packageJson,
-          slimDateTime: helpers.slimDateTime,
-          formatCurrency: helpers.formatCurrency,
+            packageJson,
+            slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
         });
-      } catch (error) {
-        console.error(error);
+    } catch (error) {
+        logger.error('Error reading user:', error.message);
         res.status(500).send('An error occurred.');
-      }
+    }
 };
+
 const updateUser = async (req, res) => {
     try {
         // Validate the session user state
@@ -122,7 +119,7 @@ const updateUser = async (req, res) => {
 
         // Check if User exists and has an update method
         if (!User || typeof User.update !== 'function') {
-            console.error('Error: User model or update method not found!');
+            logger.error('Error: User model or update method not found!');
             return res.status(500).send('Server Error.');
         }
 
@@ -171,8 +168,9 @@ const updateUser = async (req, res) => {
             permissionReadInvoice,
             permissionUpdateInvoice,
             permissionDeleteInvoice
-        },{
-            where: { id: req.params.id }
+        }, {
+            where: { id: req.params.id },
+            returning: true, // To get the updated user data
         });
 
         if (updatedUser[0] !== 0) {
@@ -186,7 +184,7 @@ const updateUser = async (req, res) => {
                     req.session.user = {
                         ...req.session.user,
                         ...updatedUser[1][0].dataValues
-                    }
+                    };
                 }
             }
         } else {
@@ -195,39 +193,39 @@ const updateUser = async (req, res) => {
 
         const referer = req.get('referer') ? req.get('referer') : '/dashboard';
         res.redirect(referer);
-
     } catch (error) {
-        console.error('Error updating user:', error);
+        logger.error('Error updating user:', error.message);
         req.flash('error', 'Error updating user: ' + error.message);
         res.status(500).redirect('/');
     }
-}
+};
+
 const deleteUser = async (req, res) => {
-  try {
-    if (req.session.user.role !== 'admin' && !req.session.user.permissionDeleteUser) {
-        return res.status(403).send('Access denied. Only admins can delete users.');
-    }
+    try {
+        if (req.session.user.role !== 'admin' && !req.session.user.permissionDeleteUser) {
+            return res.status(403).send('Access denied. Only admins can delete users.');
+        }
 
-    if (req.session.user.id === req.params.id) {
-        return res.status(403).send('Access denied. You cannot delete your own account.');
-    }
+        if (req.session.user.id === req.params.id) {
+            return res.status(403).send('Access denied. You cannot delete your own account.');
+        }
 
-    const user = await User.findByPk(req.params.id);
-    if (!user) {
-        req.flash('error', 'User not found');
-    } else {
-        await user.destroy();
-        req.flash('success', 'User deleted successfully');
-    }
+        const user = await User.findByPk(req.params.id);
+        if (!user) {
+            req.flash('error', 'User not found');
+        } else {
+            await user.destroy();
+            req.flash('success', 'User deleted successfully');
+        }
 
-      const referer = req.get('referer') ? req.get('referer') : '/dashboard';
-    res.redirect(referer);
-  } catch (error) {
-      console.error('Error deleting user:', error);
-    req.flash('error', 'Error: ' + error.message);
-    const referer = req.get('referer') ? req.get('referer') : '/dashboard';
-    res.status(500).redirect(referer);
-  }
+        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+        res.redirect(referer);
+    } catch (error) {
+        logger.error('Error deleting user:', error.message);
+        req.flash('error', 'Error: ' + error.message);
+        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+        res.status(500).redirect(referer);
+    }
 };
 
 router.post('/user/create/:selected', createUser);

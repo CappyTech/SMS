@@ -1,15 +1,11 @@
-// /controllers/monthlyReturns.js
-
 const express = require('express');
 const router = express.Router();
 
 const packageJson = require('../package.json');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
-const {
-    formatCurrency,
-    slimDateTime
-} = require('../helpers');
+const { formatCurrency, slimDateTime } = require('../helpers');
+const logger = require('../logger'); // Import the logger
 
 const renderMonthlyReturnsForm = async (req, res) => {
     try {
@@ -72,7 +68,7 @@ const renderMonthlyReturnsForm = async (req, res) => {
             monthNames: monthNames
         });
     } catch (error) {
-        console.error("Error rendering the form:", error);
+        logger.error("Error rendering the form:", error);
         req.flash('error', 'Error: Unable to render monthly returns');
         const referrer = req.get('referer') || '/';
         res.redirect(referrer);
@@ -85,14 +81,10 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
-        const {
-            month,
-            year,
-            id
-        } = req.params;
+        const { month, year, id } = req.params;
 
         if (!month || !year || !id) {
-            console.log("Month, Year, and Subcontractor are required.");
+            logger.warn("Month, Year, and Subcontractor are required.");
             return res.status(400).send("Month, Year, and Subcontractor are required.");
         }
 
@@ -113,7 +105,7 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
             }
         });
 
-        console.log("Rendering monthly returns:", {
+        logger.info("Rendering monthly returns:", {
             subcontractor: subcontractor,
             month: month,
             year: year
@@ -133,7 +125,7 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
             monthNames: monthNames
         });
     } catch (error) {
-        console.error("Error rendering monthly returns:", error);
+        logger.error("Error rendering monthly returns:", error);
         req.flash('error', 'Error: Unable to render monthly returns');
         const referrer = req.get('referer') || '/';
         res.redirect(referrer);
@@ -146,13 +138,10 @@ const renderMonthlyReturnsForAll = async (req, res) => {
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
-        const {
-            month,
-            year
-        } = req.params;
+        const { month, year } = req.params;
 
         if (!month || !year) {
-            console.log("Month and Year are required.");
+            logger.warn("Month and Year are required.");
             return res.status(400).send("Month and Year are required.");
         }
 
@@ -173,7 +162,7 @@ const renderMonthlyReturnsForAll = async (req, res) => {
             order: [['name', 'ASC']]
         });
 
-        console.log("Rendering monthly returns:", {
+        logger.info("Rendering monthly returns:", {
             subcontractors: subcontractors,
             month: month,
             year: year
@@ -192,7 +181,7 @@ const renderMonthlyReturnsForAll = async (req, res) => {
             monthNames: monthNames
         });
     } catch (error) {
-        console.error("Error rendering monthly returns:", error);
+        logger.error("Error rendering monthly returns:", error);
         req.flash('error', 'Error: Unable to render monthly returns');
         const referrer = req.get('referer') || '/';
         res.redirect(referrer);
@@ -205,12 +194,10 @@ const renderMonthlyReturnsYear = async (req, res) => {
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
-        const {
-            year
-        } = req.params;
+        const { year } = req.params;
 
         if (!year) {
-            console.log("Year is required.");
+            logger.warn("Year is required.");
             return res.status(400).send("Year is required.");
         }
 
@@ -228,12 +215,10 @@ const renderMonthlyReturnsYear = async (req, res) => {
                 },
                 order: [['invoiceNumber', 'ASC']]
             },
-            order: [['name', 'ASC']]
+            order: [['company', 'ASC']]
         });
 
-        console.log("Rendering monthly returns:", {
-            year: year
-        });
+        logger.info("Rendering monthly returns:", { year: year });
 
         res.render('renderMonthlyReturnsYear', {
             errorMessages: req.flash('error'),
@@ -248,7 +233,7 @@ const renderMonthlyReturnsYear = async (req, res) => {
             monthNames: monthNames
         });
     } catch (error) {
-        console.error("Error rendering monthly returns:", error);
+        logger.error("Error rendering monthly returns:", error);
         req.flash('error', 'Error: Unable to render monthly returns');
         const referrer = req.get('referer') || '/';
         res.redirect(referrer);

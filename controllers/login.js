@@ -1,16 +1,15 @@
-// /controllers/login.js
 const express = require('express');
 const router = express.Router();
 const packageJson = require("../package.json");
 const User = require("../models/user");
-const {Op} = require("sequelize");
+const { Op } = require("sequelize");
 const Subcontractor = require("../models/subcontractor");
 const bcrypt = require("bcrypt");
 const speakeasy = require("speakeasy");
-
+const logger = require('../logger'); // Import the logger
 
 const renderSigninForm = (req, res) => {
-    console.log(req.session);
+    logger.info('Session data:', req.session);
     res.render('signin', {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
@@ -73,14 +72,14 @@ const loginUser = async (req, res) => {
                 const userJSON = JSON.stringify(userWithoutPassword);
 
                 if (user.role === 'admin') {
-                    console.log('Admin Logged in: \n' + userJSON);
+                    logger.info('Admin Logged in:', userJSON);
                     return res.redirect('/dashboard');
                 }
                 if (user.role === 'subcontractor') {
-                    console.log('Subcontractor Logged in: \n' + userJSON);
+                    logger.info('Subcontractor Logged in:', userJSON);
                     return res.redirect('/dashboard');
                 }
-                console.log('User Logged in: \n' + userJSON);
+                logger.info('User Logged in:', userJSON);
                 return res.redirect('/dashboard');
             } else {
                 req.flash('error', 'Invalid 2FA code.');
@@ -91,6 +90,7 @@ const loginUser = async (req, res) => {
             return res.redirect('/signin');
         }
     } catch (error) {
+        logger.error('Error logging in:', error.message);
         req.flash('error', 'Error: ' + error.message);
         const referrer = req.get('referer') || '/';
         res.redirect(referrer);
@@ -100,11 +100,12 @@ const loginUser = async (req, res) => {
 const logoutUser = (req, res) => {
     req.session.destroy((err) => {
         if (err) {
-            console.error('Error logging out:', err);
+            logger.error('Error logging out:', err);
+            res.redirect('/signin');
+        } else {
+            logger.info('Session destroyed');
             res.redirect('/signin');
         }
-        console.log('Session destroyed');
-        res.redirect('/signin');
     });
 };
 

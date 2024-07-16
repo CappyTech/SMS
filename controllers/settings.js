@@ -1,10 +1,10 @@
-// /controllers/settings.js
 const express = require('express');
 const router = express.Router();
 
 const User = require('../models/user');
 const helpers = require('../helpers');
 const packageJson = require('../package.json');
+const logger = require('../logger'); // Import the logger
 
 // Update the account settings
 const updateAccountSettings = async (req, res) => {
@@ -30,7 +30,7 @@ const updateAccountSettings = async (req, res) => {
         req.flash('success', 'Account settings updated successfully');
         res.redirect('/account');
     } catch (error) {
-        console.error('Error updating account settings:', error);
+        logger.error('Error updating account settings:', error.message);
         req.flash('error', 'Failed to update account settings');
         res.redirect('/account');
     }
@@ -39,7 +39,7 @@ const updateAccountSettings = async (req, res) => {
 // Display the account page
 const getAccountPage = async (req, res) => {
     try {
-        console.log(req.session);
+        logger.info('Session data:', req.session);
         // Fetch the user data based on the current user's session
         const user = await User.findOne({
             where: {
@@ -57,6 +57,7 @@ const getAccountPage = async (req, res) => {
             message: req.query.message || '',
         });
     } catch (error) {
+        logger.error('Error getting account page:', error.message);
         req.flash('error', 'Error: ' + error.message);
         const referrer = req.get('referer') || '/';
         res.redirect(referrer);

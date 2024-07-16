@@ -1,19 +1,11 @@
-// /controllers/yearlyReturns.js
-
 const express = require('express');
 const router = express.Router();
 
 const packageJson = require('../package.json');
-const {
-    Op
-} = require('sequelize');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
-const {
-    formatCurrency,
-    slimDateTime,
-    rounding
-} = require('../helpers');
+const { formatCurrency, slimDateTime, rounding } = require('../helpers');
+const logger = require('../logger'); // Import the logger
 
 const renderYearlyReturns = async (req, res) => {
     try {
@@ -21,13 +13,10 @@ const renderYearlyReturns = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const {
-            year,
-            id
-        } = req.params;
+        const { year, id } = req.params;
 
         if (!year || !id) {
-            console.log("Year and Subcontractor ID are required.");
+            logger.warn("Year and Subcontractor ID are required.");
             return res.status(400).send("Year and Subcontractor ID are required.");
         }
 
@@ -52,7 +41,7 @@ const renderYearlyReturns = async (req, res) => {
         });
 
         if (!subcontractor) {
-            console.log("Subcontractor not found."); // Add a log statement
+            logger.warn("Subcontractor not found.");
             return res.status(404).send("Subcontractor not found.");
         }
 
@@ -66,7 +55,7 @@ const renderYearlyReturns = async (req, res) => {
             invoicesByMonth[month].push(invoice);
         });
 
-        console.log("Rendering yearly returns:", {
+        logger.info("Rendering yearly returns:", {
             subcontractor: subcontractor,
             year: year,
             invoicesByMonth: invoicesByMonth
@@ -86,7 +75,7 @@ const renderYearlyReturns = async (req, res) => {
             monthNames: monthNames
         });
     } catch (error) {
-        console.error("Error rendering yearly returns:", error);
+        logger.error("Error rendering yearly returns:", error.message);
         res.status(500).send("Internal Server Error");
     }
 };

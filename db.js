@@ -1,23 +1,23 @@
 // db.js
 require('dotenv').config();
 const Sequelize = require('sequelize');
-
+const logger = require('./logger');
 const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USER, process.env.DB_PASSWORD, {
     host: process.env.DB_HOST,
     dialect: 'mysql',
-    logging: process.env.DEBUG ? console.log : false,
+    logging: process.env.DEBUG ? msg => logger.debug(msg) : false,
 });
 
 sequelize
     .authenticate()
     .then(() => {
         if (process.env.DEBUG) {
-            console.log('Database connection has been established successfully.');
+            logger.info('Database connection has been established successfully.');
         }
     })
     .catch((error) => {
-        console.error('Unable to connect to the database:', error.message);
-        console.error('Details:', error);
+        logger.error('Unable to connect to the database:', error.message);
+        logger.error('Details:', error);
     });
 
 module.exports = sequelize;

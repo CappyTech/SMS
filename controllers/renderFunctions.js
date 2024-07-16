@@ -1,5 +1,3 @@
-// /controllers/renderfunctions.js
-
 const express = require('express');
 const router = express.Router();
 
@@ -9,10 +7,8 @@ const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const moment = require('moment');
 const helpers = require('../helpers');
-const {
-    Op
-} = require('sequelize');
 const Submission = require('../models/submission');
+const logger = require('../logger'); // Import the logger
 
 const renderIndex = (req, res) => {
     res.render('index', {
@@ -28,7 +24,7 @@ const renderadminDashboard = async (req, res) => {
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
-        console.log(req.session);
+        logger.info('Session data:', req.session);
 
         // Fetch the specified tax year from the URL parameter or use the current tax year
         const specifiedYear = req.params.year ? parseInt(req.params.year) : helpers.getCurrentTaxYear();
@@ -54,7 +50,6 @@ const renderadminDashboard = async (req, res) => {
             subcontractorIds.includes(sub.id)
         );
 
-
         res.render('adminDashboard', {
             subcontractorCount: filteredSubcontractors.length,
             invoiceCount: filteredInvoices.length,
@@ -70,14 +65,15 @@ const renderadminDashboard = async (req, res) => {
             currentMonthlyReturn
         });
     } catch (error) {
+        logger.error('Error rendering admin dashboard:', error.message);
         req.flash('error', 'Error: ' + error.message);
         const referrer = req.header('Referer') || '/';
         res.redirect(referrer);
     }
 };
+
 const renderUserCreateForm = async (req, res) => {
     try {
-        // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
@@ -89,14 +85,15 @@ const renderUserCreateForm = async (req, res) => {
             packageJson,
         });
     } catch (error) {
+        logger.error('Error rendering user create form:', error.message);
         res.status(500).send('Error: ' + error.message);
     }
 };
+
 const renderSubcontractorCreateForm = (req, res) => {
     try {
-    console.log(req.session);
+        logger.info('Session data:', req.session);
         if (req.session.user.role === 'admin') {
-
             res.render('createSubcontractor', {
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
@@ -107,24 +104,25 @@ const renderSubcontractorCreateForm = (req, res) => {
             return res.status(403).send('Access denied.');
         }
     } catch (error) {
-        return req.flash('error', 'Error: ' + error.message);
+        logger.error('Error rendering subcontractor create form:', error.message);
+        req.flash('error', 'Error: ' + error.message);
+        res.redirect(req.get('referer') || '/');
     }
 };
+
 const renderInvoiceCreateForm = async (req, res) => {
     try {
-        // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
-        console.log(req.session);
+        logger.info('Session data:', req.session);
         if (req.params.id) {
             const subcontractor = await Subcontractor.findByPk(req.params.id);
             if (!subcontractor) {
                 req.flash('error', 'Error: No Subcontractors exist.');
-                const referrer = '/subcontractor/create';
-                res.redirect(referrer);
+                res.redirect('/subcontractor/create');
             }
-            return res.render('createInvoice', {
+            res.render('createInvoice', {
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
                 session: req.session,
@@ -132,15 +130,18 @@ const renderInvoiceCreateForm = async (req, res) => {
                 subcontractor,
                 slimDateTime: helpers.slimDateTime,
             });
+        } else {
+            res.status(404).send('Subcontractor not found');
         }
-        return res.send('Subcontractor not found');
     } catch (error) {
-        return req.flash('error', 'Error: ' + error.message);
+        logger.error('Error rendering invoice create form:', error.message);
+        req.flash('error', 'Error: ' + error.message);
+        res.redirect(req.get('referer') || '/');
     }
 };
+
 const renderUserUpdateForm = async (req, res) => {
     try {
-        // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
@@ -162,12 +163,13 @@ const renderUserUpdateForm = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
+        logger.error('Error rendering user update form:', error.message);
         res.status(500).send('Error: ' + error.message);
     }
 };
+
 const renderSubcontractorUpdateForm = async (req, res) => {
     try {
-        // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
@@ -189,12 +191,13 @@ const renderSubcontractorUpdateForm = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
+        logger.error('Error rendering subcontractor update form:', error.message);
         res.status(500).send('Error: ' + error.message);
     }
 };
+
 const renderInvoiceUpdateForm = async (req, res) => {
     try {
-        // Check if the user is an admin
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
@@ -215,12 +218,14 @@ const renderInvoiceUpdateForm = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
+        logger.error('Error rendering invoice update form:', error.message);
         res.status(500).send('Error: ' + error.message);
     }
 };
+
 const selectSubcontractor = async (req, res) => {
     try {
-        console.log(req.session);
+        logger.info('Session data:', req.session);
         let subcontractors;
         if (req.session.user.role === 'admin') {
             subcontractors = await Subcontractor.findAll({});
@@ -234,8 +239,7 @@ const selectSubcontractor = async (req, res) => {
 
         if (subcontractors.length === 0) {
             req.flash('error', 'Error: No Subcontractors exist, Or you don\'t have access to any Subcontractors.');
-            const referrer = '/subcontractor/create';
-            res.redirect(referrer);
+            res.redirect('/subcontractor/create');
         }
 
         res.render('selectSubcontractor', {
@@ -247,9 +251,9 @@ const selectSubcontractor = async (req, res) => {
             slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
+        logger.error('Error selecting subcontractor:', error.message);
         req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        res.redirect(req.get('referer') || '/');
     }
 };
 
@@ -262,11 +266,11 @@ const e500 = async (req, res) => {
             packageJson,
         });
     } catch (error) {
+        logger.error('Error rendering 500 page:', error.message);
         req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        res.redirect(req.get('referer') || '/');
     }
-}
+};
 
 // Display form to create a new submission
 const renderSubmissionCreateForm = async (req, res) => {
@@ -280,7 +284,7 @@ const renderSubmissionCreateForm = async (req, res) => {
             packageJson
         });
     } catch (error) {
-        console.error('Error rendering submission create form:', error);
+        logger.error('Error rendering submission create form:', error.message);
         req.flash('error', 'An error occurred while rendering the submission form.');
         res.redirect('/submission/create');
     }
@@ -289,7 +293,7 @@ const renderSubmissionCreateForm = async (req, res) => {
 // Display form to update a new submission
 const renderSubmissionUpdateForm = async (req, res) => {
     try {
-        const submission = await Submission.findByPk({ where: { id: req.params.id } });
+        const submission = await Submission.findByPk(req.params.id);
         res.render('updateSubmission', {
             submission,
             errorMessages: req.flash('error'),
@@ -298,7 +302,7 @@ const renderSubmissionUpdateForm = async (req, res) => {
             packageJson
         });
     } catch (error) {
-        console.error('Error rendering submission update form:', error);
+        logger.error('Error rendering submission update form:', error.message);
         req.flash('error', 'An error occurred while rendering the submission form.');
         res.redirect('/submission');
     }
@@ -308,12 +312,12 @@ router.get('/', renderIndex);
 router.get('/dashboard/:year?', renderadminDashboard);
 router.get('/user/create', renderUserCreateForm);
 router.get('/subcontractor/create', renderSubcontractorCreateForm);
-router.get('/invoice/create/:id', renderInvoiceCreateForm)
+router.get('/invoice/create/:id', renderInvoiceCreateForm);
 router.get('/user/update/:id', renderUserUpdateForm);
 router.get('/subcontractor/update/:id', renderSubcontractorUpdateForm);
 router.get('/invoice/update/:id', renderInvoiceUpdateForm);
 router.get('/subcontractor/select', selectSubcontractor);
-router.get('/500', e500)
+router.get('/500', e500);
 router.get('/submission/create', renderSubmissionCreateForm);
 router.get('/submission/update/:id', renderSubmissionUpdateForm);
 

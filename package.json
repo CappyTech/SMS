@@ -68,12 +68,13 @@
     "nodemailer": "^6.9.7",
     "sequelize": "^6.31.1",
     "speakeasy": "^2.0.0",
+    "winston": "^3.13.1",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.4",
+    "electron": "^31.2.0",
     "electron-builder": "^24.13.3",
-    "sequelize-cli": "^6.6.0",
-    "electron": "^31.2.0"
+    "nodemon": "^3.1.4",
+    "sequelize-cli": "^6.6.0"
   }
 }

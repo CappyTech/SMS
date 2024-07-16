@@ -1,14 +1,12 @@
 // app.js
 
 // npm install express body-parser express-session express-mysql-session express-flash dotenv helmet xss-clean express-rate-limit express-ejs-layouts
-
+const logger = require('./logger');
 const express = require('express');
 const app = express();
 const fs = require('fs');
 app.use(express.json());
-app.use(express.urlencoded({
-    extended: true
-}));
+app.use(express.urlencoded({ extended: true }));
 require('dotenv').config();
 const path = require('path');
 const helpers = require('./helpers');
@@ -66,11 +64,11 @@ app.use(session({
     saveUninitialized: false
 }));
 sessionStore.onReady().then(() => {
-    if(process.env.DEBUG) {
-        console.log('MySQLStore ready');
+    if (process.env.DEBUG) {
+        logger.info('MySQLStore ready');
     }
 }).catch(error => {
-    console.error(error);
+    logger.error(error);
 });
 
 app.use((req, res, next) => {
@@ -118,20 +116,15 @@ app.use(
     })
 );
 
-const {
-    Op
-} = require("sequelize");
+const { Op } = require("sequelize");
 
 const createDefaultAdmin = async () => {
     try {
         const admin = await User.findOne({
             where: {
-                [Op.or]: [{
-                        username: 'admin'
-                    },
-                    {
-                        role: 'admin'
-                    }
+                [Op.or]: [
+                    { username: 'admin' },
+                    { role: 'admin' }
                 ]
             }
         });
@@ -144,22 +137,21 @@ const createDefaultAdmin = async () => {
             }, {
                 fields: ['username', 'email', 'password', 'role']
             });
-            if(process.env.DEBUG) {
-                console.log('Default admin created.');
+            if (process.env.DEBUG) {
+                logger.info('Default admin created.');
             }
-        }
-        if (admin) {
-            if(process.env.DEBUG) {
-                console.log('Default admin already exists.');
+        } else {
+            if (process.env.DEBUG) {
+                logger.info('Default admin already exists.');
             }
         }
     } catch (error) {
-        console.error('Error creating default admin:', error);
+        logger.error('Error creating default admin:', error);
     }
 };
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    logger.error(err.stack);
     res.status(500).send('Something broke!');
 });
 
@@ -174,7 +166,7 @@ app.use(async (req, res, next) => {
         });
         next();
     } catch (error) {
-        console.error('Error fetching invoices:', error);
+        logger.error('Error fetching invoices:', error);
         next();
     }
 });
@@ -209,14 +201,14 @@ Submission.belongsToMany(Invoice, {
         await Invoice.sync();
         await Submission.sync();
         await SubmissionInvoices.sync();
-        if(process.env.DEBUG) {
-            console.log('Models synced with the database');
+        if (process.env.DEBUG) {
+            logger.info('Models synced with the database');
         };
         if (process.env.DEV) {
             await createDefaultAdmin();
         }
     } catch (error) {
-        console.error('Error syncing models:', error);
+        logger.error('Error syncing models:', error);
     }
 })();
 
@@ -250,9 +242,8 @@ app.use('/', yearlyReturns);
 
 app.use('/', submission);
 
-
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    logger.error(err.stack);
     const status = err.status || 500;
     const errorViewPath = path.join(__dirname, 'views', `${status}.ejs`);
 
@@ -274,5 +265,5 @@ app.use((err, req, res, next) => {
 
 const port = 3000;
 app.listen(port, 'localhost', () => {
-    console.log('Server on http://localhost:3000');
+    logger.info('Server running at http://localhost:3000');
 });

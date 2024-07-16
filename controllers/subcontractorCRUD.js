@@ -1,14 +1,11 @@
-// /controllers/subcontractorCRUD.js
-
 const express = require('express');
 const router = express.Router();
 
 const packageJson = require('../package.json');
 const Subcontractor = require('../models/subcontractor');
 const helpers = require('../helpers');
-const {
-    Op
-} = require('sequelize');
+const { Op } = require('sequelize');
+const logger = require('../logger'); // Import the logger
 
 const createSubcontractor = async (req, res) => {
     try {
@@ -35,9 +32,7 @@ const createSubcontractor = async (req, res) => {
         // Check if the subcontractor already exists
         const existingSubcontractor = await Subcontractor.findOne({
             where: {
-                [Op.or]: [{
-                    utrNumber
-                }],
+                [Op.or]: [{ utrNumber }],
             },
         });
 
@@ -61,34 +56,19 @@ const createSubcontractor = async (req, res) => {
             ])
         );
 
-        /*
-        await Subcontractor.create({
-            name: nullCheckname,
-            company,
-            line1,
-            line2: nullCheckline2,
-            city,
-            county,
-            postalCode,
-            cisNumber: nullCheckcisNumber,
-            utrNumber: nullCheckutrNumber,
-            vatNumber: nullCheckvatNumber,
-            deduction,
-            isGross
-        });
-        */
-
         await Subcontractor.create(sanitizedData);
 
         req.flash('success', 'Subcontractor created.');
         const referer = '/dashboard';
         res.redirect(referer);
     } catch (error) {
+        logger.error('Error creating subcontractor:', error.message);
         req.flash('error', 'Error creating subcontractor: ' + error.message);
         const referer = req.get('referer') || '/';
         res.redirect(referer);
     }
 };
+
 const readSubcontractor = async (req, res) => {
     try {
         // Check if the user has permissions
@@ -112,9 +92,11 @@ const readSubcontractor = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
+        logger.error('Error reading subcontractor:', error.message);
         res.status(500).send('Error: ' + error.message);
     }
 };
+
 const updateSubcontractor = async (req, res) => {
     try {
         // Check if the user has permissions
@@ -140,7 +122,6 @@ const updateSubcontractor = async (req, res) => {
         const subcontractor = await Subcontractor.findByPk(req.params.id);
 
         if (subcontractor) {
-
             subcontractor.name = name;
             subcontractor.company = company;
             subcontractor.line1 = line1;
@@ -157,23 +138,23 @@ const updateSubcontractor = async (req, res) => {
             await subcontractor.save();
 
             req.flash('success', 'Subcontractor updated.');
-            console.log('Subcontractor updated.');
+            logger.info('Subcontractor updated.');
             const referrer = '/dashboard';
             res.redirect(referrer);
         } else {
             req.flash('error', 'Subcontractor not found.');
-            console.log('Subcontractor not found.');
+            logger.warn('Subcontractor not found.');
             const referer = req.get('referer') ? req.get('referer') : '/dashboard';
             res.redirect(referer);
         }
     } catch (error) {
-        // Handle error
-        console.error('Error updating subcontractor:', error);
+        logger.error('Error updating subcontractor:', error.message);
         req.flash('error', 'Error updating subcontractor: ' + error.message);
         const referer = req.get('referer') ? req.get('referer') : '/dashboard';
         res.redirect(referer);
     }
 };
+
 const deleteSubcontractor = async (req, res) => {
     try {
         // Check if the user has permissions
@@ -184,17 +165,20 @@ const deleteSubcontractor = async (req, res) => {
         const subcontractor = await Subcontractor.findByPk(req.params.id);
 
         if (!subcontractor) {
-            // res.status(404).send('Subcontractor not found');
-            return req.flash('error', 'Subcontractor not found');
+            req.flash('error', 'Subcontractor not found');
+            logger.warn('Subcontractor not found.');
+            const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+            return res.redirect(referer);
         }
 
         await subcontractor.destroy();
 
         req.flash('success', 'Subcontractor deleted.');
-        console.log('Subcontractor deleted.');
+        logger.info('Subcontractor deleted.');
         const referer = req.get('referer') ? req.get('referer') : '/dashboard';
         res.redirect(referer);
     } catch (error) {
+        logger.error('Error deleting subcontractor:', error.message);
         req.flash('error', 'Error: ' + error.message);
         const referer = req.get('referer') ? req.get('referer') : '/dashboard';
         res.redirect(referer);

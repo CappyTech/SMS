@@ -1,11 +1,11 @@
-// /controllers/invoiceCRUD.js
-
 const express = require('express');
 const router = express.Router();
 const packageJson = require('../package.json');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const { validateInvoiceData, calculateInvoiceAmounts, slimDateTime, formatCurrency } = require('../helpers');
+const moment = require('moment');
+const logger = require('../logger'); // Import the logger
 
 const createInvoice = async (req, res) => {
     try {
@@ -16,6 +16,26 @@ const createInvoice = async (req, res) => {
         // If remittanceDate or submissionDate are not provided, set them to null
         validatedData.remittanceDate = validatedData.remittanceDate || null;
         validatedData.submissionDate = validatedData.submissionDate || null;
+
+        // Calculate Tax Year and Tax Month
+        const calculateTaxYearAndMonth = (date) => {
+            if (!date) return { taxYear: null, taxMonth: null };
+
+            const remittanceMoment = moment.utc(date);
+            const year = remittanceMoment.year();
+            const startOfTaxYear = moment.utc(`${year}-04-06T00:00:00Z`);
+
+            // Determine tax year
+            const taxYear = remittanceMoment.isBefore(startOfTaxYear) ? `${year - 1}/${year}` : `${year}/${year + 1}`;
+
+            // Determine tax month
+            const startOfCurrentTaxYear = remittanceMoment.isBefore(startOfTaxYear) ? moment.utc(`${year - 1}-04-06T00:00:00Z`) : startOfTaxYear;
+            const taxMonth = remittanceMoment.diff(startOfCurrentTaxYear, 'months') + 1;
+
+            return { taxYear, taxMonth };
+        };
+
+        const { taxYear, taxMonth } = calculateTaxYearAndMonth(validatedData.remittanceDate);
 
         // Create invoice record
         const newInvoice = await Invoice.create({
@@ -32,6 +52,8 @@ const createInvoice = async (req, res) => {
             reverseCharge: amounts.reverseCharge,
             month: validatedData.month,
             year: validatedData.year,
+            taxYear, // Save calculated tax year
+            taxMonth, // Save calculated tax month
             SubcontractorId: req.params.selected
         });
 
@@ -40,7 +62,7 @@ const createInvoice = async (req, res) => {
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
             const errorMessages = error.errors.map((err) => err.message);
-            console.log('Validation errors:', errorMessages);
+            logger.error(`Validation errors: ${errorMessages.join(', ')}`);
             return res.render('createInvoice', {
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
@@ -48,7 +70,7 @@ const createInvoice = async (req, res) => {
                 packageJson,
             });
         }
-        console.error('Error creating invoice:', error);
+        logger.error(`Error creating invoice: ${error.message}`);
         req.flash('error', 'Error: ' + error.message);
         const referrer = req.get('referer') || '/';
         res.redirect(referrer);
@@ -84,7 +106,7 @@ const readInvoice = async (req, res) => {
             formatCurrency: formatCurrency,
         });
     } catch (error) {
-        console.error('Error viewing invoice:', error);
+        logger.error(`Error viewing invoice: ${error.message}`);
         res.status(500).json({ error: 'Error: ' + error.message });
     }
 };
@@ -124,7 +146,7 @@ const readInvoices = async (req, res) => {
             formatCurrency: formatCurrency,
         });
     } catch (error) {
-        console.error('Error viewing invoices:', error);
+        logger.error(`Error viewing invoices: ${error.message}`);
         res.status(500).json({ error: 'Error: ' + error.message });
     }
 };
@@ -154,7 +176,7 @@ const updateInvoice = async (req, res) => {
         req.flash('success', 'Invoice updated successfully');
         return res.redirect(`/invoice/read/${req.params.id}`);
     } catch (error) {
-        console.error('Error updating invoice:', error.message);
+        logger.error(`Error updating invoice with ID: ${req.params.id}. Details: ${error.message}`);
         req.flash('error', `Error updating invoice with ID: ${req.params.id}. Details: ${error.message}`);
         return res.redirect(`/invoice/read/${req.params.id}`);
     }
@@ -170,8 +192,8 @@ const deleteInvoice = async (req, res) => {
         const invoice = await Invoice.findByPk(req.params.id);
 
         if (!invoice) {
-            // res.status(404).send('Invoice not found');
-            return req.flash('error', 'Invoice not found');
+            req.flash('error', 'Invoice not found');
+            return res.redirect(req.get('referer') || '/dashboard');
         }
 
         await invoice.destroy();
@@ -180,6 +202,7 @@ const deleteInvoice = async (req, res) => {
         const referer = req.get('referer') || '/dashboard';
         res.redirect(referer);
     } catch (error) {
+        logger.error(`Error deleting invoice: ${error.message}`);
         req.flash('error', 'Error: ' + error.message);
         const referer = req.get('referer') || '/';
         res.redirect(referer);
