@@ -1,52 +1,43 @@
-<!-- views/createUser.ejs -->
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-        <div class="container-fluid py-5 text-center">
-            <h1 class="display-5 fw-bold">Create User</h1>
-            <form action="/user/create/" method="POST">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <td>
-                                <label for="username" class="form-label">Username</label>
-                            </td>
-                            <td>
-                                <input type="text" name="username" id="username" class="form-control" required>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="email" class="form-label">Email</label>
-                            </td>
-                            <td>
-                                <input type="email" name="email" id="email" class="form-control" required>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="password" class="form-label">Password</label>
-                            </td>
-                            <td>
-                                <input type="password" name="password" id="password" class="form-control" required>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="role" class="form-label">Role</label>
-                            </td>
-                            <td>
-                                <select name="role" id="role" class="form-select" required>
-                                    <option value="admin">Admin</option>
-                                    <option value="subcontractor">Subcontractor</option>
-                                </select>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <h1 class="display-5">New User</h1>
+        <div class="container-fluid text-center">
+            <form action="/user/create/" method="POST" class="needs-validation" novalidate>
+                <div class="row mb-3">
+                    <label for="username" class="col-sm-3 col-form-label">Username</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="username" id="username" class="form-control" required autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="email" class="col-sm-3 col-form-label">Email</label>
+                    <div class="col-sm-9">
+                        <input type="email" name="email" id="email" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="password" class="col-sm-3 col-form-label">Password</label>
+                    <div class="col-sm-9">
+                        <input type="password" name="password" id="password" class="form-control" required autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="role" class="col-sm-3 col-form-label">Role</label>
+                    <div class="col-sm-9">
+                        <select name="role" id="role" class="form-select" required>
+                            <option value="admin">Admin</option>
+                            <option value="subcontractor">Subcontractor</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-hcs-green"><i class="bi bi-person-plus"></i> Create User</button>
+                    <button type="submit" class="btn btn-hcs-green"><i class="bi bi-person-plus"></i> New User</button>
                 </div>
             </form>
         </div>
