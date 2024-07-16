@@ -2,89 +2,112 @@
 <%- include('../partials/errorAlerts.ejs') %>
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-        <div class="container-fluid py-5 text-center">
-            <h1 class="display-5 fw-bold">Create Subcontractor</h1>
-            <form action="/subcontractor/create/" method="POST">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <td><label for="name" class="form-label">Name</label></td>
-                            <td><input type="text" id="name" name="name" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="company" class="form-label">Company *</label></td>
-                            <td><input type="text" id="company" name="company" class="form-control" required></td>
-                        </tr>
-                        <tr>
-                            <td><label for="line1" class="form-label">Line 1</label></td>
-                            <td><input type="text" id="line1" name="line1" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="line2" class="form-label">Line 2</label></td>
-                            <td><input type="text" id="line2" name="line2" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="city" class="form-label">City</label></td>
-                            <td><input type="text" id="city" name="city" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="county" class="form-label">County</label></td>
-                            <td><input type="text" id="county" name="county" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="postalCode" class="form-label">Postal Code</label></td>
-                            <td><input type="text" id="postalCode" name="postalCode" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="cisNumber" class="form-label">CIS Number</label></td>
-                            <td><input type="text" id="cisNumber" name="cisNumber" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="utrNumber" class="form-label">UTR Number *</label></td>
-                            <td><input type="text" id="utrNumber" name="utrNumber" class="form-control" required></td>
-                        </tr>
-                        <tr>
-                            <td><label for="vatNumber" class="form-label">VAT Number</label></td>
-                            <td><input type="text" id="vatNumber" name="vatNumber" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <td><label for="deduction" class="form-check-label">Deduction</label></td>
-                            <td>
-                                <div class="form-group">
-                                    <select id="deduction" name="deduction" class="form-control">
-                                        <option value="0.3">30%</option>
-                                        <option value="0.2" selected>20%</option>
-                                        <option value="0">0%</option>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="isGross" class="form-check-label">Gross</label></td>
-                            <td>
-                                <div class="form-group">
-                                    <select id="isGross" name="isGross" class="form-control">
-                                        <option value="false" selected>False</option>
-                                        <option value="true">True</option>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="isReverseCharge" class="form-check-label">Reverse Charge</label></td>
-                            <td>
-                                <div class="form-group">
-                                    <select id="isReverseCharge" name="isReverseCharge" class="form-control">
-                                        <option value="false" selected>False</option>
-                                        <option value="true">True</option>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <h1 class="display-5">New Subcontractor</h1>
+        <div class="container-fluid text-center">
+            <form action="/subcontractor/create/" method="POST" class="needs-validation">
+                <div class="row mb-3">
+                    <label for="name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="name" name="name" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="company" class="col-sm-3 col-form-label">Company <span class="hcs-red-text">*</span></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="company" name="company" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="line1" class="col-sm-3 col-form-label">Line 1</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="line1" name="line1" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="line2" class="col-sm-3 col-form-label">Line 2</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="line2" name="line2" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="city" class="col-sm-3 col-form-label">City</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="city" name="city" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="county" class="col-sm-3 col-form-label">County</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="county" name="county" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="postalCode" class="col-sm-3 col-form-label">Postal Code</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="postalCode" name="postalCode" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="cisNumber" class="col-sm-3 col-form-label">CIS Number</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="cisNumber" name="cisNumber" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="utrNumber" class="col-sm-3 col-form-label">UTR Number <span class="hcs-red-text">*</span></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="utrNumber" name="utrNumber" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="vatNumber" class="col-sm-3 col-form-label">VAT Number</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="vatNumber" name="vatNumber" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="deduction" class="col-sm-3 col-form-label">Deduction</label>
+                    <div class="col-sm-9">
+                        <select id="deduction" name="deduction" class="form-select">
+                            <option value="0.3">30%</option>
+                            <option value="0.2" selected>20%</option>
+                            <option value="0">0%</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="isGross" class="col-sm-3 col-form-label">Gross</label>
+                    <div class="col-sm-9">
+                        <select id="isGross" name="isGross" class="form-select">
+                            <option value="false" selected>No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="isReverseCharge" class="col-sm-3 col-form-label">Reverse Charge</label>
+                    <div class="col-sm-9">
+                        <select id="isReverseCharge" name="isReverseCharge" class="form-select">
+                            <option value="false" selected>No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-hcs-green"><i class="bi bi-person-plus"></i> Create Subcontractor</button>
+                    <button type="submit" class="btn btn-hcs-green"><i class="bi bi-person-plus"></i> New Subcontractor</button>
                 </div>
             </form>
         </div>
