@@ -200,12 +200,6 @@ strong {
 	box-shadow: 0 1px 0 0 #4e4e4e;
 }
 
-a {
-	color: #A0333D;
-}
-a:hover {
-	color: #2B9E1B;
-}
 .sticky-bottom {
 	position: fixed;
 	bottom: 0;
@@ -225,35 +219,35 @@ a:hover {
 	background-color: #A0333D;
 	color: white;
 	border-color: #A0333D;
-  }
+}
   
-  .btn-hcs-green {
-	background-color: #2B9E1B;
-	color: white;
-	border-color: #2B9E1B;
-  }
-  
-  .btn-hcs-black {
-	background-color: #4e4e4e;
-	color: white;
-	border-color: #4e4e4e;
-  }
-  
-  /* Override Bootstrap styles for these custom buttons */
-  .btn-hcs-red:hover {
-	background-color: #a7a9ac;
-	border-color: #a7a9ac;
-  }
-  
-  .btn-hcs-green:hover {
-	background-color: #a7a9ac;
-	border-color: #a7a9ac;
-  }
-  
-  .btn-hcs-black:hover {
-	background-color: #818181;
-	border-color: #818181;
-  }
+.btn-hcs-green {
+background-color: #2B9E1B;
+color: white;
+border-color: #2B9E1B;
+}
+
+.btn-hcs-black {
+background-color: #4e4e4e;
+color: white;
+border-color: #4e4e4e;
+}
+
+/* Override Bootstrap styles for these custom buttons */
+.btn-hcs-red:hover {
+background-color: #a7a9ac;
+border-color: #a7a9ac;
+}
+
+.btn-hcs-green:hover {
+background-color: #a7a9ac;
+border-color: #a7a9ac;
+}
+
+.btn-hcs-black:hover {
+background-color: #818181;
+border-color: #818181;
+}
 
 .form-check-input:checked {
 	background-color: #28a745;
@@ -262,4 +256,15 @@ a:hover {
 .scrollable-list {
 	max-height: 70vh; /* Set a fixed height */
 	overflow-y: auto; /* Enable vertical scrolling */
+}
+
+html, body {
+      height: 100%;
+    }
+body {
+	display: flex;
+	flex-direction: column;
+}
+.content {
+	flex: 1;
 }
