@@ -50,10 +50,8 @@ const createInvoice = async (req, res) => {
             netAmount: amounts.netAmount,
             submissionDate: validatedData.submissionDate,
             reverseCharge: amounts.reverseCharge,
-            month: validatedData.month,
-            year: validatedData.year,
-            taxYear, // Save calculated tax year
-            taxMonth, // Save calculated tax month
+            month: taxMonth,
+            year: taxYear,
             SubcontractorId: req.params.selected
         });
 
