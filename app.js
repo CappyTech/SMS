@@ -306,6 +306,6 @@ app.use((err, req, res, next) => {
 });
 
 const port = 80;
-app.listen(port, 'sms.heroncs.local', () => {
-    logger.info('Server running at http://sms.heroncs.local');
+app.listen(port, 'localhost', () => {
+    logger.info('Server running at http://localhost');
 });
