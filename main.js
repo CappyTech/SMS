@@ -15,7 +15,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadURL('http://localhost:3000');
+  mainWindow.loadURL('http://localhost');
 
   // Remove the menu bar
   mainWindow.setMenu(null);
@@ -26,8 +26,8 @@ function createWindow() {
 }
 
 app.on('ready', () => {
-  expressApp.listen(3000, () => {
-    console.log('Express server running on http://localhost:3000');
+  expressApp.listen(81, () => {
+    console.log('Express server running on http://localhost');
     createWindow();
   });
 });
