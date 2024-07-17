@@ -1,0 +1,23 @@
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <% if (totalNotifications > 0) { %>
+            <i class="bi bi-bell"></i>
+            Alerts
+            <span class="badge"><%= totalNotifications %></span>
+        <% } else { %> 
+            <i class="bi bi-bell-fill"></i>
+        <% } %>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
+        <li><h6 class="dropdown-header">Notifications</h6></li>
+        <% if (unpaidInvoices.length === 0 && unsubmittedInvoices.length === 0) { %>
+            <li><span class="dropdown-item-text">No notifications</span></li>
+        <% } %>
+        <% unpaidInvoices.forEach(invoice => { %>
+            <li><a class="dropdown-item" href="/invoice/read/<%= invoice.id %>">Unpaid Invoice #<%= invoice.kashflowNumber %></a></li>
+        <% }) %>
+        <% unsubmittedInvoices.forEach(invoice => { %>
+            <li><a class="dropdown-item" href="/invoice/read/<%= invoice.id %>">Unsubmitted Invoice #<%= invoice.kashflowNumber %></a></li>
+        <% }) %>
+    </ul>
+</li>
