@@ -73,19 +73,36 @@ sessionStore.onReady().then(() => {
 
 app.use((req, res, next) => {
     res.locals.session = req.session;
+    if (process.env.DEBUG) {
+        logger.info(`Session Data: ${JSON.stringify(req.session)}`);
+    }
+    const username = req.session.user ? req.session.user.username : 'unknown user';
+    const logMessage = `${username} accessed path ${req.path}`;
+
+    if (req.path.includes('/update/')) {
+        logger.warn(`-------- Warn: ${logMessage}`);
+    } else if (req.path.includes('/delete/')) {
+        logger.error(`------- Danger: ${logMessage}`);
+    } else {
+        logger.info(`${logMessage}`);
+    }
     next();
 });
 
 const flash = require('express-flash');
 
 app.use(flash());
-
+// Add the Origin-Agent-Cluster header to all responses
+app.use((req, res, next) => {
+    res.setHeader('Origin-Agent-Cluster', '?1');
+    next();
+});
 const helmet = require('helmet');
 app.use(helmet());
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
-            defaultSrc: ["'self'"],
+            defaultSrc: ["'self'", "sms.heroncs.local"], // Added local domain explicitly
             styleSrc: [
                 "'self'",
                 "'unsafe-inline'",
@@ -111,7 +128,7 @@ app.use(
                 "https://i.creativecommons.org",
                 "https://licensebuttons.net",
             ],
-            connectSrc: ["'self'"],
+            connectSrc: ["'self'", "sms.heroncs.local"], // Allowing connections to local domain
         },
     })
 );
@@ -164,6 +181,31 @@ app.use(async (req, res, next) => {
             attributes: ['id', 'kashflowNumber'],
             order: [['kashflowNumber', 'ASC']]
         });
+        next();
+    } catch (error) {
+        logger.error('Error fetching invoices:', error);
+        next();
+    }
+});
+
+app.use(async (req, res, next) => {
+    try {
+        const unpaidInvoices = await Invoice.findAll({
+            where: { remittanceDate: null },
+            attributes: ['id', 'kashflowNumber'],
+            order: [['kashflowNumber', 'ASC']]
+        });
+
+        const unsubmittedInvoices = await Invoice.findAll({
+            where: { submissionDate: null },
+            attributes: ['id', 'kashflowNumber'],
+            order: [['kashflowNumber', 'ASC']]
+        });
+
+        res.locals.unpaidInvoices = unpaidInvoices;
+        res.locals.unsubmittedInvoices = unsubmittedInvoices;
+        res.locals.totalNotifications = unpaidInvoices.length + unsubmittedInvoices.length;
+
         next();
     } catch (error) {
         logger.error('Error fetching invoices:', error);
@@ -263,7 +305,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-const port = 3000;
-app.listen(port, 'localhost', () => {
-    logger.info('Server running at http://localhost:3000');
+const port = 80;
+app.listen(port, 'sms.heroncs.local', () => {
+    logger.info('Server running at http://sms.heroncs.local');
 });
