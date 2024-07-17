@@ -1,33 +1,14 @@
 @echo off
-
-:: Check if Node.js is installed
-where node >nul 2>nul
-IF %ERRORLEVEL% EQU 0 (
-    echo Node.js is already installed.
-) ELSE (
-    echo Node.js is not installed.
-    echo Downloading and installing Node.js...
-
-    :: Download Node.js installer using PowerShell
-    powershell -Command "Invoke-WebRequest -Uri https://nodejs.org/dist/v18.16.0/node-v18.16.0-x64.msi -OutFile nodejs.msi"
-
-    :: Install Node.js silently
-    msiexec /i nodejs.msi /quiet
-
-    :: Clean up installer
-    del nodejs.msi
-
-    echo Node.js installation complete.
-)
-
-:: Run npm install
-echo Running npm install...
-npm install
-IF %ERRORLEVEL% NEQ 0 (
-    echo npm install failed. Please check for errors.
-    pause
+:: Check if the script is running with administrator privileges
+openfiles >nul 2>&1
+if %errorlevel% neq 0 (
+    echo This script requires Administrator privileges.
+    echo Please wait while we attempt to restart it with elevated permissions...
+    powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
+
+echo Running with administrator privileges...
 
 :: Check if .env file exists, if not create it
 IF NOT EXIST .env (
@@ -68,9 +49,49 @@ IF NOT EXIST .env (
     echo .env file already exists.
 )
 
+setlocal enabledelayedexpansion
+
+REM Get the current date and time for the backup filename
+for /f "tokens=1-5 delims=/: " %%d in ("%date% %time%") do (
+    set backupDate=%%d-%%e-%%f
+    set backupTime=%%g-%%h-%%i
+)
+set BACKUP_FILE=%SystemRoot%\System32\drivers\etc\hosts_%backupDate%_%backupTime%.bak
+
+set HOSTS_FILE=%SystemRoot%\System32\drivers\etc\hosts
+set HOST_ENTRY=127.0.0.1 localhost
+
+REM Backup the existing hosts file
+copy "%HOSTS_FILE%" "%BACKUP_FILE%"
+if %errorlevel% neq 0 (
+    echo Failed to create a backup of the hosts file.
+    echo Please make sure you run this script as an administrator.
+    pause
+    exit /b 1
+) else (
+    echo Backup of the hosts file created successfully: %BACKUP_FILE%
+)
+
+REM Check if the HOST_ENTRY is already in the hosts file
+echo Checking if the entry "%HOST_ENTRY%" exists in the hosts file...
+findstr /C:"%HOST_ENTRY%" "%HOSTS_FILE%" >nul
+if %errorlevel% equ 0 (
+    echo The entry "%HOST_ENTRY%" already exists in the hosts file.
+) else (
+    echo The entry "%HOST_ENTRY%" does not exist. Adding it now...
+    echo %HOST_ENTRY% >> "%HOSTS_FILE%"
+    if %errorlevel% equ 0 (
+        echo Entry added successfully.
+    ) else (
+        echo Failed to add the entry. Please make sure you run this script as an administrator.
+    )
+)
+
+endlocal
+
 :: Start the Node.js application
 cd /d "%~dp0"
-powershell -Command "Start-Process 'http://localhost:3000'"
+powershell -Command "Start-Process 'http://localhost'"
 node app.js
 
 :: Keep the command prompt open
