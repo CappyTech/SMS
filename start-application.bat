@@ -1,15 +1,5 @@
 @echo off
-:: Check if the script is running with administrator privileges
-openfiles >nul 2>&1
-if %errorlevel% neq 0 (
-    echo This script requires Administrator privileges.
-    echo Please wait while we attempt to restart it with elevated permissions...
-    powershell -Command "Start-Process '%~f0' -Verb RunAs"
-    exit /b
-)
-
-echo Running with administrator privileges...
-
+title SMS - Heron CS LTD - Start Application
 :: Check if .env file exists, if not create it
 IF NOT EXIST .env (
     echo .env file not found. Creating .env file...
@@ -48,46 +38,6 @@ IF NOT EXIST .env (
 ) ELSE (
     echo .env file already exists.
 )
-
-setlocal enabledelayedexpansion
-
-REM Get the current date and time for the backup filename
-for /f "tokens=1-5 delims=/: " %%d in ("%date% %time%") do (
-    set backupDate=%%d-%%e-%%f
-    set backupTime=%%g-%%h-%%i
-)
-set BACKUP_FILE=%SystemRoot%\System32\drivers\etc\hosts_%backupDate%_%backupTime%.bak
-
-set HOSTS_FILE=%SystemRoot%\System32\drivers\etc\hosts
-set HOST_ENTRY=127.0.0.1 localhost
-
-REM Backup the existing hosts file
-copy "%HOSTS_FILE%" "%BACKUP_FILE%"
-if %errorlevel% neq 0 (
-    echo Failed to create a backup of the hosts file.
-    echo Please make sure you run this script as an administrator.
-    pause
-    exit /b 1
-) else (
-    echo Backup of the hosts file created successfully: %BACKUP_FILE%
-)
-
-REM Check if the HOST_ENTRY is already in the hosts file
-echo Checking if the entry "%HOST_ENTRY%" exists in the hosts file...
-findstr /C:"%HOST_ENTRY%" "%HOSTS_FILE%" >nul
-if %errorlevel% equ 0 (
-    echo The entry "%HOST_ENTRY%" already exists in the hosts file.
-) else (
-    echo The entry "%HOST_ENTRY%" does not exist. Adding it now...
-    echo %HOST_ENTRY% >> "%HOSTS_FILE%"
-    if %errorlevel% equ 0 (
-        echo Entry added successfully.
-    ) else (
-        echo Failed to add the entry. Please make sure you run this script as an administrator.
-    )
-)
-
-endlocal
 
 :: Start the Node.js application
 cd /d "%~dp0"
