@@ -17,6 +17,7 @@
     "appId": "uk.co.heroncs.sms",
     "productName": "Subcontractor Management System - Heron CS LTD",
     "files": [
+      "logger.js",
       ".env",
       "db.js",
       "app.js",
@@ -55,6 +56,7 @@
     "bootstrap-icons": "^1.11.0",
     "dotenv": "^16.1.0",
     "ejs": "^3.1.9",
+    "electron-updater": "^6.2.1",
     "express": "^4.18.2",
     "express-ejs-layouts": "^2.5.1",
     "express-flash": "^0.0.2",
