@@ -39,8 +39,8 @@ function validateInvoiceData(data) {
         remittanceDate: value => !value || !isNaN(Date.parse(value)),
         labourCost: value => !isNaN(value) && Number(value) >= 0,
         materialCost: value => !isNaN(value) && Number(value) >= 0,
-        month: value => !isNaN(value) && Number(value) >= 1 && Number(value) <= 12,
-        year: value => !isNaN(value) && Number(value) >= 2000
+        //month: value => !isNaN(value) && Number(value) >= 1 && Number(value) <= 12,
+        //year: value => !isNaN(value) && Number(value) >= 2000
     };
 
     Object.keys(validations).forEach(field => {
