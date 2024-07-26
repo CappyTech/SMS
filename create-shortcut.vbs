@@ -8,14 +8,17 @@ sBatchFilePath = oArgs(0)
 sIconFilePath = oArgs(1)
 
 Set oWS = WScript.CreateObject("WScript.Shell")
+Set oFSO = CreateObject("Scripting.FileSystemObject")
 sLinkFile = oWS.SpecialFolders("Desktop") & "\Start Application.lnk"
 
 If oFSO.FileExists(sLinkFile) Then
     WScript.Echo "Shortcut already exists on Desktop."
+    WScript.Quit 0
 Else
     Set oLink = oWS.CreateShortcut(sLinkFile)
     oLink.TargetPath = sBatchFilePath
     oLink.IconLocation = sIconFilePath
     oLink.Save
     WScript.Echo "Shortcut created on Desktop."
+    WScript.Quit 1
 End If
