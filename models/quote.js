@@ -5,7 +5,7 @@ const {
 } = require('sequelize');
 const sequelize = require('../db.js');
 
-const Quote = sequelize.define('Quote', {
+const Quotes = sequelize.define('Quotes', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -44,8 +44,6 @@ const Quote = sequelize.define('Quote', {
     invoice_date: {
         type: DataTypes.DATE
     }
-},{
-    tableName: 'quotes' // table name in your database
 });
 
-module.exports = Quote;
+module.exports = Quotes;
