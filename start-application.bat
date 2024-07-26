@@ -54,7 +54,7 @@ set exitcode=%ERRORLEVEL%
 :: If the shortcut already exists, start the Node.js application
 IF %exitcode% EQU 0 (
     cd /d "%~dp0"
-    powershell -Command "Start-Process 'http://localhost:3000'"
+    powershell -Command "Start-Process 'http://localhost'"
     node app.js
 ) ELSE (
     echo Shortcut created. Please use the shortcut to start the application.
