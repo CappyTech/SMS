@@ -1,9 +1,18 @@
 @echo off
-title SMS - Heron CS LTD - Start Application
+title Starting Node.js Application Setup
 
+:: Ensure we are in the script's directory
 cd /d "%~dp0"
 
-:: Check if .env file exists, if not create it
+:: Call the install-node.bat script
+call install-node.bat
+IF %ERRORLEVEL% NEQ 0 (
+    echo Failed to install Node.js or run npm install. Exiting...
+    pause
+    exit /b 1
+)
+
+:: Check if .env file exists in the script's directory, if not create it and prompt for values
 IF NOT EXIST "%~dp0.env" (
     echo .env file not found. Creating .env file...
 
@@ -18,8 +27,8 @@ IF NOT EXIST "%~dp0.env" (
     set /p ADMIN_PASSWORD="Enter ADMIN_PASSWORD: "
     set /p ADMIN_USERNAME="Enter ADMIN_USERNAME: "
     set /p ADMIN_EMAIL="Enter ADMIN_EMAIL: "
-    set /p DEV="Enter DEV: <meant to be empty - press enter>"
-    set /p DEBUG="Enter DEBUG: <meant to be empty - press enter>"
+    set /p DEV="Enter DEV: "
+    set /p DEBUG="Enter DEBUG: "
 
     echo Writing to .env file...
     (
@@ -35,7 +44,7 @@ IF NOT EXIST "%~dp0.env" (
         echo ADMIN_EMAIL=%ADMIN_EMAIL%
         echo DEV=%DEV%
         echo DEBUG=%DEBUG%
-    ) > .env
+    ) > "%~dp0.env"
 
     echo .env file created.
 ) ELSE (
@@ -48,11 +57,16 @@ set ICON_PATH=%~dp0favicon.ico
 
 :: Create a shortcut with a custom icon using the VBS script
 cscript //nologo create-shortcut.vbs "%SCRIPT_PATH%" "%ICON_PATH%"
+set exitcode=%ERRORLEVEL%
 
-:: Start the Node.js application
-cd /d "%~dp0"
-powershell -Command "Start-Process 'http://localhost'"
-node app.js
+:: If the shortcut already exists, start the Node.js application
+IF %exitcode% EQU 0 (
+    cd /d "%~dp0"
+    powershell -Command "Start-Process 'http://localhost:3000'"
+    node app.js
+) ELSE (
+    echo Shortcut created. Please use the shortcut to start the application.
+)
 
 :: Keep the command prompt open
 pause
