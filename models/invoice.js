@@ -69,7 +69,7 @@ const Invoice = sequelize.define('Invoice', {
         allowNull: false
     },
 }, {
-    paranoid: false, // Add the paranoid option
+    paranoid: true,
 });
 
 module.exports = Invoice;
