@@ -57,7 +57,6 @@
             </li>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="darkModeToggle">
-              <label class="form-check-label" for="darkModeToggle" id="darkModeToggleLabel">Switch to Night Mode</label>
             </div>
         <% } %>
       </ul>
@@ -65,58 +64,59 @@
   </nav>
   <nav class="navbar navbar-expand-lg navbar-light bg-grey d-print-none">
     <div class="container">
-      <ul class="navbar-nav hstack gap-3">
+      <ul class="navbar-nav w-100 d-flex align-items-center">
         <% if (typeof session.user === 'undefined') { %>
         <% } else { %>
-          <!--
-          <div class="dropdown">
-              <button class="btn btn-hcs-green dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Create <i class="bi bi-menu-down"></i>
-              </button>
-              <ul class="dropdown-menu">
-                -->
-                  <% if (session.user.permissionCreateInvoice) { %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/subcontractor/select">
-                          <i class="bi bi-file-plus"></i>
-                          Invoice
-                        </a>
-                    </li>
-                  <% } else {} %>
-                  <% if (session.user.permissionCreateSubcontractor) { %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/subcontractor/create">
-                          <i class="bi bi-person-plus"></i>
-                         Subcontractor
-                        </a>
-                    </li>
-                  <% } else {} %>
-                  <% if (session.user.permissionCreateUser) { %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/create">
-                          <i class="bi bi-person-plus"></i>
-                          User
-                        </a>
-                    </li>
-                  <% } else {} %>
-                  <!--
-                  <% if (session.user.permissionCreateInvoice) { %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/submission/create">
-                          <i class="bi bi-file-plus"></i>
-                          Submission
-                        </a>
-                    </li>
-                  <% } else {} %>
-                  -->
-              </ul>
-          <!--
-          </div> 
-          -->
+        <!-- Left Links -->
+        <div class="d-flex me-auto">
+          <% if (session.user.permissionCreateInvoice) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/subcontractor/select">
+              <i class="bi bi-receipt"></i>
+              Invoice
+            </a>
+          </li>
+          <% } %>
+          <% if (session.user.permissionCreateSubcontractor) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/subcontractor/create">
+              <i class="bi bi-people"></i>
+              Subcontractor
+            </a>
+          </li>
+          <% } %>
+        </div>
+        <!-- Center Links -->
+        <div class="d-flex mx-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/job/create">
+              <i class="bi bi-briefcase"></i>
+              Jobs
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/quote/create">
+              <i class="bi bi-file-earmark-text"></i>
+              Quotes
+            </a>
+          </li>
+        </div>
+        <!-- Right Links -->
+        <div class="d-flex ms-auto">
+          <% if (session.user.permissionCreateUser) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/user/create">
+              <i class="bi bi-person"></i>
+              User
+            </a>
+          </li>
+          <% } %>
+        </div>
         <% } %>
       </ul>
     </div>
   </nav>
+
   <div class="content">
     <%- body %>
   </div>
