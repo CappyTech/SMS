@@ -7,7 +7,6 @@ const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const moment = require('moment');
 const helpers = require('../helpers');
-const Submission = require('../models/submission');
 const logger = require('../logger'); // Import the logger
 
 const renderIndex = (req, res) => {
@@ -272,42 +271,6 @@ const e500 = async (req, res) => {
     }
 };
 
-// Display form to create a new submission
-const renderSubmissionCreateForm = async (req, res) => {
-    try {
-        const invoices = await Invoice.findAll({ where: { submissionDate: null } });
-        res.render('createSubmission', {
-            invoices: invoices,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            packageJson
-        });
-    } catch (error) {
-        logger.error('Error rendering submission create form:', error.message);
-        req.flash('error', 'An error occurred while rendering the submission form.');
-        res.redirect('/submission/create');
-    }
-};
-
-// Display form to update a new submission
-const renderSubmissionUpdateForm = async (req, res) => {
-    try {
-        const submission = await Submission.findByPk(req.params.id);
-        res.render('updateSubmission', {
-            submission,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            packageJson
-        });
-    } catch (error) {
-        logger.error('Error rendering submission update form:', error.message);
-        req.flash('error', 'An error occurred while rendering the submission form.');
-        res.redirect('/submission');
-    }
-};
-
 router.get('/', renderIndex);
 router.get('/dashboard/:year?', renderadminDashboard);
 router.get('/user/create', renderUserCreateForm);
@@ -318,7 +281,5 @@ router.get('/subcontractor/update/:id', renderSubcontractorUpdateForm);
 router.get('/invoice/update/:id', renderInvoiceUpdateForm);
 router.get('/subcontractor/select', selectSubcontractor);
 router.get('/500', e500);
-router.get('/submission/create', renderSubmissionCreateForm);
-router.get('/submission/update/:id', renderSubmissionUpdateForm);
 
 module.exports = router;
