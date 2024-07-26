@@ -216,8 +216,9 @@ app.use(async (req, res, next) => {
 const User = require('./models/user');
 const Subcontractor = require('./models/subcontractor');
 const Invoice = require('./models/invoice');
-const Submission = require('./models/submission');
-const SubmissionInvoices = require('./models/associations/submissionInvoices');
+const Worker = require('./models/worker')
+const Attendance = require('./models/attendance');
+
 User.hasMany(Subcontractor, {
     foreignKey: 'userId',
     allowNull: false,
@@ -231,18 +232,30 @@ Invoice.belongsTo(Subcontractor, {
     foreignKey: 'SubcontractorId',
     allowNull: false,
 });
-Submission.belongsToMany(Invoice, {
-    through: 'SubmissionInvoices',
-    foreignKey: 'submissionId',
-    otherKey: 'invoiceId',
+Worker.hasMany(Attendance, {
+    foreignKey: 'workerId',
+    allowNull: true,
 });
+Subcontractor.hasMany(Attendance, {
+    foreignKey: 'subcontractorId',
+    allowNull: true,
+});
+Attendance.belongsTo(Worker, {
+    foreignKey: 'workerId',
+    allowNull: true,
+});
+Attendance.belongsTo(Subcontractor, {
+    foreignKey: 'subcontractorId',
+    allowNull: true,
+});
+
 (async () => {
     try {
         await User.sync();
         await Subcontractor.sync();
         await Invoice.sync();
-        await Submission.sync();
-        await SubmissionInvoices.sync();
+        await Worker.sync();
+        await Attendance.sync();
         if (process.env.DEBUG) {
             logger.info('Models synced with the database');
         };
@@ -267,8 +280,6 @@ const invoiceCRUD = require('./controllers/invoiceCRUD');
 const monthlyReturns = require('./controllers/monthlyReturns');
 const yearlyReturns = require('./controllers/yearlyReturns');
 
-const submission = require('./controllers/submissionCRUD');
-
 app.use('/', renderFunctions);
 
 app.use('/', login);
@@ -281,8 +292,6 @@ app.use('/', invoiceCRUD);
 
 app.use('/', monthlyReturns);
 app.use('/', yearlyReturns);
-
-app.use('/', submission);
 
 app.use((err, req, res, next) => {
     logger.error(err.stack);
