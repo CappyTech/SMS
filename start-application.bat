@@ -4,14 +4,6 @@ title Starting Node.js Application Setup
 :: Ensure we are in the script's directory
 cd /d "%~dp0"
 
-:: Call the install-node.bat script
-call install-node.bat
-IF %ERRORLEVEL% NEQ 0 (
-    echo Failed to install Node.js or run npm install. Exiting...
-    pause
-    exit /b 1
-)
-
 :: Check if .env file exists in the script's directory, if not create it and prompt for values
 IF NOT EXIST "%~dp0.env" (
     echo .env file not found. Creating .env file...
