@@ -1,7 +1,10 @@
 @echo off
 title SMS - Heron CS LTD - Start Application
+
+cd /d "%~dp0"
+
 :: Check if .env file exists, if not create it
-IF NOT EXIST .env (
+IF NOT EXIST "%~dp0.env" (
     echo .env file not found. Creating .env file...
 
     set /p DB_HOST="Enter DB_HOST: "
@@ -38,6 +41,13 @@ IF NOT EXIST .env (
 ) ELSE (
     echo .env file already exists.
 )
+
+:: Set the paths
+set SCRIPT_PATH=%~dp0start-application.bat
+set ICON_PATH=%~dp0favicon.ico
+
+:: Create a shortcut with a custom icon using the VBS script
+cscript //nologo create-shortcut.vbs "%SCRIPT_PATH%" "%ICON_PATH%"
 
 :: Start the Node.js application
 cd /d "%~dp0"
