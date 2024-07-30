@@ -70,8 +70,7 @@ const createInvoice = async (req, res) => {
         }
         logger.error(`Error creating invoice: ${error.message}`);
         req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        res.redirect('/error');
     }
 };
 
@@ -83,7 +82,7 @@ const readInvoice = async (req, res) => {
             return res.redirect('/'); // Ensure to return here
         }
 
-        const invoice = await Invoice.findByPk(req.params.id, {
+        const invoice = await Invoice.findByPk(req.params.invoice, {
             include: [
                 { model: Subcontractor }
             ],
@@ -105,7 +104,8 @@ const readInvoice = async (req, res) => {
         });
     } catch (error) {
         logger.error(`Error viewing invoice: ${error.message}`);
-        res.status(500).json({ error: 'Error: ' + error.message });
+        req.flash('error', 'Error viewing invoice:' + error.message);
+        res.redirect('/error');
     }
 };
 
@@ -117,13 +117,13 @@ const readInvoices = async (req, res) => {
             return res.redirect('/'); // Ensure to return here
         }
 
-        const subcontractor = await Subcontractor.findByPk(req.params.id);
+        const subcontractor = await Subcontractor.findByPk(req.params.subcontractor);
 
         const invoices = await Invoice.findAll({
             include: [
                 {
                     model: Subcontractor,
-                    where: { id: req.params.id }
+                    where: { id: req.params.subcontractor }
                 }
             ],
             order: [['invoiceNumber', 'DESC']]
@@ -145,7 +145,8 @@ const readInvoices = async (req, res) => {
         });
     } catch (error) {
         logger.error(`Error viewing invoices: ${error.message}`);
-        res.status(500).json({ error: 'Error: ' + error.message });
+        req.flash('error', 'Error viewing invoices:' + error.message);
+        res.redirect('/error');
     }
 };
 
@@ -153,23 +154,23 @@ const updateInvoice = async (req, res) => {
     try {
         validateInvoiceData(req.body);
 
-        const invoice = await Invoice.findByPk(req.params.id);
+        const invoice = await Invoice.findByPk(req.params.invoice);
         if (!invoice) {
             throw new Error('Invoice not found');
         }
 
         if (!invoice.SubcontractorId) {
-            throw new Error(`No subcontractorId associated with invoice ID: ${req.params.id}`);
+            throw new Error(`No subcontractorId associated with invoice number: ${req.params.invoice}`);
         }
 
         const subcontractor = await Subcontractor.findByPk(invoice.SubcontractorId);
         if (!subcontractor) {
-            throw new Error(`Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.id}`);
+            throw new Error(`Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.invoice}`);
         }
 
         const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
 
-        await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.id } });
+        await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
 
         req.flash('success', 'Invoice updated successfully');
         return res.redirect(`/invoice/read/${req.params.id}`);
@@ -201,16 +202,15 @@ const deleteInvoice = async (req, res) => {
         res.redirect(referer);
     } catch (error) {
         logger.error(`Error deleting invoice: ${error.message}`);
-        req.flash('error', 'Error: ' + error.message);
-        const referer = req.get('referer') || '/';
-        res.redirect(referer);
+        req.flash('error', 'Error deleting invoice: ' + error.message);
+        res.redirect('/error');
     }
 };
 
 router.post('/invoice/create/:selected', createInvoice);
-router.get('/invoice/read/:id', readInvoice);
-router.get('/invoices/read/:id', readInvoices);
-router.post('/invoice/update/:id', updateInvoice);
-router.post('/invoice/delete/:id', deleteInvoice);
+router.get('/invoice/read/:invoice', readInvoice);
+router.get('/invoices/read/:subcontractor', readInvoices);
+router.post('/invoice/update/:invoice', updateInvoice);
+router.post('/invoice/delete/:invoice', deleteInvoice);
 
 module.exports = router;
