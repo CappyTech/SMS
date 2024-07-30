@@ -16,7 +16,7 @@ sequelize
         }
     })
     .catch((error) => {
-        logger.error('Unable to connect to the database:', error.message);
+        logger.error('Unable to connect to the database:  ', error.message);
         logger.error('Details:', error);
     });
 
