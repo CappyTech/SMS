@@ -9,7 +9,7 @@ const speakeasy = require("speakeasy");
 const logger = require('../logger'); // Import the logger
 
 const renderSigninForm = (req, res) => {
-    logger.info('Session data:', req.session);
+    
     res.render('signin', {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
@@ -22,8 +22,7 @@ const loginUser = async (req, res) => {
     try {
         const {
             usernameOrEmail,
-            password,
-            enteredCode
+            password
         } = req.body;
 
         // Find the user by username or email
@@ -40,6 +39,7 @@ const loginUser = async (req, res) => {
         });
 
         if (!user) {
+            logger.eorro('Invalid username/email:', userJSON);
             req.flash('error', 'Invalid username/email');
             return res.redirect('/signin');
         }
@@ -54,47 +54,22 @@ const loginUser = async (req, res) => {
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (passwordMatch) {
-            // Verify the entered code against the user's secret key
-            const verified = speakeasy.totp.verify({
-                secret: user.twoFactorSecret,
-                encoding: 'base32',
-                token: enteredCode,
-                window: 1,
-            });
-
-            if (verified || !user.twoFactorEnabled) {
-                req.session.user = user;
-                req.session.user.subcontractors = subcontractors;
-                const userWithoutPassword = {
-                    ...user.get(),
-                    password: undefined
-                };
-                const userJSON = JSON.stringify(userWithoutPassword);
-
-                if (user.role === 'admin') {
-                    logger.info('Admin Logged in:', userJSON);
-                    return res.redirect('/dashboard');
-                }
-                if (user.role === 'subcontractor') {
-                    logger.info('Subcontractor Logged in:', userJSON);
-                    return res.redirect('/dashboard');
-                }
-                logger.info('User Logged in:', userJSON);
-                return res.redirect('/dashboard');
-            } else {
-                req.flash('error', 'Invalid 2FA code.');
-                return res.redirect('/signin');
-            }
-        } else {
-            req.flash('error', 'Invalid password');
+            req.session.user = user;
+            req.session.user.subcontractors = subcontractors;
+            
+            logger.info('User Logged in');
+            return res.redirect('/dashboard/stats');
+        
+         } else {
+            logger.error('Error Invalid password:  ', error.message);
+             req.flash('error', 'Invalid password');
             return res.redirect('/signin');
-        }
+        };
     } catch (error) {
-        logger.error('Error logging in:', error.message);
-        req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
-    }
+        logger.error('Error logging in:  ', error.message);
+        req.flash('error', 'Error logging in: ' + error.message);
+        res.redirect('/error');
+    };
 };
 
 const logoutUser = (req, res) => {
