@@ -127,8 +127,7 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
     } catch (error) {
         logger.error("Error rendering monthly returns:", error);
         req.flash('error', 'Error: Unable to render monthly returns');
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        res.redirect('/monthly/returns/form');
     }
 };
 
@@ -183,8 +182,7 @@ const renderMonthlyReturnsForAll = async (req, res) => {
     } catch (error) {
         logger.error("Error rendering monthly returns:", error);
         req.flash('error', 'Error: Unable to render monthly returns');
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        res.redirect('/monthly/returns/form');
     }
 };
 
@@ -235,8 +233,7 @@ const renderMonthlyReturnsYear = async (req, res) => {
     } catch (error) {
         logger.error("Error rendering monthly returns:", error);
         req.flash('error', 'Error: Unable to render monthly returns');
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        res.redirect('/monthly/returns/form');
     }
 };
 
