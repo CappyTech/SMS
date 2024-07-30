@@ -61,7 +61,7 @@ const createUser = async (req, res) => {
         req.flash('success', 'User created successfully.');
         res.redirect('/dashboard');
     } catch (error) {
-        logger.error('Error creating user:', error.message);
+        logger.error('Error creating user:  ', error.message);
         req.flash('error', 'An error occurred.');
         res.redirect('/error');
     }
@@ -100,7 +100,7 @@ const readUser = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error reading user:', error.message);
+        logger.error('Error reading user:  ', error.message);
         res.status(500).send('An error occurred.');
     }
 };
@@ -189,14 +189,13 @@ const updateUser = async (req, res) => {
             }
         } else {
             req.flash('error', 'User not found.');
+            res.redirect('/dashboard/user');
         }
-
-        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
-        res.redirect(referer);
+        res.redirect('/user/read/' + req.params.id);
     } catch (error) {
-        logger.error('Error updating user:', error.message);
+        logger.error('Error updating user:  ', error.message);
         req.flash('error', 'Error updating user: ' + error.message);
-        res.status(500).redirect('/');
+        res.redirect('/error');
     }
 };
 
@@ -213,24 +212,22 @@ const deleteUser = async (req, res) => {
         const user = await User.findByPk(req.params.id);
         if (!user) {
             req.flash('error', 'User not found');
+            res.redirect('/dashboard/user');
         } else {
             await user.destroy();
             req.flash('success', 'User deleted successfully');
+            res.redirect('/dashboard/user');
         }
-
-        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
-        res.redirect(referer);
     } catch (error) {
-        logger.error('Error deleting user:', error.message);
-        req.flash('error', 'Error: ' + error.message);
-        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
-        res.status(500).redirect(referer);
+        logger.error('Error deleting user:  ', error.message);
+        req.flash('error', 'Error deleting user: ' + error.message);
+        res.redirect('/error');
     }
 };
 
 router.post('/user/create/:selected', createUser);
 router.get('/user/read/:id', readUser);
 router.post('/user/update/:id', updateUser);
-router.get('/user/delete/:id', deleteUser);
+router.post('/user/delete/:id', deleteUser);
 
 module.exports = router;
