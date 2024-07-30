@@ -1,0 +1,37 @@
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+    <i class="bi bi-speedometer"></i> Dashboards
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
+        <li><h6 class="dropdown-header">Dashboards</h6></li>
+        <li>
+            <a class="dropdown-item" href="/dashboard/stats">
+            Statistics
+            </a>
+        </li>
+        <li class="dropdown-divider"></li>
+        <li>
+            <a class="dropdown-item" href="/dashboard/invoice">
+            Invoices
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="/dashboard/subcontractor">
+            Subcontractors
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="/dashboard/quote">
+            Quotes
+            </a>
+        </li>
+        <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
+        <li class="dropdown-divider"></li>
+        <li>
+            <a class="dropdown-item" href="/dashboard/user">
+            Users
+            </a>
+        </li>
+        <% } %>
+    </ul>
+</li>
