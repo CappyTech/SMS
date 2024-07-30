@@ -1,0 +1,44 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Users Dashboard</h1>
+            <div class="d-flex justify-content-end mb-3">
+                <a href="/user/create" class="btn btn-hcs-green">Create New User</a>
+            </div>
+            <% if (users.length === 0) { %>
+                <p class="text-center">No users available.</p>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(function(user) { %>
+                                <tr>
+                                    <td class="<%= user.username ? '' : 'text-warning' %>"><%= user.username ? user.username : 'N/A' %></td>
+                                    <td class="<%= user.email ? '' : 'text-warning' %>"><%= user.email ? user.email : 'N/A' %></td>
+                                    <td class="<%= user.role ? '' : 'text-warning' %>"><%= user.role ? user.role : 'N/A' %></td>
+                                    <td>
+                                        <a href="/user/read/<%= user.id %>" class="btn btn-info btn-sm">View</a>
+                                        <a href="/user/update/<%= user.id %>" class="btn btn-warning btn-sm">Update</a>
+                                        <form action="/user/delete/<%= user.id %>" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
