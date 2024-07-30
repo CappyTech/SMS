@@ -62,10 +62,9 @@ const createSubcontractor = async (req, res) => {
         const referer = '/dashboard';
         res.redirect(referer);
     } catch (error) {
-        logger.error('Error creating subcontractor:', error.message);
+        logger.error('Error creating subcontractor:  ', error.message);
         req.flash('error', 'Error creating subcontractor: ' + error.message);
-        const referer = req.get('referer') || '/';
-        res.redirect(referer);
+        res.redirect('/');
     }
 };
 
@@ -92,8 +91,9 @@ const readSubcontractor = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error reading subcontractor:', error.message);
-        res.status(500).send('Error: ' + error.message);
+        logger.error('Error reading subcontractor:  ', error.message);
+        req.flash('error', 'Error reading subcontractor: ' + error.message);
+        res.redirect('/');
     }
 };
 
@@ -144,14 +144,13 @@ const updateSubcontractor = async (req, res) => {
         } else {
             req.flash('error', 'Subcontractor not found.');
             logger.warn('Subcontractor not found.');
-            const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+            const referer = req.get('referer');
             res.redirect(referer);
         }
     } catch (error) {
-        logger.error('Error updating subcontractor:', error.message);
+        logger.error('Error updating subcontractor:  ', error.message);
         req.flash('error', 'Error updating subcontractor: ' + error.message);
-        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
-        res.redirect(referer);
+        res.redirect('/dashboard/subcontractor');
     }
 };
 
@@ -167,7 +166,7 @@ const deleteSubcontractor = async (req, res) => {
         if (!subcontractor) {
             req.flash('error', 'Subcontractor not found');
             logger.warn('Subcontractor not found.');
-            const referer = req.get('referer') ? req.get('referer') : '/dashboard';
+            const referer = req.get('referer');
             return res.redirect(referer);
         }
 
@@ -175,13 +174,11 @@ const deleteSubcontractor = async (req, res) => {
 
         req.flash('success', 'Subcontractor deleted.');
         logger.info('Subcontractor deleted.');
-        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
-        res.redirect(referer);
+        res.redirect('/dashboard/subcontractor');
     } catch (error) {
-        logger.error('Error deleting subcontractor:', error.message);
-        req.flash('error', 'Error: ' + error.message);
-        const referer = req.get('referer') ? req.get('referer') : '/dashboard';
-        res.redirect(referer);
+        logger.error('Error deleting subcontractor:  ', error.message);
+        req.flash('error', 'Error deleting subcontractor: ' + error.message);
+        res.redirect('/dashboard/subcontractor');
     }
 };
 
