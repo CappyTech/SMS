@@ -1,0 +1,48 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Invoices Dashboard</h1>
+            <div class="d-flex justify-content-end mb-3">
+                <a href="/invoice/create" class="btn btn-hcs-green">Create New Invoice</a>
+            </div>
+            <% if (invoices.length === 0) { %>
+                <p class="text-center">No invoices available.</p>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Invoice Number</th>
+                                <th>KashFlow Number</th>
+                                <th>Invoice Date</th>
+                                <th>Remittance Date</th>
+                                <th>Gross Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% invoices.forEach(function(invoice) { %>
+                                <tr>
+                                    <td class="<%= invoice.invoiceNumber ? '' : 'text-warning' %>"><%= invoice.invoiceNumber ? invoice.invoiceNumber : 'N/A' %></td>
+                                    <td class="<%= invoice.kashflowNumber ? '' : 'text-warning' %>"><%= invoice.kashflowNumber ? invoice.kashflowNumber : 'N/A' %></td>
+                                    <td class="<%= invoice.invoiceDate ? '' : 'text-warning' %>"><%= invoice.invoiceDate ? slimDateTime(invoice.invoiceDate) : 'N/A' %></td>
+                                    <td class="<%= invoice.remittanceDate ? '' : 'text-warning' %>"><%= invoice.remittanceDate ? slimDateTime(invoice.remittanceDate) : 'N/A' %></td>
+                                    <td class="<%= invoice.grossAmount ? '' : 'text-warning' %>">£<%= invoice.grossAmount ? invoice.grossAmount.toFixed(2) : 'N/A' %></td>
+                                    <td>
+                                        <a href="/invoice/read/<%= invoice.id %>" class="btn btn-info btn-sm">View</a>
+                                        <a href="/invoice/update/<%= invoice.id %>" class="btn btn-warning btn-sm">Update</a>
+                                        <form action="/invoice/delete/<%= invoice.id %>" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
