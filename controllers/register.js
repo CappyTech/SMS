@@ -7,7 +7,7 @@ const { Op } = require("sequelize");
 const logger = require('../logger'); // Import the logger
 
 const renderRegistrationForm = (req, res) => {
-    logger.info('Session data:', req.session);
+    
     res.render('register', {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
@@ -33,18 +33,19 @@ const registerUser = async (req, res) => {
         });
 
         if (existingUser) {
+            logger.error('Username or email already exists');
             req.flash('error', 'Username or email already exists');
             return res.redirect('/register');
         }
 
         // Create a new user in the database
         await User.create({ username, email, password });
+        logger.danger('New User Created.');
         res.redirect('/');
     } catch (error) {
-        logger.error('Error registering user:', error.message);
-        req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        logger.error('Error registering user:  ', error.message);
+        req.flash('error', 'Error registering user: ' + error.message);
+        return res.redirect('/register');
     }
 };
 
