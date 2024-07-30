@@ -276,6 +276,7 @@ const settings = require('./controllers/settings');
 const userCRUD = require('./controllers/userCRUD');
 const subcontractorCRUD = require('./controllers/subcontractorCRUD');
 const invoiceCRUD = require('./controllers/invoiceCRUD');
+const quoteCRUD = require('./controllers/quoteCRUD');
 
 const monthlyReturns = require('./controllers/monthlyReturns');
 const yearlyReturns = require('./controllers/yearlyReturns');
@@ -289,6 +290,7 @@ app.use('/', settings);
 app.use('/', userCRUD);
 app.use('/', subcontractorCRUD);
 app.use('/', invoiceCRUD);
+app.use('/', quoteCRUD);
 
 app.use('/', monthlyReturns);
 app.use('/', yearlyReturns);
