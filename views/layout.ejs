@@ -20,9 +20,7 @@
       </a>
       <ul class="navbar-nav hstack gap-3">
         <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
-            <li class="nav-item">
-              <a class="nav-link hcs-white-text" href="/dashboard"><i class="bi bi-speedometer"></i> Dashboard</a>
-            </li>
+            <%- include('../partials/dashboards.ejs') %>
             <% } %>
             <% if (typeof session.user !== 'undefined') { %>
             <li class="nav-item">
@@ -85,19 +83,25 @@
             </a>
           </li>
           <% } %>
+          <li class="nav-item">
+            <a class="nav-link" href="/client/select">
+              <i class="bi bi-file-earmark-text"></i>
+              Quote
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/client/create">
+              <i class="bi bi-people"></i>
+              Client
+            </a>
+          </li>
         </div>
         <!-- Center Links -->
         <div class="d-flex mx-auto">
           <li class="nav-item">
             <a class="nav-link" href="/job/create">
               <i class="bi bi-briefcase"></i>
-              Jobs
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/quote/create">
-              <i class="bi bi-file-earmark-text"></i>
-              Quotes
+              Job
             </a>
           </li>
         </div>
