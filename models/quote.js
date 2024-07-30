@@ -13,37 +13,46 @@ const Quotes = sequelize.define('Quotes', {
     },
     date: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: true
+    },
+    quote_ref: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     job_ref: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
-    site: {
+    location: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     client: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     contact_ref: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: true
     },
     value: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false
+        type: DataTypes.FLOAT,
+        allowNull: true
     },
     desc: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: true
     },
     invoice_no: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: true
     },
     invoice_date: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        allowNull: true
     }
+}, {
+    paranoid: true,
 });
 
 module.exports = Quotes;
