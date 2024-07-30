@@ -1,24 +1,27 @@
 // controllers/quoteCRUD.js
+const express = require('express');
+const router = express.Router();
+const packageJson = require('../package.json');
 const Quote = require('../models/quote');
-const { validateQuoteData } = require('../helpers'); // Assume you have validation helpers similar to the Invoice example
+const helpers = require('../helpers');
 const moment = require('moment');
 const logger = require('../logger');
 
 const createQuote = async (req, res) => {
     try {
-        const validatedData = validateQuoteData(req.body);
+        const { date, job_ref, site, client, contact_ref, value, desc, invoice_no, invoice_date, po_number } = req.body;
 
         const newQuote = await Quote.create({
-            date: validatedData.date,
-            job_ref: validatedData.job_ref,
-            site: validatedData.site,
-            client: validatedData.client,
-            contact_ref: validatedData.contact_ref,
-            value: validatedData.value,
-            desc: validatedData.desc,
-            invoice_no: validatedData.invoice_no,
-            invoice_date: validatedData.invoice_date,
-            po_number: validatedData.po_number,
+            date,
+            job_ref,
+            site,
+            client,
+            contact_ref,
+            value,
+            desc,
+            invoice_no,
+            invoice_date,
+            po_number
         });
 
         res.redirect(`/quote/read/${newQuote.id}`);
@@ -34,9 +37,8 @@ const createQuote = async (req, res) => {
             });
         }
         logger.error(`Error creating quote: ${error.message}`);
-        req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        req.flash('error', 'Error creating quote: ' + error.message);
+        res.redirect('/dashboard/quote');
     }
 };
 
@@ -63,7 +65,8 @@ const readQuote = async (req, res) => {
         });
     } catch (error) {
         logger.error(`Error viewing quote: ${error.message}`);
-        res.status(500).json({ error: 'Error: ' + error.message });
+        req.flash('error', 'Error viewing quote: ' + error.message);
+        res.redirect('/dashboard/quote');
     }
 };
 
@@ -88,13 +91,13 @@ const readQuotes = async (req, res) => {
         });
     } catch (error) {
         logger.error(`Error viewing quotes: ${error.message}`);
-        res.status(500).json({ error: 'Error: ' + error.message });
+        req.flash('error', 'Error viewing quotes: ' + error.message);
+        res.redirect('/dashboard/quote');
     }
 };
 
 const updateQuote = async (req, res) => {
     try {
-        validateQuoteData(req.body);
 
         const quote = await Quote.findByPk(req.params.id);
         if (!quote) {
@@ -132,16 +135,15 @@ const deleteQuote = async (req, res) => {
         res.redirect(referer);
     } catch (error) {
         logger.error(`Error deleting quote: ${error.message}`);
-        req.flash('error', 'Error: ' + error.message);
-        const referer = req.get('referer') || '/';
-        res.redirect(referer);
+        req.flash('error', 'Error deleting quote: ' + error.message);
+        res.redirect('/dashboard/quote');
     }
 };
 
-module.exports = {
-    createQuote,
-    readQuote,
-    readQuotes,
-    updateQuote,
-    deleteQuote,
-};
+router.post('/quote/create/', createQuote);
+router.get('/quote/read/:id', readQuote);
+router.get('/quotes', readQuotes);
+router.post('/quote/update/:id', updateQuote);
+router.post('/quote/delete/:id', deleteQuote);
+
+module.exports = router;
