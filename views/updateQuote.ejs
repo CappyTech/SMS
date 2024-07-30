@@ -1,0 +1,93 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <h1 class="display-5">Update Quote</h1>
+        <div class="container-fluid text-center">
+            <form action="/quote/update/<%= quote.id %>" method="POST" class="needs-validation">
+                <div class="row mb-3">
+                    <label for="date" class="col-sm-3 col-form-label">Date <i class="bi bi-calendar2-date-fill"></i></label>
+                    <div class="col-sm-9">
+                        <input type="date" id="date" name="date" class="form-control" value="<%= slimDateTime(quote.date, true) %>" >
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="quote_ref" class="col-sm-3 col-form-label">Quote Ref <i class="bi bi-file-earmark-text"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="quote_ref" name="quote_ref" class="form-control" value="<%= quote.quote_ref %>" >
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="job_ref" class="col-sm-3 col-form-label">Job Ref <i class="bi bi-briefcase"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="job_ref" name="job_ref" class="form-control" value="<%= quote.job_ref %>" >
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="location" class="col-sm-3 col-form-label">Location <i class="bi bi-geo-alt"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="location" name="location" class="form-control" value="<%= quote.location %>" >
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="client" class="col-sm-3 col-form-label">Client <i class="bi bi-person"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="client" name="client" class="form-control" value="<%= quote.client %>" >
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="contact_ref" class="col-sm-3 col-form-label">Contact Ref <i class="bi bi-person-badge"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="contact_ref" name="contact_ref" class="form-control" value="<%= quote.contact_ref %>">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="value" class="col-sm-3 col-form-label">Value <i class="bi bi-currency-pound"></i></label>
+                    <div class="col-sm-9">
+                        <input type="number" step="0.01" id="value" name="value" class="form-control" value="<%= quote.value %>" >
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="desc" class="col-sm-3 col-form-label">Description <i class="bi bi-file-text"></i></label>
+                    <div class="col-sm-9">
+                        <textarea id="desc" name="desc" class="form-control" rows="3" ><%= quote.desc %></textarea>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="invoice_no" class="col-sm-3 col-form-label">Invoice No <i class="bi bi-file-earmark"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="invoice_no" name="invoice_no" class="form-control" value="<%= quote.invoice_no %>">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="invoice_date" class="col-sm-3 col-form-label">Invoice Date <i class="bi bi-calendar2-date-fill"></i></label>
+                    <div class="col-sm-9">
+                        <input type="date" id="invoice_date" name="invoice_date" class="form-control" value="<%= slimDateTime(quote.invoice_date, true) %>">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="po_number" class="col-sm-3 col-form-label">PO Number <i class="bi bi-file-earmark-text"></i></label>
+                    <div class="col-sm-9">
+                        <input type="text" id="po_number" name="po_number" class="form-control" value="<%= quote.po_number %>">
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-hcs-green">
+                        <i class="bi bi-file-earmark-check"></i> Update Quote
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
