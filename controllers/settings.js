@@ -27,10 +27,11 @@ const updateAccountSettings = async (req, res) => {
 
         await user.save();
 
+        logger.info('Account settings updated successfully');
         req.flash('success', 'Account settings updated successfully');
         res.redirect('/account');
     } catch (error) {
-        logger.error('Error updating account settings:', error.message);
+        logger.error('Error updating account settings:  ', error.message);
         req.flash('error', 'Failed to update account settings');
         res.redirect('/account');
     }
@@ -39,7 +40,7 @@ const updateAccountSettings = async (req, res) => {
 // Display the account page
 const getAccountPage = async (req, res) => {
     try {
-        logger.info('Session data:', req.session);
+        
         // Fetch the user data based on the current user's session
         const user = await User.findOne({
             where: {
@@ -57,10 +58,9 @@ const getAccountPage = async (req, res) => {
             message: req.query.message || '',
         });
     } catch (error) {
-        logger.error('Error getting account page:', error.message);
-        req.flash('error', 'Error: ' + error.message);
-        const referrer = req.get('referer') || '/';
-        res.redirect(referrer);
+        logger.error('Error getting account page:  ', error.message);
+        req.flash('error', 'Error getting account page: ' + error.message);
+        res.redirect('/');
     }
 };
 
