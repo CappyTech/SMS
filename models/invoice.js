@@ -58,7 +58,7 @@ const Invoice = sequelize.define('Invoice', {
     },
     month: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
             min: 1,
             max: 12
@@ -66,7 +66,7 @@ const Invoice = sequelize.define('Invoice', {
     },
     year: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
     },
 }, {
     paranoid: true,
