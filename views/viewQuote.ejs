@@ -1,0 +1,53 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Quote <%= quote.quote_ref %></h1>
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between text-bg-secondary">
+                    <span><%= quote.client %></span>
+                    <a class="hcs-green-text" href="/quote/read/<%= quote.id %>">View Quote</a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <ul class="list-group">
+                                <li class="list-group-item">Date</li>
+                                <li class="list-group-item">Quote Ref</li>
+                                <li class="list-group-item">Job Ref</li>
+                                <li class="list-group-item">Location</li>
+                                <li class="list-group-item">Client</li>
+                                <li class="list-group-item">Contact Ref</li>
+                                <li class="list-group-item">Value</li>
+                                <li class="list-group-item">Description</li>
+                                <li class="list-group-item">Invoice No</li>
+                                <li class="list-group-item">Invoice Date</li>
+                                <li class="list-group-item">PO Number</li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <ul class="list-group">
+                                <li class="list-group-item <%= quote.date ? '' : 'text-warning' %>"><%= quote.date ? slimDateTime(quote.date) : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.quote_ref ? '' : 'text-warning' %>"><%= quote.quote_ref ? quote.quote_ref : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.job_ref ? '' : 'text-warning' %>"><%= quote.job_ref ? quote.job_ref : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.location ? '' : 'text-warning' %>"><%= quote.location ? quote.location : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.client ? '' : 'text-warning' %>"><%= quote.client ? quote.client : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.contact_ref ? '' : 'text-warning' %>"><%= quote.contact_ref ? quote.contact_ref : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.value ? '' : 'text-warning' %>">£<%= quote.value ? quote.value.toFixed(2) : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.desc ? '' : 'text-warning' %>"><%= quote.desc ? quote.desc : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.invoice_no ? '' : 'text-warning' %>"><%= quote.invoice_no ? quote.invoice_no : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.invoice_date ? '' : 'text-warning' %>"><%= quote.invoice_date ? slimDateTime(quote.invoice_date) : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.po_number ? '' : 'text-warning' %>"><%= quote.po_number ? quote.po_number : 'N/A' %></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a type="button" class="btn btn-hcs-green btn-sm" href="/quote/update/<%= quote.id %>">Update Quote</a>
+                    <span>Last Updated: <%= slimDateTime(quote.updatedAt, true) %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
