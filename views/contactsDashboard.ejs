@@ -5,7 +5,7 @@
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Contacts Dashboard</h1>
             <div class="d-flex justify-content-end mb-3">
-                <a href="/contact/create" class="btn btn-hcs-green">Create New Contact</a>
+                <a href="/dashboard/client" class="btn btn-hcs-green">Create New Contact</a>
             </div>
             <% if (contacts.length === 0) { %>
                 <p class="text-center">No contacts available.</p>
@@ -25,17 +25,13 @@
                         <tbody>
                             <% contacts.forEach(function(contact) { %>
                                 <tr>
-                                    <td class="<%= contact.name ? '' : 'text-warning' %>"><%= contact.name ? contact.name : 'N/A' %></td>
-                                    <td class="<%= contact.clientName ? '' : 'text-warning' %>"><%= contact.clientName ? contact.clientName : 'N/A' %></td>
-                                    <td class="<%= contact.phone ? '' : 'text-warning' %>"><%= contact.phone ? contact.phone : 'N/A' %></td>
-                                    <td class="<%= contact.email ? '' : 'text-warning' %>"><%= contact.email ? contact.email : 'N/A' %></td>
-                                    <td class="<%= contact.note ? '' : 'text-warning' %>"><%= contact.note ? contact.note : 'N/A' %></td>
+                                    <td><a href='/client/read/<%= contact.id %>'><%= contact.name %></a></td>
+                                    <td><a href='/client/read/<%= contact.Client.id %>'><%= contact.Client.name %></a></td>
+                                    <td><%= contact.phone %></td>
+                                    <td><%= contact.email %></td>
+                                    <td><%= contact.note %></td>
                                     <td>
-                                        <a href="/contact/read/<%= contact.id %>" class="btn btn-info btn-sm">View</a>
                                         <a href="/contact/update/<%= contact.id %>" class="btn btn-warning btn-sm">Update</a>
-                                        <form action="/contact/delete/<%= contact.id %>" method="post" class="d-inline">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
                                     </td>
                                 </tr>
                             <% }); %>
