@@ -1,11 +1,8 @@
 // models/invoice.js
-
-const {
-    DataTypes
-} = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
 
-const Invoice = sequelize.define('Invoice', {
+const Invoices = sequelize.define('Invoices', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -68,8 +65,20 @@ const Invoice = sequelize.define('Invoice', {
         type: DataTypes.INTEGER,
         allowNull: true
     },
+    createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+    },
+    updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+    },
+    deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
 }, {
     paranoid: true,
 });
 
-module.exports = Invoice;
+module.exports = Invoices;
