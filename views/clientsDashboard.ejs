@@ -1,0 +1,40 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Clients Dashboard</h1>
+            <div class="d-flex justify-content-end mb-3">
+                <a href="/client/create" class="btn btn-hcs-green">Create New Client</a>
+            </div>
+            <% if (clients.length === 0) { %>
+                <p class="text-center">No clients available.</p>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% clients.forEach(function(client) { %>
+                                <tr>
+                                    <td class="<%= client.name ? '' : 'text-warning' %>"><%= client.name ? client.name : 'N/A' %></td>
+                                    <td>
+                                        <a href="/client/read/<%= client.id %>" class="btn btn-info btn-sm">View</a>
+                                        <a href="/client/update/<%= client.id %>" class="btn btn-warning btn-sm">Update</a>
+                                        <form action="/client/delete/<%= client.id %>" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
