@@ -10,6 +10,7 @@
             </a>
         </li>
         <li class="dropdown-divider"></li>
+        <li><h6 class="dropdown-header">CIS Returns</h6></li>
         <li>
             <a class="dropdown-item" href="/dashboard/invoice">
             Invoices
@@ -20,13 +21,33 @@
             Subcontractors
             </a>
         </li>
+        <li class="dropdown-divider"></li>
+        <li><h6 class="dropdown-header">Management</h6></li>
         <li>
             <a class="dropdown-item" href="/dashboard/quote">
             Quotes
             </a>
         </li>
+        <li>
+            <a class="dropdown-item" href="/dashboard/client">
+            Clients
+            </a>
+        </li>
+        <li class="dropdown-divider"></li>
+        <li><h6 class="dropdown-header">Payroll</h6></li>
+        <li>
+            <a class="dropdown-item" href="/dashboard/attendance">
+            Attendances
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="/dashboard/employee">
+            Employees
+            </a>
+        </li>
         <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
         <li class="dropdown-divider"></li>
+        <li><h6 class="dropdown-header">Administration</h6></li>
         <li>
             <a class="dropdown-item" href="/dashboard/user">
             Users
