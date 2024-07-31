@@ -2,67 +2,86 @@
 <%- include('../partials/errorAlerts') %>
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-        <h1 class="display-5">Client Details</h1>
-        <div class="container-fluid">
-            <div class="card mb-4">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center"><%= clients.name %></h1>
+            <div class="card">
                 <div class="card-header d-flex justify-content-between text-bg-secondary">
-                    <span><%= clients.name %></span>
-                    <a href="/client/update/<%= clients.id %>" class="btn btn-warning btn-sm">Update Client</a>
+                    <span>Client</span>
+                    <a class="text-white" href="/contact/read/<%= clients.id %>">View Contacts</a>
                 </div>
                 <div class="card-body">
-                    <ul class="list-group">
-                        <li class="list-group-item"><strong>Contact:</strong> <%= clients.contacts ? clients.contacts.name : 'N/A' %></li>
-                        <li class="list-group-item"><strong>Email:</strong> <%= clients.contacts ? clients.contacts.email : 'N/A' %></li>
-                        <li class="list-group-item"><strong>Phone:</strong> <%= clients.contacts ? clients.contacts.phone : 'N/A' %></li>
-                        <li class="list-group-item"><strong>Address:</strong> <%= clients.address ? clients.address : 'N/A' %></li>
-                    </ul>
+                    <div class="row">
+                        <div class="col-6">
+                            <ul class="list-group">
+                                <li class="list-group-item">Contact</li>
+                                <li class="list-group-item">Email</li>
+                                <li class="list-group-item">Phone</li>
+                                <li class="list-group-item">Note </li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <ul class="list-group">
+                                <li class="list-group-item"><%= clients.contacts ? clients.contacts.name : 'N/A' %></li>
+                                <li class="list-group-item"><%= clients.contacts ? clients.contacts.email : 'N/A' %></li>
+                                <li class="list-group-item"><%= clients.contacts ? clients.contacts.phone : 'N/A' %></li>
+                                <li class="list-group-item"><%= clients.contacts ? clients.contacts.note : 'N/A' %></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a type="button" class="btn btn-hcs-green btn-sm" href="/client/update/<%= clients.id %>">Update Client</a>
+                    <span>Last Updated: <%= slimDateTime(clients.updatedAt, true) %></span>
                 </div>
             </div>
 
             <h3 class="mt-4">Contacts</h3>
-            <form action="/contact/create" method="POST" class="needs-validation">
-                <input type="hidden" name="clientId" value="<%= clients.id %>">
                 <div class="row mb-3">
-                    <div class="col-sm-5">
-                        <input type="text" name="contactName" class="form-control" placeholder="Contact Name" required>
+                    <div class="col-sm-6">
+                        <form action="/contact/create/<%= clients.id %>" method="POST" class="needs-validation">
+                            <input type="hidden" name="clientId" value="<%= clients.id %>">
+                            <input type="text" name="name" class="form-control" placeholder="Contact Name" required>
+                            <input type="text" name="phone" class="form-control" placeholder="Phone Number">
+                            <input type="text" name="email" class="form-control" placeholder="Email">
+                            <input type="textarea" name="note" class="form-control" placeholder="Note">
+                            <button type="submit" class="btn btn-hcs-green w-100">Add Contact</button>
+                        </form>
                     </div>
-                    <div class="col-sm-5">
-                        <input type="text" name="phone" class="form-control" placeholder="Phone Number">
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="submit" class="btn btn-hcs-green w-100">Add Contact</button>
+                    <div class="col-sm-6">
+                        <% if (clients.Contacts.length === 0) { %>
+                        <p class="text-center">No contacts available.</p>
+                        <% } else { %>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>Note</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% clients.Contacts.forEach(function(contact) { %>
+                                        <tr>
+                                            <td class="<%= contact.name ? '' : 'text-warning' %>"><%= contact.name ? contact.name : 'N/A' %></td>
+                                            <td class="<%= contact.phone ? '' : 'text-warning' %>"><%= contact.phone ? contact.phone : 'N/A' %></td>
+                                            <td class="<%= contact.email ? '' : 'text-warning' %>"><%= contact.email ? contact.email : 'N/A' %></td>
+                                            <td class="<%= contact.note ? '' : 'text-warning' %>"><%= contact.note ? contact.note : 'N/A' %></td>
+                                            <td>
+                                                <form action="/contact/delete/<%= contact.id %>" method="post" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <% } %>
                     </div>
                 </div>
-            </form>
-            <% if (clients.Contacts.length === 0) { %>
-                <p class="text-center">No contacts available.</p>
-            <% } else { %>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Contact Name</th>
-                                <th>Phone</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% clients.Contacts.forEach(function(contact) { %>
-                                <tr>
-                                    <td class="<%= contact.name ? '' : 'text-warning' %>"><%= contact.name ? contact.name : 'N/A' %></td>
-                                    <td class="<%= contact.phone ? '' : 'text-warning' %>"><%= contact.phone ? contact.phone : 'N/A' %></td>
-                                    <td>
-                                        <form action="/clientContact/delete/<%= contact.id %>" method="post" class="d-inline">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
-                </div>
-            <% } %>
-
             <h3 class="mt-4">Quotes</h3>
             <% if (clients.Quotes.length === 0) { %>
                 <p class="text-center">No quotes available.</p>
