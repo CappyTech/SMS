@@ -9,8 +9,8 @@ const User = require('../models/user');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const Quote = require('../models/quote');
-const Client = require('../models/client');
-const Contact = require('../models/contact');
+const Clients = require('../models/client');
+const Contacts = require('../models/contact');
 
 const renderIndex = (req, res) => {
     res.render('index', {
@@ -218,12 +218,24 @@ const renderQuoteCreateForm = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        res.render('createQuote', {
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            packageJson,
-        });
+        if (req.params.client) {
+            const clients = await Clients.findByPk(req.params.client, {
+                include: [Contact]
+            });
+            if (!clients) {
+                req.flash('error', 'Error: No Clients exist.');
+                return res.redirect('/client/create');
+            }
+            return res.render('createQuote', {
+                clients,
+                errorMessages: req.flash('error'),
+                successMessage: req.flash('success'),
+                session: req.session,
+                packageJson,
+            });
+        } else {
+            return res.status(404).send('Client not found');
+        }
     } catch (error) {
         logger.error('Error rendering quote create form: ', error.message);
         req.flash('error', 'Error rendering quotes create form: ' + error.message);
@@ -237,13 +249,20 @@ const renderQuoteUpdateForm = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const quote = await Quote.findByPk(req.params.quote);
+        const quote = await Quote.findByPk(req.params.quote, {
+            include: [{
+                model: Clients,
+                include: [Contacts]
+            }]
+        });
 
         if (!quote) {
             return res.status(404).send('Quote not found');
         }
 
-        res.render('updateQuote', {
+        logger.info(JSON.stringify(quote, null, 2));
+
+        return res.render('updateQuote', {
             quote,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -262,7 +281,7 @@ const renderQuoteUpdateForm = async (req, res) => {
 const selectClient = async (req, res) => {
     try {
         
-        const clients = await Client.findAll({});
+        const clients = await Clients.findAll({});
         
         if (clients.length === 0) {
             req.flash('error', 'Error: No Clients exist, Or you don\'t have access to any Clients.');
@@ -301,16 +320,16 @@ const renderClientCreateForm = async (req, res) => {
 
 const renderClientUpdateForm = async (req, res) => {
     try {
-        const client = await Client.findByPk(req.params.id, {
+        const clients = await Clients.findByPk(req.params.client, {
             include: [{ model: Contact }]
         });
 
-        if (!client) {
+        if (!clients) {
             return res.status(404).send('Client not found');
         }
 
         res.render('updateClient', {
-            client,
+            clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
@@ -359,7 +378,7 @@ const selectContact = async (req, res) => {
 const renderContactCreateForm = async (req, res) => {
     try {
         const contact = await Contact.findAll({
-            include: [{ model: Client }]
+            include: [{ model: Clients }]
         });
 
         res.render('createContact', {
@@ -379,7 +398,7 @@ const renderContactCreateForm = async (req, res) => {
 const renderContactUpdateForm = async (req, res) => {
     try {
         const contact = await Contact.findByPk(req.params.contact, {
-            include: [{ model: Client }]
+            include: [{ model: Clients }]
         });
 
         if (!contact) {
@@ -388,7 +407,6 @@ const renderContactUpdateForm = async (req, res) => {
 
         res.render('updateContact', {
             contact,
-            client: contact.Client,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
@@ -415,6 +433,36 @@ const e500 = async (req, res) => {
     }
 };
 
+const e404 = async (req, res) => {
+    try {
+        res.render('404', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+        });
+    } catch (error) {
+        logger.error('Error rendering 404 page:  ', error.message);
+        req.flash('error', 'Error rendering 404 page: ' + error.message);
+        return res.redirect('/');
+    }
+};
+
+const e403 = async (req, res) => {
+    try {
+        res.render('403', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+        });
+    } catch (error) {
+        logger.error('Error rendering 403 page:  ', error.message);
+        req.flash('error', 'Error rendering 403 page: ' + error.message);
+        return res.redirect('/');
+    }
+};
+
 router.get('/', renderIndex);
 
 router.get('/user/create', renderUserCreateForm);
@@ -427,7 +475,7 @@ router.get('/invoice/create/:subcontractor', renderInvoiceCreateForm);
 router.get('/invoice/update/:invoice', renderInvoiceUpdateForm);
 router.get('/subcontractor/select', selectSubcontractor);
 
-router.get('/quote/create', renderQuoteCreateForm);
+router.get('/quote/create/:client', renderQuoteCreateForm);
 router.get('/quote/update/:quote', renderQuoteUpdateForm);
 router.get('/client/select', selectClient);
 
@@ -435,9 +483,11 @@ router.get('/client/create', renderClientCreateForm);
 router.get('/client/update/:client', renderClientUpdateForm);
 router.get('/contact/select', selectContact);
 
-router.get('/contact/create/', renderContactCreateForm);
-router.get('/contact/update/', renderContactUpdateForm);
+router.get('/contact/create/:client', renderContactCreateForm);
+router.get('/contact/update/:contact', renderContactUpdateForm);
 
 router.get('/500', e500);
+router.get('/404', e404);
+router.get('/403', e403);
 
 module.exports = router;
