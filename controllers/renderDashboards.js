@@ -10,6 +10,7 @@ const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const Quote = require('../models/quote');
 const Client = require('../models/client');
+const Contact = require('../models/contact');
 
 const renderstatsDashboard = async (req, res) => {
     try {
@@ -183,7 +184,7 @@ const renderContactsDashboard = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const contacts = await Contact.findAll({ order: [['createdAt', 'DESC']] });
+        const contacts = await Contact.findAll({ order: [['createdAt', 'DESC']], include: [Client] });
 
         res.render('contactsDashboard', {
             contacts,
