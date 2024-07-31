@@ -23,6 +23,9 @@ function formatCurrency(amount) {
 }
 
 const isAdmin = (req, res, next) => {
+    if (req.session) {
+        return res.redirect('signin');
+    }
     if (req.session.user.role !== 'admin') {
         logger.warn(`Access denied for user role: ${req.session.user.role}`);
         return res.status(403).send('Access denied.');
