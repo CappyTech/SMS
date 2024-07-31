@@ -14,6 +14,7 @@ Make map for jobs, maybe open street maps.
 
 Send Jobs to kashflow.
 Send Quotes to kashflow.
+Sort Quotes Desc to be filterable.
 
 Use leaflet.js
 Make Clients have colours for pins on maps.
