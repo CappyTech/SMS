@@ -36,14 +36,27 @@
                 <div class="row mb-3">
                     <label for="client" class="col-sm-3 col-form-label">Client <i class="bi bi-person"></i></label>
                     <div class="col-sm-9">
-                        <input type="text" id="client" name="client" class="form-control" value="<%= quote.client %>" >
+                        <div class="input-group">
+                            <select id="client" name="client" class="form-select">
+                                <option value="<%= quote.Client.id %>"><%= quote.Client.name %></option>
+                            </select>
+                            <button id="addClientButton" type="button" class="btn btn-hcs-green">+</button>
+                        </div>
                     </div>
                 </div>
-
+                
                 <div class="row mb-3">
                     <label for="contact_ref" class="col-sm-3 col-form-label">Contact Ref <i class="bi bi-person-badge"></i></label>
                     <div class="col-sm-9">
-                        <input type="text" id="contact_ref" name="contact_ref" class="form-control" value="<%= quote.contact_ref %>">
+                        <select id="contact_ref" name="contact_ref" class="form-select">
+                            <% if (!quote.Client.Contacts || quote.Client.Contacts.length === 0) { %>
+                                <option class="text-warning" value="">N/A</option>
+                            <% } else { %>
+                                <% quote.Client.Contacts.forEach(function(contact) { %>
+                                    <option value="<%= contact.id %>"><%= contact.name %></option>
+                                <% }); %>
+                            <% } %>
+                        </select>
                     </div>
                 </div>
 
@@ -72,13 +85,6 @@
                     <label for="invoice_date" class="col-sm-3 col-form-label">Invoice Date <i class="bi bi-calendar2-date-fill"></i></label>
                     <div class="col-sm-9">
                         <input type="date" id="invoice_date" name="invoice_date" class="form-control" value="<%= slimDateTime(quote.invoice_date, true) %>">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <label for="po_number" class="col-sm-3 col-form-label">PO Number <i class="bi bi-file-earmark-text"></i></label>
-                    <div class="col-sm-9">
-                        <input type="text" id="po_number" name="po_number" class="form-control" value="<%= quote.po_number %>">
                     </div>
                 </div>
 
