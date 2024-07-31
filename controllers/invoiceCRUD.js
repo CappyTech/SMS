@@ -3,15 +3,15 @@ const router = express.Router();
 const packageJson = require('../package.json');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
-const { validateInvoiceData, calculateInvoiceAmounts, slimDateTime, formatCurrency } = require('../helpers');
+const helpers = require('../helpers');
 const moment = require('moment');
 const logger = require('../logger'); // Import the logger
 
 const createInvoice = async (req, res) => {
     try {
-        const validatedData = validateInvoiceData(req.body);
+        const validatedData = helpers.validateInvoiceData(req.body);
         const subcontractor = await Subcontractor.findByPk(req.params.selected);
-        const amounts = calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
+        const amounts = helpers.calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
 
         // If remittanceDate or submissionDate are not provided, set them to null
         validatedData.remittanceDate = validatedData.remittanceDate || null;
@@ -35,7 +35,7 @@ const createInvoice = async (req, res) => {
             return { taxYear, taxMonth };
         };
 
-        const { taxYear, taxMonth } = calculateTaxYearAndMonth(validatedData.remittanceDate);
+        const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(validatedData.remittanceDate);
 
         // Create invoice record
         const newInvoice = await Invoice.create({
@@ -99,8 +99,8 @@ const readInvoice = async (req, res) => {
             successMessage: req.flash('success'),
             session: req.session,
             packageJson,
-            slimDateTime: slimDateTime,
-            formatCurrency: formatCurrency,
+            slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         logger.error(`Error viewing invoice: ${error.message}`);
@@ -140,8 +140,8 @@ const readInvoices = async (req, res) => {
             successMessage: req.flash('success'),
             session: req.session,
             packageJson,
-            slimDateTime: slimDateTime,
-            formatCurrency: formatCurrency,
+            slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         logger.error(`Error viewing invoices: ${error.message}`);
@@ -152,7 +152,7 @@ const readInvoices = async (req, res) => {
 
 const updateInvoice = async (req, res) => {
     try {
-        validateInvoiceData(req.body);
+        helpers.validateInvoiceData(req.body);
 
         const invoice = await Invoice.findByPk(req.params.invoice);
         if (!invoice) {
@@ -173,11 +173,11 @@ const updateInvoice = async (req, res) => {
         await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
 
         req.flash('success', 'Invoice updated successfully');
-        return res.redirect(`/invoice/read/${req.params.id}`);
+        return res.redirect(`/invoice/read/${req.params.invoice}`);
     } catch (error) {
-        logger.error(`Error updating invoice with ID: ${req.params.id}. Details: ${error.message}`);
-        req.flash('error', `Error updating invoice with ID: ${req.params.id}. Details: ${error.message}`);
-        return res.redirect(`/invoice/read/${req.params.id}`);
+        logger.error(`Error updating invoice with ID: ${req.params.invoice}. Details: ${error.message}`);
+        req.flash('error', `Error updating invoice with ID: ${req.params.invoice}. Details: ${error.message}`);
+        return res.redirect(`/invoice/read/${req.params.invoice}`);
     }
 };
 
@@ -188,18 +188,17 @@ const deleteInvoice = async (req, res) => {
             return res.status(403).send('Access denied. Only admins can delete invoices.');
         }
         // TODO: Add SubcontractorId to the invoice model and refer back to the /invoices/read/:id route
-        const invoice = await Invoice.findByPk(req.params.id);
+        const invoice = await Invoice.findByPk(req.params.invoice);
 
         if (!invoice) {
             req.flash('error', 'Invoice not found');
-            return res.redirect(req.get('referer') || '/dashboard');
+            return res.redirect(req.get('referer') || '/dashboard/stats');
         }
 
         await invoice.destroy();
 
         req.flash('success', 'Invoice deleted successfully');
-        const referer = req.get('referer') || '/dashboard';
-        res.redirect(referer);
+        res.redirect('/dashboard/invoice');
     } catch (error) {
         logger.error(`Error deleting invoice: ${error.message}`);
         req.flash('error', 'Error deleting invoice: ' + error.message);

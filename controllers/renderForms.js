@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
-
+const moment = require('moment');
+const helpers = require('../helpers');
+const logger = require('../logger');
 const packageJson = require('../package.json');
+
 const User = require('../models/user');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const Quote = require('../models/quote');
-const moment = require('moment');
-const helpers = require('../helpers');
-const logger = require('../logger'); // Import the logger
-const Subcontractors = require('../models/subcontractor');
+const Client = require('../models/client');
+const Contact = require('../models/contact');
 
 const renderIndex = (req, res) => {
     res.render('index', {
@@ -18,81 +19,6 @@ const renderIndex = (req, res) => {
         session: req.session,
         packageJson,
     });
-};
-
-const renderstatsDashboard = async (req, res) => {
-    try {
-        if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
-        }
-        
-
-        // Fetch the specified tax year from the URL parameter or use the current tax year
-        const specifiedYear = req.params.year ? parseInt(req.params.year) : helpers.getCurrentTaxYear();
-
-        // Fetch all subcontractors and invoices
-        const subcontractors = await Subcontractor.findAll();
-        const invoices = await Invoice.findAll({ order: [['updatedAt', 'ASC']] });
-
-        // Determine the start and end of the specified tax year
-        const taxYear = helpers.getTaxYearStartEnd(specifiedYear);
-        const currentMonthlyReturn = helpers.getCurrentMonthlyReturn();
-
-        // Filter invoices for the current monthly return period
-        const filteredInvoices = invoices.filter(invoice =>
-            moment(invoice.remittanceDate).isBetween(currentMonthlyReturn.periodStart, currentMonthlyReturn.periodEnd, null, '[]')
-        );
-
-        // Extract the SubcontractorId from the filtered invoices
-        const subcontractorIds = filteredInvoices.map(invoice => invoice.SubcontractorId);
-
-        // Filter subcontractors based on the SubcontractorId in the filtered invoices
-        const filteredSubcontractors = subcontractors.filter(sub =>
-            subcontractorIds.includes(sub.id)
-        );
-
-        res.render('statsDashboard', {
-            subcontractorCount: filteredSubcontractors.length,
-            invoiceCount: filteredInvoices.length,
-            subcontractors: filteredSubcontractors,
-            invoices: filteredInvoices,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            packageJson,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
-            taxYear,
-            currentMonthlyReturn
-        });
-    } catch (error) {
-        logger.error('Error rendering stats dashboard: ', error.message);
-        req.flash('error', 'Error rendering stats dashboard: ' + error.message);
-        res.redirect('/');
-    }
-};
-
-const renderUserDashboard = async (req, res) => {
-    try {
-        if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
-        }
-
-        const users = await User.findAll({ order: [['createdAt', 'DESC']] });
-
-        res.render('usersDashboard', {
-            users,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
-        });
-    } catch (error) {
-        logger.error('Error rendering users dashboard: ', error.message);
-        req.flash('error', 'Error rendering users dashboard: ' + error.message);
-        res.redirect('/');
-    }
 };
 
 const renderUserCreateForm = async (req, res) => {
@@ -110,7 +36,7 @@ const renderUserCreateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering user create form: ', error.message);
         req.flash('error', 'Error rendering user create form: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
@@ -139,30 +65,7 @@ const renderUserUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering user update form: ', error.message);
         req.flash('error', 'Error rendering user update form: ' + error.message);
-        res.redirect('/');
-    }
-};
-
-const renderInvoiceDashboard = async (req, res) => {
-    try {
-        if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
-        }
-
-        const invoices = await Invoice.findAll({ order: [['createdAt', 'DESC']] });
-
-        res.render('invoicesDashboard', {
-            invoices,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
-        });
-    } catch (error) {
-        logger.error('Error rendering invoices dashboard: ', error.message);
-        req.flash('error', 'Error rendering invoices dashboard: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
@@ -193,7 +96,7 @@ const renderInvoiceCreateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering invoice create form: ', error.message);
         req.flash('error', 'Error rendering invoice create form: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
@@ -221,7 +124,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering invoice update form:  ', error.message);
         req.flash('error', 'Error rendering invoice update form: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
@@ -256,30 +159,7 @@ const selectSubcontractor = async (req, res) => {
     } catch (error) {
         logger.error('Error selecting subcontractor: ', error.message);
         req.flash('error', 'Error selecting subcontractor: ' + error.message);
-        res.redirect('/');
-    }
-};
-
-const renderSubcontractorDashboard = async (req, res) => {
-    try {
-        if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
-        }
-
-        const subcontractors = await Subcontractors.findAll({ order: [['createdAt', 'DESC']] });
-
-        res.render('subcontractorsDashboard', {
-            subcontractors,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
-        });
-    } catch (error) {
-        logger.error('Error rendering subcontractors dashboard: ', error.message);
-        req.flash('error', 'Error rendering subcontractors dashboard: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
@@ -299,7 +179,7 @@ const renderSubcontractorCreateForm = (req, res) => {
     } catch (error) {
         logger.error('Error rendering subcontractor create form: ', error.message);
         req.flash('error', 'Error rendering subcontractor create form: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
@@ -328,31 +208,7 @@ const renderSubcontractorUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering subcontractor update form: ', error.message);
         req.flash('error', 'Error rendering subcontractor update form: ' + error.message);
-        res.redirect('/');
-    }
-};
-
-
-const renderQuotesDashboard = async (req, res) => {
-    try {
-        if (req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
-        }
-
-        const quotes = await Quote.findAll({ order: [['createdAt', 'DESC']] });
-
-        res.render('quotesDashboard', {
-            quotes,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            session: req.session,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
-        });
-    } catch (error) {
-        logger.error('Error rendering quotes dashboard: ', error.message);
-        req.flash('error', 'Error rendering quotes dashboard: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
@@ -371,7 +227,7 @@ const renderQuoteCreateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering quote create form: ', error.message);
         req.flash('error', 'Error rendering quotes create form: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
@@ -399,27 +255,18 @@ const renderQuoteUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering quote update form:  ', error.message);
         req.flash('error', 'Error rendering quote update form: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
 const selectClient = async (req, res) => {
     try {
         
-        let clients;
-        if (req.session.user.role === 'admin') {
-            clients = await Subcontractor.findAll({});
-        } else {
-            clients = await Subcontractor.findAll({
-                where: {
-                    userId: req.session.user.id
-                }
-            });
-        }
-
+        const clients = await Client.findAll({});
+        
         if (clients.length === 0) {
-            req.flash('error', 'Error: No Subcontractors exist, Or you don\'t have access to any Subcontractors.');
-            res.redirect('/subcontractor/create');
+            req.flash('error', 'Error: No Clients exist, Or you don\'t have access to any Clients.');
+            res.redirect('/client/create');
         }
 
         res.render('selectClient', {
@@ -434,7 +281,122 @@ const selectClient = async (req, res) => {
     } catch (error) {
         logger.error('Error selecting client:  ', error.message);
         req.flash('error', 'Error selecting client: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
+    }
+};
+
+const renderClientCreateForm = async (req, res) => {
+    try {
+        res.render('createClient', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+        });
+    } catch (error) {
+        logger.error('Error rendering client create form:', error.message);
+        res.status(500).send('Error: ' + error.message);
+    }
+};
+
+const renderClientUpdateForm = async (req, res) => {
+    try {
+        const client = await Client.findByPk(req.params.id, {
+            include: [{ model: Contact }]
+        });
+
+        if (!client) {
+            return res.status(404).send('Client not found');
+        }
+
+        res.render('updateClient', {
+            client,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+        });
+    } catch (error) {
+        logger.error('Error rendering client update form:', error.message);
+        res.status(500).send('Error: ' + error.message);
+    }
+};
+
+const selectContact = async (req, res) => {
+    try {
+        const contacts = await Contact.findAll({
+            include: [{ model: Client, attributes: ['name'] }]
+        });
+
+        if (contacts.length === 0) {
+            req.flash('error', 'Error: No Contacts exist, or you don\'t have access to any Contacts.');
+            return res.redirect('/contact/create');
+        }
+
+        const contactList = contacts.map(contact => ({
+            id: contact.id,
+            name: contact.name,
+            clientId: contact.Client.id,
+            clientName: contact.Client.name
+        }));
+
+        res.render('selectContact', {
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            contacts: contactList,
+            slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
+        });
+    } catch (error) {
+        logger.error('Error selecting contact:  ', error.message);
+        req.flash('error', 'Error selecting contact: ' + error.message);
+        return res.redirect('/');
+    }
+};
+
+const renderContactCreateForm = async (req, res) => {
+    try {
+        const contact = await Contact.findAll({
+            include: [{ model: Client }]
+        });
+
+        res.render('createContact', {
+            contact,
+            clients: contact.Client,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+        });
+    } catch (error) {
+        logger.error('Error rendering contact create form:', error.message);
+        res.status(500).send('Error: ' + error.message);
+    }
+};
+
+const renderContactUpdateForm = async (req, res) => {
+    try {
+        const contact = await Contact.findByPk(req.params.contact, {
+            include: [{ model: Client }]
+        });
+
+        if (!contact) {
+            return res.status(404).send('Contact not found');
+        }
+
+        res.render('updateContact', {
+            contact,
+            client: contact.Client,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+        });
+    } catch (error) {
+        logger.error('Error rendering contact update form:', error.message);
+        return res.status(500).send('Error: ' + error.message);
     }
 };
 
@@ -449,30 +411,32 @@ const e500 = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering 500 page:  ', error.message);
         req.flash('error', 'Error rendering 500 page: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
 router.get('/', renderIndex);
-router.get('/dashboard/stats', renderstatsDashboard);
 
-router.get('/dashboard/user', renderUserDashboard);
 router.get('/user/create', renderUserCreateForm);
 router.get('/user/update/:user', renderUserUpdateForm);
 
-router.get('/dashboard/subcontractor', renderSubcontractorDashboard);
 router.get('/subcontractor/create', renderSubcontractorCreateForm);
 router.get('/subcontractor/update/:subcontractor', renderSubcontractorUpdateForm);
 
-router.get('/dashboard/invoice', renderInvoiceDashboard);
 router.get('/invoice/create/:subcontractor', renderInvoiceCreateForm);
 router.get('/invoice/update/:invoice', renderInvoiceUpdateForm);
 router.get('/subcontractor/select', selectSubcontractor);
 
-router.get('/dashboard/quote', renderQuotesDashboard);
 router.get('/quote/create', renderQuoteCreateForm);
 router.get('/quote/update/:quote', renderQuoteUpdateForm);
 router.get('/client/select', selectClient);
+
+router.get('/client/create', renderClientCreateForm);
+router.get('/client/update/:client', renderClientUpdateForm);
+router.get('/contact/select', selectContact);
+
+router.get('/contact/create/', renderContactCreateForm);
+router.get('/contact/update/', renderContactUpdateForm);
 
 router.get('/500', e500);
 

@@ -141,8 +141,8 @@ const deleteQuote = async (req, res) => {
 };
 
 router.post('/quote/create/', createQuote);
-router.get('/quote/read/:id', readQuote);
-router.get('/quotes', readQuotes);
+router.get('/quote/read/:quote', readQuote);
+router.get('/quote/read/:client', readQuotes);
 router.post('/quote/update/:id', updateQuote);
 router.post('/quote/delete/:id', deleteQuote);
 

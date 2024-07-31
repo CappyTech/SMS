@@ -41,7 +41,7 @@ const registerUser = async (req, res) => {
         // Create a new user in the database
         await User.create({ username, email, password });
         logger.danger('New User Created.');
-        res.redirect('/');
+        return res.redirect('/');
     } catch (error) {
         logger.error('Error registering user:  ', error.message);
         req.flash('error', 'Error registering user: ' + error.message);

@@ -64,7 +64,7 @@ const createSubcontractor = async (req, res) => {
     } catch (error) {
         logger.error('Error creating subcontractor:  ', error.message);
         req.flash('error', 'Error creating subcontractor: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
@@ -93,7 +93,7 @@ const readSubcontractor = async (req, res) => {
     } catch (error) {
         logger.error('Error reading subcontractor:  ', error.message);
         req.flash('error', 'Error reading subcontractor: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 

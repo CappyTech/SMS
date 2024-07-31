@@ -60,7 +60,7 @@ const getAccountPage = async (req, res) => {
     } catch (error) {
         logger.error('Error getting account page:  ', error.message);
         req.flash('error', 'Error getting account page: ' + error.message);
-        res.redirect('/');
+        return res.redirect('/');
     }
 };
 
