@@ -14,8 +14,8 @@ const createClient = async (req, res) => {
         const {
             name 
         } = req.body;
-        const client = await Client.create({
-            name
+        const client = await Clients.create({
+            name: name
         });
         req.flash('success', 'Client created successfully');
         return res.redirect(`/client/read/${client.id}`);
