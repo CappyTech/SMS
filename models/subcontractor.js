@@ -1,11 +1,8 @@
 // models/subcontractor.js
-
-const {
-    DataTypes
-} = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
 
-const Subcontractors = sequelize.define('Subcontractor', {
+const Subcontractors = sequelize.define('Subcontractors', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -72,7 +69,19 @@ const Subcontractors = sequelize.define('Subcontractor', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
-    }
+    },
+    createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+    },
+    updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+    },
+    deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
 }, {
     paranoid: true,
 });
