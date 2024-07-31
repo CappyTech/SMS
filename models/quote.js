@@ -1,9 +1,7 @@
 // models/quote.js
-
-const {
-    DataTypes
-} = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
+const Clients = require('./client');
 
 const Quotes = sequelize.define('Quotes', {
     id: {
@@ -27,9 +25,15 @@ const Quotes = sequelize.define('Quotes', {
         type: DataTypes.STRING,
         allowNull: true
     },
-    client: {
-        type: DataTypes.STRING,
-        allowNull: true
+    clientId: { // Change client to clientId
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+            model: Clients,
+            key: 'id',
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
     },
     contact_ref: {
         type: DataTypes.STRING,
@@ -50,7 +54,19 @@ const Quotes = sequelize.define('Quotes', {
     invoice_date: {
         type: DataTypes.DATE,
         allowNull: true
-    }
+    },
+    createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+      },
+    updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+    },
+    deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
 }, {
     paranoid: true,
 });
