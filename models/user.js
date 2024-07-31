@@ -1,12 +1,9 @@
 // models/user.js
-
-const {
-    DataTypes
-} = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
 const bcrypt = require('bcrypt');
 
-const User = sequelize.define('User', {
+const Users = sequelize.define('Users', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -93,13 +90,21 @@ const User = sequelize.define('User', {
         allowNull: false,
         defaultValue: false,
     },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false
+    }
 }, {
-    paranoid: true, // Add the paranoid option
+    paranoid: false, // Add the paranoid option
 });
 
 // Hook to hash the password before saving
-User.beforeCreate(async (user) => {
+Users.beforeCreate(async (user) => {
     user.password = await bcrypt.hash(user.password, 10);
 });
 
-module.exports = User;
+module.exports = Users;
