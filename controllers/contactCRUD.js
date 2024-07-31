@@ -9,12 +9,28 @@ const Contact = require('../models/contact');
 
 const createContact = async (req, res) => {
     try {
-        const { name } = req.body;
-        const contact = await Contact.create({
-            name
-        });
-        req.flash('success', 'Contact created successfully');
-        return res.redirect(`/client/read/${contact.clientId}`);
+        const {
+            name,
+            phone,
+            email,
+            note
+        } = req.body;
+
+        const clientId = req.params.client;
+        if (!clientId) {
+            req.flash('erorr', 'Client wasn\'t specificied.');
+            return res.redirect(`/`);
+        } else {
+            const contact = await Contact.create({
+                clientId:clientId,
+                name:name,
+                phone:phone,
+                email:email,
+                note:note,
+            });
+            req.flash('success', 'Contact created successfully');
+            return res.redirect(`/client/read/${contact.clientId}`);
+        }
     } catch (error) {
         logger.error('Error creating contact:', error.message);
         req.flash('error', 'Error: ' + error.message);
@@ -32,7 +48,7 @@ const deleteContact = async (req, res) => {
 
         await contact.destroy();
         req.flash('success', 'Contact deleted successfully');
-        return res.redirect(`dashboard/client/`);
+        return res.redirect(`/dashboard/client/`);
     } catch (error) {
         logger.error('Error deleting  contact:', error.message);
         req.flash('error', 'Error: ' + error.message);
@@ -40,7 +56,7 @@ const deleteContact = async (req, res) => {
     }
 };
 
-router.post('/contact/create/', createContact);
+router.post('/contact/create/:client', createContact);
 router.post('/contact/delete/:id', deleteContact);
 
 module.exports = router;
