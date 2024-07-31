@@ -254,6 +254,16 @@ Contacts.belongsTo(Clients, {
         if (process.env.DEV) {
             await createDefaultAdmin();
         }
+        if (process.env.NODE_ENV === 'production') {
+            await Users.sync({ alter: false });
+            await Subcontractors.sync({ alter: false });
+            await Invoices.sync({ alter: false });
+            await Employees.sync({ alter: false });
+            await Attendances.sync({ alter: false });
+            await Clients.sync({ alter: false });
+            await Quotes.sync({ alter: false });
+            await Contacts.sync({ alter: false });
+        }
     } catch (error) {
         logger.error('Error syncing models:', error);
     }
