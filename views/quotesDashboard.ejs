@@ -5,7 +5,7 @@
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Quotes Dashboard</h1>
             <div class="d-flex justify-content-end mb-3">
-                <a href="/quote/create" class="btn btn-hcs-green">Create New Quote</a>
+                <a href="/client/select" class="btn btn-hcs-green">Create New Quote</a>
             </div>
             <% if (quotes.length === 0) { %>
                 <p class="text-center">No quotes available.</p>
@@ -15,16 +15,15 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Quote Ref</th>
-                                <th>Job Ref</th>
+                                <th>Quote</th>
+                                <th>Job</th>
                                 <th>Location</th>
                                 <th>Client</th>
-                                <th>Contact Ref</th>
+                                <th>Contact</th>
                                 <th>Value</th>
                                 <th>Description</th>
-                                <th>Invoice No</th>
+                                <th>Invoice</th>
                                 <th>Invoice Date</th>
-                                <th>PO Number</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -41,7 +40,6 @@
                                     <td class="<%= quote.desc ? '' : 'text-warning' %>"><%= quote.desc ? quote.desc : 'N/A' %></td>
                                     <td class="<%= quote.invoice_no ? '' : 'text-warning' %>"><%= quote.invoice_no ? quote.invoice_no : 'N/A' %></td>
                                     <td class="<%= quote.invoice_date ? '' : 'text-warning' %>"><%= quote.invoice_date ? slimDateTime(quote.invoice_date) : 'N/A' %></td>
-                                    <td class="<%= quote.po_number ? '' : 'text-warning' %>"><%= quote.po_number ? quote.po_number : 'N/A' %></td>
                                     <td>
                                         <a href="/quote/read/<%= quote.id %>" class="btn btn-info btn-sm">View</a>
                                         <a href="/quote/update/<%= quote.id %>" class="btn btn-warning btn-sm">Update</a>
