@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const packageJson = require('../package.json');
-const Invoice = require('../models/invoice');
-const Subcontractor = require('../models/subcontractor');
 const helpers = require('../helpers');
 const moment = require('moment');
 const logger = require('../logger'); // Import the logger
+
+const Invoice = require('../models/invoice');
+const Subcontractor = require('../models/subcontractor');
 
 const createInvoice = async (req, res) => {
     try {
