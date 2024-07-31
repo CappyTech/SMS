@@ -1,11 +1,8 @@
-// models/Attendance.js
-
-const {
-    DataTypes
-} = require('sequelize');
+// models/attendance.js
+const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
 
-const Attendance = sequelize.define('Attendance', {
+const Attendances = sequelize.define('Attendances', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -29,7 +26,7 @@ const Attendance = sequelize.define('Attendance', {
     allowNull: true,
   },
 }, {
-    paranoid: true,
+    paranoid: false,
 });
 
-module.exports = Attendance;
+module.exports = Attendances;
