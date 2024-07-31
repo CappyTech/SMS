@@ -1,0 +1,42 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <h1 class="display-5">Create Contact</h1>
+        <div class="container-fluid text-center">
+            <form action="/contact/create" method="POST" class="needs-validation">
+                <div class="row mb-3">
+                    <label for="clientId" class="col-sm-3 col-form-label">Client</label>
+                    <div class="col-sm-9">
+                        <select id="clientId" name="clientId" class="form-select" required>
+                            <% clients.forEach(client => { %>
+                                <option value="<%= client.id %>"><%= client.name %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="email" class="col-sm-3 col-form-label">Email</label>
+                    <div class="col-sm-9">
+                        <input type="email" id="email" name="email" class="form-control">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="phone" class="col-sm-3 col-form-label">Phone</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="phone" name="phone" class="form-control">
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-hcs-green">Create Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
