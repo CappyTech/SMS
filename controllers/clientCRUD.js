@@ -34,7 +34,7 @@ const readClient = async (req, res) => {
             return res.redirect('/'); // Ensure to return here
         }
 
-        const clients = await Clients.findByPk(req.params.clients, {
+        const clients = await Clients.findByPk(req.params.client, {
             include: [
                 { model: Contacts },
                 { model: Quotes }
@@ -63,7 +63,7 @@ const readClient = async (req, res) => {
 
 const updateClient = async (req, res) => {
     try {
-        const clients = await Clients.findByPk(req.params.clients);
+        const clients = await Clients.findByPk(req.params.client);
 
         if (!clients) {
             return res.status(404).send('Client not found');
@@ -81,7 +81,7 @@ const updateClient = async (req, res) => {
 
 const deleteClient = async (req, res) => {
     try {
-        const clients = await Clients.findByPk(req.params.clients);
+        const clients = await Clients.findByPk(req.params.client);
 
         if (!clients) {
             return res.status(404).send('Client not found');
@@ -98,8 +98,8 @@ const deleteClient = async (req, res) => {
 };
 
 router.post('/client/create/', createClient);
-router.get('/client/read/:clients', readClient);
-router.post('/client/update/:clients', updateClient);
-router.post('/client/delete/:clients', deleteClient);
+router.get('/client/read/:client', readClient);
+router.post('/client/update/:client', updateClient);
+router.post('/client/delete/:client', deleteClient);
 
 module.exports = router;
