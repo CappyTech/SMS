@@ -19,30 +19,28 @@
         <span class="d-none d-md-inline">Subcontractor Management System</span>
       </a>
       <ul class="navbar-nav hstack gap-3">
-        <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
-            <%- include('../partials/dashboards.ejs') %>
-            <% } %>
-            <% if (typeof session.user !== 'undefined') { %>
-            <li class="nav-item">
-              <a class="nav-link hcs-white-text" href="/monthly/returns/form">
-                <i class="bi bi-file-spreadsheet-fill"></i>
-                Monthly Returns
-              </a>
-            </li>
-            <div class="vr"></div>
-            <li class="nav-item">
-              <a class="nav-link hcs-green-text" href="/account">
-                <i class="bi bi-person"></i>
-                Account
-              </a>
-            </li>
-            <%- include('../partials/notify.ejs') %>
-            <li class="nav-item">
-              <a class="nav-link hcs-red-text" href="/logout">
-                <i class="bi bi-box-arrow-right"></i>
-                Logout
-              </a>
-            </li>
+        <%- include('../partials/dashboards.ejs') %>
+        <% if (typeof session.user !== 'undefined') { %>
+          <li class="nav-item">
+            <a class="nav-link hcs-white-text" href="/monthly/returns/form">
+              <i class="bi bi-file-spreadsheet-fill"></i>
+              Monthly Returns
+            </a>
+          </li>
+          <div class="vr"></div>
+          <li class="nav-item">
+            <a class="nav-link hcs-green-text" href="/account">
+              <i class="bi bi-person"></i>
+              Account
+            </a>
+          </li>
+          <%- include('../partials/notify.ejs') %>
+          <li class="nav-item">
+            <a class="nav-link hcs-red-text" href="/logout">
+              <i class="bi bi-box-arrow-right"></i>
+              Logout
+            </a>
+          </li>
         <% } else { %>
             <li class="nav-item">
               <a class="nav-link" href="/signin"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
