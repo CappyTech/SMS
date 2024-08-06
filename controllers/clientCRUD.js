@@ -14,13 +14,13 @@ const createClient = async (req, res) => {
         const {
             name 
         } = req.body;
-        const client = await Clients.create({
+        const clients = await Clients.create({
             name: name
         });
         req.flash('success', 'Client created successfully');
-        return res.redirect(`/client/read/${client.id}`);
+        return res.redirect('/client/read/${client.id}');
     } catch (error) {
-        logger.error('Error creating client:', error.message);
+        logger.error('Error creating client:' + error.message);
         req.flash('error', 'Error: ' + error.message);
         return res.redirect('/');
     }
@@ -55,7 +55,7 @@ const readClient = async (req, res) => {
             slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
-        logger.error('Error reading client:', error.message);
+        logger.error('Error reading client:' + error.message);
         req.flash('error', 'Error: ' + error.message);
         return res.redirect('/');
     }
@@ -71,9 +71,9 @@ const updateClient = async (req, res) => {
 
         await clients.update(req.body);
         req.flash('success', 'Client updated successfully');
-        return res.redirect(`/client/read/${clients.client}`);
+        return res.redirect('/client/read/${clients.client}');
     } catch (error) {
-        logger.error('Error updating client:', error.message);
+        logger.error('Error updating client:' + error.message);
         req.flash('error', 'Error: ' + error.message);
         return res.redirect('/');
     }
@@ -91,7 +91,7 @@ const deleteClient = async (req, res) => {
         req.flash('success', 'Client deleted successfully');
         res.redirect('/dashboard/client');
     } catch (error) {
-        logger.error('Error deleting client:', error.message);
+        logger.error('Error deleting client:' + error.message);
         req.flash('error', 'Error: ' + error.message);
         return res.redirect(req.get('referer') || '/');
     }
