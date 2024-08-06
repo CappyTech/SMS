@@ -57,7 +57,7 @@ const renderstatsDashboard = async (req, res) => {
             currentMonthlyReturn
         });
     } catch (error) {
-        logger.error('Error rendering stats dashboard: ', error.message);
+        logger.error('Error rendering stats dashboard:' + error.message);
         req.flash('error', 'Error rendering stats dashboard: ' + error.message);
         return res.redirect('/');
     }
@@ -80,7 +80,7 @@ const renderUserDashboard = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering users dashboard: ', error.message);
+        logger.error('Error rendering users dashboard:' + error.message);
         req.flash('error', 'Error rendering users dashboard: ' + error.message);
         return res.redirect('/');
     }
@@ -103,7 +103,7 @@ const renderInvoiceDashboard = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering invoices dashboard: ', error.message);
+        logger.error('Error rendering invoices dashboard:' + error.message);
         req.flash('error', 'Error rendering invoices dashboard: ' + error.message);
         return res.redirect('/');
     }
@@ -126,7 +126,7 @@ const renderSubcontractorDashboard = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering subcontractors dashboard: ', error.message);
+        logger.error('Error rendering subcontractors dashboard:' + error.message);
         req.flash('error', 'Error rendering subcontractors dashboard: ' + error.message);
         return res.redirect('/');
     }
@@ -149,7 +149,7 @@ const renderQuotesDashboard = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering quotes dashboard: ', error.message);
+        logger.error('Error rendering quotes dashboard:' + error.message);
         req.flash('error', 'Error rendering quotes dashboard: ' + error.message);
         return res.redirect('/');
     }
@@ -172,7 +172,7 @@ const renderClientsDashboard = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering clients dashboard: ', error.message);
+        logger.error('Error rendering clients dashboard:' + error.message);
         req.flash('error', 'Error rendering clients dashboard: ' + error.message);
         return res.redirect('/');
     }
@@ -195,7 +195,7 @@ const renderContactsDashboard = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering contacts dashboard: ', error.message);
+        logger.error('Error rendering contacts dashboard:' + error.message);
         req.flash('error', 'Error rendering contacts dashboard: ' + error.message);
         return res.redirect('/');
     }
@@ -241,7 +241,7 @@ const renderJobsDashboard = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering jobs dashboard: ', error.message);
+        logger.error('Error rendering jobs dashboard:' + error.message);
         req.flash('error', 'Error rendering jobs dashboard: ' + error.message);
         res.redirect('/');
     }
