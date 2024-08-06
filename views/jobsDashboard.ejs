@@ -4,9 +4,6 @@
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Jobs Dashboard</h1>
-            <div class="d-flex justify-content-end mb-3">
-                <a href="/quote/create" class="btn btn-hcs-green">Create New Job</a>
-            </div>
             <% if (jobs.length === 0) { %>
                 <p class="text-center">No jobs available.</p>
             <% } else { %>
@@ -15,40 +12,30 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Job Ref</th>
                                 <th>Quote Ref</th>
+                                <th>Job Ref</th>
                                 <th>Location</th>
                                 <th>Client</th>
-                                <th>Contact Ref</th>
+                                <th>Contact</th>
                                 <th>Value</th>
                                 <th>Description</th>
                                 <th>Invoice No</th>
                                 <th>Invoice Date</th>
-                                <th>PO Number</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% jobs.forEach(function(job) { %>
                                 <tr>
-                                    <td class="<%= job.date ? '' : 'text-warning' %>"><%= job.date ? slimDateTime(job.date) : 'N/A' %></td>
-                                    <td class="<%= job.job_ref ? '' : 'text-warning' %>"><%= job.job_ref ? job.job_ref : 'N/A' %></td>
-                                    <td class="<%= job.quote_ref ? '' : 'text-warning' %>"><%= job.quote_ref ? job.quote_ref : 'N/A' %></td>
-                                    <td class="<%= job.location ? '' : 'text-warning' %>"><%= job.location ? job.location : 'N/A' %></td>
-                                    <td class="<%= job.client ? '' : 'text-warning' %>"><%= job.client ? job.client : 'N/A' %></td>
-                                    <td class="<%= job.contact_ref ? '' : 'text-warning' %>"><%= job.contact_ref ? job.contact_ref : 'N/A' %></td>
-                                    <td class="<%= job.value ? '' : 'text-warning' %>">£<%= job.value ? job.value.toFixed(2) : 'N/A' %></td>
-                                    <td class="<%= job.desc ? '' : 'text-warning' %>"><%= job.desc ? job.desc : 'N/A' %></td>
-                                    <td class="<%= job.invoice_no ? '' : 'text-warning' %>"><%= job.invoice_no ? job.invoice_no : 'N/A' %></td>
-                                    <td class="<%= job.invoice_date ? '' : 'text-warning' %>"><%= job.invoice_date ? slimDateTime(job.invoice_date) : 'N/A' %></td>
-                                    <td class="<%= job.po_number ? '' : 'text-warning' %>"><%= job.po_number ? job.po_number : 'N/A' %></td>
-                                    <td>
-                                        <a href="/job/read/<%= job.id %>" class="btn btn-info btn-sm">View</a>
-                                        <a href="/job/update/<%= job.id %>" class="btn btn-warning btn-sm">Update</a>
-                                        <form action="/job/delete/<%= job.id %>" method="post" class="d-inline">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </td>
+                                    <td><%= slimDateTime(job.date) %></td>
+                                    <td><%= job.quote_ref %></td>
+                                    <td><%= job.job_ref %></td>
+                                    <td><%= job.location %></td>
+                                    <td><%= job.client.name %></td>
+                                    <td><%= job.contact.name %></td>
+                                    <td><%= formatCurrency(job.value) %></td>
+                                    <td><%= job.desc %></td>
+                                    <td><%= job.invoice_no %></td>
+                                    <td><%= slimDateTime(job.invoice_date) %></td>
                                 </tr>
                             <% }); %>
                         </tbody>
