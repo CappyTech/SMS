@@ -7,7 +7,7 @@ function slimDateTime(dateString, includeTime = false) {
 
     if (includeTime) {
         const formattedTime = date.format('HH:mm');
-        return `${formattedDate} ${formattedTime}`;
+        return '${formattedDate} ${formattedTime}';
     }
 
     return formattedDate;
@@ -27,7 +27,7 @@ const isAdmin = (req, res, next) => {
         return res.redirect('signin');
     }
     if (req.session.user.role !== 'admin') {
-        logger.warn(`Access denied for user role: ${req.session.user.role}`);
+        logger.warn('Access denied for user role: ${req.session.user.role}');
         return res.status(403).send('Access denied.');
     }
     next();
@@ -48,7 +48,7 @@ function validateInvoiceData(data) {
 
     Object.keys(validations).forEach(field => {
         if (!validations[field](data[field])) {
-            errors.push(`Invalid or missing value for ${field}`);
+            errors.push('Invalid or missing value for ${field}');
         }
     });
 
@@ -58,7 +58,7 @@ function validateInvoiceData(data) {
 
     if (errors.length > 0) {
         const errorMessage = errors.join(', ');
-        logger.error(`Validation errors: ${errorMessage}`);
+        logger.error('Validation errors: ${errorMessage}');
         throw new Error(errorMessage);
     }
 
