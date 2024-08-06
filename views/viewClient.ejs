@@ -30,8 +30,11 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
-                    <a type="button" class="btn btn-hcs-green btn-sm" href="/client/update/<%= clients.id %>">Update Client</a>
-                    <span>Last Updated: <%= slimDateTime(clients.updatedAt, true) %></span>
+                    <a type="button" class="btn btn-hcs-green btn-sm" href="/client/update/<%= client.id %>">Update Client</a>
+                    <span>Last Updated: <%= slimDateTime(contact.updatedAt,true) %></span>
+                    <form action="/client/delete/<%= client.id %>" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete Contact</button>
+                    </form>
                 </div>
             </div>
 
