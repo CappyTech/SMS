@@ -24,13 +24,13 @@ const createInvoice = async (req, res) => {
 
             const remittanceMoment = moment.utc(date);
             const year = remittanceMoment.year();
-            const startOfTaxYear = moment.utc(`${year}-04-06T00:00:00Z`);
+            const startOfTaxYear = moment.utc('${year}-04-06T00:00:00Z');
 
             // Determine tax year
-            const taxYear = remittanceMoment.isBefore(startOfTaxYear) ? `${year - 1}/${year}` : `${year}/${year + 1}`;
+            const taxYear = remittanceMoment.isBefore(startOfTaxYear) ? '${year - 1}/${year}' : '${year}/${year + 1}';
 
             // Determine tax month
-            const startOfCurrentTaxYear = remittanceMoment.isBefore(startOfTaxYear) ? moment.utc(`${year - 1}-04-06T00:00:00Z`) : startOfTaxYear;
+            const startOfCurrentTaxYear = remittanceMoment.isBefore(startOfTaxYear) ? moment.utc('${year - 1}-04-06T00:00:00Z') : startOfTaxYear;
             const taxMonth = remittanceMoment.diff(startOfCurrentTaxYear, 'months') + 1;
 
             return { taxYear, taxMonth };
@@ -56,12 +56,12 @@ const createInvoice = async (req, res) => {
             SubcontractorId: req.params.selected
         });
 
-        res.redirect(`/invoice/read/${newInvoice.id}`);
+        res.redirect('/invoice/read/${newInvoice.id}');
 
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
             const errorMessages = error.errors.map((err) => err.message);
-            logger.error(`Validation errors: ${errorMessages.join(', ')}`);
+            logger.error('Validation errors: ${errorMessages.join(', ')}');
             return res.render('createInvoice', {
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
@@ -69,7 +69,7 @@ const createInvoice = async (req, res) => {
                 packageJson,
             });
         }
-        logger.error(`Error creating invoice: ${error.message}`);
+        logger.error('Error creating invoice:' + error.message);
         req.flash('error', 'Error: ' + error.message);
         res.redirect('/error');
     }
@@ -104,7 +104,7 @@ const readInvoice = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error(`Error viewing invoice: ${error.message}`);
+        logger.error('Error viewing invoice:'+ error.message);
         req.flash('error', 'Error viewing invoice:' + error.message);
         res.redirect('/error');
     }
@@ -145,7 +145,7 @@ const readInvoices = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error(`Error viewing invoices: ${error.message}`);
+        logger.error('Error viewing invoices:'+ error.message);
         req.flash('error', 'Error viewing invoices:' + error.message);
         res.redirect('/error');
     }
@@ -161,12 +161,12 @@ const updateInvoice = async (req, res) => {
         }
 
         if (!invoice.SubcontractorId) {
-            throw new Error(`No subcontractorId associated with invoice number: ${req.params.invoice}`);
+            throw new Error('No subcontractorId associated with invoice number: ${req.params.invoice}');
         }
 
         const subcontractor = await Subcontractor.findByPk(invoice.SubcontractorId);
         if (!subcontractor) {
-            throw new Error(`Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.invoice}`);
+            throw new Error('Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.invoice}');
         }
 
         const amounts = helpers.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
@@ -174,11 +174,11 @@ const updateInvoice = async (req, res) => {
         await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
 
         req.flash('success', 'Invoice updated successfully');
-        return res.redirect(`/invoice/read/${req.params.invoice}`);
+        return res.redirect('/invoice/read/${req.params.invoice}');
     } catch (error) {
-        logger.error(`Error updating invoice with ID: ${req.params.invoice}. Details: ${error.message}`);
-        req.flash('error', `Error updating invoice with ID: ${req.params.invoice}. Details: ${error.message}`);
-        return res.redirect(`/invoice/read/${req.params.invoice}`);
+        logger.error('Error updating invoice with ID: ${req.params.invoice}. Details:'+ error.message);
+        req.flash('error', 'Error updating invoice with ID: ${req.params.invoice}. Details:'+ error.message);
+        return res.redirect('/invoice/read/${req.params.invoice}');
     }
 };
 
@@ -201,7 +201,7 @@ const deleteInvoice = async (req, res) => {
         req.flash('success', 'Invoice deleted successfully');
         res.redirect('/dashboard/invoice');
     } catch (error) {
-        logger.error(`Error deleting invoice: ${error.message}`);
+        logger.error('Error deleting invoice:'+ error.message);
         req.flash('error', 'Error deleting invoice: ' + error.message);
         res.redirect('/error');
     }
