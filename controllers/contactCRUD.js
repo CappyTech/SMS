@@ -47,7 +47,7 @@ const readContact = async (req, res) => {
             return res.redirect('/'); // Ensure to return here
         }
 
-        const contact = await Contacts.findByPk(req.params.contact, {
+        const contact = await Contact.findByPk(req.params.contact, {
             include: [
                 { model: Clients }
             ]
