@@ -6,6 +6,7 @@ const moment = require('moment');
 const logger = require('../logger');
 
 const Contact = require('../models/contact');
+const Clients = require('../models/client');
 
 const createContact = async (req, res) => {
     try {
@@ -38,9 +39,43 @@ const createContact = async (req, res) => {
     }
 };
 
+const readContact = async (req, res) => {
+    try {
+        // Check if session exists and session user role is an admin
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/'); // Ensure to return here
+        }
+
+        const contact = await Contacts.findByPk(req.params.contact, {
+            include: [
+                { model: Clients }
+            ]
+        });
+
+        if (!contact) {
+            return res.status(404).json({ error: 'Contact not found' });
+        }
+
+        res.render('viewContact', {
+            contact,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            packageJson,
+            slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
+        });
+    } catch (error) {
+        logger.error(`Error viewing contact: ${error.message}`);
+        req.flash('error', 'Error viewing contact:' + error.message);
+        res.redirect('/error');
+    }
+};
+
 const deleteContact = async (req, res) => {
     try {
-        const contact = await Contact.findByPk(req.params.id);
+        const contact = await Contact.findByPk(req.params.contact);
 
         if (!Contact) {
             return res.status(404).send('Contact not found');
@@ -57,6 +92,7 @@ const deleteContact = async (req, res) => {
 };
 
 router.post('/contact/create/:client', createContact);
-router.post('/contact/delete/:id', deleteContact);
+router.get('/contact/read/:contact', readContact);
+router.post('/contact/delete/:contact', deleteContact);
 
 module.exports = router;
