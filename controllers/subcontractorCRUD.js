@@ -114,9 +114,10 @@ const updateSubcontractor = async (req, res) => {
             postalCode,
             cisNumber,
             utrNumber,
-            isGross,
             vatNumber,
             deduction,
+            isGross,
+            isReverseCharge,
         } = req.body;
 
         const subcontractor = await Subcontractor.findByPk(req.params.id);
@@ -129,11 +130,14 @@ const updateSubcontractor = async (req, res) => {
             subcontractor.city = city;
             subcontractor.county = county;
             subcontractor.postalCode = postalCode;
+
             subcontractor.cisNumber = cisNumber;
             subcontractor.utrNumber = utrNumber;
-            subcontractor.isGross = isGross;
             subcontractor.vatNumber = vatNumber;
+
             subcontractor.deduction = deduction;
+            subcontractor.isGross = isGross;
+            subcontractor.isReverseCharge = isReverseCharge;
 
             await subcontractor.save();
 
