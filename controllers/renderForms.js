@@ -313,7 +313,7 @@ const renderClientCreateForm = async (req, res) => {
             packageJson,
         });
     } catch (error) {
-        logger.error('Error rendering client create form:', error.message);
+        logger.error('Error rendering client create form:' + error.message);
         res.status(500).send('Error: ' + error.message);
     }
 };
@@ -336,7 +336,7 @@ const renderClientUpdateForm = async (req, res) => {
             packageJson,
         });
     } catch (error) {
-        logger.error('Error rendering client update form:', error.message);
+        logger.error('Error rendering client update form:' + error.message);
         res.status(500).send('Error: ' + error.message);
     }
 };
@@ -390,7 +390,7 @@ const renderContactCreateForm = async (req, res) => {
             packageJson,
         });
     } catch (error) {
-        logger.error('Error rendering contact create form:', error.message);
+        logger.error('Error rendering contact create form:' + error.message);
         res.status(500).send('Error: ' + error.message);
     }
 };
@@ -413,7 +413,7 @@ const renderContactUpdateForm = async (req, res) => {
             packageJson,
         });
     } catch (error) {
-        logger.error('Error rendering contact update form:', error.message);
+        logger.error('Error rendering contact update form:' + error.message);
         return res.status(500).send('Error: ' + error.message);
     }
 };
