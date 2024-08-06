@@ -20,7 +20,7 @@ const createContact = async (req, res) => {
         const clientId = req.params.client;
         if (!clientId) {
             req.flash('erorr', 'Client wasn\'t specificied.');
-            return res.redirect(`/`);
+            return res.redirect('/');
         } else {
             const contact = await Contact.create({
                 clientId:clientId,
@@ -30,10 +30,10 @@ const createContact = async (req, res) => {
                 note:note,
             });
             req.flash('success', 'Contact created successfully');
-            return res.redirect(`/client/read/${contact.clientId}`);
+            return res.redirect('/client/read/${contact.clientId}');
         }
     } catch (error) {
-        logger.error('Error creating contact:', error.message);
+        logger.error('Error creating contact:' + error.message);
         req.flash('error', 'Error: ' + error.message);
         return res.redirect(req.get('referer') || '/');
     }
@@ -67,7 +67,7 @@ const readContact = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error(`Error viewing contact: ${error.message}`);
+        logger.error('Error viewing contact:'+ error.message);
         req.flash('error', 'Error viewing contact:' + error.message);
         res.redirect('/error');
     }
@@ -83,11 +83,11 @@ const deleteContact = async (req, res) => {
 
         await contact.destroy();
         req.flash('success', 'Contact deleted successfully');
-        return res.redirect(`/dashboard/client/`);
+        return res.redirect('/dashboard/client/');
     } catch (error) {
-        logger.error('Error deleting  contact:', error.message);
+        logger.error('Error deleting  contact:' + error.message);
         req.flash('error', 'Error: ' + error.message);
-        return res.redirect(`/client/read/${contact.clientId}`);
+        return res.redirect('/client/read/${contact.clientId}');
     }
 };
 
