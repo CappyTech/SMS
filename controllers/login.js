@@ -39,7 +39,7 @@ const loginUser = async (req, res) => {
         });
 
         if (!user) {
-            logger.eorro('Invalid username/email:', userJSON);
+            logger.error('Invalid username/email:' + error.message);
             req.flash('error', 'Invalid username/email');
             return res.redirect('/signin');
         }
@@ -61,13 +61,13 @@ const loginUser = async (req, res) => {
             return res.redirect('/dashboard/stats');
         
          } else {
-            logger.error('Error Invalid password:  ', error.message);
+            logger.error('Error Invalid password:' + error.message);
              req.flash('error', 'Invalid password');
             return res.redirect('/signin');
         };
     } catch (error) {
-        logger.error('Error logging in:  ', error.message);
-        req.flash('error', 'Error logging in: ' + error.message);
+        logger.error('Error logging in:' + error.message);
+        req.flash('error', 'Error logging in:' + error.message);
         res.redirect('/error');
     };
 };
