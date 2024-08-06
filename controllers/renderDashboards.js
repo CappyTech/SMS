@@ -4,13 +4,13 @@ const moment = require('moment');
 const helpers = require('../helpers');
 const logger = require('../logger');
 const packageJson = require('../package.json');
-
-const User = require('../models/user');
-const Invoice = require('../models/invoice');
-const Subcontractor = require('../models/subcontractor');
-const Quote = require('../models/quote');
-const Client = require('../models/client');
-const Contact = require('../models/contact');
+const { Op } = require("sequelize");
+const Users = require('../models/user');
+const Invoices = require('../models/invoice');
+const Subcontractors = require('../models/subcontractor');
+const Quotes = require('../models/quote');
+const Clients = require('../models/client');
+const Contacts = require('../models/contact');
 
 const renderstatsDashboard = async (req, res) => {
     try {
@@ -22,8 +22,8 @@ const renderstatsDashboard = async (req, res) => {
         const specifiedYear = req.params.year ? parseInt(req.params.year) : helpers.getCurrentTaxYear();
 
         // Fetch all subcontractors and invoices
-        const subcontractors = await Subcontractor.findAll();
-        const invoices = await Invoice.findAll({ order: [['updatedAt', 'ASC']] });
+        const subcontractors = await Subcontractors.findAll();
+        const invoices = await Invoices.findAll({ order: [['updatedAt', 'ASC']] });
 
         // Determine the start and end of the specified tax year
         const taxYear = helpers.getTaxYearStartEnd(specifiedYear);
@@ -69,7 +69,7 @@ const renderUserDashboard = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const users = await User.findAll({ order: [['createdAt', 'DESC']] });
+        const users = await Users.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render('usersDashboard', {
             users,
@@ -92,7 +92,7 @@ const renderInvoiceDashboard = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const invoices = await Invoice.findAll({ order: [['createdAt', 'DESC']] });
+        const invoices = await Invoices.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render('invoicesDashboard', {
             invoices,
@@ -115,7 +115,7 @@ const renderSubcontractorDashboard = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const subcontractors = await Subcontractor.findAll({ order: [['createdAt', 'DESC']] });
+        const subcontractors = await Subcontractors.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render('subcontractorsDashboard', {
             subcontractors,
@@ -138,7 +138,7 @@ const renderQuotesDashboard = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const quotes = await Quote.findAll({ order: [['createdAt', 'DESC']] });
+        const quotes = await Quotes.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render('quotesDashboard', {
             quotes,
@@ -161,7 +161,7 @@ const renderClientsDashboard = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const clients = await Client.findAll({ order: [['createdAt', 'DESC']] });
+        const clients = await Clients.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render('clientsDashboard', {
             clients,
@@ -184,7 +184,7 @@ const renderContactsDashboard = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const contacts = await Contact.findAll({ order: [['createdAt', 'DESC']], include: [Client] });
+        const contacts = await Contacts.findAll({ order: [['createdAt', 'DESC']], include: [Client] });
 
         res.render('contactsDashboard', {
             contacts,
@@ -201,6 +201,52 @@ const renderContactsDashboard = async (req, res) => {
     }
 };
 
+const renderJobsDashboard = async (req, res) => {
+    try {
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
+
+        const jobs = await Quotes.findAll({
+            where: {
+                job_ref: {
+                    [Op.ne]: ""
+                }
+            },
+            order: [['createdAt', 'DESC']],
+        });
+
+        // Fetch associated clients and contacts
+        const jobsWithAssociations = await Promise.all(jobs.map(async job => {
+            const client = await Clients.findByPk(job.clientId);
+            const contact = await Contacts.findOne({
+                where: {
+                    clientId: job.clientId,
+                    id: job.contact_ref
+                }
+            });
+            return {
+                ...job.toJSON(),
+                client,
+                contact
+            };
+        }));
+
+        res.render('jobsDashboard', {
+            jobs: jobsWithAssociations,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            session: req.session,
+            slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
+        });
+    } catch (error) {
+        logger.error('Error rendering jobs dashboard: ', error.message);
+        req.flash('error', 'Error rendering jobs dashboard: ' + error.message);
+        res.redirect('/');
+    }
+};
+
 router.get('/dashboard/stats', renderstatsDashboard);
 router.get('/dashboard/user', renderUserDashboard);
 router.get('/dashboard/subcontractor', renderSubcontractorDashboard);
@@ -208,5 +254,6 @@ router.get('/dashboard/invoice', renderInvoiceDashboard);
 router.get('/dashboard/quote', renderQuotesDashboard);
 router.get('/dashboard/client', renderClientsDashboard);
 router.get('/dashboard/contact', renderContactsDashboard);
+router.get('/dashboard/jobs', renderJobsDashboard);
 
 module.exports = router;
