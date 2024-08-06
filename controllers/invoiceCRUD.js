@@ -36,7 +36,7 @@ const createInvoice = async (req, res) => {
             return { taxYear, taxMonth };
         };
 
-        const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(validatedData.remittanceDate);
+        const { taxYear, taxMonth } = calculateTaxYearAndMonth(validatedData.remittanceDate);
 
         // Create invoice record
         const newInvoice = await Invoice.create({
@@ -169,7 +169,7 @@ const updateInvoice = async (req, res) => {
             throw new Error(`Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.invoice}`);
         }
 
-        const amounts = calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
+        const amounts = helpers.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
 
         await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
 
