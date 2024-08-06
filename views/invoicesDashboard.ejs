@@ -3,46 +3,75 @@
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold text-center">Invoices Dashboard</h1>
-            <div class="d-flex justify-content-end mb-3">
-                <a href="/invoice/create" class="btn btn-hcs-green">Create New Invoice</a>
-            </div>
-            <% if (invoices.length === 0) { %>
-                <p class="text-center">No invoices available.</p>
-            <% } else { %>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Invoice Number</th>
-                                <th>KashFlow Number</th>
-                                <th>Invoice Date</th>
-                                <th>Remittance Date</th>
-                                <th>Gross Amount</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% invoices.forEach(function(invoice) { %>
-                                <tr>
-                                    <td class="<%= invoice.invoiceNumber ? '' : 'text-warning' %>"><%= invoice.invoiceNumber ? invoice.invoiceNumber : 'N/A' %></td>
-                                    <td class="<%= invoice.kashflowNumber ? '' : 'text-warning' %>"><%= invoice.kashflowNumber ? invoice.kashflowNumber : 'N/A' %></td>
-                                    <td class="<%= invoice.invoiceDate ? '' : 'text-warning' %>"><%= invoice.invoiceDate ? slimDateTime(invoice.invoiceDate) : 'N/A' %></td>
-                                    <td class="<%= invoice.remittanceDate ? '' : 'text-warning' %>"><%= invoice.remittanceDate ? slimDateTime(invoice.remittanceDate) : 'N/A' %></td>
-                                    <td class="<%= invoice.grossAmount ? '' : 'text-warning' %>">£<%= invoice.grossAmount ? invoice.grossAmount.toFixed(2) : 'N/A' %></td>
-                                    <td>
-                                        <a href="/invoice/read/<%= invoice.id %>" class="btn btn-info btn-sm">View</a>
-                                        <a href="/invoice/update/<%= invoice.id %>" class="btn btn-warning btn-sm">Update</a>
-                                        <form action="/invoice/delete/<%= invoice.id %>" method="post" class="d-inline">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
+            <h1 class="display-5 fw-bold text-center">Invoices</h1>
+            <div class="row">
+                <div class="col-2">
+                    <ul class="scrollable-list list-group sticky-top">
+                        <a class="list-group-item list-group-item-action disabled text-bg-secondary text-center" aria-disabled="true">Invoice List</a>
+                        <% invoices.forEach(invoice => { %>
+                            <a href="#<%= invoice.id %>" class="list-group-item list-group-item-action text-center">
+                                <%= invoice.invoiceNumber %>
+                            </a>
+                        <% }); %>
+                    </ul>
                 </div>
-            <% } %>
+                <div class="col-10">
+                    <% invoices.forEach(invoice => { %>
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between text-bg-secondary">
+                            <span>Invoice: <%= invoice.invoiceNumber %></span>
+                            <a class="text-white" href="/invoice/read/<%= invoice.id %>">View Invoice</a>
+                        </div>
+                        <div class="card-body" id="<%= invoice.id %>">
+                            <div class="row">
+                                <div class="col-6">
+                                    <ul class="list-group">
+                                        <li class="list-group-item">Invoice Number</li>
+                                        <li class="list-group-item">KashFlow Number</li>
+                                        <li class="list-group-item">Invoice Date</li>
+                                        <li class="list-group-item">Remittance Date</li>
+                                        <li class="list-group-item">Gross Amount</li>
+                                        <li class="list-group-item">Labour Cost</li>
+                                        <li class="list-group-item">Material Cost</li>
+                                        <li class="list-group-item">CIS Amount</li>
+                                        <li class="list-group-item">Net Amount</li>
+                                        <% if (invoice.reverseCharge) { %>
+                                        <li class="list-group-item">Reverse Charge</li>
+                                        <% } %>
+                                        <li class="list-group-item">Tax Month</li>
+                                        <li class="list-group-item">Tax Year</li>
+                                        <li class="list-group-item">Submission Date</li>
+                                    </ul>
+                                </div>
+                                <div class="col-6">
+                                    <ul class="list-group">
+                                        <li class="list-group-item"><%= invoice.invoiceNumber %></li>
+                                        <li class="list-group-item"><%= invoice.kashflowNumber %></li>
+                                        <li class="list-group-item"><%= slimDateTime(invoice.invoiceDate) %></li>
+                                        <li class="list-group-item"><%= slimDateTime(invoice.remittanceDate) %></li>
+                                        <li class="list-group-item"><%= formatCurrency(invoice.grossAmount) %></li>
+                                        <li class="list-group-item"><%= formatCurrency(invoice.labourCost) %></li>
+                                        <li class="list-group-item"><%= formatCurrency(invoice.materialCost) %></li>
+                                        <li class="list-group-item"><%= formatCurrency(invoice.cisAmount) %></li>
+                                        <li class="list-group-item"><%= formatCurrency(invoice.netAmount) %></li>
+                                        <% if (invoice.reverseCharge) { %>
+                                        <li class="list-group-item"><%= formatCurrency(invoice.reverseCharge) %></li>
+                                        <% } %>
+                                        <li class="list-group-item"><%= invoice.month %></li>
+                                        <li class="list-group-item"><%= invoice.year %></li>
+                                        <li class="list-group-item"><%= slimDateTime(invoice.submissionDate) %></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a type="button" class="btn btn-hcs-green btn-sm" href="/invoice/update/<%= invoice.id %>">Update Invoice</a>
+                            <span>Last Updated: <%= slimDateTime(invoice.updatedAt, true) %></span>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
         </div>
     </div>
 </div>
