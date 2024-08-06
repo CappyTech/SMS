@@ -25,7 +25,7 @@
                         <tbody>
                             <% contacts.forEach(function(contact) { %>
                                 <tr>
-                                    <td><a href='/client/read/<%= contact.id %>'><%= contact.name %></a></td>
+                                    <td><a href='/contact/read/<%= contact.id %>'><%= contact.name %></a></td>
                                     <td><a href='/client/read/<%= contact.Client.id %>'><%= contact.Client.name %></a></td>
                                     <td><%= contact.phone %></td>
                                     <td><%= contact.email %></td>
