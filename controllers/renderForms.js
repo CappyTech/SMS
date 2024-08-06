@@ -34,7 +34,7 @@ const renderUserCreateForm = async (req, res) => {
             packageJson,
         });
     } catch (error) {
-        logger.error('Error rendering user create form: ', error.message);
+        logger.error('Error rendering user create form:' + error.message);
         req.flash('error', 'Error rendering user create form: ' + error.message);
         return res.redirect('/');
     }
@@ -63,7 +63,7 @@ const renderUserUpdateForm = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering user update form: ', error.message);
+        logger.error('Error rendering user update form:' + error.message);
         req.flash('error', 'Error rendering user update form: ' + error.message);
         return res.redirect('/');
     }
@@ -94,7 +94,7 @@ const renderInvoiceCreateForm = async (req, res) => {
             res.status(404).send('Subcontractor not found');
         }
     } catch (error) {
-        logger.error('Error rendering invoice create form: ', error.message);
+        logger.error('Error rendering invoice create form:' + error.message);
         req.flash('error', 'Error rendering invoice create form: ' + error.message);
         return res.redirect('/');
     }
@@ -157,7 +157,7 @@ const selectSubcontractor = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error selecting subcontractor: ', error.message);
+        logger.error('Error selecting subcontractor:' + error.message);
         req.flash('error', 'Error selecting subcontractor: ' + error.message);
         return res.redirect('/');
     }
@@ -177,7 +177,7 @@ const renderSubcontractorCreateForm = (req, res) => {
             return res.status(403).send('Access denied.');
         }
     } catch (error) {
-        logger.error('Error rendering subcontractor create form: ', error.message);
+        logger.error('Error rendering subcontractor create form:' + error.message);
         req.flash('error', 'Error rendering subcontractor create form: ' + error.message);
         return res.redirect('/');
     }
@@ -206,7 +206,7 @@ const renderSubcontractorUpdateForm = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering subcontractor update form: ', error.message);
+        logger.error('Error rendering subcontractor update form:' + error.message);
         req.flash('error', 'Error rendering subcontractor update form: ' + error.message);
         return res.redirect('/');
     }
@@ -237,7 +237,7 @@ const renderQuoteCreateForm = async (req, res) => {
             return res.status(404).send('Client not found');
         }
     } catch (error) {
-        logger.error('Error rendering quote create form: ', error.message);
+        logger.error('Error rendering quote create form:' + error.message);
         req.flash('error', 'Error rendering quotes create form: ' + error.message);
         return res.redirect('/');
     }
