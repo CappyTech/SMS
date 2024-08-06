@@ -93,17 +93,17 @@ sessionStore.onReady().then(() => {
 app.use((req, res, next) => {
     res.locals.session = req.session;
     if (process.env.DEBUG) {
-        logger.info(`Session Data: ${JSON.stringify(req.session)}`);
+        logger.info('Session Data: ${JSON.stringify(req.session)}');
     }
     const username = req.session.user ? req.session.user.username : 'unknown user';
-    const logMessage = `${username} accessed path ${req.method} ${req.path}`;
+    const logMessage = '${username} accessed path ${req.method} ${req.path}';
 
     if (req.path.includes('/update/')) {
-        logger.warn(`-------- Warn: ${logMessage}`);
+        logger.warn('-------- Warn: ${logMessage}');
     } else if (req.path.includes('/delete/')) {
-        logger.error(`------- Danger: ${logMessage}`);
+        logger.error('------- Danger: ${logMessage}');
     } else {
-        logger.info(`${logMessage}`);
+        logger.info('${logMessage}');
     }
     next();
 });
@@ -310,7 +310,7 @@ app.use('/', yearlyReturns);
 const errorHandler = (err, req, res, next) => {
     logger.error(err.stack);
     const status = err.status || 500;
-    const errorViewPath = path.join(__dirname, 'views', `${status}.ejs`);
+    const errorViewPath = path.join(__dirname, 'views', '${status}.ejs');
 
     fs.access(errorViewPath, fs.constants.F_OK, (fsErr) => {
         if (fsErr) {
@@ -331,5 +331,5 @@ app.use(errorHandler);
 
 const port = process.env.PORT || 80;
 app.listen(port, 'localhost', () => {
-    logger.info(`Server running at http://localhost:${port}`);
+    logger.info('Server running at http://localhost:${port}');
 });
