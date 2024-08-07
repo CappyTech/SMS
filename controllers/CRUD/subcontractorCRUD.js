@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const packageJson = require('../package.json');
-const Subcontractor = require('../models/subcontractor');
-const helpers = require('../helpers');
+const packageJson = require('../../package.json');
+const Subcontractor = require('../../models/subcontractor');
+const helpers = require('../../helpers');
 const { Op } = require('sequelize');
-const logger = require('../logger'); // Import the logger
+const logger = require('../../logger'); 
 
 const createSubcontractor = async (req, res) => {
     try {
@@ -81,7 +81,7 @@ const readSubcontractor = async (req, res) => {
             return res.status(404).send('Subcontractor not found');
         }
 
-        res.render('viewSubcontractor', {
+        res.render(path.join('subcontractors', 'viewSubcontractor'), {
             subcontractor,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),

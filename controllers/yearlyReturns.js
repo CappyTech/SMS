@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-
 const packageJson = require('../package.json');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const { formatCurrency, slimDateTime, rounding } = require('../helpers');
-const logger = require('../logger'); // Import the logger
+const logger = require('../logger'); 
+const path = require('path');
 
 const renderYearlyReturns = async (req, res) => {
     try {
@@ -61,7 +61,7 @@ const renderYearlyReturns = async (req, res) => {
             invoicesByMonth: invoicesByMonth
         });
 
-        res.render('yearlyReturns', {
+        res.render(path.join('monthlyreturns', 'yearlyReturns'), {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,

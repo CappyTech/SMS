@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const packageJson = require("../package.json");
+const packageJson = require("../../package.json");
 const speakeasy = require("speakeasy");
-const User = require("../models/user");
+const User = require("../../models/user");
 const { Op } = require("sequelize");
-const logger = require('../logger'); // Import the logger
+const logger = require('../../logger'); 
 
 const renderRegistrationForm = (req, res) => {
     

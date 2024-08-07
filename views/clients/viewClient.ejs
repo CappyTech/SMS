@@ -7,32 +7,15 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between text-bg-secondary">
                     <span>Client</span>
-                    <a class="text-white" href="/contact/read/<%= clients.id %>">View Contacts</a>
+                    <a class="text-white" href="/contacts/read/<%= clients.id %>">View Contacts</a>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <ul class="list-group">
-                                <li class="list-group-item">Contact</li>
-                                <li class="list-group-item">Email</li>
-                                <li class="list-group-item">Phone</li>
-                                <li class="list-group-item">Note </li>
-                            </ul>
-                        </div>
-                        <div class="col-6">
-                            <ul class="list-group">
-                                <li class="list-group-item"><%= clients.contacts ? clients.contacts.name : 'N/A' %></li>
-                                <li class="list-group-item"><%= clients.contacts ? clients.contacts.email : 'N/A' %></li>
-                                <li class="list-group-item"><%= clients.contacts ? clients.contacts.phone : 'N/A' %></li>
-                                <li class="list-group-item"><%= clients.contacts ? clients.contacts.note : 'N/A' %></li>
-                            </ul>
-                        </div>
-                    </div>
+                    
                 </div>
                 <div class="card-footer d-flex justify-content-between">
-                    <a type="button" class="btn btn-hcs-green btn-sm" href="/client/update/<%= client.id %>">Update Client</a>
-                    <span>Last Updated: <%= slimDateTime(contact.updatedAt,true) %></span>
-                    <form action="/client/delete/<%= client.id %>" method="post" class="d-inline">
+                    <a type="button" class="btn btn-hcs-green btn-sm" href="/client/update/<%= clients.id %>">Update Client</a>
+                    <span>Last Updated: <%= slimDateTime(clients.Contacts.updatedAt,true) %></span>
+                    <form action="/client/delete/<%= clients.id %>" method="post" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Delete Contact</button>
                     </form>
                 </div>
@@ -52,7 +35,7 @@
                     </div>
                     <div class="col-sm-6">
                         <% if (clients.Contacts.length === 0) { %>
-                        <p class="text-center">No contacts available.</p>
+                        <p class="text-center">No Contacts available.</p>
                         <% } else { %>
                         <div class="table-responsive">
                             <table class="table table-striped">

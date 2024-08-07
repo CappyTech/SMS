@@ -7,7 +7,7 @@ function slimDateTime(dateString, includeTime = false) {
 
     if (includeTime) {
         const formattedTime = date.format('HH:mm');
-        return '${formattedDate} ${formattedTime}';
+        return `${formattedDate} ${formattedTime}`;
     }
 
     return formattedDate;
@@ -22,15 +22,41 @@ function formatCurrency(amount) {
     return '£' + amount.toFixed(2);
 }
 
-const isAdmin = (req, res, next) => {
-    if (req.session) {
-        return res.redirect('signin');
-    }
-    if (req.session.user.role !== 'admin') {
-        logger.warn('Access denied for user role: ${req.session.user.role}');
-        return res.status(403).send('Access denied.');
+
+const ensureAuthenticated = (req, res, next) => {
+    if (!req.session.user) {
+        req.flash('error', 'You need to sign in.');
+        return res.redirect('/signin');
     }
     next();
+};
+
+const ensureRole = (role) => {
+    return (req, res, next) => {
+        if (!req.session.user) {
+            req.flash('error', 'You need to sign in.');
+            return res.redirect('/signin');
+        }
+        if (req.session.user.role !== role) {
+            return res.status(403).send('Access denied.');
+        }
+        next();
+    };
+};
+
+const ensurePermission = (permissions) => {
+    return (req, res, next) => {
+        if (!req.session.user) {
+            req.flash('error', 'You need to sign in.');
+            return res.redirect('/signin');
+        }
+        const userPermissions = req.session.user;
+        const hasPermission = permissions.some(permission => userPermissions[permission]);
+        if (!hasPermission) {
+            return res.status(403).send('Access denied.');
+        }
+        next();
+    };
 };
 
 function validateInvoiceData(data) {
@@ -48,7 +74,7 @@ function validateInvoiceData(data) {
 
     Object.keys(validations).forEach(field => {
         if (!validations[field](data[field])) {
-            errors.push('Invalid or missing value for ${field}');
+            errors.push(`Invalid or missing value for ${field}`);
         }
     });
 
@@ -58,7 +84,7 @@ function validateInvoiceData(data) {
 
     if (errors.length > 0) {
         const errorMessage = errors.join(', ');
-        logger.error('Validation errors: ${errorMessage}');
+        logger.error(`Validation errors: ${errorMessage}`);
         throw new Error(errorMessage);
     }
 
@@ -116,24 +142,21 @@ function getTaxYearStartEnd(year) {
 }
 
 function getCurrentMonthlyReturn(year, month) {
+    const startOfTaxYear = moment.utc({ year, month: 3, day: 6 });
+    const startOfPeriod = moment.utc(startOfTaxYear).add(month - 1, 'months');
+    const endOfPeriod = moment.utc(startOfPeriod).add(1, 'months').subtract(1, 'days');
     const today = moment.utc();
-    let startOfCurrentPeriod = moment.utc({ year, month, day: 6 }); // 6th of the specified month
 
-    if (today.isBefore(startOfCurrentPeriod)) {
-        startOfCurrentPeriod.subtract(1, 'months');
-    }
-
-    const endOfCurrentPeriod = moment.utc(startOfCurrentPeriod).add(1, 'months').subtract(1, 'days');
-    const submissionDeadline = moment.utc(endOfCurrentPeriod).add(6, 'days'); // 11th of the current month
-    const hmrcUpdateDate = moment.utc(endOfCurrentPeriod).add(11, 'days'); // 17th of the current month
+    const submissionDeadline = moment.utc(endOfPeriod).add(6, 'days'); // 11th of the next month
+    const hmrcUpdateDate = moment.utc(endOfPeriod).add(11, 'days'); // 16th of the next month
     const submissionDeadlineInDays = submissionDeadline.diff(today, 'days');
     const hmrcUpdateDateInDays = hmrcUpdateDate.diff(today, 'days');
 
     return {
-        periodStart: startOfCurrentPeriod.format('YYYY-MM-DD'),
-        periodEnd: endOfCurrentPeriod.format('YYYY-MM-DD'),
-        periodStartDisplay: startOfCurrentPeriod.format('Do MMMM YYYY'),
-        periodEndDisplay: endOfCurrentPeriod.format('Do MMMM YYYY'),
+        periodStart: startOfPeriod.format('YYYY-MM-DD'),
+        periodEnd: endOfPeriod.format('YYYY-MM-DD'),
+        periodStartDisplay: startOfPeriod.format('Do MMMM YYYY'),
+        periodEndDisplay: endOfPeriod.format('Do MMMM YYYY'),
         submissionDeadline: submissionDeadline.format('Do MMMM YYYY'),
         hmrcUpdateDate: hmrcUpdateDate.format('Do MMMM YYYY'),
         submissionDeadlineInDays,
@@ -141,14 +164,17 @@ function getCurrentMonthlyReturn(year, month) {
     };
 }
 
+
 module.exports = {
     slimDateTime,
     formatCurrency,
-    isAdmin,
     validateInvoiceData,
     calculateInvoiceAmounts,
     rounding,
     getCurrentTaxYear,
     getTaxYearStartEnd,
-    getCurrentMonthlyReturn
+    getCurrentMonthlyReturn,
+    ensureAuthenticated,
+    ensurePermission,
+    ensureRole,
 };

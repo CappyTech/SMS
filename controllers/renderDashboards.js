@@ -11,8 +11,9 @@ const Subcontractors = require('../models/subcontractor');
 const Quotes = require('../models/quote');
 const Clients = require('../models/client');
 const Contacts = require('../models/contact');
+const path = require('path');
 
-const renderstatsDashboard = async (req, res) => {
+const renderStatsDashboard = async (req, res) => {
     try {
         if (req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
@@ -20,6 +21,7 @@ const renderstatsDashboard = async (req, res) => {
 
         // Fetch the specified tax year from the URL parameter or use the current tax year
         const specifiedYear = req.params.year ? parseInt(req.params.year) : helpers.getCurrentTaxYear();
+        const specifiedMonth = req.params.month ? parseInt(req.params.month) : moment().month() + 1;
 
         // Fetch all subcontractors and invoices
         const subcontractors = await Subcontractors.findAll();
@@ -27,7 +29,7 @@ const renderstatsDashboard = async (req, res) => {
 
         // Determine the start and end of the specified tax year
         const taxYear = helpers.getTaxYearStartEnd(specifiedYear);
-        const currentMonthlyReturn = helpers.getCurrentMonthlyReturn();
+        const currentMonthlyReturn = helpers.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
 
         // Filter invoices for the current monthly return period
         const filteredInvoices = invoices.filter(invoice =>
@@ -42,11 +44,39 @@ const renderstatsDashboard = async (req, res) => {
             subcontractorIds.includes(sub.id)
         );
 
-        res.render('statsDashboard', {
+        // Calculate totals for each subcontractor
+        const subcontractorTotals = {};
+        filteredInvoices.forEach(invoice => {
+            if (!subcontractorTotals[invoice.SubcontractorId]) {
+                subcontractorTotals[invoice.SubcontractorId] = {
+                    grossTotal: 0,
+                    labourTotal: 0,
+                    materialTotal: 0,
+                    cisTotal: 0,
+                    netTotal: 0,
+                    reverseChargeTotal: 0
+                };
+            }
+            subcontractorTotals[invoice.SubcontractorId].grossTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].grossTotal + invoice.grossAmount, false);
+            subcontractorTotals[invoice.SubcontractorId].labourTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].labourTotal + invoice.labourCost, false);
+            subcontractorTotals[invoice.SubcontractorId].materialTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].materialTotal + invoice.materialCost, false);
+            subcontractorTotals[invoice.SubcontractorId].cisTotal = subcontractorTotals[invoice.SubcontractorId].cisTotal + invoice.cisAmount;
+            subcontractorTotals[invoice.SubcontractorId].netTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].netTotal + invoice.netAmount, false);
+            subcontractorTotals[invoice.SubcontractorId].reverseChargeTotal = subcontractorTotals[invoice.SubcontractorId].reverseChargeTotal + invoice.reverseCharge;
+        });
+
+        // Calculate the previous and next periods
+        const previousMonth = specifiedMonth - 1 === 0 ? 12 : specifiedMonth - 1;
+        const previousYear = specifiedMonth - 1 === 0 ? specifiedYear - 1 : specifiedYear;
+        const nextMonth = specifiedMonth + 1 === 13 ? 1 : specifiedMonth + 1;
+        const nextYear = specifiedMonth + 1 === 13 ? specifiedYear + 1 : specifiedYear;
+
+        res.render(path.join('dashboards', 'statsDashboard'), {
             subcontractorCount: filteredSubcontractors.length,
             invoiceCount: filteredInvoices.length,
             subcontractors: filteredSubcontractors,
             invoices: filteredInvoices,
+            subcontractorTotals,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
@@ -54,7 +84,11 @@ const renderstatsDashboard = async (req, res) => {
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
             taxYear,
-            currentMonthlyReturn
+            currentMonthlyReturn,
+            previousYear,
+            previousMonth,
+            nextYear,
+            nextMonth
         });
     } catch (error) {
         logger.error('Error rendering stats dashboard:' + error.message);
@@ -62,6 +96,8 @@ const renderstatsDashboard = async (req, res) => {
         return res.redirect('/');
     }
 };
+
+
 
 const renderUserDashboard = async (req, res) => {
     try {
@@ -71,7 +107,7 @@ const renderUserDashboard = async (req, res) => {
 
         const users = await Users.findAll({ order: [['createdAt', 'DESC']] });
 
-        res.render('usersDashboard', {
+        res.render(path.join('dashboards', 'usersDashboard'), {
             users,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -80,7 +116,7 @@ const renderUserDashboard = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering users dashboard:' + error.message);
+        logger.error('Error rendering users dashboard: ' + error.message);
         req.flash('error', 'Error rendering users dashboard: ' + error.message);
         return res.redirect('/');
     }
@@ -94,7 +130,7 @@ const renderInvoiceDashboard = async (req, res) => {
 
         const invoices = await Invoices.findAll({ order: [['createdAt', 'DESC']] });
 
-        res.render('invoicesDashboard', {
+        res.render(path.join('dashboards', 'invoicesDashboard'), {
             invoices,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -117,7 +153,7 @@ const renderSubcontractorDashboard = async (req, res) => {
 
         const subcontractors = await Subcontractors.findAll({ order: [['createdAt', 'DESC']] });
 
-        res.render('subcontractorsDashboard', {
+        res.render(path.join('dashboards', 'subcontractorsDashboard'), {
             subcontractors,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -140,7 +176,7 @@ const renderQuotesDashboard = async (req, res) => {
 
         const quotes = await Quotes.findAll({ order: [['createdAt', 'DESC']] });
 
-        res.render('quotesDashboard', {
+        res.render(path.join('dashboards', 'quotesDashboard'), {
             quotes,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -163,7 +199,7 @@ const renderClientsDashboard = async (req, res) => {
 
         const clients = await Clients.findAll({ order: [['createdAt', 'DESC']] });
 
-        res.render('clientsDashboard', {
+        res.render(path.join('dashboards', 'clientsDashboard'), {
             clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -184,9 +220,9 @@ const renderContactsDashboard = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const contacts = await Contacts.findAll({ order: [['createdAt', 'DESC']], include: [Client] });
+        const contacts = await Contacts.findAll({ order: [['createdAt', 'DESC']], include: [Clients] });
 
-        res.render('contactsDashboard', {
+        res.render(path.join('dashboards', 'contactsDashboard'), {
             contacts,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -232,7 +268,7 @@ const renderJobsDashboard = async (req, res) => {
             };
         }));
 
-        res.render('jobsDashboard', {
+        res.render(path.join('dashboards', 'jobsDashboard'), {
             jobs: jobsWithAssociations,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -247,7 +283,7 @@ const renderJobsDashboard = async (req, res) => {
     }
 };
 
-router.get('/dashboard/stats', renderstatsDashboard);
+router.get('/dashboard/stats/:year?/:month?', renderStatsDashboard);
 router.get('/dashboard/user', renderUserDashboard);
 router.get('/dashboard/subcontractor', renderSubcontractorDashboard);
 router.get('/dashboard/invoice', renderInvoiceDashboard);

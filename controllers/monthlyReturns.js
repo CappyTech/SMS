@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-
 const packageJson = require('../package.json');
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const { formatCurrency, slimDateTime } = require('../helpers');
-const logger = require('../logger'); // Import the logger
+const logger = require('../logger');
+const path = require('path');
 
 const renderMonthlyReturnsForm = async (req, res) => {
     try {
@@ -57,7 +57,7 @@ const renderMonthlyReturnsForm = async (req, res) => {
         });
 
         // Render the EJS view, passing in the modified subcontractors data
-        res.render('monthlyReturnsForm', {
+        res.render(path.join('monthlyreturns', 'monthlyReturnsForm'), {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
@@ -111,7 +111,7 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
             year: year
         });
 
-        res.render('monthlyReturnsForOneSubcontractor', {
+        res.render(path.join('monthlyreturns', 'monthlyReturnsForOneSubcontractor'), {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
@@ -167,7 +167,7 @@ const renderMonthlyReturnsForAll = async (req, res) => {
             year: year
         });
 
-        res.render('monthlyReturnsForAll', {
+        res.render(path.join('monthlyreturns', 'monthlyReturnsForAll'), {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
@@ -218,7 +218,7 @@ const renderMonthlyReturnsYear = async (req, res) => {
 
         logger.info("Rendering monthly returns:", { year: year });
 
-        res.render('renderMonthlyReturnsYear', {
+        res.render(path.join('monthlyreturns', 'renderMonthlyReturnsYear'), {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,

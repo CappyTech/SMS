@@ -1,12 +1,12 @@
 // controllers/quoteCRUD.js
 const express = require('express');
 const router = express.Router();
-const packageJson = require('../package.json');
-const Quotes = require('../models/quote');
-const Clients = require('../models/client');
-const helpers = require('../helpers');
+const packageJson = require('../../package.json');
+const Quotes = require('../../models/quote');
+const Clients = require('../../models/client');
+const helpers = require('../../helpers');
 const moment = require('moment');
-const logger = require('../logger');
+const logger = require('../../logger');
 
 const createQuote = async (req, res) => {
     try {
@@ -26,11 +26,11 @@ const createQuote = async (req, res) => {
             invoice_date: invoice_date
         });
 
-        res.redirect('/quote/read/${newQuote.id}');
+        res.redirect(`/quote/read/${newQuote.id}`);
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
             const errorMessages = error.errors.map((err) => err.message);
-            logger.error('Validation errors: ${errorMessages.join(', ')}');
+            logger.error(`Validation errors: ${errorMessages.join(', ')}`);
         }
         logger.error('Error creating quote:'+ error.message);
         req.flash('error', 'Error creating quote: ' + error.message);
@@ -54,7 +54,7 @@ const readQuote = async (req, res) => {
         if (!req.params.quote) {
             return res.status(404).json({ error: 'Quote not found' });
         } else {
-            res.render('viewQuote', {
+            res.render(path.join('quotes', 'viewQuote'), {
                 quote,
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
@@ -83,7 +83,7 @@ const readQuotes = async (req, res) => {
             order: [['date', 'DESC']],
         });
 
-        res.render('viewQuotes', {
+        res.render(path.join('quotes', 'viewQuotes'), {
             quotes,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -110,11 +110,11 @@ const updateQuote = async (req, res) => {
         await Quotes.update(req.body, { where: { id: req.params.id } });
 
         req.flash('success', 'Quote updated successfully');
-        return res.redirect('/quote/read/${req.params.id}');
+        return res.redirect(`/quote/read/${req.params.id}`);
     } catch (error) {
-        logger.error('Error updating quote with ID: ${req.params.id}. Details:'+ error.message);
-        req.flash('error', 'Error updating quote with ID: ${req.params.id}. Details:'+ error.message);
-        return res.redirect('/quote/read/${req.params.id}');
+        logger.error(`Error updating quote with ID: ${req.params.id}. Details:` + error.message);
+        req.flash('error', `Error updating quote with ID: ${req.params.id}. Details:` + error.message);
+        return res.redirect(`/quote/read/${req.params.id}`);
     }
 };
 
@@ -136,7 +136,7 @@ const deleteQuote = async (req, res) => {
         req.flash('success', 'Quote deleted successfully');
         res.redirect('/dashboard/quote');
     } catch (error) {
-        logger.error('Error deleting quote:'+ error.message);
+        logger.error('Error deleting quote: ' + error.message);
         req.flash('error', 'Error deleting quote: ' + error.message);
         res.redirect('/dashboard/quote');
     }

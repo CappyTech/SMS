@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const packageJson = require('../package.json');
-const User = require('../models/user');
-const helpers = require('../helpers');
-const logger = require('../logger'); // Import the logger
+const packageJson = require('../../package.json');
+const User = require('../../models/user');
+const helpers = require('../../helpers');
+const logger = require('../../logger');
 
 const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
@@ -32,8 +32,8 @@ const createUser = async (req, res) => {
     try {
         const { error, value } = schema.validate(req.body);
         if (error) {
-            req.flash('error', 'Invalid input.');
-            return res.redirect('/dashboard');
+            req.flash('error', 'Invalid input.' + error);
+            return res.redirect('/');
         }
 
         const { username, email, password, role } = value;
@@ -46,7 +46,7 @@ const createUser = async (req, res) => {
 
         if (existingUser) {
             req.flash('error', 'Registration failed.');
-            return res.redirect('/dashboard');
+            return res.redirect('/');
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -59,9 +59,9 @@ const createUser = async (req, res) => {
         });
 
         req.flash('success', 'User created successfully.');
-        res.redirect('/dashboard');
+        res.redirect('/');
     } catch (error) {
-        logger.error('Error creating user:  ', error.message);
+        logger.error('Error creating user: ' + error.message);
         req.flash('error', 'An error occurred.');
         res.redirect('/error');
     }
@@ -90,7 +90,7 @@ const readUser = async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        res.render('viewUser', {
+        res.render(path.join('users', 'viewUser'), {
             user,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -225,9 +225,9 @@ const deleteUser = async (req, res) => {
     }
 };
 
-router.post('/user/create/:selected', createUser);
-router.get('/user/read/:id', readUser);
-router.post('/user/update/:id', updateUser);
-router.post('/user/delete/:id', deleteUser);
+router.post('/user/create/:selected', helpers.ensurePermission(['permissionCreateUser']), createUser);
+router.get('/user/read/:id', helpers.ensurePermission(['permissionReadUser']), readUser);
+router.post('/user/update/:id', helpers.ensurePermission(['permissionUpdateUser']), updateUser);
+router.post('/user/delete/:id', helpers.ensurePermission(['permissionDeleteUser']), deleteUser);
 
 module.exports = router;

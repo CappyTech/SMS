@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-
-const User = require('../models/user');
-const helpers = require('../helpers');
-const packageJson = require('../package.json');
-const logger = require('../logger'); // Import the logger
+const User = require('../../models/user');
+const helpers = require('../../helpers');
+const packageJson = require('../../package.json');
+const logger = require('../../logger'); 
 
 // Update the account settings
 const updateAccountSettings = async (req, res) => {

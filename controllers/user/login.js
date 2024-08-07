@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const packageJson = require("../package.json");
-const User = require("../models/user");
+const packageJson = require("../../package.json");
+const User = require("../../models/user");
 const { Op } = require("sequelize");
-const Subcontractor = require("../models/subcontractor");
+const Subcontractor = require("../../models/subcontractor");
 const bcrypt = require("bcrypt");
-const speakeasy = require("speakeasy");
-const logger = require('../logger'); // Import the logger
+const logger = require('../../logger'); 
 
 const renderSigninForm = (req, res) => {
     
