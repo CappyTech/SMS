@@ -5,11 +5,12 @@ const User = require("../../models/user");
 const { Op } = require("sequelize");
 const Subcontractor = require("../../models/subcontractor");
 const bcrypt = require("bcrypt");
-const logger = require('../../logger'); 
+const logger = require('../../logger');
+const path = require('path'); 
 
 const renderSigninForm = (req, res) => {
     
-    res.render('signin', {
+    res.render(path.join('user', 'signin'), {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
         session: req.session,
@@ -57,11 +58,12 @@ const loginUser = async (req, res) => {
             req.session.user.subcontractors = subcontractors;
             
             logger.info('User Logged in');
-            return res.redirect('/dashboard/stats');
+            req.flash('success', 'Logged In');
+            return res.redirect('/');
         
          } else {
             logger.error('Error Invalid password:' + error.message);
-             req.flash('error', 'Invalid password');
+            req.flash('error', 'Invalid password');
             return res.redirect('/signin');
         };
     } catch (error) {
