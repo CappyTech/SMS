@@ -22,14 +22,20 @@ function formatCurrency(amount) {
     return '£' + amount.toFixed(2);
 }
 
+// Middleware to ensure authenticated access and clear flash messages
 const ensureAuthenticated = (req, res, next) => {
+    logger.info(`Session Data: ${JSON.stringify(req.session)}`);
     if (!req.session.user) {
         req.flash('error', 'You need to sign in.');
+        logger.info(`Unknown user accessed path ${req.method} ${req.originalUrl}`);
         return res.redirect('/signin');
     }
+    res.locals.errorMessages = req.flash('error');
+    res.locals.successMessages = req.flash('success');
     next();
 };
 
+// Middleware to handle role-based access
 const ensureRole = (role) => {
     return (req, res, next) => {
         if (!req.session.user) {
@@ -37,12 +43,14 @@ const ensureRole = (role) => {
             return res.redirect('/signin');
         }
         if (req.session.user.role !== role) {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
         next();
     };
 };
 
+// Middleware to handle permission-based access
 const ensurePermission = (permissions) => {
     return (req, res, next) => {
         if (!req.session.user) {
@@ -52,7 +60,8 @@ const ensurePermission = (permissions) => {
         const userPermissions = req.session.user;
         const hasPermission = permissions.some(permission => userPermissions[permission]);
         if (!hasPermission) {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
         next();
     };
