@@ -1,11 +1,6 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
 <div class="container py-4">
-    <div class="d-flex justify-content-between mb-3">
-        <a href="/dashboard/stats/<%= previousYear %>/<%= previousMonth %>" class="btn btn-hcs-green">&laquo; Previous</a>
-        <h1 class="display-4">Period: <%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></h1>
-        <a href="/dashboard/stats/<%= nextYear %>/<%= nextMonth %>" class="btn btn-hcs-green">Next &raquo;</a>
-    </div>
     <div class="row mb-4">
         <div class="col-lg-6 col-md-6 mb-4">
             <div class="card">
@@ -52,23 +47,36 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-6">
+        <div class="col-12">
             <h3>Subcontractors</h3>
-            <ul class="list-group">
-                <% subcontractors.forEach(subcontractor => { %>
-                <li class="list-group-item">
-                    <a href="/subcontractor/read/<%= subcontractor.id %>"><%= subcontractor.company %></a>
-                    <div>
-                        <p>Gross Total: <%= formatCurrency(subcontractorTotals[subcontractor.id].grossTotal) %></p>
-                        <p>Labour Total: <%= formatCurrency(subcontractorTotals[subcontractor.id].labourTotal) %></p>
-                        <p>Material Total: <%= formatCurrency(subcontractorTotals[subcontractor.id].materialTotal) %></p>
-                        <p>CIS Total: <%= formatCurrency(subcontractorTotals[subcontractor.id].cisTotal) %></p>
-                        <p>Net Total: <%= formatCurrency(subcontractorTotals[subcontractor.id].netTotal) %></p>
-                        <p>Reverse Charge Total: <%= formatCurrency(subcontractorTotals[subcontractor.id].reverseChargeTotal) %></p>
-                    </div>
-                </li>
-                <% }); %>
-            </ul>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Subcontractor</th>
+                            <th>Gross Total</th>
+                            <th>Labour Total</th>
+                            <th>Material Total</th>
+                            <th>CIS Total</th>
+                            <th>Net Total</th>
+                            <th>Reverse Charge Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% subcontractors.forEach(subcontractor => { %>
+                        <tr>
+                            <td><a href="/subcontractor/read/<%= subcontractor.id %>"><%= subcontractor.company %></a></td>
+                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].grossTotal) %></td>
+                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].labourTotal) %></td>
+                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].materialTotal) %></td>
+                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].cisTotal) %></td>
+                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].netTotal) %></td>
+                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].reverseChargeTotal) %></td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div class="row">
