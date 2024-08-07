@@ -1,6 +1,11 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
 <div class="container py-4">
+    <div class="d-flex justify-content-between mb-3">
+        <a href="/dashboard/stats/<%= previousYear %>/<%= previousMonth %>" class="btn btn-primary">&laquo; Previous</a>
+        <h1>Period: <%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></h1>
+        <a href="/dashboard/stats/<%= nextYear %>/<%= nextMonth %>" class="btn btn-primary">Next &raquo;</a>
+    </div>
     <div class="row mb-4">
         <div class="col-lg-6 col-md-6 mb-4">
             <div class="card">
@@ -59,7 +64,9 @@
                             <th>Material Total</th>
                             <th>CIS Total</th>
                             <th>Net Total</th>
-                            <th>Reverse Charge Total</th>
+                            <% if (subcontractors.some(subcontractor => subcontractor.isReverseCharge)) { %>
+                                <th>Reverse Charge Total</th>
+                            <% } %>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,7 +78,11 @@
                             <td><%= formatCurrency(subcontractorTotals[subcontractor.id].materialTotal) %></td>
                             <td><%= formatCurrency(subcontractorTotals[subcontractor.id].cisTotal) %></td>
                             <td><%= formatCurrency(subcontractorTotals[subcontractor.id].netTotal) %></td>
-                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].reverseChargeTotal) %></td>
+                            <% if (subcontractor.isReverseCharge) { %>
+                                <td><%= formatCurrency(subcontractorTotals[subcontractor.id].reverseChargeTotal) %></td>
+                            <% } else { %>
+                                <td>N/A</td>
+                            <% } %>
                         </tr>
                         <% }); %>
                     </tbody>
