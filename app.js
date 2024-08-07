@@ -11,6 +11,7 @@ const rateLimit = require('express-rate-limit');
 const logger = require('./logger');
 const fs = require('fs');
 require('dotenv').config();
+const helpers = require('./helpers');
 
 // Set up EJS
 app.set('view engine', 'ejs');
@@ -83,27 +84,23 @@ app.use(session({
 }));
 
 sessionStore.onReady().then(() => {
-    if (process.env.DEBUG) {
-        logger.info('MySQLStore ready');
-    }
+    logger.info('MySQLStore ready');
 }).catch(error => {
     logger.error(error);
 });
 
 app.use((req, res, next) => {
     res.locals.session = req.session;
-    if (process.env.DEBUG) {
-        logger.info('Session Data: ${JSON.stringify(req.session)}');
-    }
+    logger.info(`Session Data: ${JSON.stringify(req.session)}`);
     const username = req.session.user ? req.session.user.username : 'unknown user';
-    const logMessage = '${username} accessed path ${req.method} ${req.path}';
+    const logMessage = `${username} accessed path ${req.method} ${req.path}`;
 
     if (req.path.includes('/update/')) {
-        logger.warn('-------- Warn: ${logMessage}');
+        logger.warn(`-------- Warn: ${logMessage}`);
     } else if (req.path.includes('/delete/')) {
-        logger.error('------- Danger: ${logMessage}');
+        logger.error(`------- Danger: ${logMessage}`);
     } else {
-        logger.info('${logMessage}');
+        logger.info(`${logMessage}`);
     }
     next();
 });
@@ -112,7 +109,7 @@ const { Op } = require("sequelize");
 
 const createDefaultAdmin = async () => {
     try {
-        const admin = await User.findOne({
+        const admin = await Users.findOne({
             where: {
                 [Op.or]: [
                     { username: 'admin' },
@@ -121,7 +118,7 @@ const createDefaultAdmin = async () => {
             }
         });
         if (!admin) {
-            await User.create({
+            await Users.create({
                 username: process.env.ADMIN_USERNAME,
                 email: process.env.ADMIN_EMAIL,
                 password: process.env.ADMIN_PASSWORD,
@@ -141,47 +138,6 @@ const createDefaultAdmin = async () => {
         logger.error('Error creating default admin:', error);
     }
 };
-
-app.use(async (req, res, next) => {
-    try {
-        res.locals.invoicesWithoutSubmissionDate = await Invoices.findAll({
-            where: {
-                submissionDate: null
-            },
-            attributes: ['id', 'kashflowNumber'],
-            order: [['kashflowNumber', 'ASC']]
-        });
-        next();
-    } catch (error) {
-        logger.error('Error fetching invoices:', error);
-        next();
-    }
-});
-
-app.use(async (req, res, next) => {
-    try {
-        const unpaidInvoices = await Invoices.findAll({
-            where: { remittanceDate: null },
-            attributes: ['id', 'kashflowNumber'],
-            order: [['kashflowNumber', 'ASC']]
-        });
-
-        const unsubmittedInvoices = await Invoices.findAll({
-            where: { submissionDate: null },
-            attributes: ['id', 'kashflowNumber'],
-            order: [['kashflowNumber', 'ASC']]
-        });
-
-        res.locals.unpaidInvoices = unpaidInvoices;
-        res.locals.unsubmittedInvoices = unsubmittedInvoices;
-        res.locals.totalNotifications = unpaidInvoices.length + unsubmittedInvoices.length;
-
-        next();
-    } catch (error) {
-        logger.error('Error fetching invoices:', error);
-        next();
-    }
-});
 
 const Users = require('./models/user');
 const Subcontractors = require('./models/subcontractor');
@@ -207,25 +163,27 @@ Invoices.belongsTo(Subcontractors, {
 });
 Employees.hasMany(Attendances, {
     foreignKey: 'employeeId',
-    allowNull: true,
+    allowNull: false,
 });
 Subcontractors.hasMany(Attendances, {
     foreignKey: 'subcontractorId',
-    allowNull: true,
+    allowNull: false,
 });
 Attendances.belongsTo(Employees, {
     foreignKey: 'employeeId',
-    allowNull: true,
+    allowNull: false,
 });
 Attendances.belongsTo(Subcontractors, {
     foreignKey: 'subcontractorId',
-    allowNull: true,
+    allowNull: false,
 });
 Clients.hasMany(Quotes, {
-    foreignKey: 'clientId'
+    foreignKey: 'clientId',
+    allowNull: false,
 });
 Quotes.belongsTo(Clients, {
-    foreignKey: 'clientId'
+    foreignKey: 'clientId',
+    allowNull: false,
 });
 Clients.hasMany(Contacts, {
     foreignKey: 'clientId',
@@ -269,30 +227,93 @@ Contacts.belongsTo(Clients, {
     }
 })();
 
-const renderForms = require('./controllers/renderForms');
+app.use(async (req, res, next) => {
+    try {
+        res.locals.invoicesWithoutSubmissionDate = await Invoices.findAll({
+            where: {
+                submissionDate: null
+            },
+            attributes: ['id', 'kashflowNumber'],
+            order: [['kashflowNumber', 'ASC']]
+        });
+        next();
+    } catch (error) {
+        logger.error('Error fetching invoices without submission date: ' + error);
+        next();
+    }
+});
+
+app.use(async (req, res, next) => {
+    try {
+        const unpaidInvoices = await Invoices.findAll({
+            where: { remittanceDate: null },
+            attributes: ['id', 'kashflowNumber'],
+            order: [['kashflowNumber', 'ASC']]
+        });
+
+        const unsubmittedInvoices = await Invoices.findAll({
+            where: { submissionDate: null },
+            attributes: ['id', 'kashflowNumber'],
+            order: [['kashflowNumber', 'ASC']]
+        });
+
+        res.locals.unpaidInvoices = unpaidInvoices;
+        res.locals.unsubmittedInvoices = unsubmittedInvoices;
+        res.locals.totalNotifications = unpaidInvoices.length + unsubmittedInvoices.length;
+
+        next();
+    } catch (error) {
+        logger.error('Error fetching invoices: ' + error);
+        next();
+    }
+});
+
+const render = require('./controllers/renderForms');
+
+const formsClient = require('./controllers/forms/client');
+const formsContact = require('./controllers/forms/contact');
+const formsError = require('./controllers/forms/error');
+const formsInvoice = require('./controllers/forms/invoice');
+const formsQuote = require('./controllers/forms/quote');
+const formsSubcontractor = require('./controllers/forms/subcontractor');
+const formsUser = require('./controllers/forms/user');
+
 const renderDashboard = require('./controllers/renderDashboards');
 
-const login = require('./controllers/login');
-const register = require('./controllers/register');
-const settings = require('./controllers/settings');
+const userLogin = require('./controllers/user/login');
+const userRegister = require('./controllers/user/register');
+const userSettings = require('./controllers/user/settings');
 
-const userCRUD = require('./controllers/userCRUD');
-const subcontractorCRUD = require('./controllers/subcontractorCRUD');
-const invoiceCRUD = require('./controllers/invoiceCRUD');
-const quoteCRUD = require('./controllers/quoteCRUD');
-const clientCRUD = require('./controllers/clientCRUD');
-const contactCRUD = require('./controllers/contactCRUD');
-// const attendanceCRUD = require('./controllers/attendanceCRUD');
-// const employeeCRUD = require('./controllers/employeeCRUD');
+const userCRUD = require('./controllers/CRUD/userCRUD');
+const subcontractorCRUD = require('./controllers/CRUD/subcontractorCRUD');
+const invoiceCRUD = require('./controllers/CRUD/invoiceCRUD');
+const quoteCRUD = require('./controllers/CRUD/quoteCRUD');
+const clientCRUD = require('./controllers/CRUD/clientCRUD');
+const contactCRUD = require('./controllers/CRUD/contactCRUD');
+// const attendanceCRUD = require('./controllers/CRUD/attendanceCRUD');
+// const employeeCRUD = require('./controllers/CRUD/employeeCRUD');
 
 const monthlyReturns = require('./controllers/monthlyReturns');
 const yearlyReturns = require('./controllers/yearlyReturns');
 
-app.use('/', renderForms);
+// Ensure the user is authenticated for all routes
+app.use(helpers.ensureAuthenticated);
+
+app.use('/', render);
+
+app.use('/', formsClient);
+app.use('/', formsContact);
+app.use('/', formsError);
+app.use('/', formsInvoice);
+app.use('/', formsQuote);
+app.use('/', formsSubcontractor);
+app.use('/', formsUser);
+
 app.use('/', renderDashboard);
-app.use('/', login);
-app.use('/', register);
-app.use('/', settings);
+
+app.use('/', userLogin);
+app.use('/', userRegister);
+app.use('/', userSettings);
 
 app.use('/', userCRUD);
 app.use('/', subcontractorCRUD);
@@ -310,7 +331,7 @@ app.use('/', yearlyReturns);
 const errorHandler = (err, req, res, next) => {
     logger.error(err.stack);
     const status = err.status || 500;
-    const errorViewPath = path.join(__dirname, 'views', '${status}.ejs');
+    const errorViewPath = path.join(__dirname, 'views', `${status}.ejs`);
 
     fs.access(errorViewPath, fs.constants.F_OK, (fsErr) => {
         if (fsErr) {
@@ -331,5 +352,5 @@ app.use(errorHandler);
 
 const port = process.env.PORT || 80;
 app.listen(port, 'localhost', () => {
-    logger.info('Server running at http://localhost:${port}');
+    logger.info(`Server running at http://localhost:${port}`);
 });
