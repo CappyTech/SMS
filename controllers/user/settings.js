@@ -47,7 +47,7 @@ const getAccountPage = async (req, res) => {
             }
         });
 
-        res.render('account', {
+        res.render(path.join('user', 'account'), {
             user: user,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
