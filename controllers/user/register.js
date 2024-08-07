@@ -8,7 +8,7 @@ const logger = require('../../logger');
 
 const renderRegistrationForm = (req, res) => {
     
-    res.render('register', {
+    res.render(path.join('user', 'register'), {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
         session: req.session,
@@ -43,7 +43,7 @@ const registerUser = async (req, res) => {
         logger.danger('New User Created.');
         return res.redirect('/');
     } catch (error) {
-        logger.error('Error registering user:  ', error.message);
+        logger.error('Error registering user: ' + error.message);
         req.flash('error', 'Error registering user: ' + error.message);
         return res.redirect('/register');
     }
