@@ -22,7 +22,6 @@ function formatCurrency(amount) {
     return '£' + amount.toFixed(2);
 }
 
-
 const ensureAuthenticated = (req, res, next) => {
     if (!req.session.user) {
         req.flash('error', 'You need to sign in.');
