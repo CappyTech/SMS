@@ -1,4 +1,6 @@
 const express = require('express');
+const https = require('https');
+const selfsigned = require('selfsigned');
 const app = express();
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
@@ -12,6 +14,23 @@ const logger = require('./logger');
 const fs = require('fs');
 require('dotenv').config();
 const helpers = require('./helpers');
+
+// Generate the self-signed certificate
+const attrs = [
+    { name: 'commonName', value: process.env.SSL_COMMON_NAME },
+    { name: 'countryName', value: process.env.SSL_COUNTRY },
+    { shortName: 'ST', value: process.env.SSL_STATE },
+    { name: 'localityName', value: process.env.SSL_LOCALITY },
+    { name: 'organizationName', value: process.env.SSL_ORGANIZATION },
+    { shortName: 'OU', value: process.env.SSL_ORGANIZATIONAL_UNIT }
+];
+
+const pems = selfsigned.generate(attrs, { days: 365 });
+
+const options = {
+    key: pems.private,
+    cert: pems.cert
+};
 
 // Set up EJS
 app.set('view engine', 'ejs');
@@ -75,9 +94,9 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     store: sessionStore,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
         httpOnly: true,
         maxAge: 43200000, // 12 hours
     }
@@ -347,7 +366,7 @@ const errorHandler = (err, req, res, next) => {
 
 app.use(errorHandler);
 
-const port = process.env.PORT || 80;
-app.listen(port, 'localhost', () => {
-    logger.info(`Server running at http://localhost:${port}`);
+const PORT = process.env.PORT || 443;
+https.createServer(options, app).listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on https://${process.env.SSL_COMMON_NAME}`);
 });
