@@ -135,7 +135,7 @@ const createDefaultAdmin = async () => {
             }
         }
     } catch (error) {
-        logger.error('Error creating default admin:', error);
+        logger.error('Error creating default admin: ' + error);
     }
 };
 
@@ -295,9 +295,6 @@ const contactCRUD = require('./controllers/CRUD/contactCRUD');
 
 const monthlyReturns = require('./controllers/monthlyReturns');
 const yearlyReturns = require('./controllers/yearlyReturns');
-
-// Ensure the user is authenticated for all routes
-app.use(helpers.ensureAuthenticated);
 
 app.use('/', render);
 
