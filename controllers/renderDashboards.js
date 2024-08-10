@@ -15,7 +15,7 @@ const path = require('path');
 
 const renderStatsDashboard = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
@@ -101,7 +101,7 @@ const renderStatsDashboard = async (req, res) => {
 
 const renderUserDashboard = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
@@ -124,7 +124,7 @@ const renderUserDashboard = async (req, res) => {
 
 const renderInvoiceDashboard = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
@@ -147,7 +147,7 @@ const renderInvoiceDashboard = async (req, res) => {
 
 const renderSubcontractorDashboard = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
@@ -170,7 +170,7 @@ const renderSubcontractorDashboard = async (req, res) => {
 
 const renderQuotesDashboard = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
@@ -193,7 +193,7 @@ const renderQuotesDashboard = async (req, res) => {
 
 const renderClientsDashboard = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
@@ -216,7 +216,7 @@ const renderClientsDashboard = async (req, res) => {
 
 const renderContactsDashboard = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
@@ -239,7 +239,7 @@ const renderContactsDashboard = async (req, res) => {
 
 const renderJobsDashboard = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
