@@ -63,7 +63,7 @@ const renderSubcontractorCreateForm = (req, res) => {
 
 const renderSubcontractorUpdateForm = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
