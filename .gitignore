@@ -3,3 +3,4 @@
 /config/
 /dist/
 app.log
+*.zip
