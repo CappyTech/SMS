@@ -10,7 +10,7 @@ const Contacts = require('../../models/contact');
 
 const renderQuoteCreateForm = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
@@ -41,7 +41,7 @@ const renderQuoteCreateForm = async (req, res) => {
 
 const renderQuoteUpdateForm = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
