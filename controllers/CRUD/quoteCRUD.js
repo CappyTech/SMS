@@ -121,7 +121,7 @@ const updateQuote = async (req, res) => {
 
 const deleteQuote = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied. Only admins can delete quotes.');
         }
 
