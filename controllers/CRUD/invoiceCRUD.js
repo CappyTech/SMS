@@ -185,7 +185,7 @@ const updateInvoice = async (req, res) => {
 const deleteInvoice = async (req, res) => {
     try {
         // Check if the user is an admin
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied. Only admins can delete invoices.');
         }
         // TODO: Add SubcontractorId to the invoice model and refer back to the /invoices/read/:id route
