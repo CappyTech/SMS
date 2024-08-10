@@ -27,9 +27,16 @@ app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use(xss());
 app.use(flash());
 
+// Trust the first proxy in front of the app
+app.set('trust proxy', 1); // or use true to trust all proxies
+
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 1500,
+    keyGenerator: (req) => {
+        // Use the IP address for rate-limiting
+        return req.ip;
+    },
 });
 app.use(limiter);
 
