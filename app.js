@@ -1,6 +1,4 @@
 const express = require('express');
-const https = require('https');
-const selfsigned = require('selfsigned');
 const app = express();
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
@@ -39,12 +37,12 @@ app.use(helmet());
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
-            defaultSrc: ["'self'", "https://sms.heroncs.co.uk", "https://sms-heroncs.azurewebsites.net"],
+            defaultSrc: ["'self'", "https://sms.heroncs.co.uk"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
             scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
             fontSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
-            imgSrc: ["'self'", "data:", "otpauth:", "https://i.creativecommons.org", "https://licensebuttons.net", "https://<your-azure-domain>.azurewebsites.net"],
-            connectSrc: ["'self'", "https://sms.heroncs.co.uk", "https://sms-heroncs.azurewebsites.net"],
+            imgSrc: ["'self'", "data:", "otpauth:", "https://i.creativecommons.org", "https://licensebuttons.net", "https://sms-heroncs.co.uk"],
+            connectSrc: ["'self'", "https://sms.heroncs.co.uk"],
         },
     })
 );
@@ -353,6 +351,6 @@ const errorHandler = (err, req, res, next) => {
 
 app.use(errorHandler);
 
-app.listen(80, '0.0.0.0', () => {
+app.listen(443, '0.0.0.0', () => {
     logger.info(`Server is running`);
 });
