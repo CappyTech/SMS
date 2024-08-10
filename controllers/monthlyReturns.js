@@ -10,7 +10,7 @@ const path = require('path');
 const renderMonthlyReturnsForm = async (req, res) => {
     try {
         // Check if the user is an admin
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
         // Define the monthNames array starting with April as month 1
@@ -78,7 +78,7 @@ const renderMonthlyReturnsForm = async (req, res) => {
 const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
     try {
         // Check if the user is an admin
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
         const { month, year, id } = req.params;
@@ -134,7 +134,7 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
 const renderMonthlyReturnsForAll = async (req, res) => {
     try {
         // Check if the user is an admin
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
         const { month, year } = req.params;
@@ -189,7 +189,7 @@ const renderMonthlyReturnsForAll = async (req, res) => {
 const renderMonthlyReturnsYear = async (req, res) => {
     try {
         // Check if the user is an admin
-        if (req.session.user.role !== 'admin') {
+        if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
         const { year } = req.params;
