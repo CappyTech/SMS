@@ -110,9 +110,9 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     store: sessionStore,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-        secure: true,
+        secure: false,
         httpOnly: true,
         maxAge: 43200000, // 12 hours
     }
@@ -280,9 +280,6 @@ app.use(async (req, res, next) => {
 
 app.use(async (req, res, next) => {
     try {
-        if (!req.session) {
-            
-        }
         const unpaidInvoices = await Invoices.findAll({
             where: { remittanceDate: null },
             attributes: ['id', 'kashflowNumber'],
