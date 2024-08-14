@@ -4,45 +4,40 @@
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Subcontractors Dashboard</h1>
-            <div class="d-flex justify-content-end mb-3">
-                <a href="/subcontractor/create" class="btn btn-hcs-green">Create New Subcontractor</a>
-            </div>
-            <% if (subcontractors.length === 0) { %>
-                <p class="text-center">No subcontractors available.</p>
-            <% } else { %>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Company</th>
-                                <th>Contact</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% subcontractors.forEach(function(subcontractor) { %>
-                                <tr>
-                                    <td class="<%= subcontractor.name ? '' : 'text-warning' %>"><%= subcontractor.name ? subcontractor.name : 'N/A' %></td>
-                                    <td class="<%= subcontractor.company ? '' : 'text-warning' %>"><%= subcontractor.company ? subcontractor.company : 'N/A' %></td>
-                                    <td class="<%= subcontractor.contact ? '' : 'text-warning' %>"><%= subcontractor.contact ? subcontractor.contact : 'N/A' %></td>
-                                    <td class="<%= subcontractor.email ? '' : 'text-warning' %>"><%= subcontractor.email ? subcontractor.email : 'N/A' %></td>
-                                    <td class="<%= subcontractor.phone ? '' : 'text-warning' %>"><%= subcontractor.phone ? subcontractor.phone : 'N/A' %></td>
-                                    <td>
-                                        <a href="/subcontractor/read/<%= subcontractor.id %>" class="btn btn-info btn-sm">View</a>
-                                        <a href="/subcontractor/update/<%= subcontractor.id %>" class="btn btn-warning btn-sm">Update</a>
-                                        <form action="/subcontractor/delete/<%= subcontractor.id %>" method="post" class="d-inline">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
+            <div class="row">
+                <div class="col-4">
+                    <ul class="scrollable-list list-group sticky-top">
+                        <a class="list-group-item list-group-item-action disabled text-bg-secondary text-center" aria-disabled="true">Subcontractor List</a>
+                        <% subcontractors.forEach(subcontractor => { %>
+                            <a href="#<%= subcontractor.id %>" class="list-group-item list-group-item-action text-center">
+                                <%= subcontractor.name %>
+                            </a>
+                        <% }); %>
+                    </ul>
                 </div>
-            <% } %>
+                <div class="col-8">
+                    <% subcontractors.forEach(subcontractor => { %>
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between text-bg-secondary">
+                            <span>Subcontractor: <%= subcontractor.name %></span>
+                            <a class="text-white" href="/subcontractor/read/<%= subcontractor.id %>">View Subcontractor</a>
+                        </div>
+                        <div class="card-body" id="<%= subcontractor.id %>">
+                            <ul class="list-group">
+                                <li class="list-group-item">Name: <%= subcontractor.name %></li>
+                                <li class="list-group-item">Company: <%= subcontractor.company %></li>
+                                <li class="list-group-item">CIS Number: <%= subcontractor.cisNumber %></li>
+                                <li class="list-group-item">UTR Number: <%= subcontractor.utrNumber %></li>
+                            </ul>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a type="button" class="btn btn-hcs-green btn-sm" href="/subcontractor/update/<%= subcontractor.id %>">Update Subcontractor</a>
+                            <span>Last Updated: <%= slimDateTime(subcontractor.updatedAt, true) %></span>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
         </div>
     </div>
 </div>
