@@ -4,55 +4,51 @@
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Quotes Dashboard</h1>
-            <div class="d-flex justify-content-end mb-3">
-                <a href="/client/select" class="btn btn-hcs-green">Create New Quote</a>
-            </div>
-            <% if (quotes.length === 0) { %>
-                <p class="text-center">No quotes available.</p>
-            <% } else { %>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Quote</th>
-                                <th>Job</th>
-                                <th>Location</th>
-                                <th>Client</th>
-                                <th>Contact</th>
-                                <th>Value</th>
-                                <th>Description</th>
-                                <th>Invoice</th>
-                                <th>Invoice Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% quotes.forEach(function(quote) { %>
-                                <tr>
-                                    <td class="<%= quote.date ? '' : 'text-warning' %>"><%= quote.date ? slimDateTime(quote.date) : 'N/A' %></td>
-                                    <td class="<%= quote.quote_ref ? '' : 'text-warning' %>"><%= quote.quote_ref ? quote.quote_ref : 'N/A' %></td>
-                                    <td class="<%= quote.job_ref ? '' : 'text-warning' %>"><%= quote.job_ref ? quote.job_ref : 'N/A' %></td>
-                                    <td class="<%= quote.location ? '' : 'text-warning' %>"><%= quote.location ? quote.location : 'N/A' %></td>
-                                    <td class="<%= quote.client ? '' : 'text-warning' %>"><%= quote.clientId ? quote.clientId : 'N/A' %></td>
-                                    <td class="<%= quote.contact_ref ? '' : 'text-warning' %>"><%= quote.contact_ref ? quote.contact_ref : 'N/A' %></td>
-                                    <td class="<%= quote.value ? '' : 'text-warning' %>">£<%= quote.value ? quote.value.toFixed(2) : 'N/A' %></td>
-                                    <td class="<%= quote.desc ? '' : 'text-warning' %>"><%= quote.desc ? quote.desc : 'N/A' %></td>
-                                    <td class="<%= quote.invoice_no ? '' : 'text-warning' %>"><%= quote.invoice_no ? quote.invoice_no : 'N/A' %></td>
-                                    <td class="<%= quote.invoice_date ? '' : 'text-warning' %>"><%= quote.invoice_date ? slimDateTime(quote.invoice_date) : 'N/A' %></td>
-                                    <td>
-                                        <a href="/quote/read/<%= quote.id %>" class="btn btn-info btn-sm">View</a>
-                                        <a href="/quote/update/<%= quote.id %>" class="btn btn-warning btn-sm">Update</a>
-                                        <form action="/quote/delete/<%= quote.id %>" method="post" class="d-inline">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
+            <div class="row">
+                <div class="col-2">
+                    <ul class="scrollable-list list-group sticky-top">
+                        <a class="list-group-item list-group-item-action disabled text-bg-secondary text-center" aria-disabled="true">Quote List</a>
+                        <% quotes.forEach(quote => { %>
+                            <a href="#<%= quote.id %>" class="list-group-item list-group-item-action text-center">
+                                <%= quote.quote_ref %>
+                            </a>
+                        <% }); %>
+                    </ul>
                 </div>
-            <% } %>
+                <div class="col-10">
+                    <% quotes.forEach(quote => { %>
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between text-bg-secondary">
+                            <span>Quote: <%= quote.quote_ref %></span>
+                            <a class="text-white" href="/quote/read/<%= quote.id %>">View Quote</a>
+                        </div>
+                        <div class="card-body" id="<%= quote.id %>">
+                            <ul class="list-group">
+                                <li class="list-group-item">Date: <%= slimDateTime(quote.date) %></li>
+                                <li class="list-group-item">Job: <%= quote.job_ref %></li>
+                                <li class="list-group-item">Location: <%= quote.location %></li>
+                                <li class="list-group-item">Client: <%= quote.Client ? quote.Client.name : 'N/A' %></li>
+                                <li class="list-group-item">Contact: 
+                                    <% if (quote.Client && quote.Client.Contacts && quote.Client.Contacts.length > 0) { %>
+                                        <%= quote.Client.Contacts[0].name %> <!-- Assuming you want to display the first contact -->
+                                    <% } else { %>
+                                        N/A
+                                    <% } %>
+                                </li>
+                                <li class="list-group-item">Value: <%= formatCurrency(quote.value) %></li>
+                                <li class="list-group-item">Description: <%= quote.desc %></li>
+                                <li class="list-group-item">Invoice No: <%= quote.invoice_no %></li>
+                                <li class="list-group-item">Invoice Date: <%= slimDateTime(quote.invoice_date) %></li>
+                            </ul>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a type="button" class="btn btn-hcs-green btn-sm" href="/quote/update/<%= quote.id %>">Update Quote</a>
+                            <span>Last Updated: <%= slimDateTime(quote.updatedAt, true) %></span>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
         </div>
     </div>
 </div>
