@@ -1,7 +1,7 @@
 // controllers/quoteCRUD.js
 const express = require('express');
 const router = express.Router();
-
+const packageJson = require('../../package.json');
 const Quotes = require('../../models/quote');
 const Clients = require('../../models/client');
 const helpers = require('../../helpers');
