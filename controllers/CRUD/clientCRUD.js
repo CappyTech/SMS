@@ -45,7 +45,7 @@ const readClient = async (req, res) => {
             return res.redirect('/');
         }
 
-        return res.render(path.join('client', 'viewClient'), {
+        return res.render(path.join('clients', 'viewClient'), {
             clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
