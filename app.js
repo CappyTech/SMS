@@ -12,23 +12,50 @@ const logger = require('./logger');
 const fs = require('fs');
 require('dotenv').config();
 const helpers = require('./helpers');
-
+const os = require('os');
+const packageJson = require('./package.json');
 // Set up EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set('layout', 'layout'); // default layout
 app.use(expressLayouts);
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
-
 app.use(xss());
-app.use(flash());
+app.set('trust proxy', 1);
 
-// Trust the first proxy in front of the app
-app.set('trust proxy', 1); // or use true to trust all proxies
+const useragent = require('useragent');
+
+const logRequestDetails = (req, res, next) => {
+    // Safely parse the user-agent
+    const agent = req.headers['user-agent'] ? useragent.parse(req.headers['user-agent']) : null;
+
+    const logData = {
+        method: req.method,
+        url: req.originalUrl,
+        ip: req.ip,
+        userAgent: agent ? {
+            browser: agent.toAgent(),
+            os: agent.os.toString(),
+        } : 'Unknown',
+        headers: req.headers,
+        referer: req.headers['referer'] || 'N/A',
+        host: req.headers['host'] || 'N/A',
+        xForwardedFor: req.headers['x-forwarded-for'] || 'N/A',
+        timestamp: new Date().toISOString(),
+    };
+
+    logger.info('Incoming Request Details: ' + JSON.stringify(logData, null, 2));
+
+    next();
+};
+
+app.use(logRequestDetails);
+
+
+app.use(flash());
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -279,6 +306,14 @@ app.use(async (req, res, next) => {
     }
 });
 
+app.use((req, res, next) => {
+    res.locals.session = req.session;
+    res.locals.package = packageJson.version;
+    res.locals.node = process.version;
+    res.locals.serverPlatform = `${os.type()} ${os.release()} (${os.arch()})`;
+    next();
+});
+
 const render = require('./controllers/renderForms');
 
 const formsClient = require('./controllers/forms/client');
@@ -306,6 +341,7 @@ const contactCRUD = require('./controllers/CRUD/contactCRUD');
 
 const monthlyReturns = require('./controllers/monthlyReturns');
 const yearlyReturns = require('./controllers/yearlyReturns');
+const { platform } = require('os');
 
 app.use('/', render);
 
@@ -358,32 +394,6 @@ const errorHandler = (err, req, res, next) => {
 
 app.use(errorHandler);
 
-const useragent = require('useragent');
-
-const logRequestDetails = (req, res, next) => {
-
-    const agent = useragent.parse(req.headers['user-agent']);
-
-    logger.info('Incoming Request', {
-        method: req.method,
-        url: req.originalUrl,
-        ip: req.ip,
-        userAgent: {
-            browser: agent.toAgent(),
-            os: agent.os.toString(),
-            platform: agent.platform.toString(),
-        },
-        headers: req.headers,
-        referer: req.headers['referer'] || 'N/A',
-        host: req.headers['host'] || 'N/A',
-        xForwardedFor: req.headers['x-forwarded-for'] || 'N/A',
-        timestamp: new Date().toISOString(),
-    });
-
-    next();
-};
-app.use(logRequestDetails);
-
-app.listen(443, '0.0.0.0', () => {
+app.listen(80, '127.0.0.1', () => {
     logger.info(`Server is running`);
 });
