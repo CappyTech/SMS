@@ -9,9 +9,21 @@ const path = require('path');
 
 const createSubcontractor = async (req, res) => {
     try {
+        logger.info('Session User: ' + JSON.stringify(req.session.user, null, 2));
         // Check if the user has permissions
+        if (!req.session) {
+            logger.error("Session does not exist.");
+            return res.status(403).send('Access denied. No session found.');
+        }
+
+        if (!req.session.user) {
+            logger.error("User not found in session.");
+            return res.status(403).send('Access denied. No user found in session.');
+        }
+
         if (!req.session.user.permissionCreateSubcontractor) {
-            return res.status(403).send('Access denied.');
+            logger.error("User does not have permission to create subcontractor.");
+            return res.status(403).send('Access denied. Insufficient permissions.');
         }
 
         const {
@@ -59,10 +71,10 @@ const createSubcontractor = async (req, res) => {
         await Subcontractor.create(sanitizedData);
 
         req.flash('success', 'Subcontractor created.');
-        const referer = '/dashboard';
+        const referer = '/dashboard/subcontractor';
         res.redirect(referer);
     } catch (error) {
-        logger.error('Error creating subcontractor:  ', error.message);
+        logger.error('Error creating subcontractor: ' + error.message);
         req.flash('error', 'Error creating subcontractor: ' + error.message);
         return res.redirect('/');
     }
@@ -85,8 +97,6 @@ const readSubcontractor = async (req, res) => {
             subcontractor,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
