@@ -170,7 +170,17 @@ const renderQuotesDashboard = async (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const quotes = await Quotes.findAll({ order: [['createdAt', 'DESC']] });
+        const quotes = await Quotes.findAll({
+            order: [['createdAt', 'DESC']],
+            include: [{
+                model: Clients,
+                include: [
+                    {
+                        model: Contacts,
+                    }
+                ]
+            }]
+        });
 
         res.render(path.join('dashboards', 'quotesDashboard'), {
             quotes,
@@ -288,6 +298,7 @@ router.get('/dashboard/stats', (req, res) => {
     // Redirect to the dashboard with the calculated tax year and month
     res.redirect(`/dashboard/stats/${taxYear}/${taxMonth}`);
 });
+
 router.get('/dashboard/stats/:year?/:month?', renderStatsDashboard);
 router.get('/dashboard/user', renderUserDashboard);
 router.get('/dashboard/subcontractor', renderSubcontractorDashboard);
