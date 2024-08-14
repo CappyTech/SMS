@@ -4,44 +4,45 @@
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Jobs Dashboard</h1>
-            <% if (jobs.length === 0) { %>
-                <p class="text-center">No jobs available.</p>
-            <% } else { %>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Quote Ref</th>
-                                <th>Job Ref</th>
-                                <th>Location</th>
-                                <th>Client</th>
-                                <th>Contact</th>
-                                <th>Value</th>
-                                <th>Description</th>
-                                <th>Invoice No</th>
-                                <th>Invoice Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% jobs.forEach(function(job) { %>
-                                <tr>
-                                    <td><%= slimDateTime(job.date) %></td>
-                                    <td><%= job.quote_ref %></td>
-                                    <td><%= job.job_ref %></td>
-                                    <td><%= job.location %></td>
-                                    <td><%= job.client.name %></td>
-                                    <td><%= job.contact.name %></td>
-                                    <td><%= formatCurrency(job.value) %></td>
-                                    <td><%= job.desc %></td>
-                                    <td><%= job.invoice_no %></td>
-                                    <td><%= slimDateTime(job.invoice_date) %></td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
+            <div class="row">
+                <div class="col-2">
+                    <ul class="scrollable-list list-group sticky-top">
+                        <a class="list-group-item list-group-item-action disabled text-bg-secondary text-center" aria-disabled="true">Job List</a>
+                        <% jobs.forEach(job => { %>
+                            <a href="#<%= job.id %>" class="list-group-item list-group-item-action text-center">
+                                <%= job.job_ref %>
+                            </a>
+                        <% }); %>
+                    </ul>
                 </div>
-            <% } %>
+                <div class="col-10">
+                    <% jobs.forEach(job => { %>
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between text-bg-secondary">
+                            <span>Job: <%= job.job_ref %></span>
+                            <a class="text-white" href="/quote/read/<%= job.id %>">View Job</a>
+                        </div>
+                        <div class="card-body" id="<%= job.id %>">
+                            <ul class="list-group">
+                                <li class="list-group-item">Date: <%= slimDateTime(job.date) %></li>
+                                <li class="list-group-item">Quote Ref: <%= job.quote_ref %></li>
+                                <li class="list-group-item">Location: <%= job.location %></li>
+                                <li class="list-group-item">Client: <%= job.client.name %></li>
+                                <li class="list-group-item">Contact: <%= job.contact.name %></li>
+                                <li class="list-group-item">Value: <%= formatCurrency(job.value) %></li>
+                                <li class="list-group-item">Description: <%= job.desc %></li>
+                                <li class="list-group-item">Invoice No: <%= job.invoice_no %></li>
+                                <li class="list-group-item">Invoice Date: <%= slimDateTime(job.invoice_date) %></li>
+                            </ul>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a type="button" class="btn btn-hcs-green btn-sm" href="/quote/update/<%= job.id %>">Update Job</a>
+                            <span>Last Updated: <%= slimDateTime(job.updatedAt, true) %></span>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
         </div>
     </div>
 </div>
