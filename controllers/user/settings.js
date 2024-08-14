@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../models/user');
 const helpers = require('../../helpers');
-const packageJson = require('../../package.json');
+
 const logger = require('../../logger'); 
 const path = require('path');
 
@@ -53,7 +53,7 @@ const getAccountPage = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: helpers.slimDateTime,
             message: req.query.message || '',
         });

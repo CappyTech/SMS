@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const packageJson = require('../../package.json');
+
 const path = require('path');
 
 const e500 = async (req, res) => {
@@ -9,7 +9,7 @@ const e500 = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
         });
     } catch (error) {
         logger.error('Error rendering 500 page: ' + error.message);
@@ -24,7 +24,7 @@ const e404 = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
         });
     } catch (error) {
         logger.error('Error rendering 404 page: ' + error.message);
@@ -39,7 +39,7 @@ const e403 = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
         });
     } catch (error) {
         logger.error('Error rendering 403 page: ' + error.message);

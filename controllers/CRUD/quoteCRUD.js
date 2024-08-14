@@ -1,7 +1,7 @@
 // controllers/quoteCRUD.js
 const express = require('express');
 const router = express.Router();
-const packageJson = require('../../package.json');
+
 const Quotes = require('../../models/quote');
 const Clients = require('../../models/client');
 const helpers = require('../../helpers');
@@ -60,7 +60,7 @@ const readQuote = async (req, res) => {
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
                 session: req.session,
-                packageJson,
+                
                 moment: moment,
                 slimDateTime: helpers.slimDateTime,
             });
@@ -89,7 +89,7 @@ const readQuotes = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             moment: moment,
             slimDateTime: helpers.slimDateTime,
         });

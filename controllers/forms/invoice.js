@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
-const packageJson = require('../../package.json');
+
 const path = require('path');
 const Invoice = require('../../models/invoice');
 const Subcontractor = require('../../models/subcontractor');
@@ -23,7 +23,7 @@ const renderInvoiceCreateForm = async (req, res) => {
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
                 session: req.session,
-                packageJson,
+                
                 subcontractor,
                 slimDateTime: helpers.slimDateTime,
                 formatCurrency: helpers.formatCurrency,
@@ -55,7 +55,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });

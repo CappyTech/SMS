@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
-const packageJson = require('../../package.json');
+
 const path = require('path');
 const Clients = require('../../models/client');
 const Contacts = require('../../models/contact');
@@ -29,7 +29,7 @@ const selectContact = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             contacts: contactList,
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
@@ -53,7 +53,7 @@ const renderContactCreateForm = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
         });
     } catch (error) {
         logger.error('Error rendering contact create form:' + error.message);
@@ -77,7 +77,7 @@ const renderContactUpdateForm = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
         });
     } catch (error) {
         logger.error('Error rendering contact update form:' + error.message);

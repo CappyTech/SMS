@@ -61,7 +61,7 @@ const renderMonthlyReturnsForm = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             subcontractorsWithMonths: subcontractorsWithMonths,
@@ -115,7 +115,7 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             month: month,
@@ -171,7 +171,7 @@ const renderMonthlyReturnsForAll = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             month: month,
@@ -222,7 +222,7 @@ const renderMonthlyReturnsYear = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             year: year,

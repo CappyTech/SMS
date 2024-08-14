@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const packageJson = require('../../package.json');
+
 const User = require('../../models/user');
 const helpers = require('../../helpers');
 const logger = require('../../logger');
@@ -95,7 +95,7 @@ const readUser = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });

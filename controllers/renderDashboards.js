@@ -80,7 +80,7 @@ const renderStatsDashboard = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
             taxYear,

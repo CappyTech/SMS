@@ -7,7 +7,7 @@ const renderIndex = (req, res) => {
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
         session: req.session,
-        packageJson,
+        
     });
 };
 

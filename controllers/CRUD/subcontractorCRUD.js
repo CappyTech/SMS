@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const packageJson = require('../../package.json');
+
 const Subcontractor = require('../../models/subcontractor');
 const helpers = require('../../helpers');
 const { Op } = require('sequelize');
@@ -86,7 +86,7 @@ const readSubcontractor = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });

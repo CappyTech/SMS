@@ -65,7 +65,7 @@ const renderYearlyReturns = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             rounding: rounding,

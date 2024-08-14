@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
-const packageJson = require('../../package.json');
+
 const path = require('path');
 const Subcontractor = require('../../models/subcontractor');
 
@@ -29,7 +29,7 @@ const selectSubcontractor = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             subcontractors,
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
@@ -49,7 +49,7 @@ const renderSubcontractorCreateForm = (req, res) => {
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
                 session: req.session,
-                packageJson,
+                
             });
         } else {
             return res.status(403).send('Access denied.');
@@ -79,7 +79,7 @@ const renderSubcontractorUpdateForm = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });

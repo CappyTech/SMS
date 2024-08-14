@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
-const packageJson = require('../../package.json');
+
 const path = require('path');
 const Clients = require('../../models/client');
 const Contacts = require('../../models/contact');
@@ -21,7 +21,7 @@ const selectClient = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
             clients,
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
@@ -39,7 +39,7 @@ const renderClientCreateForm = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
         });
     } catch (error) {
         logger.error('Error rendering client create form:' + error.message);
@@ -62,7 +62,7 @@ const renderClientUpdateForm = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            packageJson,
+            
         });
     } catch (error) {
         logger.error('Error rendering client update form:' + error.message);
