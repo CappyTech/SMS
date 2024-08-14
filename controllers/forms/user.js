@@ -13,9 +13,10 @@ const renderUserCreateForm = async (req, res) => {
         }
 
         res.render(path.join('users', 'createUser'), {
+            title: 'Create User',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
         });
     } catch (error) {
@@ -39,10 +40,11 @@ const renderUserUpdateForm = async (req, res) => {
         }
 
         res.render(path.join('users', 'updateUser'), {
+            title: 'Update User',
             user,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,

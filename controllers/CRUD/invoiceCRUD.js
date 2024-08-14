@@ -46,9 +46,10 @@ const createInvoice = async (req, res) => {
             const errorMessages = error.errors.map((err) => err.message);
             logger.error(`Validation errors: ${errorMessages.join(', ')}`);
             return res.render('createInvoice', {
+                title: 'Create Invoice',
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
-                session: req.session,
+                
                 
             });
         }
@@ -78,10 +79,11 @@ const readInvoice = async (req, res) => {
         }
 
         res.render(path.join('invoices', 'viewInvoice'), {
+            title: 'Invoice',
             invoice,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
@@ -118,11 +120,12 @@ const readInvoices = async (req, res) => {
         }
 
         res.render(path.join('invoices', 'viewInvoices'), {
+            title: 'Invoices',
             subcontractor,
             invoices,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,

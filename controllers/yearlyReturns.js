@@ -61,9 +61,10 @@ const renderYearlyReturns = async (req, res) => {
         });
 
         res.render(path.join('monthlyreturns', 'yearlyReturns'), {
+            title: 'Yearly Returns',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,

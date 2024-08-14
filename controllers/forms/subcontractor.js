@@ -25,6 +25,7 @@ const selectSubcontractor = async (req, res) => {
         }
 
         res.render(path.join('subcontractors', 'selectSubcontractor'), {
+            title: 'Select Subcontractor',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             subcontractors,
@@ -43,6 +44,7 @@ const renderSubcontractorCreateForm = (req, res) => {
         
         if (req.session.user.role === 'admin') {
             res.render(path.join('subcontractors', 'createSubcontractor'), {
+                title: 'Create Subcontractor',
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),  
             });
@@ -70,6 +72,7 @@ const renderSubcontractorUpdateForm = async (req, res) => {
         }
 
         res.render(path.join('subcontractors', 'updateSubcontractor'), {
+            title: 'Update Subcontractor',
             subcontractor,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),

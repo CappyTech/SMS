@@ -20,9 +20,10 @@ const renderInvoiceCreateForm = async (req, res) => {
                 res.redirect('/subcontractor/create');
             }
             res.render(path.join('invoices', 'createInvoice'), {
+                title: 'Create Invoice',
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
-                session: req.session,
+                
                 
                 subcontractor,
                 slimDateTime: helpers.slimDateTime,
@@ -54,7 +55,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
             invoice,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,

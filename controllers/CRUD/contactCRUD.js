@@ -58,10 +58,11 @@ const readContact = async (req, res) => {
         }
 
         res.render(path.join('contacts', 'viewContact'), {
+            title: 'Contact',
             contact,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
@@ -92,11 +93,12 @@ const readContacts = async (req, res) => {
         }
 
         res.render(path.join('contacts', 'viewContacts'), {
+            title: 'Contacts',
             clients,
             contacts,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,

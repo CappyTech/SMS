@@ -3,9 +3,10 @@ const router = express.Router();
 
 const renderIndex = (req, res) => {
     res.render('index', {
+        title: 'Home',
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
-        session: req.session,
+        
         
     });
 };

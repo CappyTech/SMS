@@ -94,6 +94,7 @@ const readSubcontractor = async (req, res) => {
         }
 
         res.render(path.join('subcontractors', 'viewSubcontractor'), {
+            title: 'Subcontractor',
             subcontractor,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),

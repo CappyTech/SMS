@@ -57,10 +57,9 @@ const renderMonthlyReturnsForm = async (req, res) => {
 
         // Render the EJS view, passing in the modified subcontractors data
         res.render(path.join('monthlyreturns', 'monthlyReturnsForm'), {
+            title: 'Monthly Returns Form',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
-            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             subcontractorsWithMonths: subcontractorsWithMonths,
@@ -111,10 +110,9 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
         });
 
         res.render(path.join('monthlyreturns', 'monthlyReturnsForOneSubcontractor'), {
+            title: 'Monthly Returns Subcontractor',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
-            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             month: month,
@@ -167,10 +165,9 @@ const renderMonthlyReturnsForAll = async (req, res) => {
         });
 
         res.render(path.join('monthlyreturns', 'monthlyReturnsForAll'), {
+            title: 'Monthly Returns',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
-            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             month: month,
@@ -218,10 +215,9 @@ const renderMonthlyReturnsYear = async (req, res) => {
         logger.info("Rendering monthly returns:", { year: year });
 
         res.render(path.join('monthlyreturns', 'renderMonthlyReturnsYear'), {
+            title: 'Monthly Returns Report',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
-            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             year: year,

@@ -46,10 +46,11 @@ const readClient = async (req, res) => {
         }
 
         return res.render(path.join('clients', 'viewClient'), {
+            title: 'Client',
             clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {

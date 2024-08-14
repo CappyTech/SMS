@@ -9,6 +9,7 @@ const path = require('path');
 const renderSigninForm = (req, res) => {
     
     res.render(path.join('user', 'signin'), {
+        title: 'Sign In',
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
     });

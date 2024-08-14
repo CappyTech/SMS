@@ -91,10 +91,11 @@ const readUser = async (req, res) => {
         }
 
         res.render(path.join('users', 'viewUser'), {
+            title: 'User',
             user,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,

@@ -71,6 +71,7 @@ const renderStatsDashboard = async (req, res) => {
         const nextYear = specifiedMonth + 1 === 13 ? specifiedYear + 1 : specifiedYear;
 
         res.render(path.join('dashboards', 'statsDashboard'), {
+            title: 'Overview',
             subcontractorCount: filteredSubcontractors.length,
             invoiceCount: filteredInvoices.length,
             subcontractors: filteredSubcontractors,
@@ -78,7 +79,7 @@ const renderStatsDashboard = async (req, res) => {
             subcontractorTotals,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
             taxYear,
@@ -104,10 +105,11 @@ const renderUserDashboard = async (req, res) => {
         const users = await Users.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'usersDashboard'), {
+            title: 'Users',
             users,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -127,10 +129,11 @@ const renderInvoiceDashboard = async (req, res) => {
         const invoices = await Invoices.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'invoicesDashboard'), {
+            title: 'Invoices',
             invoices,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -150,10 +153,11 @@ const renderSubcontractorDashboard = async (req, res) => {
         const subcontractors = await Subcontractors.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'subcontractorsDashboard'), {
+            title: 'Subcontractors',
             subcontractors,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -183,10 +187,11 @@ const renderQuotesDashboard = async (req, res) => {
         });
 
         res.render(path.join('dashboards', 'quotesDashboard'), {
+            title: 'Quotes',
             quotes,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -206,10 +211,11 @@ const renderClientsDashboard = async (req, res) => {
         const clients = await Clients.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'clientsDashboard'), {
+            title: 'Clients',
             clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -229,10 +235,11 @@ const renderContactsDashboard = async (req, res) => {
         const contacts = await Contacts.findAll({ order: [['createdAt', 'DESC']], include: [Clients] });
 
         res.render(path.join('dashboards', 'contactsDashboard'), {
+            title: 'Contacts',
             contacts,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -275,10 +282,11 @@ const renderJobsDashboard = async (req, res) => {
         }));
 
         res.render(path.join('dashboards', 'jobsDashboard'), {
+            title: 'Jobs',
             jobs: jobsWithAssociations,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });

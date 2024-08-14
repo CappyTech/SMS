@@ -23,10 +23,11 @@ const renderQuoteCreateForm = async (req, res) => {
                 return res.redirect('/client/create');
             }
             return res.render(path.join('quotes', 'createQuote'), {
+                title: 'Create Quote',
                 clients,
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
-                session: req.session,
+                
                 
             });
         } else {
@@ -59,10 +60,11 @@ const renderQuoteUpdateForm = async (req, res) => {
         logger.info(JSON.stringify(quote, null, 2));
 
         return res.render(path.join('quotes', 'updateQuote'), {
+            title: 'Update Quote',
             quote,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,

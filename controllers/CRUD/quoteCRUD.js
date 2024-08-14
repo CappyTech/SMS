@@ -56,10 +56,11 @@ const readQuote = async (req, res) => {
             return res.status(404).json({ error: 'Quote not found' });
         } else {
             res.render(path.join('quotes', 'viewQuote'), {
+                title: 'Quote',
                 quote,
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
-                session: req.session,
+                
                 
                 moment: moment,
                 slimDateTime: helpers.slimDateTime,
@@ -85,10 +86,11 @@ const readQuotes = async (req, res) => {
         });
 
         res.render(path.join('quotes', 'viewQuotes'), {
+            title: 'Quotes',
             quotes,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             moment: moment,
             slimDateTime: helpers.slimDateTime,

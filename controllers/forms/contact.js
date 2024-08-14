@@ -26,9 +26,10 @@ const selectContact = async (req, res) => {
         }));
 
         res.render(path.join('contacts', 'selectContact'), {
+            title: 'Select Contact',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             contacts: contactList,
             slimDateTime: helpers.slimDateTime,
@@ -48,11 +49,12 @@ const renderContactCreateForm = async (req, res) => {
         });
 
         res.render(path.join('contacts', 'createContact'), {
+            title: 'Create Contact',
             contact,
             clients: contact.Clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
         });
     } catch (error) {
@@ -72,11 +74,12 @@ const renderContactUpdateForm = async (req, res) => {
         }
 
         res.render(path.join('contacts', 'updateContact'), {
+            title: 'Update Contact',
             contact,
             clients: contact.Clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
         });
     } catch (error) {

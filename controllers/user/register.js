@@ -8,6 +8,7 @@ const path = require('path');
 const renderRegistrationForm = (req, res) => {
     
     res.render(path.join('user', 'register'), {
+        title: 'Register',
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
         message: req.query.message || '',

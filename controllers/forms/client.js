@@ -18,9 +18,10 @@ const selectClient = async (req, res) => {
         }
 
         res.render(path.join('clients', 'selectClient'), {
+            title: 'Select Client',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
             clients,
             slimDateTime: helpers.slimDateTime,
@@ -36,9 +37,10 @@ const selectClient = async (req, res) => {
 const renderClientCreateForm = async (req, res) => {
     try {
         res.render(path.join('clients', 'createClient'), {
+            title: 'Create Client',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
         });
     } catch (error) {
@@ -58,10 +60,11 @@ const renderClientUpdateForm = async (req, res) => {
         }
 
         res.render(path.join('clients', 'updateClient'), {
+            title: 'Update Client',
             clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
+            
             
         });
     } catch (error) {
