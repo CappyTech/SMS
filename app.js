@@ -358,6 +358,32 @@ const errorHandler = (err, req, res, next) => {
 
 app.use(errorHandler);
 
+const useragent = require('useragent');
+
+const logRequestDetails = (req, res, next) => {
+
+    const agent = useragent.parse(req.headers['user-agent']);
+
+    logger.info('Incoming Request', {
+        method: req.method,
+        url: req.originalUrl,
+        ip: req.ip,
+        userAgent: {
+            browser: agent.toAgent(),
+            os: agent.os.toString(),
+            platform: agent.platform.toString(),
+        },
+        headers: req.headers,
+        referer: req.headers['referer'] || 'N/A',
+        host: req.headers['host'] || 'N/A',
+        xForwardedFor: req.headers['x-forwarded-for'] || 'N/A',
+        timestamp: new Date().toISOString(),
+    });
+
+    next();
+};
+app.use(logRequestDetails);
+
 app.listen(443, '0.0.0.0', () => {
     logger.info(`Server is running`);
 });
