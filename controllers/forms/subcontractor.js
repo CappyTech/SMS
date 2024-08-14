@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
-
 const path = require('path');
 const Subcontractor = require('../../models/subcontractor');
 
@@ -28,8 +27,6 @@ const selectSubcontractor = async (req, res) => {
         res.render(path.join('subcontractors', 'selectSubcontractor'), {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
-            
             subcontractors,
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
@@ -47,9 +44,7 @@ const renderSubcontractorCreateForm = (req, res) => {
         if (req.session.user.role === 'admin') {
             res.render(path.join('subcontractors', 'createSubcontractor'), {
                 errorMessages: req.flash('error'),
-                successMessage: req.flash('success'),
-                session: req.session,
-                
+                successMessage: req.flash('success'),  
             });
         } else {
             return res.status(403).send('Access denied.');
@@ -78,8 +73,6 @@ const renderSubcontractorUpdateForm = async (req, res) => {
             subcontractor,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            session: req.session,
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
