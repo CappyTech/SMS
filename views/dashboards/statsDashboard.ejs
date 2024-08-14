@@ -1,106 +1,113 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
 <div class="container py-4">
-    <div class="d-flex justify-content-between mb-3">
-        <a href="/dashboard/stats/<%= previousYear %>/<%= previousMonth %>" class="btn btn-hcs-green">&laquo; Previous</a>
-        <h1>Period: <%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></h1>
-        <a href="/dashboard/stats/<%= nextYear %>/<%= nextMonth %>" class="btn btn-hcs-green">Next &raquo;</a>
-    </div>
-    <div class="row mb-4">
-        <div class="col-lg-6 col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h4>Total Subcontractors</h4>
-                    <p class="display-4"><%= subcontractorCount %></p>
+    <div class="mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <div class="d-flex justify-content-between mb-2">
+                <button class="btn btn-hcs-green"><a class="text-white" href="/dashboard/stats/<%= previousYear %>/<%= previousMonth %>">&laquo; Previous</a></button>
+                <h1 class="display-6"><%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></h1>
+                <button class="btn btn-hcs-green"><a class="text-white" href="/dashboard/stats/<%= nextYear %>/<%= nextMonth %>">Next &raquo;</a></button>
+            </div>
+            <div class="row mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Total Subcontractors</h4>
+                            <p class="display-4"><%= subcontractorCount %></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Total Invoices</h4>
+                            <p class="display-4"><%= invoiceCount %></p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-6 col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h4>Total Invoices</h4>
-                    <p class="display-4"><%= invoiceCount %></p>
+            <div class="row mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h4>Tax Year</h4>
+                            <p><%= taxYear.start %> - <%= taxYear.end %></p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Monthly Return</h4>
+                            <p><%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h4>Submission Deadline</h4>
+                            <p><%= currentMonthlyReturn.submissionDeadline %> (<%= currentMonthlyReturn.submissionDeadlineInDays %> days left)</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>HMRC Update Date</h4>
+                            <p><%= currentMonthlyReturn.hmrcUpdateDate %> (<%= currentMonthlyReturn.hmrcUpdateDateInDays %> days left)</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="row mb-4">
-        <div class="col-lg-6 col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h4>Current Tax Year</h4>
-                    <p><%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></p>
-                    <p><%= taxYear.start %> - <%= taxYear.end %></p>
-                    <h4>Current Monthly Return</h4>
-                    <p><%= currentMonthlyReturn.periodStart %> - <%= currentMonthlyReturn.periodEnd %></p>
+            <div class="row">
+                <div class="col-12">
+                    <h3>Subcontractors</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subcontractor</th>
+                                    <th>Gross Total</th>
+                                    <th>Labour Total</th>
+                                    <th>Material Total</th>
+                                    <th>CIS Total</th>
+                                    <th>Net Total</th>
+                                    <% if (subcontractors.some(subcontractor => subcontractor.isReverseCharge)) { %>
+                                        <th>Reverse Charge Total</th>
+                                    <% } %>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% subcontractors.forEach(subcontractor => { %>
+                                <tr>
+                                    <td><a href="/subcontractor/read/<%= subcontractor.id %>"><%= subcontractor.company %></a></td>
+                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].grossTotal) %></td>
+                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].labourTotal) %></td>
+                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].materialTotal) %></td>
+                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].cisTotal) %></td>
+                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].netTotal) %></td>
+                                    <% if (subcontractor.isReverseCharge) { %>
+                                        <td><%= formatCurrency(subcontractorTotals[subcontractor.id].reverseChargeTotal) %></td>
+                                    <% } else { %>
+                                        <td>N/A</td>
+                                    <% } %>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-6 col-md-6 mb-4">
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h4>Submission Deadline</h4>
-                    <p><%= currentMonthlyReturn.submissionDeadline %> (<%= currentMonthlyReturn.submissionDeadlineInDays %> days left)</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <h4>HMRC Update Date</h4>
-                    <p><%= currentMonthlyReturn.hmrcUpdateDate %> (<%= currentMonthlyReturn.hmrcUpdateDateInDays %> days left)</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <h3>Subcontractors</h3>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Subcontractor</th>
-                            <th>Gross Total</th>
-                            <th>Labour Total</th>
-                            <th>Material Total</th>
-                            <th>CIS Total</th>
-                            <th>Net Total</th>
-                            <% if (subcontractors.some(subcontractor => subcontractor.isReverseCharge)) { %>
-                                <th>Reverse Charge Total</th>
-                            <% } %>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% subcontractors.forEach(subcontractor => { %>
-                        <tr>
-                            <td><a href="/subcontractor/read/<%= subcontractor.id %>"><%= subcontractor.company %></a></td>
-                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].grossTotal) %></td>
-                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].labourTotal) %></td>
-                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].materialTotal) %></td>
-                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].cisTotal) %></td>
-                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].netTotal) %></td>
-                            <% if (subcontractor.isReverseCharge) { %>
-                                <td><%= formatCurrency(subcontractorTotals[subcontractor.id].reverseChargeTotal) %></td>
-                            <% } else { %>
-                                <td>N/A</td>
-                            <% } %>
-                        </tr>
+            <div class="row">
+                <div class="col-6">
+                    <h3>Invoices</h3>
+                    <ul class="list-group">
+                        <% invoices.forEach(invoice => { %>
+                        <a href="/invoice/read/<%= invoice.id %>" class="list-group-item list-group-item-action">
+                            <%= invoice.kashflowNumber %> | <%= invoice.invoiceNumber %>
+                            <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
+                        </a>
                         <% }); %>
-                    </tbody>
-                </table>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-6">
-            <h3>Invoices</h3>
-            <ul class="list-group">
-                <% invoices.forEach(invoice => { %>
-                <a href="/invoice/read/<%= invoice.id %>" class="list-group-item list-group-item-action">
-                    <%= invoice.kashflowNumber %> | <%= invoice.invoiceNumber %>
-                    <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
-                </a>
-                <% }); %>
-            </ul>
         </div>
     </div>
 </div>
