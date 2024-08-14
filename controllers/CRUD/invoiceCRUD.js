@@ -19,24 +19,7 @@ const createInvoice = async (req, res) => {
         validatedData.submissionDate = validatedData.submissionDate || null;
 
         // Calculate Tax Year and Tax Month
-        const calculateTaxYearAndMonth = (date) => {
-            if (!date) return { taxYear: null, taxMonth: null };
-
-            const remittanceMoment = moment.utc(date);
-            const year = remittanceMoment.year();
-            const startOfTaxYear = moment.utc(`${year}-04-06T00:00:00Z`);
-
-            // Determine tax year
-            const taxYear = remittanceMoment.isBefore(startOfTaxYear) ? `${year - 1}/${year}` : `${year}/${year + 1}`;
-
-            // Determine tax month
-            const startOfCurrentTaxYear = remittanceMoment.isBefore(startOfTaxYear) ? moment.utc(`${year - 1}-04-06T00:00:00Z`) : startOfTaxYear;
-            const taxMonth = remittanceMoment.diff(startOfCurrentTaxYear, 'months') + 1;
-
-            return { taxYear, taxMonth };
-        };
-
-        const { taxYear, taxMonth } = calculateTaxYearAndMonth(validatedData.remittanceDate);
+        const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(validatedData.remittanceDate);
 
         // Create invoice record
         const newInvoice = await Invoice.create({
@@ -69,7 +52,7 @@ const createInvoice = async (req, res) => {
                 
             });
         }
-        logger.error('Error creating invoice:' + error.message);
+        logger.error('Error creating invoice: ' + error.message);
         req.flash('error', 'Error: ' + error.message);
         res.redirect('/error');
     }
@@ -104,8 +87,8 @@ const readInvoice = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error viewing invoice:'+ error.message);
-        req.flash('error', 'Error viewing invoice:' + error.message);
+        logger.error('Error viewing invoice: ' + error.message);
+        req.flash('error', 'Error viewing invoice: ' + error.message);
         res.redirect('/error');
     }
 };
