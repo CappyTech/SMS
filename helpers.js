@@ -11,7 +11,7 @@ function slimDateTime(dateString, includeTime = false) {
     }
 
     return formattedDate;
-}
+};
 
 function formatCurrency(amount) {
     if (typeof amount !== 'number') {
@@ -20,7 +20,7 @@ function formatCurrency(amount) {
         throw new Error(errorMessage);
     }
     return '£' + amount.toFixed(2);
-}
+};
 
 // Middleware to ensure authenticated access and clear flash messages
 const ensureAuthenticated = (req, res, next) => {
@@ -97,7 +97,7 @@ function validateInvoiceData(data) {
     }
 
     return data;
-}
+};
 
 function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber) {
     labourCost = parseFloat(labourCost);
@@ -125,11 +125,11 @@ function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber)
         netAmount: netAmount.toFixed(2),
         reverseCharge: reverseCharge.toFixed(2)
     };
-}
+};
 
 function rounding(number, up) {
     return up ? Math.ceil(number) : Math.floor(number);
-}
+};
 
 function getCurrentTaxYear() {
     const today = moment.utc();
@@ -138,7 +138,7 @@ function getCurrentTaxYear() {
         return startOfTaxYear.subtract(1, 'years').year();
     }
     return startOfTaxYear.year();
-}
+};
 
 function getTaxYearStartEnd(year) {
     const startOfTaxYear = moment.utc({ year, month: 3, day: 6 }); // 6th April of the specified year
@@ -147,7 +147,7 @@ function getTaxYearStartEnd(year) {
         start: startOfTaxYear.format('Do MMMM YYYY'),
         end: endOfTaxYear.format('Do MMMM YYYY')
     };
-}
+};
 
 function getCurrentMonthlyReturn(year, month) {
     const startOfTaxYear = moment.utc({ year, month: 3, day: 6 });
@@ -170,8 +170,36 @@ function getCurrentMonthlyReturn(year, month) {
         submissionDeadlineInDays,
         hmrcUpdateDateInDays
     };
-}
+};
 
+const calculateTaxYearAndMonth = (date) => {
+    // If no date is provided, return null values for tax year and tax month
+    if (!date) return { taxYear: null, taxMonth: null };
+
+    // Convert the provided date into a UTC moment object for consistent timezone handling
+    const remittanceMoment = moment.utc(date);
+
+    // Extract the year from the date
+    const year = remittanceMoment.year();
+
+    // Define the start of the tax year as April 6th of the given year
+    const startOfTaxYear = moment.utc(`${year}-04-06T00:00:00Z`);
+
+    // Determine the tax year:
+    // If the date is before the start of the tax year (April 6th), 
+    // the tax year is the previous year (e.g., 2023).
+    // Otherwise, it is the current year (e.g., 2024).
+    const taxYear = remittanceMoment.isBefore(startOfTaxYear) ? year - 1 : year;
+
+    // Calculate the start of the current tax year based on whether the date is before April 6th or not
+    const startOfCurrentTaxYear = remittanceMoment.isBefore(startOfTaxYear) ? moment.utc(`${year - 1}-04-06T00:00:00Z`) : startOfTaxYear;
+
+    // Determine the tax month by calculating the difference in months between the provided date and the start of the current tax year, plus one
+    const taxMonth = remittanceMoment.diff(startOfCurrentTaxYear, 'months') + 1;
+
+    // Return the calculated tax year (as a single year) and tax month
+    return { taxYear, taxMonth };
+};
 
 module.exports = {
     slimDateTime,
@@ -185,4 +213,5 @@ module.exports = {
     ensureAuthenticated,
     ensurePermission,
     ensureRole,
+    calculateTaxYearAndMonth,
 };
