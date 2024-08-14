@@ -4,7 +4,7 @@
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subcontractor Management System</title>
+  <title><%= title || 'Subcontractor Management System' %></title>
   <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="/node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
@@ -23,7 +23,7 @@
       <!-- Navbar Brand -->
       <a class="navbar-brand d-flex align-items-center" href="/">
         <img src="/images/favicon.png" alt="Favicon" class="me-2" width="32" height="32">
-        <span class="d-none d-md-inline">Subcontractor Management System</span>
+        <span class="d-none d-md-inline">Heron Constructive Solutions LTD</span>
       </a>
 
       <ul class="navbar-nav ms-auto hstack gap-3">
@@ -147,13 +147,14 @@
       <ul class="nav flex-column">
         <li class="nav-item">
           <a class="nav-link" href="/account">
-            <i class="bi bi-person"></i>
-            My Details
+            <i class="bi bi-gear-wide"></i>
+            Settings
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link hcs-red-text" href="/logout">
-            <i class="bi bi-box-arrow-right"></i> Logout
+            <i class="bi bi-box-arrow-right"></i>
+            Logout
           </a>
         </li>
       </ul>
