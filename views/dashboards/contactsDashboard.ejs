@@ -4,41 +4,40 @@
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Contacts Dashboard</h1>
-            <div class="d-flex justify-content-end mb-3">
-                <a href="/dashboard/client" class="btn btn-hcs-green">Create New Contact</a>
-            </div>
-            <% if (contacts.length === 0) { %>
-                <p class="text-center">No contacts available.</p>
-            <% } else { %>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Client</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>Note</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% contacts.forEach(function(contact) { %>
-                                <tr>
-                                    <td><a href='/contact/read/<%= contact.id %>'><%= contact.name %></a></td>
-                                    <td><a href='/client/read/<%= contact.Client.id %>'><%= contact.Client.name %></a></td>
-                                    <td><%= contact.phone %></td>
-                                    <td><%= contact.email %></td>
-                                    <td><%= contact.note %></td>
-                                    <td>
-                                        <a href="/contact/update/<%= contact.id %>" class="btn btn-warning btn-sm">Update</a>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
+            <div class="row">
+                <div class="col-2">
+                    <ul class="scrollable-list list-group sticky-top">
+                        <a class="list-group-item list-group-item-action disabled text-bg-secondary text-center" aria-disabled="true">Contact List</a>
+                        <% contacts.forEach(contact => { %>
+                            <a href="#<%= contact.id %>" class="list-group-item list-group-item-action text-center">
+                                <%= contact.name %>
+                            </a>
+                        <% }); %>
+                    </ul>
                 </div>
-            <% } %>
+                <div class="col-10">
+                    <% contacts.forEach(contact => { %>
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between text-bg-secondary">
+                            <span>Contact: <%= contact.name %></span>
+                        </div>
+                        <div class="card-body" id="<%= contact.id %>">
+                            <ul class="list-group">
+                                <li class="list-group-item">Name: <%= contact.name %></li>
+                                <li class="list-group-item">Client: <%= contact.Client.name %></li>
+                                <li class="list-group-item">Phone: <%= contact.phone %></li>
+                                <li class="list-group-item">Email: <%= contact.email %></li>
+                                <li class="list-group-item">Note: <%= contact.note %></li>
+                            </ul>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a type="button" class="btn btn-hcs-green btn-sm" href="/contact/update/<%= contact.id %>">Update Contact</a>
+                            <span>Last Updated: <%= slimDateTime(contact.updatedAt, true) %></span>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
         </div>
     </div>
 </div>
