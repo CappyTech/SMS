@@ -3,7 +3,6 @@ const router = express.Router();
 const moment = require('moment');
 const helpers = require('../helpers');
 const logger = require('../logger');
-const packageJson = require('../package.json');
 const { Op } = require("sequelize");
 const Users = require('../models/user');
 const Invoices = require('../models/invoice');
@@ -20,8 +19,8 @@ const renderStatsDashboard = async (req, res) => {
         }
 
         // Fetch the specified tax year from the URL parameter or use the current tax year
-        const specifiedYear = req.params.year ? parseInt(req.params.year) : helpers.getCurrentTaxYear();
-        const specifiedMonth = req.params.month ? parseInt(req.params.month) : moment().month() + 1;
+        const specifiedYear = req.params.year
+        const specifiedMonth = req.params.month
 
         // Fetch all subcontractors and invoices
         const subcontractors = await Subcontractors.findAll();
@@ -80,7 +79,6 @@ const renderStatsDashboard = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             session: req.session,
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
             taxYear,
@@ -96,8 +94,6 @@ const renderStatsDashboard = async (req, res) => {
         return res.redirect('/');
     }
 };
-
-
 
 const renderUserDashboard = async (req, res) => {
     try {
@@ -283,6 +279,15 @@ const renderJobsDashboard = async (req, res) => {
     }
 };
 
+router.get('/dashboard/stats', (req, res) => {
+    const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(moment());
+
+    // Output for debugging
+    logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
+
+    // Redirect to the dashboard with the calculated tax year and month
+    res.redirect(`/dashboard/stats/${taxYear}/${taxMonth}`);
+});
 router.get('/dashboard/stats/:year?/:month?', renderStatsDashboard);
 router.get('/dashboard/user', renderUserDashboard);
 router.get('/dashboard/subcontractor', renderSubcontractorDashboard);
