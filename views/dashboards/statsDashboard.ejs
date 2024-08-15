@@ -9,7 +9,7 @@
                 <button class="btn btn-hcs-green"><a class="text-white" href="/dashboard/stats/<%= nextYear %>/<%= nextMonth %>">Next &raquo;</a></button>
             </div>
             <div class="row mb-4">
-                <div class="col-lg-6 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6">
                     <div class="card">
                         <div class="card-body">
                             <h4>Total Subcontractors</h4>
@@ -17,7 +17,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6">
                     <div class="card">
                         <div class="card-body">
                             <h4>Total Invoices</h4>
@@ -26,8 +26,21 @@
                     </div>
                 </div>
             </div>
+            <!-- Submitted On Section -->
+            <% if (allInvoicesSubmitted) { %>
             <div class="row mb-4">
-                <div class="col-lg-6 col-md-6 mb-4">
+                <div class="col-lg-12">
+                    <div class="card bg-success text-white text-center">
+                        <div class="card-body">
+                            <h4>Submitted On:</h4>
+                            <p class="display-6"><%= slimDateTime(submissionDate) %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+            <div class="row mb-4">
+                <div class="col-lg-6 col-md-6">
                     <div class="card mb-3">
                         <div class="card-body">
                             <h4>Tax Year</h4>
@@ -41,7 +54,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6">
                     <div class="card mb-3">
                         <div class="card-body">
                             <h4>Submission Deadline</h4>
@@ -65,10 +78,8 @@
                                 <tr>
                                     <th>Subcontractor</th>
                                     <th>Gross Total</th>
-                                    <th>Labour Total</th>
                                     <th>Material Total</th>
                                     <th>CIS Total</th>
-                                    <th>Net Total</th>
                                     <% if (subcontractors.some(subcontractor => subcontractor.isReverseCharge)) { %>
                                         <th>Reverse Charge Total</th>
                                     <% } %>
@@ -79,11 +90,9 @@
                                 <tr>
                                     <td><a href="/subcontractor/read/<%= subcontractor.id %>"><%= subcontractor.company %></a></td>
                                     <td><%= formatCurrency(subcontractorTotals[subcontractor.id].grossTotal) %></td>
-                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].labourTotal) %></td>
                                     <td><%= formatCurrency(subcontractorTotals[subcontractor.id].materialTotal) %></td>
                                     <td><%= formatCurrency(subcontractorTotals[subcontractor.id].cisTotal) %></td>
-                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].netTotal) %></td>
-                                    <% if (subcontractor.isReverseCharge) { %>
+                                    <% if (subcontractorTotals[subcontractor.id].reverseChargeTotal) { %>
                                         <td><%= formatCurrency(subcontractorTotals[subcontractor.id].reverseChargeTotal) %></td>
                                     <% } else { %>
                                         <td>N/A</td>
