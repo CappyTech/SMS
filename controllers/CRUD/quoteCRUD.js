@@ -14,20 +14,25 @@ const createQuote = async (req, res) => {
         const { date, quote_ref, job_ref, location, contact_ref, value, desc, invoice_no, invoice_date} = req.body;
         logger.info(req.body);
         const clientId = req.params.client;
-        const newQuote = await Quotes.create({
-            date: date,
-            quote_ref: quote_ref,
-            job_ref: job_ref,
-            location: location,
-            clientId: clientId,
-            contact_ref: contact_ref,
-            value: value,
-            desc: desc,
-            invoice_no: invoice_no,
-            invoice_date: invoice_date
-        });
-
-        res.redirect(`/quote/read/${newQuote.id}`);
+        if (!clientId) {
+            req.flash('erorr', 'Client wasn\'t specificied.');
+            return res.redirect('/');
+        } else {
+            const newQuote = await Quotes.create({
+                date: date,
+                quote_ref: quote_ref,
+                job_ref: job_ref,
+                location: location,
+                clientId: clientId,
+                contact_ref: contact_ref,
+                value: value,
+                desc: desc,
+                invoice_no: invoice_no,
+                invoice_date: invoice_date
+            });
+            req.flash('success', 'Quote created successfully');
+            res.redirect(`/quote/read/${newQuote.id}`);
+        };
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
             const errorMessages = error.errors.map((err) => err.message);
