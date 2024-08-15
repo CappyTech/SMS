@@ -29,8 +29,6 @@ const selectContact = async (req, res) => {
             title: 'Select Contact',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
             contacts: contactList,
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
@@ -44,24 +42,31 @@ const selectContact = async (req, res) => {
 
 const renderContactCreateForm = async (req, res) => {
     try {
-        const contact = await Contacts.findAll({
-            include: [{ model: Clients }]
-        });
+        // Get the client ID from the route parameters
+        const clientId = req.params.client;
 
+        // Find the client by primary key (PK)
+        const clients = await Clients.findByPk(clientId);
+
+        if (!clients) {
+            // If the client is not found, send an error message
+            req.flash('error', 'Client not found.');
+            return res.redirect('/dashboard');
+        }
+
+        // Render the create contact form and pass the found client to the view
         res.render(path.join('contacts', 'createContact'), {
             title: 'Create Contact',
-            contact,
-            clients: contact.Clients,
+            clients, // Pass the specific client to the view
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
         });
     } catch (error) {
-        logger.error('Error rendering contact create form:' + error.message);
+        logger.error('Error rendering contact create form: ' + error.message);
         res.status(500).send('Error: ' + error.message);
     }
 };
+
 
 const renderContactUpdateForm = async (req, res) => {
     try {
@@ -79,8 +84,6 @@ const renderContactUpdateForm = async (req, res) => {
             clients: contact.Clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
         });
     } catch (error) {
         logger.error('Error rendering contact update form:' + error.message);
