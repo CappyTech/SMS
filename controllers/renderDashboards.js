@@ -14,19 +14,25 @@ const path = require('path');
 
 const renderStatsDashboard = async (req, res) => {
     try {
+        // Ensure that the user is an admin
         if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
-        // Fetch the specified tax year from the URL parameter or use the current tax year
-        const specifiedYear = req.params.year
-        const specifiedMonth = req.params.month
+        // Fetch the specified year and month from the URL parameters
+        const specifiedYear = parseInt(req.params.year);
+        const specifiedMonth = parseInt(req.params.month);
+
+        // Ensure valid values for year and month
+        if (isNaN(specifiedYear) || isNaN(specifiedMonth) || specifiedMonth < 1 || specifiedMonth > 12) {
+            return res.status(400).send('Invalid year or month.');
+        }
 
         // Fetch all subcontractors and invoices
         const subcontractors = await Subcontractors.findAll();
         const invoices = await Invoices.findAll({ order: [['updatedAt', 'ASC']] });
 
-        // Determine the start and end of the specified tax year
+        // Determine the tax year start and end dates and the current monthly return period
         const taxYear = helpers.getTaxYearStartEnd(specifiedYear);
         const currentMonthlyReturn = helpers.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
 
@@ -35,41 +41,46 @@ const renderStatsDashboard = async (req, res) => {
             moment(invoice.remittanceDate).isBetween(currentMonthlyReturn.periodStart, currentMonthlyReturn.periodEnd, null, '[]')
         );
 
-        // Extract the SubcontractorId from the filtered invoices
+        // Extract the subcontractor IDs from the filtered invoices
         const subcontractorIds = filteredInvoices.map(invoice => invoice.SubcontractorId);
 
-        // Filter subcontractors based on the SubcontractorId in the filtered invoices
+        // Filter subcontractors based on their ID in the filtered invoices
         const filteredSubcontractors = subcontractors.filter(sub =>
             subcontractorIds.includes(sub.id)
         );
 
-        // Calculate totals for each subcontractor
+        // Calculate the relevant totals for each subcontractor (Gross, Materials, CIS, Reverse Charge)
         const subcontractorTotals = {};
         filteredInvoices.forEach(invoice => {
             if (!subcontractorTotals[invoice.SubcontractorId]) {
                 subcontractorTotals[invoice.SubcontractorId] = {
                     grossTotal: 0,
-                    labourTotal: 0,
                     materialTotal: 0,
                     cisTotal: 0,
-                    netTotal: 0,
                     reverseChargeTotal: 0
                 };
             }
+
             subcontractorTotals[invoice.SubcontractorId].grossTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].grossTotal + invoice.grossAmount, false);
-            subcontractorTotals[invoice.SubcontractorId].labourTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].labourTotal + invoice.labourCost, false);
             subcontractorTotals[invoice.SubcontractorId].materialTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].materialTotal + invoice.materialCost, false);
-            subcontractorTotals[invoice.SubcontractorId].cisTotal = subcontractorTotals[invoice.SubcontractorId].cisTotal + invoice.cisAmount;
-            subcontractorTotals[invoice.SubcontractorId].netTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].netTotal + invoice.netAmount, false);
-            subcontractorTotals[invoice.SubcontractorId].reverseChargeTotal = subcontractorTotals[invoice.SubcontractorId].reverseChargeTotal + invoice.reverseCharge;
+            subcontractorTotals[invoice.SubcontractorId].cisTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].cisTotal + invoice.cisAmount, false);
+
+            if (invoice.reverseCharge) {
+                subcontractorTotals[invoice.SubcontractorId].reverseChargeTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].reverseChargeTotal + invoice.reverseCharge, false);
+            }
         });
 
-        // Calculate the previous and next periods
-        const previousMonth = specifiedMonth - 1 === 0 ? 12 : specifiedMonth - 1;
-        const previousYear = specifiedMonth - 1 === 0 ? specifiedYear - 1 : specifiedYear;
-        const nextMonth = specifiedMonth + 1 === 13 ? 1 : specifiedMonth + 1;
-        const nextYear = specifiedMonth + 1 === 13 ? specifiedYear + 1 : specifiedYear;
+        // Correct month/year pagination logic
+        const previousMonth = specifiedMonth === 1 ? 12 : specifiedMonth - 1;
+        const previousYear = specifiedMonth === 1 ? specifiedYear - 1 : specifiedYear;
+        const nextMonth = specifiedMonth === 12 ? 1 : specifiedMonth + 1;
+        const nextYear = specifiedMonth === 12 ? specifiedYear + 1 : specifiedYear;
 
+        // Check if all invoices are submitted and capture submission date
+        const allInvoicesSubmitted = filteredInvoices.every(invoice => invoice.submissionDate !== null);
+        const submissionDate = allInvoicesSubmitted ? filteredInvoices[0].submissionDate : null;
+
+        // Render the stats dashboard view with the necessary data
         res.render(path.join('dashboards', 'statsDashboard'), {
             title: 'Overview',
             subcontractorCount: filteredSubcontractors.length,
@@ -79,7 +90,6 @@ const renderStatsDashboard = async (req, res) => {
             subcontractorTotals,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
             taxYear,
@@ -87,10 +97,12 @@ const renderStatsDashboard = async (req, res) => {
             previousYear,
             previousMonth,
             nextYear,
-            nextMonth
+            nextMonth,
+            allInvoicesSubmitted,
+            submissionDate
         });
     } catch (error) {
-        logger.error('Error rendering stats dashboard:' + error.message);
+        logger.error('Error rendering stats dashboard: ' + error.message);
         req.flash('error', 'Error rendering stats dashboard: ' + error.message);
         return res.redirect('/');
     }
