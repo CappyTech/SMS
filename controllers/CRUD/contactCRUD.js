@@ -33,9 +33,13 @@ const createContact = async (req, res) => {
             return res.redirect(`/client/read/${contact.clientId}`);
         }
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errorMessages = error.errors.map((err) => err.message);
+            logger.error(`Validation errors: ${errorMessages.join(', ')}`);
+        }
         logger.error('Error creating contact:' + error.message);
         req.flash('error', 'Error: ' + error.message);
-        return res.redirect(req.get('referer') || '/');
+        return res.redirect('/dashboard/client');
     }
 };
 
