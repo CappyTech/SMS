@@ -52,6 +52,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
         }
 
         res.render(path.join('invoices', 'updateInvoice'), {
+            title: 'Update Invoice',
             invoice,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
