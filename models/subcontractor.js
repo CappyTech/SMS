@@ -1,6 +1,7 @@
 // models/subcontractor.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
+const logger = require('../logger'); 
 
 const Subcontractors = sequelize.define('Subcontractors', {
     id: {
@@ -10,7 +11,7 @@ const Subcontractors = sequelize.define('Subcontractors', {
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     company: {
         type: DataTypes.STRING,
@@ -18,28 +19,27 @@ const Subcontractors = sequelize.define('Subcontractors', {
     },
     line1: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     line2: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     city: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     county: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     postalCode: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     cisNumber: {
         type: DataTypes.STRING,
         allowNull: true,
-        unique: true,
     },
     utrNumber: {
         type: DataTypes.STRING,
@@ -48,7 +48,7 @@ const Subcontractors = sequelize.define('Subcontractors', {
     },
     deduction: {
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: true
     },
     vatNumber: {
         type: DataTypes.STRING,
@@ -84,6 +84,10 @@ const Subcontractors = sequelize.define('Subcontractors', {
     },
 }, {
     paranoid: true,
+});
+
+Subcontractors.beforeValidate((subcontractor, options) => {
+    logger.info('Before validate: ' + subcontractor + ' ' + options);
 });
 
 module.exports = Subcontractors;
