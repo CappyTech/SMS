@@ -6,8 +6,6 @@ const renderIndex = (req, res) => {
         title: 'Home',
         errorMessages: req.flash('error'),
         successMessage: req.flash('success'),
-        
-        
     });
 };
 
