@@ -70,7 +70,7 @@ const renderStatsDashboard = async (req, res) => {
             }
         });
 
-        // Correct month/year pagination logic
+        // Calculate the previous and next periods for pagination
         const previousMonth = specifiedMonth === 1 ? 12 : specifiedMonth - 1;
         const previousYear = specifiedMonth === 1 ? specifiedYear - 1 : specifiedYear;
         const nextMonth = specifiedMonth === 12 ? 1 : specifiedMonth + 1;
@@ -78,7 +78,12 @@ const renderStatsDashboard = async (req, res) => {
 
         // Check if all invoices are submitted and capture submission date
         const allInvoicesSubmitted = filteredInvoices.every(invoice => invoice.submissionDate !== null);
-        const submissionDate = allInvoicesSubmitted ? filteredInvoices[0].submissionDate : null;
+        const submissionDate = allInvoicesSubmitted && filteredInvoices.length > 0 ? filteredInvoices[0].submissionDate : null;
+
+        // Use currentMonthlyReturn.periodEndDisplay to determine the correct submission window
+        const periodEnd = moment(currentMonthlyReturn.periodEndDisplay, 'Do MMMM YYYY');
+        const submissionStartDate = periodEnd.clone().date(7).format('Do MMMM YYYY');
+        const submissionEndDate = periodEnd.clone().date(11).format('Do MMMM YYYY');
 
         // Render the stats dashboard view with the necessary data
         res.render(path.join('dashboards', 'statsDashboard'), {
@@ -99,7 +104,9 @@ const renderStatsDashboard = async (req, res) => {
             nextYear,
             nextMonth,
             allInvoicesSubmitted,
-            submissionDate
+            submissionDate,
+            submissionStartDate,  // Correct submission range using the periodEndDisplay
+            submissionEndDate     // Correct submission range using the periodEndDisplay
         });
     } catch (error) {
         logger.error('Error rendering stats dashboard: ' + error.message);
@@ -107,6 +114,7 @@ const renderStatsDashboard = async (req, res) => {
         return res.redirect('/');
     }
 };
+
 
 const renderUserDashboard = async (req, res) => {
     try {
