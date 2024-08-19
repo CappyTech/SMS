@@ -306,7 +306,6 @@ const renderJobsDashboard = async (req, res) => {
             jobs: jobsWithAssociations,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -334,6 +333,6 @@ router.get('/dashboard/invoice', renderInvoiceDashboard);
 router.get('/dashboard/quote', renderQuotesDashboard);
 router.get('/dashboard/client', renderClientsDashboard);
 router.get('/dashboard/contact', renderContactsDashboard);
-router.get('/dashboard/jobs', renderJobsDashboard);
+router.get('/dashboard/job', renderJobsDashboard);
 
 module.exports = router;
