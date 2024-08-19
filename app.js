@@ -14,6 +14,7 @@ require('dotenv').config();
 const helpers = require('./helpers');
 const os = require('os');
 const packageJson = require('./package.json');
+const sequelize = require('./db');
 // Set up EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -231,34 +232,19 @@ Contacts.belongsTo(Clients, {
 
 (async () => {
     try {
+        // Sync all models at once
         if (process.env.NODE_ENV === 'development') {
-            await Users.sync({ alter: true });
-            await Subcontractors.sync({ alter: true });
-            await Invoices.sync({ alter: true });
-            await Employees.sync({ alter: true });
-            await Attendances.sync({ alter: true });
-            await Clients.sync({ alter: true });
-            await Quotes.sync({ alter: true });
-            await Contacts.sync({ alter: true });
+            await sequelize.sync({ alter: true }); // Use alter to auto-migrate in development
+            logger.info('All models synchronized in development mode.');
+        } else if (process.env.NODE_ENV === 'production') {
+            await sequelize.sync(); // In production, avoid altering the table structure automatically
+            logger.info('All models synchronized in production mode.');
         }
-        if (process.env.DEBUG) {
-            logger.info('Models synced with the database');
-        };
         if (process.env.DEV) {
-            await createDefaultAdmin();
-        }
-        if (process.env.NODE_ENV === 'production') {
-            await Users.sync({ alter: false });
-            await Subcontractors.sync({ alter: false });
-            await Invoices.sync({ alter: false });
-            await Employees.sync({ alter: false });
-            await Attendances.sync({ alter: false });
-            await Clients.sync({ alter: false });
-            await Quotes.sync({ alter: false });
-            await Contacts.sync({ alter: false });
+            await createDefaultAdmin(); // Create default admin user if needed
         }
     } catch (error) {
-        logger.error('Error syncing models:', error);
+        logger.error('Error syncing models: ' + error);
     }
 })();
 
