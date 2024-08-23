@@ -1,27 +1,23 @@
-// models/quote.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
 const Clients = require('./client');
-const Contacts = require('./contact');
+const Quotes = require('./quote');
 const Locations = require('./location');
 
-const Quotes = sequelize.define('Quotes', {
+const Jobs = sequelize.define('Jobs', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    date: {
-        type: DataTypes.DATE,
-        allowNull: true
-    },
-    quote_ref: {
+    job_ref: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
+        unique: true,
     },
     locationId: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: Locations,
             key: 'id',
@@ -31,7 +27,7 @@ const Quotes = sequelize.define('Quotes', {
     },
     clientId: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: Clients,
             key: 'id',
@@ -39,11 +35,11 @@ const Quotes = sequelize.define('Quotes', {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
     },
-    contactId: {
+    quoteId: {
         type: DataTypes.UUID,
         allowNull: true,
         references: {
-            model: Contacts,
+            model: Quotes,
             key: 'id',
         },
         onDelete: 'SET NULL',
@@ -51,24 +47,20 @@ const Quotes = sequelize.define('Quotes', {
     },
     value: {
         type: DataTypes.FLOAT,
-        allowNull: true
+        allowNull: true,
+    },
+    status: {
+        type: DataTypes.ENUM('pending', 'in_progress', 'completed', 'archived'),
+        allowNull: false,
+        defaultValue: 'pending',
     },
     desc: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
     },
-    invoice_no: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    invoice_date: {
+    completionDate: {
         type: DataTypes.DATE,
-        allowNull: true
-    },
-    isAccepted: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
+        allowNull: true,
     },
     createdAt: {
         allowNull: false,
@@ -84,6 +76,12 @@ const Quotes = sequelize.define('Quotes', {
     },
 }, {
     paranoid: true,
+    indexes: [
+        // Add a composite index instead of separate indexes for locationId and clientId
+        {
+            fields: ['locationId', 'clientId'],
+        },
+    ],
 });
 
-module.exports = Quotes;
+module.exports = Jobs;

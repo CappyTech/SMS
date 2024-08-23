@@ -29,6 +29,7 @@ const Users = sequelize.define('Users', {
     role: {
         type: DataTypes.ENUM('subcontractor', 'employee', 'accountant', 'hmrc', 'admin'),
         defaultValue: 'subcontractor',
+        allowNull: false,
     },
     permissionCreateUser: {
         type: DataTypes.BOOLEAN,
