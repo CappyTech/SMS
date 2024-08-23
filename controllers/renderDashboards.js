@@ -10,6 +10,8 @@ const Subcontractors = require('../models/subcontractor');
 const Quotes = require('../models/quote');
 const Clients = require('../models/client');
 const Contacts = require('../models/contact');
+const Jobs = require('../models/job');
+const Locations = require('../models/location');
 const path = require('path');
 
 const renderStatsDashboard = async (req, res) => {
@@ -196,14 +198,12 @@ const renderQuotesDashboard = async (req, res) => {
 
         const quotes = await Quotes.findAll({
             order: [['createdAt', 'DESC']],
-            include: [{
-                model: Clients,
-                include: [
-                    {
-                        model: Contacts,
-                    }
-                ]
-            }]
+            include: [
+                {
+                    model: Clients,
+                    include: [{ model: Contacts }]
+                }
+            ]
         });
 
         res.render(path.join('dashboards', 'quotesDashboard'), {
@@ -211,16 +211,16 @@ const renderQuotesDashboard = async (req, res) => {
             quotes,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering quotes dashboard:' + error.message);
+        logger.error('Error rendering quotes dashboard: ' + error.message);
         req.flash('error', 'Error rendering quotes dashboard: ' + error.message);
         return res.redirect('/');
     }
 };
+
 
 const renderClientsDashboard = async (req, res) => {
     try {
@@ -272,11 +272,13 @@ const renderContactsDashboard = async (req, res) => {
 
 const renderJobsDashboard = async (req, res) => {
     try {
+        // Ensure only admin can access
         if (!req.session.user || req.session.user.role !== 'admin') {
             return res.status(403).send('Access denied.');
         }
 
-        const jobs = await Quotes.findAll({
+        // Fetch jobs with a non-empty job_ref
+        const jobs = await Jobs.findAll({
             where: {
                 job_ref: {
                     [Op.ne]: ""
@@ -287,20 +289,29 @@ const renderJobsDashboard = async (req, res) => {
 
         // Fetch associated clients and contacts
         const jobsWithAssociations = await Promise.all(jobs.map(async job => {
-            const client = await Clients.findByPk(job.clientId);
-            const contact = await Contacts.findOne({
+            // Ensure clientId exists before querying Clients
+            const client = job.clientId ? await Clients.findByPk(job.clientId) : null;
+
+            // Ensure contactId exists before querying Contacts (assuming job.contactId is the field you want)
+            const contact = job.contactId ? await Contacts.findOne({
                 where: {
-                    clientId: job.clientId,
-                    id: job.contact_ref
+                    id: job.contactId,
+                    clientId: job.clientId
                 }
-            });
+            }) : null;
+
+            // Return job along with its associated client and contact
             return {
                 ...job.toJSON(),
-                client,
-                contact
+                client: client || {},  // Return an empty object if no client found
+                contact: contact || {} // Return an empty object if no contact found
             };
         }));
 
+        // Log to check the result
+        logger.info('Jobs with Associations: ' + JSON.stringify(jobsWithAssociations, null, 2));
+
+        // Render the jobs dashboard
         res.render(path.join('dashboards', 'jobsDashboard'), {
             title: 'Jobs',
             jobs: jobsWithAssociations,
@@ -310,21 +321,49 @@ const renderJobsDashboard = async (req, res) => {
             formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering jobs dashboard:' + error.message);
+        // Log the error
+        logger.error('Error rendering jobs dashboard: ' + error.message);
         req.flash('error', 'Error rendering jobs dashboard: ' + error.message);
         res.redirect('/');
     }
 };
 
+
 router.get('/dashboard/stats', (req, res) => {
-    const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(moment());
-
-    // Output for debugging
-    logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
-
-    // Redirect to the dashboard with the calculated tax year and month
-    res.redirect(`/dashboard/stats/${taxYear}/${taxMonth}`);
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            return res.status(403).send('Access denied.');
+        }
+        const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(moment());
+        // Output for debugging
+        logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
+        // Redirect to the dashboard with the calculated tax year and month
+        res.redirect(`/dashboard/stats/${taxYear}/${taxMonth}`);
+    } catch (error) {
+        logger.error('Error rendering jobs dashboard:' + error.message);
+        req.flash('error', 'Error rendering jobs dashboard: ' + error.message);
+        res.redirect('/');
+    }
 });
+
+// Read all locations
+const renderLocationsDashboard = async (req, res) => {
+    try {
+        const locations = await Locations.findAll({ order: [['createdAt', 'DESC']] });
+
+        res.render(path.join('dashboards', 'locationsDashboard'), {
+            title: 'Locations',
+            locations,
+            slimDateTime: helpers.slimDateTime,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+        });
+    } catch (error) {
+        logger.error('Error viewing locations: ' + error.message);
+        req.flash('error', 'Error viewing locations: ' + error.message);
+        res.redirect('/dashboard/location');
+    }
+};
 
 router.get('/dashboard/stats/:year?/:month?', renderStatsDashboard);
 router.get('/dashboard/user', renderUserDashboard);
@@ -334,5 +373,7 @@ router.get('/dashboard/quote', renderQuotesDashboard);
 router.get('/dashboard/client', renderClientsDashboard);
 router.get('/dashboard/contact', renderContactsDashboard);
 router.get('/dashboard/job', renderJobsDashboard);
+//router.get('/dashboard/archive', renderQuoteArchiveDashboard);
+router.get('/dashboard/location', renderLocationsDashboard);
 
 module.exports = router;

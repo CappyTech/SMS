@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
-
 const path = require('path');
 const Invoice = require('../../models/invoice');
 const Subcontractor = require('../../models/subcontractor');

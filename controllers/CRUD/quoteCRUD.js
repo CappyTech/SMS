@@ -1,9 +1,9 @@
-// controllers/quoteCRUD.js
 const express = require('express');
 const router = express.Router();
-const packageJson = require('../../package.json');
 const Quotes = require('../../models/quote');
 const Clients = require('../../models/client');
+const Contacts = require('../../models/contact');
+const Jobs = require('../../models/job');
 const helpers = require('../../helpers');
 const moment = require('moment');
 const logger = require('../../logger');
@@ -11,11 +11,12 @@ const path = require('path');
 
 const createQuote = async (req, res) => {
     try {
-        const { date, quote_ref, job_ref, location, contact_ref, value, desc, invoice_no, invoice_date} = req.body;
+        const { date, quote_ref, job_ref, location, contactId, value, desc, invoice_no, invoice_date } = req.body;
         logger.info(req.body);
         const clientId = req.params.client;
+
         if (!clientId) {
-            req.flash('erorr', 'Client wasn\'t specificied.');
+            req.flash('error', 'Client wasn\'t specified.');
             return res.redirect('/');
         } else {
             const newQuote = await Quotes.create({
@@ -24,7 +25,7 @@ const createQuote = async (req, res) => {
                 job_ref: job_ref,
                 location: location,
                 clientId: clientId,
-                contact_ref: contact_ref,
+                contactId: contactId, // Use contactId from the body
                 value: value,
                 desc: desc,
                 invoice_no: invoice_no,
@@ -32,13 +33,13 @@ const createQuote = async (req, res) => {
             });
             req.flash('success', 'Quote created successfully');
             res.redirect(`/quote/read/${newQuote.id}`);
-        };
+        }
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
             const errorMessages = error.errors.map((err) => err.message);
             logger.error(`Validation errors: ${errorMessages.join(', ')}`);
         }
-        logger.error('Error creating quote:'+ error.message);
+        logger.error('Error creating quote:' + error.message);
         req.flash('error', 'Error creating quote: ' + error.message);
         res.redirect('/dashboard/quote');
     }
@@ -53,11 +54,12 @@ const readQuote = async (req, res) => {
 
         const quote = await Quotes.findByPk(req.params.quote, {
             include: [{
-                model: Clients
+                model: Clients,
+                include: [Contacts]
             }]
-          });
+        });
 
-        if (!req.params.quote) {
+        if (!quote) {
             return res.status(404).json({ error: 'Quote not found' });
         } else {
             res.render(path.join('quotes', 'viewQuote'), {
@@ -65,14 +67,12 @@ const readQuote = async (req, res) => {
                 quote,
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
-                
-                
                 moment: moment,
                 slimDateTime: helpers.slimDateTime,
             });
         }
     } catch (error) {
-        logger.error('Error viewing quote:'+ error.message);
+        logger.error('Error viewing quote:' + error.message);
         req.flash('error', 'Error viewing quote: ' + error.message);
         res.redirect('/dashboard/quote');
     }
@@ -84,10 +84,11 @@ const readQuotes = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        
+
         const quotes = await Quotes.findAll({
-            where: { ClientId: req.params.client },
+            where: { clientId: req.params.client },
             order: [['date', 'DESC']],
+            include: [Clients]
         });
 
         res.render(path.join('quotes', 'viewQuotes'), {
@@ -95,13 +96,11 @@ const readQuotes = async (req, res) => {
             quotes,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
             moment: moment,
             slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
-        logger.error('Error viewing quotes:'+ error.message);
+        logger.error('Error viewing quotes:' + error.message);
         req.flash('error', 'Error viewing quotes: ' + error.message);
         res.redirect('/dashboard/quote');
     }
@@ -109,7 +108,6 @@ const readQuotes = async (req, res) => {
 
 const updateQuote = async (req, res) => {
     try {
-
         const quote = await Quotes.findByPk(req.params.id);
         if (!quote) {
             throw new Error('Quote not found');
@@ -150,10 +148,49 @@ const deleteQuote = async (req, res) => {
     }
 };
 
+const convertToJob = async (req, res) => {
+    try {
+        // Fetch the quote by its ID
+        const quote = await Quotes.findByPk(req.params.quoteId, {
+            include: [Clients] // Include necessary associations if needed
+        });
+
+        // If the quote doesn't exist, return an error
+        if (!quote) {
+            req.flash('error', 'Quote not found');
+            return res.redirect('/dashboard/quote');
+        }
+
+        // Create a new job using the relevant data from the quote
+        const job = await Jobs.create({
+            job_ref: `JOB-${quote.quote_ref}`, // Create a job reference based on the quote reference
+            location: quote.location,
+            clientId: quote.clientId,
+            quoteId: quote.id, // Link this job to the original quote
+            value: quote.value,
+            desc: quote.desc,
+            status: 'pending', // Default status of the job
+        });
+
+        // Mark the quote as accepted (optional)
+        quote.isAccepted = true;
+        await quote.save();
+
+        // Redirect to the new job's page or another relevant page
+        req.flash('success', 'Quote successfully converted to Job.');
+        return res.redirect(`/job/read/${job.id}`);
+    } catch (error) {
+        logger.error('Error converting quote to job: ' + error.message);
+        req.flash('error', 'Error converting quote to job: ' + error.message);
+        return res.redirect('/dashboard/quote');
+    };
+};
+
 router.post('/quote/create/:client', createQuote);
 router.get('/quote/read/:quote', readQuote);
 router.get('/quote/read/:client', readQuotes);
 router.post('/quote/update/:id', updateQuote);
 router.post('/quote/delete/:id', deleteQuote);
+router.get('/quote/convert-to-job/:quoteId', convertToJob);
 
 module.exports = router;
