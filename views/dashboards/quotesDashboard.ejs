@@ -1,5 +1,6 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
+
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
@@ -25,16 +26,10 @@
                         <div class="card-body" id="<%= quote.id %>">
                             <ul class="list-group">
                                 <li class="list-group-item">Date: <%= slimDateTime(quote.date) %></li>
-                                <li class="list-group-item">Job: <%= quote.job_ref %></li>
+                                <li class="list-group-item">Job: <a class="hcs-green-text" href="/quote/convert-to-job/<%= quote.id %>">Add Job Number</a></li>
                                 <li class="list-group-item">Location: <%= quote.location %></li>
-                                <li class="list-group-item">Client: <%= quote.Client ? quote.Client.name : 'N/A' %></li>
-                                <li class="list-group-item">Contact: 
-                                    <% if (quote.Client && quote.Client.Contacts && quote.Client.Contacts.length > 0) { %>
-                                        <%= quote.Client.Contacts[0].name %> <!-- Assuming you want to display the first contact -->
-                                    <% } else { %>
-                                        N/A
-                                    <% } %>
-                                </li>
+                                <li class="list-group-item">Client: <%= quote.Client.name %></li>
+                                <li class="list-group-item">Contact: <%= quote.Client.Contacts[0].name %></li>
                                 <li class="list-group-item">Value: <%= formatCurrency(quote.value) %></li>
                                 <li class="list-group-item">Description: <%= quote.desc %></li>
                                 <li class="list-group-item">Invoice No: <%= quote.invoice_no %></li>

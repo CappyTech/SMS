@@ -1,0 +1,43 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <h1 class="display-5">Update Location</h1>
+        <div class="container-fluid text-center">
+            <form action="/location/update/<%= location.id %>" method="POST" class="needs-validation">
+                <div class="row mb-3">
+                    <label for="address" class="col-sm-3 col-form-label">Address</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="address" name="address" class="form-control" value="<%= location.address %>" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="city" class="col-sm-3 col-form-label">City</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="city" name="city" class="form-control" value="<%= location.city %>" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="postalCode" class="col-sm-3 col-form-label">Postal Code</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="postalCode" name="postalCode" class="form-control" value="<%= location.postalCode %>" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="country" class="col-sm-3 col-form-label">Country</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="country" name="country" class="form-control" value="<%= location.country %>" required>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-hcs-green">Update Location</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

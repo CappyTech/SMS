@@ -1,3 +1,4 @@
+<% if (session.user && session.user.role === 'admin') {%>
 <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <% if (totalNotifications > 0) { %>
@@ -20,3 +21,4 @@
         <% }) %>
     </ul>
 </li>
+<%} %>

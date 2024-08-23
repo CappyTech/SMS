@@ -20,16 +20,16 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="job_ref" class="col-sm-3 col-form-label">Job Ref <i class="bi bi-briefcase"></i></label>
-                    <div class="col-sm-9">
-                        <input type="text" id="job_ref" name="job_ref" class="form-control" >
-                    </div>
-                </div>
-
-                <div class="row mb-3">
                     <label for="location" class="col-sm-3 col-form-label">Location <i class="bi bi-geo-alt"></i></label>
                     <div class="col-sm-9">
-                        <input type="text" id="location" name="location" class="form-control" >
+                        <div class="input-group">
+                            <input type="text" id="location" name="location" class="form-control" >
+                            <a class="text-white" href="/">
+                                <button type="button" class="btn btn-hcs-green">
+                                    +
+                                </button>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -40,7 +40,11 @@
                             <select id="client" name="client" class="form-select">
                                 <option value="<%= clients.id %>"><%= clients.name %></option>
                             </select>
-                            <button id="addClientButton" type="button" class="btn btn-hcs-green">+</button>
+                            <a class="text-white" href="/client/create">
+                                <button type="button" class="btn btn-hcs-green">
+                                    +
+                                </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -48,15 +52,22 @@
                 <div class="row mb-3">
                     <label for="contact_ref" class="col-sm-3 col-form-label">Contact Ref <i class="bi bi-person-badge"></i></label>
                     <div class="col-sm-9">
-                        <select id="contact_ref" name="contact_ref" class="form-select">
-                            <% if (clients.Contacts.length === 0) { %>
-                                <option class="text-warning" value="">N/A</option>
-                            <% } else { %>
-                                <% clients.Contacts.forEach(function(contact) { %>
-                                    <option value="<%= contact.name %>"><%= contact.name %></option>
-                                <% }); %>
-                            <% } %>
-                        </select>
+                        <div class="input-group">
+                            <select id="contact_ref" name="contact_ref" class="form-select">
+                                <% if (clients.Contacts.length === 0) { %>
+                                    <option class="text-warning" value="">N/A</option>
+                                <% } else { %>
+                                    <% clients.Contacts.forEach(function(contact) { %>
+                                        <option value="<%= contact.name %>"><%= contact.name %></option>
+                                    <% }); %>
+                                <% } %>
+                            </select>
+                            <a class="text-white" href="/contact/create/<%= clients.id %>">
+                                <button type="button" class="btn btn-hcs-green">
+                                    +
+                                </button>
+                            </a>
+                        </div>
                     </div>
                 </div>
 

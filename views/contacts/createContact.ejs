@@ -2,7 +2,7 @@
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <h1 class="display-5">Create Contact for <%= clients.name %></h1>
         <div class="container-fluid text-center">
-            <form action="/contact/create" method="POST" class="needs-validation">
+            <form action="/contact/create/<%= clients.id %>" method="POST" class="needs-validation">
                 <!-- Hidden input to pass the client ID -->
                 <input type="hidden" id="clientId" name="clientId" value="<%= clients.id %>">
                 

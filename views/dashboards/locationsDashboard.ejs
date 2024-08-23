@@ -1,0 +1,47 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Locations</h1>
+            <div class="row">
+                <div class="col-2">
+                    <ul class="scrollable-list list-group sticky-top">
+                        <a class="list-group-item list-group-item-action disabled text-bg-secondary text-center" aria-disabled="true">Location List</a>
+                        <% locations.forEach(location => { %>
+                            <a href="#<%= location.id %>" class="list-group-item list-group-item-action text-center">
+                                <%= location.address %>
+                            </a>
+                        <% }); %>
+                    </ul>
+                </div>
+                <div class="col-10">
+                    <% locations.forEach(location => { %>
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between text-bg-secondary">
+                            <span>Location: <%= location.address %>, <%= location.city %></span>
+                            <a class="text-white" href="/location/view/<%= location.id %>">View Location</a>
+                        </div>
+                        <div class="card-body" id="<%= location.id %>">
+                            <ul class="list-group">
+                                <li class="list-group-item">City: <%= location.city %></li>
+                                <li class="list-group-item">Postal Code: <%= location.postalCode %></li>
+                                <li class="list-group-item">Country: <%= location.country %></li>
+                                <li class="list-group-item">Created At: <%= slimDateTime(location.createdAt) %></li>
+                                <li class="list-group-item">Last Updated: <%= slimDateTime(location.updatedAt, true) %></li>
+                            </ul>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a type="button" class="btn btn-hcs-green btn-sm" href="/location/update/<%= location.id %>">Update Location</a>
+                            <form action="/location/delete/<%= location.id %>" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this location?')">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

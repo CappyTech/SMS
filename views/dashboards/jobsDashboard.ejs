@@ -1,5 +1,6 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
+
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
@@ -19,24 +20,22 @@
                     <% jobs.forEach(job => { %>
                     <div class="card mb-3">
                         <div class="card-header d-flex justify-content-between text-bg-secondary">
-                            <span>Job: <%= job.job_ref %></span>
-                            <a class="text-white" href="/quote/read/<%= job.id %>">View Job</a>
+                            <span>Job Ref: <%= job.job_ref %></span>
+                            <a class="text-white" href="/job/read/<%= job.id %>">View Job</a>
                         </div>
                         <div class="card-body" id="<%= job.id %>">
                             <ul class="list-group">
-                                <li class="list-group-item">Date: <%= slimDateTime(job.date) %></li>
-                                <li class="list-group-item">Quote Ref: <%= job.quote_ref %></li>
-                                <li class="list-group-item">Location: <%= job.location %></li>
-                                <li class="list-group-item">Client: <%= job.client.name %></li>
-                                <li class="list-group-item">Contact: <%= job.contact.name %></li>
+                                <li class="list-group-item">Start Date: <%= slimDateTime(job.createdAt) %></li>
+                                <li class="list-group-item">Location: <%= job.Location ? job.Location.address : 'N/A' %></li>
+                                <li class="list-group-item">Client: <%= job.Client ? job.Client.name : 'N/A' %></li>
                                 <li class="list-group-item">Value: <%= formatCurrency(job.value) %></li>
-                                <li class="list-group-item">Description: <%= job.desc %></li>
-                                <li class="list-group-item">Invoice No: <%= job.invoice_no %></li>
-                                <li class="list-group-item">Invoice Date: <%= slimDateTime(job.invoice_date) %></li>
+                                <li class="list-group-item">Status: <%= job.status %></li>
+                                <li class="list-group-item">Description: <%= job.desc || 'No Description Provided' %></li>
+                                <li class="list-group-item">Completion Date: <%= slimDateTime(job.completionDate) %></li>
                             </ul>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                            <a type="button" class="btn btn-hcs-green btn-sm" href="/quote/update/<%= job.id %>">Update Job</a>
+                            <a type="button" class="btn btn-hcs-green btn-sm" href="/job/update/<%= job.id %>">Update Job</a>
                             <span>Last Updated: <%= slimDateTime(job.updatedAt, true) %></span>
                         </div>
                     </div>

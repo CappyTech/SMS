@@ -18,7 +18,7 @@
                                 <li class="list-group-item">Job Ref</li>
                                 <li class="list-group-item">Location</li>
                                 <li class="list-group-item">Client</li>
-                                <li class="list-group-item">Contact Ref</li>
+                                <li class="list-group-item">Contact</li>
                                 <li class="list-group-item">Value</li>
                                 <li class="list-group-item">Description</li>
                                 <li class="list-group-item">Invoice No</li>
@@ -32,7 +32,7 @@
                                 <li class="list-group-item <%= quote.job_ref ? '' : 'text-warning' %>"><%= quote.job_ref ? quote.job_ref : 'N/A' %></li>
                                 <li class="list-group-item <%= quote.location ? '' : 'text-warning' %>"><%= quote.location ? quote.location : 'N/A' %></li>
                                 <li class="list-group-item <%= quote.Client.name ? '' : 'text-warning' %>"><%= quote.Client.name ? quote.Client.name : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.contact_ref ? '' : 'text-warning' %>"><%= quote.contact_ref ? quote.contact_ref : 'N/A' %></li>
+                                <li class="list-group-item <%= quote.contactId ? '' : 'text-warning' %>"><%= quote.contactId ? quote.contactId : 'N/A' %></li>
                                 <li class="list-group-item <%= quote.value ? '' : 'text-warning' %>"><%= quote.value ? '£' + quote.value : 'N/A' %></li>
                                 <li class="list-group-item <%= quote.desc ? '' : 'text-warning' %>"><%= quote.desc ? quote.desc : 'N/A' %></li>
                                 <li class="list-group-item <%= quote.invoice_no ? '' : 'text-warning' %>"><%= quote.invoice_no ? quote.invoice_no : 'N/A' %></li>
