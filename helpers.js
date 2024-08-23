@@ -1,8 +1,13 @@
 const moment = require('moment');
 const logger = require('./logger');
 
-function slimDateTime(dateString, includeTime = false) {
+function slimDateTime(dateString, includeTime = false, forDateInput = false) {
     const date = moment.utc(dateString);
+
+    if (forDateInput) {
+        return date.format('YYYY-MM-DD'); // Return in the format needed for input[type="date"]
+    }
+
     const formattedDate = date.format('DD/MM/YYYY');
 
     if (includeTime) {
@@ -11,7 +16,8 @@ function slimDateTime(dateString, includeTime = false) {
     }
 
     return formattedDate;
-};
+}
+
 
 function formatCurrency(amount) {
     if (typeof amount !== 'number') {
