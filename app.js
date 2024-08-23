@@ -183,36 +183,51 @@ const Attendances = require('./models/attendance');
 const Quotes = require('./models/quote');
 const Clients = require('./models/client');
 const Contacts = require('./models/contact');
+const Jobs = require('./models/job');
+const Locations = require('./models/location');
 
+// Association for Users and Subcontractors
 Users.hasMany(Subcontractors, {
     foreignKey: 'userId',
     allowNull: false,
 });
-Subcontractors.hasMany(Invoices, {
-    foreignKey: 'SubcontractorId',
+Subcontractors.belongsTo(Users, {
+    foreignKey: 'userId',
     allowNull: false,
-    as: 'invoices'
+});
+
+// Association for Subcontractors and Invoices
+Subcontractors.hasMany(Invoices, {
+    foreignKey: 'subcontractorId',
+    allowNull: false,
+    as: 'invoices',
 });
 Invoices.belongsTo(Subcontractors, {
-    foreignKey: 'SubcontractorId',
+    foreignKey: 'subcontractorId',
     allowNull: false,
 });
+
+// Association for Employees and Attendances
 Employees.hasMany(Attendances, {
     foreignKey: 'employeeId',
-    allowNull: false,
-});
-Subcontractors.hasMany(Attendances, {
-    foreignKey: 'subcontractorId',
     allowNull: false,
 });
 Attendances.belongsTo(Employees, {
     foreignKey: 'employeeId',
     allowNull: false,
 });
+
+// Association for Subcontractors and Attendances
+Subcontractors.hasMany(Attendances, {
+    foreignKey: 'subcontractorId',
+    allowNull: false,
+});
 Attendances.belongsTo(Subcontractors, {
     foreignKey: 'subcontractorId',
     allowNull: false,
 });
+
+// Association for Clients and Quotes
 Clients.hasMany(Quotes, {
     foreignKey: 'clientId',
     allowNull: false,
@@ -221,6 +236,8 @@ Quotes.belongsTo(Clients, {
     foreignKey: 'clientId',
     allowNull: false,
 });
+
+// Association for Clients and Contacts
 Clients.hasMany(Contacts, {
     foreignKey: 'clientId',
     allowNull: false,
@@ -229,6 +246,57 @@ Contacts.belongsTo(Clients, {
     foreignKey: 'clientId',
     allowNull: false,
 });
+
+// Association for Clients and Jobs
+Clients.hasMany(Jobs, {
+    foreignKey: 'clientId',
+    allowNull: false,
+});
+Jobs.belongsTo(Clients, {
+    foreignKey: 'clientId',
+    allowNull: false,
+});
+
+// Association for Quotes and Jobs
+Quotes.hasMany(Jobs, {
+    foreignKey: 'quoteId',
+    allowNull: false,
+});
+Jobs.belongsTo(Quotes, {
+    foreignKey: 'quoteId',
+    allowNull: false,
+});
+
+// Association for Jobs and Locations
+Locations.hasMany(Jobs, {
+    foreignKey: 'locationId',
+    allowNull: false,
+});
+Jobs.belongsTo(Locations, {
+    foreignKey: 'locationId',
+    allowNull: false,
+});
+
+// Association for Quotes and Locations
+Locations.hasMany(Quotes, {
+    foreignKey: 'locationId',
+    allowNull: false,
+});
+Quotes.belongsTo(Locations, {
+    foreignKey: 'locationId',
+    allowNull: false,
+});
+
+// Association for Attendances and Locations
+Locations.hasMany(Attendances, {
+    foreignKey: 'locationId',
+    allowNull: false,
+});
+Attendances.belongsTo(Locations, {
+    foreignKey: 'locationId',
+    allowNull: false,
+});
+
 
 (async () => {
     try {
@@ -310,7 +378,7 @@ const formsUser = require('./controllers/forms/user');
 const renderDashboard = require('./controllers/renderDashboards');
 
 const userLogin = require('./controllers/user/login');
-const userRegister = require('./controllers/user/register');
+//const userRegister = require('./controllers/user/register');
 const userSettings = require('./controllers/user/settings');
 
 const userCRUD = require('./controllers/CRUD/userCRUD');
@@ -321,10 +389,11 @@ const clientCRUD = require('./controllers/CRUD/clientCRUD');
 const contactCRUD = require('./controllers/CRUD/contactCRUD');
 // const attendanceCRUD = require('./controllers/CRUD/attendanceCRUD');
 // const employeeCRUD = require('./controllers/CRUD/employeeCRUD');
+const jobCRUD = require('./controllers/CRUD/jobCRUD');
+const locationCRUD = require('./controllers/CRUD/locationCRUD');
 
 const monthlyReturns = require('./controllers/monthlyReturns');
 const yearlyReturns = require('./controllers/yearlyReturns');
-const { platform } = require('os');
 
 app.use('/', render);
 
@@ -339,7 +408,7 @@ app.use('/', formsUser);
 app.use('/', renderDashboard);
 
 app.use('/', userLogin);
-app.use('/', userRegister);
+//app.use('/', userRegister);
 app.use('/', userSettings);
 
 app.use('/', userCRUD);
@@ -350,6 +419,8 @@ app.use('/', clientCRUD);
 app.use('/', contactCRUD);
 // app.use('/', attendanceCRUD);
 // app.use('/', employeeCRUD);
+app.use('/', jobCRUD);
+app.use('/', locationCRUD);
 
 app.use('/', monthlyReturns);
 app.use('/', yearlyReturns);
