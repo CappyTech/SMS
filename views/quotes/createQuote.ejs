@@ -20,11 +20,16 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="location" class="col-sm-3 col-form-label">Location <i class="bi bi-geo-alt"></i></label>
+                    <label for="locationId" class="col-sm-3 col-form-label">Location <i class="bi bi-geo-alt"></i></label>
                     <div class="col-sm-9">
                         <div class="input-group">
-                            <input type="text" id="location" name="location" class="form-control" >
-                            <a class="text-white" href="/">
+                            <select id="locationId" name="locationId" class="form-select">
+                                <option value="">Select Location</option>
+                                <% locations.forEach(location => { %>
+                                    <option value="<%= location.id %>"><%= location.address %>, <%= location.city %>, <%= location.postalCode %></option>
+                                <% }); %>
+                            </select>
+                            <a href="/location/create">
                                 <button type="button" class="btn btn-hcs-green">
                                     +
                                 </button>
@@ -33,12 +38,16 @@
                     </div>
                 </div>
 
+
                 <div class="row mb-3">
-                    <label for="client" class="col-sm-3 col-form-label">Client <i class="bi bi-person"></i></label>
+                    <label for="clientId" class="col-sm-3 col-form-label">Client</label>
                     <div class="col-sm-9">
                         <div class="input-group">
-                            <select id="client" name="client" class="form-select">
-                                <option value="<%= clients.id %>"><%= clients.name %></option>
+                            <select id="clientId" name="clientId" class="form-select" required>
+                                <option value="">Select Client</option>
+                                <% clients.forEach(client => { %>
+                                    <option value="<%= client.id %>"><%= client.name %></option>
+                                <% }) %>
                             </select>
                             <a class="text-white" href="/client/create">
                                 <button type="button" class="btn btn-hcs-green">
@@ -50,17 +59,12 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="contact_ref" class="col-sm-3 col-form-label">Contact Ref <i class="bi bi-person-badge"></i></label>
+                    <label for="contactId" class="col-sm-3 col-form-label">Contact</label>
                     <div class="col-sm-9">
                         <div class="input-group">
-                            <select id="contact_ref" name="contact_ref" class="form-select">
-                                <% if (clients.Contacts.length === 0) { %>
-                                    <option class="text-warning" value="">N/A</option>
-                                <% } else { %>
-                                    <% clients.Contacts.forEach(function(contact) { %>
-                                        <option value="<%= contact.name %>"><%= contact.name %></option>
-                                    <% }); %>
-                                <% } %>
+                            <select id="contactId" name="contactId" class="form-select" required>
+                                <option value="">Select Contact</option>
+                                <!-- Contacts will be populated dynamically based on the selected client -->
                             </select>
                             <a class="text-white" href="/contact/create/<%= clients.id %>">
                                 <button type="button" class="btn btn-hcs-green">
@@ -108,10 +112,33 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    const addClientButton = document.getElementById('addClientButton');
-
-    addClientButton.addEventListener('click', function () {
-        window.location.href = '/client/create';
+<script>
+    document.getElementById('clientId').addEventListener('change', function () {
+        const clientId = this.value;
+        const contactDropdown = document.getElementById('contactId');
+        
+        if (clientId) {
+            fetch(`/contacts/by-client/${clientId}`)
+                .then(response => response.json())
+                .then(data => {
+                    contactDropdown.innerHTML = ''; // Clear the current options
+                    if (data.contacts && data.contacts.length) {
+                        data.contacts.forEach(contact => {
+                            const option = document.createElement('option');
+                            option.value = contact.id;
+                            option.text = contact.name;
+                            contactDropdown.appendChild(option);
+                        });
+                    } else {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.text = 'No Contacts Available';
+                        contactDropdown.appendChild(option);
+                    }
+                })
+                .catch(error => console.error('Error fetching contacts:', error));
+        } else {
+            contactDropdown.innerHTML = '<option value="">Select Contact</option>'; // Reset to default
+        }
     });
 </script>
