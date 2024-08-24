@@ -9,7 +9,8 @@ const Subcontractor = require('../../models/subcontractor');
 const renderInvoiceCreateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
         
         if (req.params.subcontractor) {
@@ -41,7 +42,8 @@ const renderInvoiceCreateForm = async (req, res) => {
 const renderInvoiceUpdateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const invoice = await Invoice.findByPk(req.params.invoice);
