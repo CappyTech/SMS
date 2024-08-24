@@ -28,14 +28,14 @@
                             <div class="card-body" id="<%= quote.id %>">
                                 <ul class="list-group">
                                     <li class="list-group-item">Date: <%= slimDateTime(quote.date) %></li>
-                                    <li class="list-group-item">Client: <%= quote.Client ? quote.Client.name : 'N/A' %></li>
-                                    <li class="list-group-item">Location: <%= quote.Location ? quote.Location.address : 'N/A' %></li>
+                                    <li class="list-group-item">Client: <%= quote.Client ? quote.Client.name : '' %></li>
+                                    <li class="list-group-item">Location: <%= quote.Location ? quote.Location.address + ', ' + quote.Location.city : '' %></li>
                                     <li class="list-group-item">Value: <%= formatCurrency(quote.value) %></li>
                                     <li class="list-group-item">Description: <%= quote.desc || 'No Description Provided' %></li>
-                                    <li class="list-group-item">Invoice No: <%= quote.invoice_no %></li>
-                                    <li class="list-group-item">Invoice Date: <%= slimDateTime(quote.invoice_date) %></li>
+                                    <li class="list-group-item">Invoice No: <%= quote.invoice_no || '' %></li>
+                                    <li class="list-group-item">Invoice Date: <%= slimDateTime(quote.invoice_date) || '' %></li>
                                     <% if (!quote.isAccepted) { %>
-                                        <li class="list-group-item">Job: <a class="hcs-green-text" href="/quote/convert-to-job/<%= quote.id %>">Add Job Number</a></li>
+                                        <li class="list-group-item">Job: <a class="hcs-green-text" href="/job/create/<%= quote.id %>">Add Job Number</a></li>
                                     <% } %>
                                 </ul>
                             </div>
