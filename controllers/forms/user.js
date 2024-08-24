@@ -9,7 +9,8 @@ const User = require('../../models/user');
 const renderUserCreateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         res.render(path.join('users', 'createUser'), {
@@ -29,7 +30,8 @@ const renderUserCreateForm = async (req, res) => {
 const renderUserUpdateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const userId = req.params.user;
