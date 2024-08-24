@@ -8,6 +8,10 @@ const helpers = require('../../helpers');
 // Create a new location
 const createLocation = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const { address, city, postalCode, country } = req.body;
 
         // Create the new location
@@ -30,6 +34,10 @@ const createLocation = async (req, res) => {
 // Read a specific location
 const readLocation = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const location = await Locations.findByPk(req.params.id);
 
         if (!location) {
@@ -54,6 +62,10 @@ const readLocation = async (req, res) => {
 // Update an existing location
 const updateLocation = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const location = await Locations.findByPk(req.params.id);
 
         if (!location) {
@@ -75,6 +87,10 @@ const updateLocation = async (req, res) => {
 // Delete a location
 const deleteLocation = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const location = await Locations.findByPk(req.params.id);
 
         if (!location) {
