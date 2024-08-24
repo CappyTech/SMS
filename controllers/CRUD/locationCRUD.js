@@ -8,28 +8,26 @@ const helpers = require('../../helpers');
 // Create a new location
 const createLocation = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-        const { address, city, postalCode, country } = req.body;
+        const { address, city, postalCode, country, latitude, longitude } = req.body;
 
-        // Create the new location
         const newLocation = await Locations.create({
             address,
             city,
             postalCode,
             country,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude),
         });
 
         req.flash('success', 'Location created successfully.');
-        res.redirect(`/location/read/${newLocation.id}`);
+        res.redirect(`/dashboard/location`);
     } catch (error) {
-        logger.error('Error creating location: ' + error.message);
+        logger.error('Error creating location:', error.message);
         req.flash('error', 'Error creating location: ' + error.message);
-        res.redirect('/dashboard/location');
+        res.redirect('/location/create');
     }
 };
+
 
 // Read a specific location
 const readLocation = async (req, res) => {
@@ -62,27 +60,33 @@ const readLocation = async (req, res) => {
 // Update an existing location
 const updateLocation = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-        const location = await Locations.findByPk(req.params.id);
+        const { address, city, postalCode, country, latitude, longitude } = req.body;
+        const locationId = req.params.locationId;
 
+        const location = await Locations.findByPk(locationId);
         if (!location) {
             req.flash('error', 'Location not found.');
             return res.redirect('/dashboard/location');
         }
 
-        await Locations.update(req.body, { where: { id: req.params.id } });
+        location.address = address;
+        location.city = city;
+        location.postalCode = postalCode;
+        location.country = country;
+        location.latitude = parseFloat(latitude);
+        location.longitude = parseFloat(longitude);
+
+        await location.save();
 
         req.flash('success', 'Location updated successfully.');
-        res.redirect(`/location/read/${req.params.id}`);
+        res.redirect(`/location/read/${location.id}`);
     } catch (error) {
-        logger.error('Error updating location: ' + error.message);
+        logger.error('Error updating location:', error.message);
         req.flash('error', 'Error updating location: ' + error.message);
-        res.redirect('/dashboard/location');
+        res.redirect(`/location/update/${req.params.locationId}`);
     }
 };
+
 
 // Delete a location
 const deleteLocation = async (req, res) => {
