@@ -367,13 +367,15 @@ app.use((req, res, next) => {
 
 const render = require('./controllers/renderForms');
 
+const formsUser = require('./controllers/forms/user');
+const formsSubcontractor = require('./controllers/forms/subcontractor');
+const formsInvoice = require('./controllers/forms/invoice');
+const formsError = require('./controllers/forms/error');
+const formsQuote = require('./controllers/forms/quote');
 const formsClient = require('./controllers/forms/client');
 const formsContact = require('./controllers/forms/contact');
-const formsError = require('./controllers/forms/error');
-const formsInvoice = require('./controllers/forms/invoice');
-const formsQuote = require('./controllers/forms/quote');
-const formsSubcontractor = require('./controllers/forms/subcontractor');
-const formsUser = require('./controllers/forms/user');
+const formsJob = require('./controllers/forms/job');
+const formsLocation = require('./controllers/forms/location');
 
 const renderDashboard = require('./controllers/renderDashboards');
 
@@ -404,6 +406,8 @@ app.use('/', formsInvoice);
 app.use('/', formsQuote);
 app.use('/', formsSubcontractor);
 app.use('/', formsUser);
+app.use('/', formsJob);
+app.use('/', formsLocation);
 
 app.use('/', renderDashboard);
 
