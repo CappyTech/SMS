@@ -11,6 +11,10 @@ const path = require('path');
 
 const createJob = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const quote = await Quotes.findByPk(req.params.quoteId, {
             include: [Clients]
         });
@@ -44,6 +48,10 @@ const createJob = async (req, res) => {
 
 const readJob = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const job = await Jobs.findByPk(req.params.jobId, {
             include: [Clients, Quotes, Locations]
         });
@@ -70,6 +78,10 @@ const readJob = async (req, res) => {
 
 const updateJob = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const job = await Jobs.findByPk(req.params.jobId);
 
         if (!job) {
@@ -90,6 +102,10 @@ const updateJob = async (req, res) => {
 
 const deleteJob = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const job = await Jobs.findByPk(req.params.jobId);
 
         if (!job) {
