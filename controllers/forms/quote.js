@@ -27,7 +27,7 @@ const renderQuoteCreateForm = async (req, res) => {
 
         return res.render(path.join('quotes', 'createQuote'), {
             title: 'Create Quote',
-            clients,  // Pass clients to the form
+            clients,
             locations,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
@@ -55,7 +55,8 @@ const renderQuoteUpdateForm = async (req, res) => {
         });
 
         if (!quote) {
-            return res.status(404).send('Quote not found');
+            req.flash('error', 'Quote not found.');
+            return res.redirect('/');
         }
 
         // Fetch all locations to populate the dropdown
@@ -80,7 +81,7 @@ const renderQuoteUpdateForm = async (req, res) => {
 };
 
 
-router.get('/quote/create/:client', renderQuoteCreateForm);
+router.get('/quote/create/', renderQuoteCreateForm);
 router.get('/quote/update/:quote', renderQuoteUpdateForm);
 
 module.exports = router;
