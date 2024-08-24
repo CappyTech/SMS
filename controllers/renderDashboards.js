@@ -207,6 +207,9 @@ const renderQuotesDashboard = async (req, res) => {
                 {
                     model: Clients,
                     include: [{ model: Contacts }]
+                },
+                {
+                    model: Locations,
                 }
             ]
         });
