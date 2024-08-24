@@ -5,11 +5,14 @@
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <h1 class="display-5">Update Location</h1>
         <div class="container-fluid text-center">
-            <form action="/location/update/<%= location.id %>" method="POST" class="needs-validation">
+            <form action="/location/update/<%= location.id %>" method="POST" class="needs-validation" novalidate>
                 <div class="row mb-3">
                     <label for="address" class="col-sm-3 col-form-label">Address</label>
                     <div class="col-sm-9">
                         <input type="text" id="address" name="address" class="form-control" value="<%= location.address %>" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid address.
+                        </div>
                     </div>
                 </div>
 
@@ -17,6 +20,9 @@
                     <label for="city" class="col-sm-3 col-form-label">City</label>
                     <div class="col-sm-9">
                         <input type="text" id="city" name="city" class="form-control" value="<%= location.city %>" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid city.
+                        </div>
                     </div>
                 </div>
 
@@ -24,6 +30,9 @@
                     <label for="postalCode" class="col-sm-3 col-form-label">Postal Code</label>
                     <div class="col-sm-9">
                         <input type="text" id="postalCode" name="postalCode" class="form-control" value="<%= location.postalCode %>" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid postal code.
+                        </div>
                     </div>
                 </div>
 
@@ -31,6 +40,23 @@
                     <label for="country" class="col-sm-3 col-form-label">Country</label>
                     <div class="col-sm-9">
                         <input type="text" id="country" name="country" class="form-control" value="<%= location.country %>" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid country.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="latitude" class="col-sm-3 col-form-label">Latitude</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="any" id="latitude" name="latitude" class="form-control" placeholder="Latitude" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="longitude" class="col-sm-3 col-form-label">Longitude</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="any" id="longitude" name="longitude" class="form-control" placeholder="Longitude" required>
                     </div>
                 </div>
 
