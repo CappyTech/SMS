@@ -40,12 +40,19 @@
                     <div class="col-sm-9">
                         <select id="quoteId" name="quoteId" class="form-select">
                             <option value="">None</option>
-                            <% quotes.forEach(quote => { %>
-                                <option value="<%= quote.id %>" <%= quote.id === job.quoteId ? 'selected' : '' %>><%= quote.quote_ref %></option>
+                            <% clients.forEach(client => { %>
+                                <% if (client.Quotes && client.Quotes.length > 0) { %>  <!-- Ensure the client has quotes -->
+                                    <% client.Quotes.forEach(quote => { %>
+                                        <option value="<%= quote.id %>" <%= quote.id === job.quoteId ? 'selected' : '' %>>
+                                            <%= quote.quote_ref %> (Client: <%= client.name %>)
+                                        </option>
+                                    <% }) %>
+                                <% } %>
                             <% }) %>
                         </select>
                     </div>
                 </div>
+
 
                 <div class="row mb-3">
                     <label for="value" class="col-sm-3 col-form-label">Value</label>
