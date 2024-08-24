@@ -18,7 +18,8 @@ const renderStatsDashboard = async (req, res) => {
     try {
         // Ensure that the user is an admin
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         // Fetch the specified year and month from the URL parameters
@@ -121,7 +122,8 @@ const renderStatsDashboard = async (req, res) => {
 const renderUserDashboard = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const users = await Users.findAll({ order: [['createdAt', 'DESC']] });
@@ -145,7 +147,8 @@ const renderUserDashboard = async (req, res) => {
 const renderInvoiceDashboard = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const invoices = await Invoices.findAll({ order: [['createdAt', 'DESC']] });
@@ -169,7 +172,8 @@ const renderInvoiceDashboard = async (req, res) => {
 const renderSubcontractorDashboard = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const subcontractors = await Subcontractors.findAll({ order: [['createdAt', 'DESC']] });
@@ -193,7 +197,8 @@ const renderSubcontractorDashboard = async (req, res) => {
 const renderQuotesDashboard = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const quotes = await Quotes.findAll({
@@ -225,7 +230,8 @@ const renderQuotesDashboard = async (req, res) => {
 const renderClientsDashboard = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const clients = await Clients.findAll({ order: [['createdAt', 'DESC']] });
@@ -249,7 +255,8 @@ const renderClientsDashboard = async (req, res) => {
 const renderContactsDashboard = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const contacts = await Contacts.findAll({ order: [['createdAt', 'DESC']], include: [Clients] });
@@ -274,7 +281,8 @@ const renderJobsDashboard = async (req, res) => {
     try {
         // Ensure only admin can access
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         // Fetch jobs with a non-empty job_ref
@@ -332,7 +340,8 @@ const renderJobsDashboard = async (req, res) => {
 router.get('/dashboard/stats', (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
         const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(moment());
         // Output for debugging
