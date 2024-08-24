@@ -41,16 +41,16 @@ const selectSubcontractor = async (req, res) => {
 
 const renderSubcontractorCreateForm = (req, res) => {
     try {
-        
-        if (req.session.user.role === 'admin') {
-            res.render(path.join('subcontractors', 'createSubcontractor'), {
-                title: 'Create Subcontractor',
-                errorMessages: req.flash('error'),
-                successMessage: req.flash('success'),  
-            });
-        } else {
-            return res.status(403).send('Access denied.');
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
+
+        res.render(path.join('subcontractors', 'createSubcontractor'), {
+            title: 'Create Subcontractor',
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),  
+        });
     } catch (error) {
         logger.error('Error rendering subcontractor create form:' + error.message);
         req.flash('error', 'Error rendering subcontractor create form: ' + error.message);
@@ -61,7 +61,8 @@ const renderSubcontractorCreateForm = (req, res) => {
 const renderSubcontractorUpdateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const subcontractorId = req.params.subcontractor;
