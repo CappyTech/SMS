@@ -9,6 +9,10 @@ const Contacts = require('../../models/contact');
 
 const selectContact = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const contacts = await Contacts.findAll({
             include: [{ model: Clients, attributes: ['name'] }]
         });
@@ -42,6 +46,10 @@ const selectContact = async (req, res) => {
 
 const renderContactCreateForm = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         // Get the client ID from the route parameters
         const clientId = req.params.client;
 
@@ -70,6 +78,10 @@ const renderContactCreateForm = async (req, res) => {
 
 const renderContactUpdateForm = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const contact = await Contacts.findByPk(req.params.contact, {
             include: [{ model: Clients }]
         });
