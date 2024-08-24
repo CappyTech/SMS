@@ -8,8 +8,12 @@ const Locations = require('../../models/location');
 const renderLocationCreateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
+
+        logger.info("Accessing /location/create");
+
 
         return res.render(path.join('locations', 'createLocation'), {
             title: 'Create Location',
@@ -27,7 +31,8 @@ const renderLocationCreateForm = async (req, res) => {
 const renderLocationUpdateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const location = await Locations.findByPk(req.params.locationId);
