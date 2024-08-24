@@ -13,7 +13,8 @@ const Locations = require('../../models/location');
 const renderJobCreateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const clients = await Clients.findAll({
@@ -48,7 +49,8 @@ const renderJobCreateForm = async (req, res) => {
 const renderJobUpdateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const job = await Jobs.findByPk(req.params.job, {
