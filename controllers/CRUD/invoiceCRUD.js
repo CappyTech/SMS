@@ -139,6 +139,10 @@ const readInvoices = async (req, res) => {
 
 const updateInvoice = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         helpers.validateInvoiceData(req.body);
 
         const invoice = await Invoice.findByPk(req.params.invoice);
@@ -172,7 +176,8 @@ const deleteInvoice = async (req, res) => {
     try {
         // Check if the user is an admin
         if (!req.session.user || req.session.user.role !== 'admin') {
-            return res.status(403).send('Access denied. Only admins can delete invoices.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
         // TODO: Add SubcontractorId to the invoice model and refer back to the /invoices/read/:id route
         const invoice = await Invoice.findByPk(req.params.invoice);
