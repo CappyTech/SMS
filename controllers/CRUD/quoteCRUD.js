@@ -3,6 +3,7 @@ const router = express.Router();
 const Quotes = require('../../models/quote');
 const Clients = require('../../models/client');
 const Contacts = require('../../models/contact');
+const Locations = require('../../models/location');
 const Jobs = require('../../models/job');
 const helpers = require('../../helpers');
 const moment = require('moment');
@@ -54,31 +55,38 @@ const readQuote = async (req, res) => {
             return res.redirect('/');
         }
 
-        const quote = await Quotes.findByPk(req.params.quote, {
-            include: [{
-                model: Clients,
-                include: [Contacts]
-            }]
+        const quote = await Quotes.findByPk(req.params.quoteId, {
+            include: [
+                {
+                    model: Locations
+                },
+                {
+                    model: Clients,
+                    include: [Contacts] // Assuming Contacts are associated with Clients
+                }
+            ]
         });
 
         if (!quote) {
-            return res.status(404).json({ error: 'Quote not found' });
-        } else {
-            res.render(path.join('quotes', 'viewQuote'), {
-                title: 'Quote',
-                quote,
-                errorMessages: req.flash('error'),
-                successMessage: req.flash('success'),
-                moment: moment,
-                slimDateTime: helpers.slimDateTime,
-            });
+            req.flash('error', 'Quote not found.');
+            return res.redirect('/dashboard/quote');
         }
+
+        res.render(path.join('quotes', 'viewQuote'), {
+            title: 'Quote Details',
+            quote,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            moment: moment,
+            slimDateTime: helpers.slimDateTime,
+        });
     } catch (error) {
-        logger.error('Error viewing quote:' + error.message);
+        logger.error('Error viewing quote: ' + error.message);
         req.flash('error', 'Error viewing quote: ' + error.message);
         res.redirect('/dashboard/quote');
     }
 };
+
 
 const readQuotes = async (req, res) => {
     try {
@@ -153,7 +161,7 @@ const deleteQuote = async (req, res) => {
 
 
 router.post('/quote/create/:client', createQuote);
-router.get('/quote/read/:quote', readQuote);
+router.get('/quote/read/:quoteId', readQuote);
 router.get('/quote/read/:client', readQuotes);
 router.post('/quote/update/:id', updateQuote);
 router.post('/quote/delete/:id', deleteQuote);
