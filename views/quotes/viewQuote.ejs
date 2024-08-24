@@ -1,13 +1,14 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
+
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Quote <%= quote.quote_ref %></h1>
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between text-bg-secondary">
-                    <span><%= quote.Client.name %></span>
-                    <a class="text-white" href="/client/read/<%= quote.Client.id %>">View Client</a>
+                    <span>Client: <%= quote.Client ? quote.Client.name : 'N/A' %></span>
+                    <a class="text-white" href="/client/read/<%= quote.Client ? quote.Client.id : '#' %>">View Client</a>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -27,16 +28,16 @@
                         </div>
                         <div class="col-6">
                             <ul class="list-group">
-                                <li class="list-group-item <%= quote.date ? '' : 'text-warning' %>"><%= quote.date ? slimDateTime(quote.date) : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.quote_ref ? '' : 'text-warning' %>"><%= quote.quote_ref ? quote.quote_ref : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.job_ref ? '' : 'text-warning' %>"><%= quote.job_ref ? quote.job_ref : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.location ? '' : 'text-warning' %>"><%= quote.location ? quote.location : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.Client.name ? '' : 'text-warning' %>"><%= quote.Client.name ? quote.Client.name : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.contactId ? '' : 'text-warning' %>"><%= quote.contactId ? quote.contactId : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.value ? '' : 'text-warning' %>"><%= quote.value ? '£' + quote.value : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.desc ? '' : 'text-warning' %>"><%= quote.desc ? quote.desc : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.invoice_no ? '' : 'text-warning' %>"><%= quote.invoice_no ? quote.invoice_no : 'N/A' %></li>
-                                <li class="list-group-item <%= quote.invoice_date ? '' : 'text-warning' %>"><%= quote.invoice_date ? slimDateTime(quote.invoice_date) : 'N/A' %></li>
+                                <li class="list-group-item"><%= slimDateTime(quote.date) || 'N/A' %></li>
+                                <li class="list-group-item"><%= quote.quote_ref || 'N/A' %></li>
+                                <li class="list-group-item"><%= quote.job_ref || 'N/A' %></li>
+                                <li class="list-group-item"><%= quote.Location && quote.Location.address || 'N/A' %></li>
+                                <li class="list-group-item"><%= quote.Client && quote.Client.name || 'N/A' %></li>
+                                <li class="list-group-item"><%= quote.Client && quote.Client.Contacts.length > 0 ? quote.Client.Contacts[0].name : 'N/A' %></li>
+                                <li class="list-group-item"><%= quote.value ? '£' + quote.value : 'N/A' %></li>
+                                <li class="list-group-item"><%= quote.desc || 'N/A' %></li>
+                                <li class="list-group-item"><%= quote.invoice_no || 'N/A' %></li>
+                                <li class="list-group-item"><%= slimDateTime(quote.invoice_date) || 'N/A' %></li>
                             </ul>
                         </div>
                     </div>
