@@ -26,7 +26,7 @@ const createJob = async (req, res) => {
 
         const job = await Jobs.create({
             job_ref: `JOB-${quote.quote_ref}`,
-            locationId: quote.locationId,  // Ensure location is from Locations table
+            locationId: quote.locationId,
             clientId: quote.clientId,
             quoteId: quote.id,
             value: quote.value,
@@ -68,6 +68,7 @@ const readJob = async (req, res) => {
             successMessage: req.flash('success'),
             moment: moment,
             slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency
         });
     } catch (error) {
         logger.error('Error reading job: ' + error.message);
@@ -124,7 +125,7 @@ const deleteJob = async (req, res) => {
     }
 };
 
-router.post('/job/create/:quoteId', createJob);
+router.get('/job/create/:quoteId', createJob);
 router.get('/job/read/:jobId', readJob);
 router.post('/job/update/:jobId', updateJob);
 router.post('/job/delete/:jobId', deleteJob);
