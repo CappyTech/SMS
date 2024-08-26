@@ -7,6 +7,8 @@ const path = require('path');
 const Clients = require('../../models/client');
 const Contacts = require('../../models/contact');
 const Quotes = require('../../models/quote');
+const Locations = require('../../models/location');
+const Jobs = require('../../models/job');
 
 const createClient = async (req, res) => {
     try {
@@ -27,42 +29,51 @@ const createClient = async (req, res) => {
 
 const readClient = async (req, res) => {
     try {
-        // Check if session exists and session user role is an admin
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
-            return res.redirect('/'); // Ensure to return here
-        }
-
-        const clients = await Clients.findByPk(req.params.client, {
-            include: [
-                { model: Contacts },
-                { model: Quotes }
-            ]
-        });
-
-        if (!clients) {
-            req.flash('error', 'Client not found');
             return res.redirect('/');
         }
 
-        return res.render(path.join('clients', 'viewClient'), {
-            title: 'Client',
+        const clientId = req.params.clientId;
+
+        const clients = await Clients.findByPk(clientId, {
+            include: [
+                {
+                    model: Contacts,
+                },
+                {
+                    model: Quotes,
+                    include: [Locations],
+                },
+                {
+                    model: Jobs,
+                    include: [Locations],
+                },
+            ],
+        });
+
+        if (!clients) {
+            req.flash('error', 'Client not found.');
+            return res.redirect('/dashboard/client');
+        }
+
+        res.render(path.join('clients', 'viewClient'), {
+            title: 'Client Overview',
             clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
             slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
-        logger.error('Error reading client:' + error.message);
-        req.flash('error', 'Error: ' + error.message);
-        return res.redirect('/');
+        logger.error('Error fetching client overview: ' + error.message);
+        req.flash('error', 'Error fetching client overview: ' + error.message);
+        res.redirect('/dashboard/client');
     }
 };
 
 const updateClient = async (req, res) => {
     try {
-        const clients = await Clients.findByPk(req.params.client);
+        const clients = await Clients.findByPk(req.params.clientId);
 
         if (!clients) {
             return res.status(404).send('Client not found');
@@ -70,7 +81,7 @@ const updateClient = async (req, res) => {
 
         await clients.update(req.body);
         req.flash('success', 'Client updated successfully');
-        return res.redirect(`/client/read/${clients.client}`);
+        return res.redirect(`/client/read/${clients.clientId}`);
     } catch (error) {
         logger.error('Error updating client:' + error.message);
         req.flash('error', 'Error: ' + error.message);
@@ -80,7 +91,7 @@ const updateClient = async (req, res) => {
 
 const deleteClient = async (req, res) => {
     try {
-        const clients = await Clients.findByPk(req.params.client);
+        const clients = await Clients.findByPk(req.params.clientId);
 
         if (!clients) {
             return res.status(404).send('Client not found');
@@ -97,8 +108,8 @@ const deleteClient = async (req, res) => {
 };
 
 router.post('/client/create/', createClient);
-router.get('/client/read/:client', readClient);
-router.post('/client/update/:client', updateClient);
-router.post('/client/delete/:client', deleteClient);
+router.get('/client/read/:clientId', readClient);
+router.post('/client/update/:clientId', updateClient);
+router.post('/client/delete/:clientId', deleteClient);
 
 module.exports = router;
