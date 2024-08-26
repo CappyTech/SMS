@@ -69,9 +69,9 @@ const createUser = async (req, res) => {
 
 const readUser = async (req, res) => {
     try {
-        // Validate the session user state
-        if (!req.session || !req.session.user) {
-            return res.status(403).send('Invalid session or user.');
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         // Check if the logged-in user has permissions.
@@ -108,9 +108,9 @@ const readUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        // Validate the session user state
-        if (!req.session || !req.session.user) {
-            return res.status(403).send('Invalid session or user.');
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         // Check if the logged-in user has permissions.
@@ -202,8 +202,9 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        if (req.session.user.role !== 'admin' && !req.session.user.permissionDeleteUser) {
-            return res.status(403).send('Access denied. Only admins can delete users.');
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         if (req.session.user.id === req.params.id) {
