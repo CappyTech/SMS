@@ -43,8 +43,9 @@
                 </div>
             </div>
 
+            <!-- Quotes Section -->
             <h3 class="mt-4">Quotes</h3>
-            <% if (clients.Quotes.length === 0) { %>
+            <% if (clients.Quotes && clients.Quotes.length === 0) { %>
                 <p class="text-center">No quotes available.</p>
             <% } else { %>
                 <div class="table-responsive">
@@ -55,32 +56,69 @@
                                 <th>Quote Ref</th>
                                 <th>Job Ref</th>
                                 <th>Location</th>
-                                <th>Contact Ref</th>
+                                <th>Contact</th>
                                 <th>Value</th>
                                 <th>Description</th>
                                 <th>Invoice No</th>
                                 <th>Invoice Date</th>
-                                <th>PO Number</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <% clients.Quotes.forEach(function(quote) { %>
+                            <% clients.Quotes.forEach(quote => { %>
                                 <tr>
-                                    <td class="<%= quote.date ? '' : 'text-warning' %>"><%= quote.date ? slimDateTime(quote.date) : 'N/A' %></td>
-                                    <td class="<%= quote.quote_ref ? '' : 'text-warning' %>"><%= quote.quote_ref ? quote.quote_ref : 'N/A' %></td>
-                                    <td class="<%= quote.job_ref ? '' : 'text-warning' %>"><%= quote.job_ref ? quote.job_ref : 'N/A' %></td>
-                                    <td class="<%= quote.location ? '' : 'text-warning' %>"><%= quote.location ? quote.location : 'N/A' %></td>
-                                    <td class="<%= quote.contact_ref ? '' : 'text-warning' %>"><%= quote.contact_ref ? quote.contact_ref : 'N/A' %></td>
-                                    <td class="<%= quote.value ? '' : 'text-warning' %>">£<%= quote.value ? quote.value.toFixed(2) : 'N/A' %></td>
-                                    <td class="<%= quote.desc ? '' : 'text-warning' %>"><%= quote.desc ? quote.desc : 'N/A' %></td>
-                                    <td class="<%= quote.invoice_no ? '' : 'text-warning' %>"><%= quote.invoice_no ? quote.invoice_no : 'N/A' %></td>
-                                    <td class="<%= quote.invoice_date ? '' : 'text-warning' %>"><%= quote.invoice_date ? slimDateTime(quote.invoice_date) : 'N/A' %></td>
-                                    <td class="<%= quote.po_number ? '' : 'text-warning' %>"><%= quote.po_number ? quote.po_number : 'N/A' %></td>
+                                    <td><%= slimDateTime(quote.date) || 'N/A' %></td>
+                                    <td><%= quote.quote_ref || 'N/A' %></td>
+                                    <td><%= quote.jobId || 'N/A' %></td>
+                                    <td><%= quote.Location ? quote.Location.address : 'N/A' %></td>
+                                    <td><%= quote.Contact ? quote.Contact.name : 'N/A' %></td>
+                                    <td>£<%= quote.value ? quote.value.toFixed(2) : 'N/A' %></td>
+                                    <td><%= quote.desc || 'No Description Provided' %></td>
+                                    <td><%= quote.invoice_no || 'N/A' %></td>
+                                    <td><%= slimDateTime(quote.invoice_date) || 'N/A' %></td>
                                     <td>
                                         <a href="/quote/read/<%= quote.id %>" class="btn btn-info btn-sm">View</a>
                                         <a href="/quote/update/<%= quote.id %>" class="btn btn-warning btn-sm">Update</a>
                                         <form action="/quote/delete/<%= quote.id %>" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+
+            <!-- Jobs Section -->
+            <h3 class="mt-4">Jobs</h3>
+            <% if (clients.Jobs && clients.Jobs.length === 0) { %>
+                <p class="text-center">No jobs available.</p>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Job Ref</th>
+                                <th>Location</th>
+                                <th>Value</th>
+                                <th>Status</th>
+                                <th>Completion Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% clients.Jobs.forEach(job => { %>
+                                <tr>
+                                    <td><%= job.job_ref || 'N/A' %></td>
+                                    <td><%= job.Location ? job.Location.address : 'N/A' %></td>
+                                    <td>£<%= job.value ? job.value.toFixed(2) : 'N/A' %></td>
+                                    <td><%= job.status || 'N/A' %></td>
+                                    <td><%= job.completionDate ? slimDateTime(job.completionDate) : 'N/A' %></td>
+                                    <td>
+                                        <a href="/job/read/<%= job.id %>" class="btn btn-info btn-sm">View</a>
+                                        <a href="/job/update/<%= job.id %>" class="btn btn-warning btn-sm">Update</a>
+                                        <form action="/job/delete/<%= job.id %>" method="post" class="d-inline">
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                         </form>
                                     </td>
