@@ -25,9 +25,8 @@
                         </div>
                         <div class="card-body" id="<%= job.id %>">
                             <ul class="list-group">
-                                <li class="list-group-item">Start Date: <%= slimDateTime(job.createdAt) %></li>
-                                <li class="list-group-item">Location: <%= job.Location ? job.Location.address : 'N/A' %></li>
-                                <li class="list-group-item">Client: <%= job.Client ? job.Client.name : 'N/A' %></li>
+                                <li class="list-group-item">Location: <a href="/location/read/<%= job.locationId %>"><%= job.location ? job.location.address : 'N/A' %></a></li>
+                                <li class="list-group-item">Client: <a href="/client/read/<%= job.clientId %>"><%= job.client ? job.client.name : 'N/A' %></a></li>
                                 <li class="list-group-item">Value: <%= formatCurrency(job.value) %></li>
                                 <li class="list-group-item">Status: <%= job.status %></li>
                                 <li class="list-group-item">Description: <%= job.desc || 'No Description Provided' %></li>
