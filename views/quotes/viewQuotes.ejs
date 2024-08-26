@@ -4,8 +4,7 @@
     <thead>
       <tr>
         <th>Date</th>
-        <th>Job Ref</th>
-        <th>Site</th>
+        <th>Location</th>
         <th>Client</th>
         <th>Contact Ref</th>
         <th>Value</th>
@@ -20,7 +19,6 @@
       <% quotes.forEach(function(quote) { %>
       <tr>
         <td><%= quote.date.toISOString().split('T')[0] %></td>
-        <td><%= quote.job_ref %></td>
         <td><%= quote.site %></td>
         <td><%= quote.client %></td>
         <td><%= quote.contact_ref %></td>
