@@ -16,7 +16,6 @@ const path = require('path');
 
 const renderStatsDashboard = async (req, res) => {
     try {
-        // Ensure that the user is an admin
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
@@ -45,7 +44,7 @@ const renderStatsDashboard = async (req, res) => {
         );
 
         // Extract the subcontractor IDs from the filtered invoices
-        const subcontractorIds = filteredInvoices.map(invoice => invoice.SubcontractorId);
+        const subcontractorIds = filteredInvoices.map(invoice => invoice.subcontractorId);
 
         // Filter subcontractors based on their ID in the filtered invoices
         const filteredSubcontractors = subcontractors.filter(sub =>
@@ -55,8 +54,8 @@ const renderStatsDashboard = async (req, res) => {
         // Calculate the relevant totals for each subcontractor (Gross, Materials, CIS, Reverse Charge)
         const subcontractorTotals = {};
         filteredInvoices.forEach(invoice => {
-            if (!subcontractorTotals[invoice.SubcontractorId]) {
-                subcontractorTotals[invoice.SubcontractorId] = {
+            if (!subcontractorTotals[invoice.subcontractorId]) {
+                subcontractorTotals[invoice.subcontractorId] = {
                     grossTotal: 0,
                     materialTotal: 0,
                     cisTotal: 0,
@@ -64,12 +63,12 @@ const renderStatsDashboard = async (req, res) => {
                 };
             }
 
-            subcontractorTotals[invoice.SubcontractorId].grossTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].grossTotal + invoice.grossAmount, false);
-            subcontractorTotals[invoice.SubcontractorId].materialTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].materialTotal + invoice.materialCost, false);
-            subcontractorTotals[invoice.SubcontractorId].cisTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].cisTotal + invoice.cisAmount, false);
+            subcontractorTotals[invoice.subcontractorId].grossTotal = helpers.rounding(subcontractorTotals[invoice.subcontractorId].grossTotal + invoice.grossAmount, false);
+            subcontractorTotals[invoice.subcontractorId].materialTotal = helpers.rounding(subcontractorTotals[invoice.subcontractorId].materialTotal + invoice.materialCost, false);
+            subcontractorTotals[invoice.subcontractorId].cisTotal = helpers.rounding(subcontractorTotals[invoice.subcontractorId].cisTotal + invoice.cisAmount, false);
 
             if (invoice.reverseCharge) {
-                subcontractorTotals[invoice.SubcontractorId].reverseChargeTotal = helpers.rounding(subcontractorTotals[invoice.SubcontractorId].reverseChargeTotal + invoice.reverseCharge, false);
+                subcontractorTotals[invoice.subcontractorId].reverseChargeTotal = helpers.rounding(subcontractorTotals[invoice.subcontractorId].reverseChargeTotal + invoice.reverseCharge, false);
             }
         });
 
@@ -108,8 +107,8 @@ const renderStatsDashboard = async (req, res) => {
             nextMonth,
             allInvoicesSubmitted,
             submissionDate,
-            submissionStartDate,  // Correct submission range using the periodEndDisplay
-            submissionEndDate     // Correct submission range using the periodEndDisplay
+            submissionStartDate,
+            submissionEndDate
         });
     } catch (error) {
         logger.error('Error rendering stats dashboard: ' + error.message);
@@ -117,7 +116,6 @@ const renderStatsDashboard = async (req, res) => {
         return res.redirect('/');
     }
 };
-
 
 const renderUserDashboard = async (req, res) => {
     try {
@@ -311,11 +309,17 @@ const renderJobsDashboard = async (req, res) => {
                 }
             }) : null;
 
+            const location = job.locationId ? await Locations.findByPk(job.locationId) : null;
+
+            const quote = job.quoteId ? await Quotes.findByPk(job.quoteId) : null;
+
             // Return job along with its associated client and contact
             return {
                 ...job.toJSON(),
-                client: client || {},  // Return an empty object if no client found
-                contact: contact || {} // Return an empty object if no contact found
+                client: client || {},
+                contact: contact || {},
+                location: location || {},
+                quote: quote || {},
             };
         }));
 
