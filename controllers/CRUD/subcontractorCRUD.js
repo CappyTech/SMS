@@ -11,14 +11,9 @@ const createSubcontractor = async (req, res) => {
     try {
         //logger.info('Session User: ' + JSON.stringify(req.session.user, null, 2));
         // Check if the user has permissions
-        if (!req.session) {
-            logger.error("Session does not exist.");
-            return res.status(403).send('Access denied. No session found.');
-        }
-
-        if (!req.session.user) {
-            logger.error("User not found in session.");
-            return res.status(403).send('Access denied. No user found in session.');
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         if (!req.session.user.permissionCreateSubcontractor) {
