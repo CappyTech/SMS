@@ -36,7 +36,7 @@ const createInvoice = async (req, res) => {
             reverseCharge: amounts.reverseCharge,
             month: taxMonth,
             year: taxYear,
-            SubcontractorId: req.params.selected
+            subcontractorId: req.params.selected
         });
 
         res.redirect(`/invoice/read/${newInvoice.id}`);
@@ -150,13 +150,13 @@ const updateInvoice = async (req, res) => {
             throw new Error('Invoice not found');
         }
 
-        if (!invoice.SubcontractorId) {
+        if (!invoice.subcontractorId) {
             throw new Error(`No subcontractorId associated with invoice number: ${req.params.invoice}`);
         }
 
-        const subcontractor = await Subcontractor.findByPk(invoice.SubcontractorId);
+        const subcontractor = await Subcontractor.findByPk(invoice.subcontractorId);
         if (!subcontractor) {
-            throw new Error(`Subcontractor with ID: ${invoice.SubcontractorId} not found for invoice ${req.params.invoice}`);
+            throw new Error(`Subcontractor with ID: ${invoice.subcontractorId} not found for invoice ${req.params.invoice}`);
         }
 
         const amounts = helpers.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
@@ -179,7 +179,7 @@ const deleteInvoice = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        // TODO: Add SubcontractorId to the invoice model and refer back to the /invoices/read/:id route
+        // TODO: Add subcontractorId to the invoice model and refer back to the /invoices/read/:id route
         const invoice = await Invoice.findByPk(req.params.invoice);
 
         if (!invoice) {
