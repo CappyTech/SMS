@@ -30,7 +30,6 @@
                             <ul class="list-group">
                                 <li class="list-group-item"><%= slimDateTime(quote.date) || 'N/A' %></li>
                                 <li class="list-group-item"><%= quote.quote_ref || 'N/A' %></li>
-                                <li class="list-group-item"><%= quote.job_ref || 'N/A' %></li>
                                 <li class="list-group-item"><%= quote.Location && quote.Location.address || 'N/A' %></li>
                                 <li class="list-group-item"><%= quote.Client && quote.Client.name || 'N/A' %></li>
                                 <li class="list-group-item"><%= quote.Client && quote.Client.Contacts.length > 0 ? quote.Client.Contacts[0].name : 'N/A' %></li>
@@ -38,6 +37,9 @@
                                 <li class="list-group-item"><%= quote.desc || 'N/A' %></li>
                                 <li class="list-group-item"><%= quote.invoice_no || 'N/A' %></li>
                                 <li class="list-group-item"><%= slimDateTime(quote.invoice_date) || 'N/A' %></li>
+                                <% if (!quote.isAccepted) { %>
+                                    <li class="list-group-item">Job: <a class="hcs-green-text" href="/job/create/<%= quote.id %>">Add Job Number</a></li>
+                                <% } %>
                             </ul>
                         </div>
                     </div>
