@@ -21,16 +21,27 @@ const createQuote = async (req, res) => {
 
         if (!clientId) {
             req.flash('error', 'Client wasn\'t specified.');
-            return res.redirect('/');
+            return res.redirect('/quote/create');
+        }
+
+        if (!locationId) {
+            req.flash('error', 'Location wasn\'t specified.');
+            return res.redirect('/quote/create');
+        }
+
+        const locationExists = await Locations.findByPk(locationId);
+        if (!locationExists) {
+            req.flash('error', 'Selected location does not exist.');
+            return res.redirect('/quote/create');
         }
 
         const newQuote = await Quotes.create({
             date: date,
             quote_ref: quote_ref,
             job_ref: job_ref,
-            locationId: locationId, // Use locationId from the form
-            clientId: clientId,      // Use clientId from the form
-            contactId: contactId,    // Use contactId from the form
+            locationId: locationId,
+            clientId: clientId,
+            contactId: contactId,
             value: value,
             desc: desc,
             invoice_no: invoice_no,
