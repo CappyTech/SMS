@@ -134,7 +134,7 @@ app.use(session({
     cookie: {
         secure: false,
         httpOnly: true,
-        maxAge: 43200000, // 12 hours
+        maxAge: 600000,
     }
 }));
 
@@ -470,6 +470,33 @@ const errorHandler = (err, req, res, next) => {
 };
 
 app.use(errorHandler);
+
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
+
+const crypto = require('crypto');
+if (process.env.NODE_ENV === 'development') {
+    if (process.env.ENCRYPTION_KEY === '') {
+        // Generate a 32-byte random key for AES-256
+        const encryptionKey = crypto.randomBytes(32).toString('hex');
+        console.log('Your Encryption Key:', encryptionKey);
+        console.log('ENCRYPTION_KEY length:', encryptionKey.length);
+        const encryptionKeyHEX = Buffer.from(encryptionKey, 'hex');
+        console.log('Your Encryption Key:', encryptionKeyHEX);
+        console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
+    } else {
+        console.log('Encryption Key:', process.env.ENCRYPTION_KEY);
+        console.log('ENCRYPTION_KEY length:', process.env.ENCRYPTION_KEY.length);
+        const encryptionKeyHEX = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
+        console.log('Encryption Key:', encryptionKeyHEX);
+        console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
+    }
+}
 
 app.listen(80, '127.0.0.1', () => {
     logger.info(`Server is running`);
