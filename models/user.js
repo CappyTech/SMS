@@ -2,7 +2,9 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
 const bcrypt = require('bcrypt');
+const helpers = require('../helpers');
 
+// Define the Users model
 const Users = sequelize.define('Users', {
     id: {
         type: DataTypes.UUID,
@@ -31,81 +33,54 @@ const Users = sequelize.define('Users', {
         defaultValue: 'subcontractor',
         allowNull: false,
     },
-    permissionCreateUser: {
+    // Permissions for roles
+    permissionCreateUser: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionReadUser: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionUpdateUser: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionDeleteUser: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionCreateSubcontractor: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionReadSubcontractor: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionUpdateSubcontractor: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionDeleteSubcontractor: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionCreateInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionReadInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionUpdateInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
+    permissionDeleteInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
+    // TOTP fields
+    totpSecret: {
+        type: DataTypes.STRING,
+        allowNull: true, // Can be null until TOTP is enabled
+        set(value) {
+            if (value) {
+                this.setDataValue('totpSecret', helpers.encrypt(value)); // Encrypt secret before storing
+            }
+        },
+        get() {
+            const encrypted = this.getDataValue('totpSecret');
+            return encrypted ? helpers.decrypt(encrypted) : null; // Decrypt when retrieving
+        }
+    },
+    totpEnabled: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
         defaultValue: false,
     },
-    permissionReadUser: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionUpdateUser: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionDeleteUser: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionCreateSubcontractor: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionReadSubcontractor: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionUpdateSubcontractor: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionDeleteSubcontractor: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionCreateInvoice: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionReadInvoice: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionUpdateInvoice: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    permissionDeleteInvoice: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-    },
-    createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false
-    },
-    updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false
-    }
 }, {
-    paranoid: false, // Add the paranoid option
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    paranoid: false, // Set to true if you want soft deletes (deletedAt)
 });
 
-// Hook to hash the password before saving
+// Hook to hash the password before creating the user
 Users.beforeCreate(async (user) => {
-    user.password = await bcrypt.hash(user.password, 10);
+    if (user.password) {
+        user.password = await bcrypt.hash(user.password, 10);
+    }
+});
+
+// Hook to hash the password before updating the user, if the password is being changed
+Users.beforeUpdate(async (user) => {
+    if (user.changed('password')) {
+        user.password = await bcrypt.hash(user.password, 10);
+    }
 });
 
 module.exports = Users;
