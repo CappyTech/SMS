@@ -317,7 +317,7 @@ Attendances.belongsTo(Locations, {
         if (process.env.NODE_ENV === 'development') {
             await sequelize.sync({ alter: true }); // Use alter to auto-migrate in development
             logger.info('All models synchronized in development mode.');
-        } else if (process.env.NODE_ENV === 'production') {
+        } else if (process.env.NODE_ENV === 'Production') {
             await sequelize.sync(); // In production, avoid altering the table structure automatically
             logger.info('All models synchronized in production mode.');
         }
