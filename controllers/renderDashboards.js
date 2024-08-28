@@ -16,8 +16,9 @@ const path = require('path');
 
 const renderStatsDashboard = async (req, res) => {
     try {
+        console.log("Session User:", req.session.user);
         if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
+            req.flash('error', 'Access denied. Stats 2');
             return res.redirect('/');
         }
 
@@ -346,10 +347,10 @@ const renderJobsDashboard = async (req, res) => {
 
 router.get('/dashboard/stats', (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        //if (!req.session.user || req.session.user.role !== 'admin') {
+            //req.flash('error', 'Access denied. Stats 1');
+            //return res.redirect('/');
+        //}
         const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(moment());
         // Output for debugging
         logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
