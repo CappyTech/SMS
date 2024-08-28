@@ -8,6 +8,10 @@ const helpers = require('../../helpers');
 // Create a new location
 const createLocation = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const { address, city, postalCode, country, latitude, longitude } = req.body;
 
         const newLocation = await Locations.create({
@@ -60,6 +64,10 @@ const readLocation = async (req, res) => {
 // Update an existing location
 const updateLocation = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const { address, city, postalCode, country, latitude, longitude } = req.body;
         const locationId = req.params.locationId;
 
