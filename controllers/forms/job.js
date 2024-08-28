@@ -48,6 +48,10 @@ const renderJobCreateForm = async (req, res) => {
 // Render Job Update Form
 const renderJobUpdateForm = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         const job = await Jobs.findByPk(req.params.jobId, {
             include: [Clients, Locations, Quotes],
         });
