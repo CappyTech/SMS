@@ -10,21 +10,29 @@
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 
-<body>
+<body class="bg-body">
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark d-print-none">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary d-print-none">
     <div class="container">
       <!-- Sidebar Toggle Button -->
       <% if (typeof session.user !== 'undefined') { %>
-      <button class="btn btn-outline-light me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+      <!--
+      <button class="btn btn-outline me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
         <i class="bi bi-list"></i>
       </button>
+      -->
       <% } %>
       <!-- Navbar Brand -->
       <a class="navbar-brand d-flex align-items-center" href="/">
         <img src="/images/favicon.png" alt="Favicon" class="me-2" width="32" height="32">
         <span class="d-none d-md-inline">Heron Constructive Solutions LTD</span>
       </a>
+
+      <div data-bs-toggle="modal" data-bs-target="#infoModal" style="cursor: pointer;">
+        <small>
+          <i class="bi bi-info"></i><%= package %>
+        </small>
+      </div>
 
       <ul class="navbar-nav ms-auto hstack gap-3">
         <% if (typeof session.user !== 'undefined') { %>
@@ -38,11 +46,164 @@
           </li> -->
         <% } %>
         <div class="form-check form-switch">
+          <label class="form-check-label me-2" for="darkModeToggle">Dark/Light</label>
           <input class="form-check-input" type="checkbox" id="darkModeToggle">
         </div>
       </ul>
     </div>
   </nav>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary d-print-none">
+    <div class="container">
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown mega-menu">
+          <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-list"></i>
+      </button>
+          <!-- Mega Menu -->
+          <div class="dropdown-menu mega-menu p-3">
+              <div class="container">
+                <div class="row">
+                  <!--
+                  <div class="col-md-3">
+                    <div class="display-7">| New</div>
+                    <ul class="nav flex-column">
+                      <li class="nav-item">
+                        <a class="nav-link" href="/subcontractor/select">
+                          <i class="bi bi-receipt"></i>
+                          Invoice
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="/subcontractor/create">
+                          <i class="bi bi-people"></i>
+                          Subcontractor
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="/quote/create">
+                          <i class="bi bi-file-earmark-text"></i>
+                          Quote
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="/client/create">
+                          <i class="bi bi-people"></i>
+                          Client
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a href="/client/select" class="nav-link">
+                          <i class="bi bi-telephone me-2"></i>Contact
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a href="/location/create" class="nav-link">
+                          <i class="bi bi-telephone me-2"></i>Location
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="/user/create">
+                          <i class="bi bi-person"></i>
+                          User
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  -->
+                    <div class="col-md-3">
+                      <div class="display-7">| Dashboards</div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a href="/dashboard/stats" class="nav-link hcs-green-text">
+                            <i class="bi bi-binoculars me-2"></i>Overview
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="display-7">| Construction Industry Scheme</div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a href="/dashboard/invoice" class="nav-link hcs-green-text">
+                            <i class="bi bi-receipt me-2"></i>Invoices
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/dashboard/subcontractor" class="nav-link hcs-green-text">
+                            <i class="bi bi-people me-2"></i>Subcontractors
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/monthly/returns/form" class="nav-link hcs-green-text">
+                            <i class="bi bi-file-spreadsheet-fill"></i> Monthly Returns
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="display-7">| Contract Management</div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a href="/dashboard/quote" class="nav-link hcs-green-text">
+                            <i class="bi bi-file-earmark-text me-2"></i>Quotes
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/dashboard/job" class="nav-link hcs-green-text">
+                            <i class="bi bi-briefcase me-2"></i>Jobs
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/dashboard/client" class="nav-link hcs-green-text">
+                            <i class="bi bi-people me-2"></i>Clients
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/dashboard/contact" class="nav-link hcs-green-text">
+                            <i class="bi bi-telephone me-2"></i>Contacts
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/dashboard/location" class="nav-link hcs-green-text">
+                            <i class="bi bi-telephone me-2"></i>Locations
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-3">
+                      <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
+                      <div class="display-7">| Administration</div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a href="/dashboard/user" class="nav-link hcs-green-text">
+                            <i class="bi bi-person me-2"></i>Users
+                          </a>
+                        </li>
+                      </ul>
+                      <% } %>
+                      <div class="display-7">| My Account</div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link hcs-green-text" href="/account">
+                            <i class="bi bi-gear-wide"></i>
+                            Settings
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link hcs-red-text" href="/logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Logout
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav> 
 
   <!-- Offcanvas Sidebar -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
@@ -204,12 +365,6 @@
             VAT No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">252295994</a>
             |
             Company No: <a class="hcs-green-text" href="https://beta.companieshouse.gov.uk/company/09276951">09276951</a>
-          </div>
-          <div>
-            <small>
-              Version: <%= package %>
-              <i class="bi bi-info" data-bs-toggle="modal" data-bs-target="#infoModal" style="cursor: pointer;"></i>
-            </small>
           </div>
         </div>
       </div>
