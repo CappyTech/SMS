@@ -9,16 +9,10 @@ const path = require('path');
 
 const createSubcontractor = async (req, res) => {
     try {
-        //logger.info('Session User: ' + JSON.stringify(req.session.user, null, 2));
-        // Check if the user has permissions
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         if (!req.session.user.permissionCreateSubcontractor) {
             logger.error("User does not have permission to create subcontractor.");
-            return res.status(403).send('Access denied. Insufficient permissions.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const {
@@ -84,7 +78,8 @@ const readSubcontractor = async (req, res) => {
     try {
         // Check if the user has permissions
         if (!req.session.user.permissionReadSubcontractor) {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const subcontractor = await Subcontractor.findByPk(req.params.id);
@@ -110,18 +105,6 @@ const readSubcontractor = async (req, res) => {
 
 const updateSubcontractor = async (req, res) => {
     try {
-        // Check if session exists
-        if (!req.session) {
-            logger.error("Session does not exist.");
-            return res.status(403).send('Access denied. No session found.');
-        }
-
-        // Check if user is authenticated
-        if (!req.session.user) {
-            logger.error("User not found in session.");
-            return res.status(403).send('Access denied. No user found in session.');
-        }
-
         // Check if user has permission
         if (!req.session.user.permissionUpdateSubcontractor) {
             logger.error("User does not have permission to update subcontractor.");
@@ -221,7 +204,8 @@ const deleteSubcontractor = async (req, res) => {
     try {
         // Check if the user has permissions
         if (!req.session.user.permissionDeleteSubcontractor) {
-            return res.status(403).send('Access denied.');
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
         }
 
         const subcontractor = await Subcontractor.findByPk(req.params.id);
