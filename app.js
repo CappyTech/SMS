@@ -506,6 +506,6 @@ app.use('/', locationCRUD);
 app.use('/', monthlyReturns);
 app.use('/', yearlyReturns);
 
-app.listen(80, '127.0.0.1', () => {
+app.listen(443, '0.0.0.0', () => {
     logger.info(`Server is running`);
 });
