@@ -42,14 +42,15 @@ const ensureAuthenticated = (req, res, next) => {
 };
 
 // Middleware to handle role-based access
-const ensureRole = (role) => {
+const ensureRole = (roles) => {
     return (req, res, next) => {
         if (!req.session.user) {
             req.flash('error', 'You need to sign in.');
             return res.redirect('/signin');
         }
-        if (req.session.user.role !== role) {
-            req.flash('error', 'Access denied ensureRole.');
+        // Check if user's role is in the list of allowed roles
+        if (!roles.includes(req.session.user.role)) {
+            req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
         next();
@@ -57,16 +58,19 @@ const ensureRole = (role) => {
 };
 
 // Middleware to handle permission-based access
-const ensurePermission = (permissions) => {
+const ensurePermission = (requiredPermissions) => {
     return (req, res, next) => {
         if (!req.session.user) {
             req.flash('error', 'You need to sign in.');
             return res.redirect('/signin');
         }
+
+        // Check if user has at least one of the required permissions
         const userPermissions = req.session.user;
-        const hasPermission = permissions.some(permission => userPermissions[permission]);
+        const hasPermission = requiredPermissions.every(permission => userPermissions[permission]);
+
         if (!hasPermission) {
-            req.flash('error', 'Access denied. ensurePermission');
+            req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
         next();
@@ -236,6 +240,117 @@ function decrypt(encryptedText) {
     return decrypted;
 }
 
+const axios = require('axios');
+const qs = require('querystring');
+
+async function getAccessToken() {
+    const tenantId = process.env.AZURE_TENANT_ID;
+    const clientId = process.env.AZURE_CLIENT_ID;
+    const clientSecret = process.env.AZURE_CLIENT_SECRET;
+
+    const tokenUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`;
+
+    const params = {
+        client_id: clientId,
+        scope: 'https://graph.microsoft.com/.default',
+        client_secret: clientSecret,
+        grant_type: 'client_credentials',
+    };
+
+    try {
+        const response = await axios.post(tokenUrl, qs.stringify(params), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
+
+        const accessToken = response.data.access_token;
+        logger.info('Access token obtained');
+        return accessToken;
+    } catch (error) {
+        logger.error('Error fetching access token: ' + error);
+        throw new Error('Access token not obtained');
+    }
+}
+
+async function fetchOneDriveFiles() {
+    try {
+        const accessToken = await getAccessToken();
+
+        if (!accessToken) {
+            logger.error('Access token not obtained');
+            throw new Error('Access token not obtained'); // Rethrow to ensure the failure propagates.
+        }
+
+        const oneDriveUrl = 'https://graph.microsoft.com/v1.0/me/drive/root/children';
+        const response = await axios.get(oneDriveUrl, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
+        });
+
+        const files = response.data.value;
+        logger.info('Fetched files:', files);
+        return files;
+    } catch (error) {
+        logger.error('Error fetching OneDrive files: ' + error.message);
+        throw new Error('Failed to fetch OneDrive files');  // Rethrow for better control upstream
+    }
+}
+
+
+const Drive = require('./models/drive');  // Assuming you have a Sequelize model for storing files
+
+async function saveFilesToDatabase(files) {
+    for (const file of files) {
+        try {
+            const existingFile = await Drive.findOne({ where: { itemId: file.id } });
+
+            if (existingFile) {
+                // Update the existing file
+                await existingFile.update({
+                    name: file.name,
+                    size: file.size,
+                    mimeType: file.file ? file.file.mimeType : null,
+                    fileType: file.file ? file.file.fileType : null,
+                    createdDateTime: file.createdDateTime,
+                    lastModifiedDateTime: file.lastModifiedDateTime,
+                    parentPath: file.parentReference ? file.parentReference.path : null,
+                    downloadUrl: file['@microsoft.graph.downloadUrl'] || null,
+                });
+                logger.info(`Updated file: ${file.name}`);
+            } else {
+                // Create a new file record
+                await Drive.create({
+                    itemId: file.id,
+                    name: file.name,
+                    size: file.size,
+                    mimeType: file.file ? file.file.mimeType : null,
+                    fileType: file.file ? file.file.fileType : null,
+                    createdDateTime: file.createdDateTime,
+                    lastModifiedDateTime: file.lastModifiedDateTime,
+                    parentPath: file.parentReference ? file.parentReference.path : null,
+                    downloadUrl: file['@microsoft.graph.downloadUrl'] || null,
+                });
+                logger.info(`Created file: ${file.name}`);
+            }
+        } catch (error) {
+            logger.error('Error saving or updating file to the database:' + error);
+        }
+    }
+}
+
+async function syncOneDriveToDatabase() {
+    try {
+        const files = await fetchOneDriveFiles();
+        if (files && files.length > 0) {
+            await saveFilesToDatabase(files);
+        }
+    } catch (error) {
+        logger.error('Error syncing OneDrive to database: ' + error.message);
+    }
+}
+
 module.exports = {
     slimDateTime,
     formatCurrency,
@@ -251,4 +366,5 @@ module.exports = {
     calculateTaxYearAndMonth,
     decrypt,
     encrypt,
+    syncOneDriveToDatabase,
 };
