@@ -49,7 +49,7 @@ const ensureRole = (role) => {
             return res.redirect('/signin');
         }
         if (req.session.user.role !== role) {
-            req.flash('error', 'Access denied.');
+            req.flash('error', 'Access denied ensureRole.');
             return res.redirect('/');
         }
         next();
@@ -66,7 +66,7 @@ const ensurePermission = (permissions) => {
         const userPermissions = req.session.user;
         const hasPermission = permissions.some(permission => userPermissions[permission]);
         if (!hasPermission) {
-            req.flash('error', 'Access denied.');
+            req.flash('error', 'Access denied. ensurePermission');
             return res.redirect('/');
         }
         next();
