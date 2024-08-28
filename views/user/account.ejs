@@ -64,6 +64,39 @@
     </div>
 </div>
 
+<div class="container py-4">
+    <h1 class="display-5 fw-bold text-center">Active Sessions</h1>
+
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Browser</th>
+                <th>Login Time</th>
+                <th>Session Expiration</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% sessions.forEach(session => { %>
+            <tr>
+                <td><%= session.ip %></td>
+                <td><%= session.userAgent %></td>
+                <td><%= session.loginTime %></td>
+                <td><%= session.expires %></td>
+                <td>
+                    <!-- Option to log out from this session -->
+                    <form action="/account/logout-session" method="POST">
+                        <input type="hidden" name="sessionId" value="<%= session.sessionId %>">
+                        <button type="submit" class="btn btn-danger">Logout</button>
+                    </form>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
+
 <!-- Modal for Changing Account Details -->
 <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
