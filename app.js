@@ -26,9 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use(xss());
 app.set('trust proxy', 1);
-
 const useragent = require('useragent');
-
 const logRequestDetails = (req, res, next) => {
     // Safely parse the user-agent
     const agent = req.headers['user-agent'] ? useragent.parse(req.headers['user-agent']) : null;
@@ -54,7 +52,6 @@ const logRequestDetails = (req, res, next) => {
 };
 
 app.use(logRequestDetails);
-
 
 app.use(flash());
 
@@ -331,6 +328,18 @@ Attendances.belongsTo(Locations, {
         logger.error('Error syncing models: ' + error);
     }
 })();
+
+const cron = require('node-cron');
+
+cron.schedule('0 * * * *', async () => {  // Runs every hour
+    try {
+        logger.info('Starting OneDrive sync...');
+        await helpers.syncOneDriveToDatabase();
+        logger.info('OneDrive sync completed successfully.');
+    } catch (error) {
+        logger.error('Error during OneDrive sync: ' + error.message);
+    }
+});
 
 app.use(async (req, res, next) => {
     try {
