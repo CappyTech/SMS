@@ -98,10 +98,6 @@ app.use(
     })
 );
 
-
-
-
-
 const sessionStore = new MySQLStore({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
@@ -135,6 +131,7 @@ app.use(session({
         secure: false,
         httpOnly: true,
         maxAge: 600000,
+        sameSite: 'strict',
     }
 }));
 
@@ -351,6 +348,8 @@ app.use(async (req, res, next) => {
     }
 });
 
+
+
 app.use(async (req, res, next) => {
     try {
         const unpaidInvoices = await Invoices.findAll({
@@ -383,6 +382,56 @@ app.use((req, res, next) => {
     res.locals.serverPlatform = `${os.type()} ${os.release()} (${os.arch()})`;
     next();
 });
+
+// Error handling middleware
+const errorHandler = (err, req, res, next) => {
+    logger.error(err.stack);
+    const status = err.status || 500;
+    const errorViewPath = path.join(__dirname, 'views', `${status}.ejs`);
+
+    fs.access(errorViewPath, fs.constants.F_OK, (fsErr) => {
+        if (fsErr) {
+            res.status(status).render('error', {
+                message: err.message,
+                error: err
+            });
+        } else {
+            res.status(status).render(String(status), {
+                message: err.message,
+                error: err
+            });
+        }
+    });
+};
+
+app.use(errorHandler);
+
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
+
+const crypto = require('crypto');
+if (process.env.NODE_ENV === 'development') {
+    if (process.env.ENCRYPTION_KEY === '') {
+        // Generate a 32-byte random key for AES-256
+        const encryptionKey = crypto.randomBytes(32).toString('hex');
+        console.log('Your Encryption Key:', encryptionKey);
+        console.log('ENCRYPTION_KEY length:', encryptionKey.length);
+        const encryptionKeyHEX = Buffer.from(encryptionKey, 'hex');
+        console.log('Your Encryption Key:', encryptionKeyHEX);
+        console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
+    } else {
+        console.log('Encryption Key:', process.env.ENCRYPTION_KEY);
+        console.log('ENCRYPTION_KEY length:', process.env.ENCRYPTION_KEY.length);
+        const encryptionKeyHEX = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
+        console.log('Encryption Key:', encryptionKeyHEX);
+        console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
+    }
+}
 
 const render = require('./controllers/renderForms');
 
@@ -447,56 +496,6 @@ app.use('/', locationCRUD);
 
 app.use('/', monthlyReturns);
 app.use('/', yearlyReturns);
-
-// Error handling middleware
-const errorHandler = (err, req, res, next) => {
-    logger.error(err.stack);
-    const status = err.status || 500;
-    const errorViewPath = path.join(__dirname, 'views', `${status}.ejs`);
-
-    fs.access(errorViewPath, fs.constants.F_OK, (fsErr) => {
-        if (fsErr) {
-            res.status(status).render('error', {
-                message: err.message,
-                error: err
-            });
-        } else {
-            res.status(status).render(String(status), {
-                message: err.message,
-                error: err
-            });
-        }
-    });
-};
-
-app.use(errorHandler);
-
-app.disable('x-powered-by');
-app.use((req, res, next) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  next();
-});
-
-const crypto = require('crypto');
-if (process.env.NODE_ENV === 'development') {
-    if (process.env.ENCRYPTION_KEY === '') {
-        // Generate a 32-byte random key for AES-256
-        const encryptionKey = crypto.randomBytes(32).toString('hex');
-        console.log('Your Encryption Key:', encryptionKey);
-        console.log('ENCRYPTION_KEY length:', encryptionKey.length);
-        const encryptionKeyHEX = Buffer.from(encryptionKey, 'hex');
-        console.log('Your Encryption Key:', encryptionKeyHEX);
-        console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
-    } else {
-        console.log('Encryption Key:', process.env.ENCRYPTION_KEY);
-        console.log('ENCRYPTION_KEY length:', process.env.ENCRYPTION_KEY.length);
-        const encryptionKeyHEX = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
-        console.log('Encryption Key:', encryptionKeyHEX);
-        console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
-    }
-}
 
 app.listen(80, '127.0.0.1', () => {
     logger.info(`Server is running`);
