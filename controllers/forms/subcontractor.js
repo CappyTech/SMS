@@ -7,7 +7,10 @@ const Subcontractor = require('../../models/subcontractor');
 
 const selectSubcontractor = async (req, res) => {
     try {
-        
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
         let subcontractors;
         if (req.session.user.role === 'admin') {
             subcontractors = await Subcontractor.findAll({});
