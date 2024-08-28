@@ -6,6 +6,30 @@ const logger = require('../../logger');
 const path = require('path');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const sessionStore = new MySQLStore({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    clearExpired: true,
+    checkExpirationInterval: 300000,
+    expiration: 43200000,
+    createDatabaseTable: true,
+    endConnectionOnClose: true,
+    disableTouch: false,
+    charset: 'utf8mb4_bin',
+    schema: {
+        tableName: 'sessions',
+        columnNames: {
+            session_id: 'session_id',
+            expires: 'expires',
+            data: 'data'
+        }
+    }
+});
 
 // Display the account page
 const getAccountPage = async (req, res) => {
@@ -48,6 +72,35 @@ const getAccountPage = async (req, res) => {
         // Generate the QR code as a data URL
         const qrCodeUrl = await qrcode.toDataURL(otpAuthUrl);
 
+        // Query sessions related to the current user
+        const sessions = await sessionStore.query(`
+            SELECT session_id, expires, data 
+            FROM sessions
+            WHERE data LIKE ?
+        `, [`%${req.session.user.id}%`]);
+
+        const activeSessions = [];
+
+        // Parse session data with error handling
+        for (const session of sessions) {
+            try {
+                if (session.data) {
+                    const sessionData = JSON.parse(session.data);
+
+                    activeSessions.push({
+                        sessionId: session.session_id,
+                        ip: sessionData.user ? sessionData.user.ip : 'N/A',
+                        userAgent: sessionData.user ? sessionData.user.userAgent : 'Unknown',
+                        loginTime: sessionData.user ? sessionData.user.loginTime : 'Unknown',
+                        expires: new Date(session.expires * 1000) // Convert expires to JS Date
+                    });
+                }
+            } catch (parseError) {
+                logger.error(`Error parsing session data for session ID ${session.session_id}: ${parseError.message}`);
+                continue; // Skip this session if there's an error in parsing
+            }
+        }
+
         // Render the account page with the QR code and secret
         res.render(path.join('user', 'account'), {
             title: 'Set up Two-Factor Authentication',
@@ -55,12 +108,13 @@ const getAccountPage = async (req, res) => {
             secret: secret, // This will be shown in case manual input is needed
             user: user,
             errorMessages: req.flash('error'),
-            successMessage: req.flash('success')
+            successMessage: req.flash('success'),
+            sessions: activeSessions,
         });
     } catch (error) {
         logger.error(`Error setting up TOTP for user ${req.session.user.id}: ${error.message}`);
         req.flash('error', 'An error occurred during TOTP setup.');
-        res.redirect('/account');
+        res.redirect('/');
     }
 };
 
@@ -98,65 +152,30 @@ const updateAccountSettings = async (req, res) => {
     }
 };
 
-// TOTP verification route - Verifies the user's TOTP token
-const verifyTOTP = async (req, res) => {
+const logoutSession = async (req, res) => {
     try {
-        const user = await User.findOne({ where: { id: req.session.user.id } });
+        const { sessionId } = req.body;
 
-        if (!user) {
-            req.flash('error', 'User not found');
-            return res.redirect('/');
-        }
+        // Remove the specific session from the store
+        sessionStore.destroy(sessionId, (err) => {
+            if (err) {
+                logger.error('Error destroying session: ' + err.message);
+                req.flash('error', 'Failed to log out session.');
+                return res.redirect('/account/active-sessions');
+            }
 
-        // Ensure the TOTP secret exists
-        if (!user.totpSecret) {
-            req.flash('error', 'No TOTP secret found. Please set up Two-Factor Authentication.');
-            return res.redirect('/');
-        }
-
-        // Decrypt the stored TOTP secret
-        let decryptedSecret;
-        try {
-            decryptedSecret = helpers.decrypt(user.totpSecret);
-            logger.info(`Decrypted TOTP Secret for user ${user.username}: ${decryptedSecret}`); // Log decrypted secret
-        } catch (error) {
-            logger.error('Error decrypting TOTP secret:', error.message);
-            req.flash('error', 'Failed to decrypt TOTP secret.');
-            return res.redirect('/');
-        }
-
-        // Log the TOTP token provided by the user
-        logger.info(`User-provided TOTP token for user ${user.username}: ${req.body.totpToken}`);
-
-        // Verify the provided TOTP token
-        const tokenValidates = speakeasy.totp.verify({
-            secret: decryptedSecret,
-            encoding: 'base32',
-            token: req.body.totpToken,
-            window: 1, // Allow for clock drift of one time step (optional)
+            req.flash('success', 'Session logged out successfully.');
+            res.redirect('/account/active-sessions');
         });
-
-        if (tokenValidates) {
-            user.totpEnabled = true; // Enable TOTP
-            await user.save();
-            req.flash('success', 'Two-Factor Authentication enabled successfully.');
-            logger.info(`TOTP enabled successfully for user ${user.username}`);
-            res.redirect('/');
-        } else {
-            req.flash('error', 'Invalid TOTP token. Please try again.');
-            logger.info(`Invalid TOTP token for user ${user.username}`);
-            res.redirect('/');
-        }
     } catch (error) {
-        logger.error('Error verifying TOTP:', error.message);
-        req.flash('error', 'An error occurred during TOTP verification.');
-        res.redirect('/');
+        logger.error('Error logging out session: ' + error.message);
+        req.flash('error', 'Error logging out session.');
+        res.redirect('/account/active-sessions');
     }
 };
 
-
 router.get('/account', helpers.ensureAuthenticated, getAccountPage);
 router.post('/account/settings', helpers.ensureAuthenticated, updateAccountSettings);
-router.post('/account/verify-totp', helpers.ensureAuthenticated, verifyTOTP);
+router.post('/account/logout-session', helpers.ensureAuthenticated, logoutSession);
 
 module.exports = router;
