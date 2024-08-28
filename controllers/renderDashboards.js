@@ -18,7 +18,7 @@ const renderStatsDashboard = async (req, res) => {
     try {
         console.log("Session User:", req.session.user);
         if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied. Stats 2');
+            req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
 
@@ -281,7 +281,6 @@ const renderContactsDashboard = async (req, res) => {
 
 const renderJobsDashboard = async (req, res) => {
     try {
-        // Ensure only admin can access
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
@@ -347,10 +346,11 @@ const renderJobsDashboard = async (req, res) => {
 
 router.get('/dashboard/stats', (req, res) => {
     try {
-        //if (!req.session.user || req.session.user.role !== 'admin') {
-            //req.flash('error', 'Access denied. Stats 1');
-            //return res.redirect('/');
-        //}
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
         const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(moment());
         // Output for debugging
         logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
@@ -366,6 +366,11 @@ router.get('/dashboard/stats', (req, res) => {
 // Read all locations
 const renderLocationsDashboard = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+        
         const locations = await Locations.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'locationsDashboard'), {
