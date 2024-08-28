@@ -7,6 +7,7 @@ const logger = require('../../logger');
 const path = require('path'); 
 const helpers = require('../../helpers');
 const speakeasy = require('speakeasy');
+const useragent = require('useragent');
 
 const renderSigninForm = (req, res) => {
     
@@ -45,14 +46,35 @@ const loginUser = async (req, res) => {
             return res.redirect('/signin');
         }
 
+        // Get user agent and IP address
+        const agent = req.headers['user-agent'] ? useragent.parse(req.headers['user-agent']) : null;
+        const ip = req.ip;
+
         // Check if TOTP is enabled for the user
         if (user.totpEnabled) {
             // Save user info to the session but don't fully log in yet
+
             req.session.userPending2FA = {
                 id: user.id,
                 username: user.username,
-                email: user.email
-            };
+                email: user.email,
+                role: user.role,
+                permissionCreateUser: user.permissionCreateUser,
+                permissionReadUser: user.permissionReadUser,
+                permissionUpdateUser: user.permissionUpdateUser,
+                permissionDeleteUser: user.permissionDeleteUser,
+                permissionCreateSubcontractor: user.permissionCreateSubcontractor,
+                permissionReadSubcontractor: user.permissionReadSubcontractor,
+                permissionUpdateSubcontractor: user.permissionUpdateSubcontractor,
+                permissionDeleteSubcontractor: user.permissionDeleteSubcontractor,
+                permissionCreateInvoice: user.permissionCreateInvoice,
+                permissionReadInvoice: user.permissionReadInvoice,
+                permissionUpdateInvoice: user.permissionUpdateInvoice,
+                permissionDeleteInvoice: user.permissionDeleteInvoice,
+                loginTime: new Date().toISOString(), // Track login time
+                ip: ip, // Track IP address
+                userAgent: agent ? agent.toAgent() : 'Unknown' // Track browser info
+            }; // make sure this is the same as below.
 
             // Redirect to the 2FA verification screen
             return res.redirect('/2fa');
@@ -75,8 +97,11 @@ const loginUser = async (req, res) => {
             permissionCreateInvoice: user.permissionCreateInvoice,
             permissionReadInvoice: user.permissionReadInvoice,
             permissionUpdateInvoice: user.permissionUpdateInvoice,
-            permissionDeleteInvoice: user.permissionDeleteInvoice
-        };
+            permissionDeleteInvoice: user.permissionDeleteInvoice,
+            loginTime: new Date().toISOString(), // Track login time
+            ip: ip, // Track IP address
+            userAgent: agent ? agent.toAgent() : 'Unknown' // Track browser info
+        }; // make sure this is the same as ABOVE.
 
         req.session.save((err) => {
             if (err) {
@@ -139,6 +164,10 @@ const verify2FA = async (req, res) => {
             return res.redirect('/signin');
         }
 
+        // Get user agent and IP address
+        const agent = req.headers['user-agent'] ? useragent.parse(req.headers['user-agent']) : null;
+        const ip = req.ip;
+
         // Decrypt the TOTP secret and verify the provided token
         const decryptedSecret = helpers.decrypt(user.totpSecret);
         const tokenValidates = speakeasy.totp.verify({
@@ -154,7 +183,29 @@ const verify2FA = async (req, res) => {
         }
 
         // Complete the login process by promoting the user to fully logged-in status
-        req.session.user = req.session.userPending2FA;
+        req.session.user = {
+            id: req.session.userPending2FA.id,
+            username: req.session.userPending2FA.username,
+            email: req.session.userPending2FA.email,
+            role: req.session.userPending2FA.role,
+            permissionCreateUser: req.session.userPending2FA.permissionCreateUser,
+            permissionReadUser: req.session.userPending2FA.permissionReadUser,
+            permissionUpdateUser: req.session.userPending2FA.permissionUpdateUser,
+            permissionDeleteUser: req.session.userPending2FA.permissionDeleteUser,
+            permissionCreateSubcontractor: req.session.userPending2FA.permissionCreateSubcontractor,
+            permissionReadSubcontractor: req.session.userPending2FA.permissionReadSubcontractor,
+            permissionUpdateSubcontractor: req.session.userPending2FA.permissionUpdateSubcontractor,
+            permissionDeleteSubcontractor: req.session.userPending2FA.permissionDeleteSubcontractor,
+            permissionCreateInvoice: req.session.userPending2FA.permissionCreateInvoice,
+            permissionReadInvoice: req.session.userPending2FA.permissionReadInvoice,
+            permissionUpdateInvoice: req.session.userPending2FA.permissionUpdateInvoice,
+            permissionDeleteInvoice: req.session.userPending2FA.permissionDeleteInvoice,
+            loginTime: new Date().toISOString(), // Track login time
+            ip: ip, // Track IP address
+            userAgent: agent ? agent.toAgent() : 'Unknown' // Track browser info
+        }; // make sure this is the same as the loginUser
+
+        // Clear the temporary 2FA session data
         delete req.session.userPending2FA;
 
         req.session.save((err) => {
