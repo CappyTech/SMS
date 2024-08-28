@@ -13,6 +13,7 @@ const selectClient = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
+        
         const clients = await Clients.findAll({});
         
         if (clients.length === 0) {
@@ -43,6 +44,7 @@ const renderClientCreateForm = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
+
         res.render(path.join('clients', 'createClient'), {
             title: 'Create Client',
             errorMessages: req.flash('error'),
@@ -62,6 +64,7 @@ const renderClientUpdateForm = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
+
         const clients = await Clients.findByPk(req.params.client, {
             include: [{ model: Contacts }]
         });
