@@ -8,11 +8,11 @@ const path = require('path');
 
 const renderMonthlyReturnsForm = async (req, res) => {
     try {
-        // Check if the user is an admin
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
+
         // Define the monthNames array starting with April as month 1
         const monthNames = [
             'April', 'May', 'June', 'July', 'August', 'September',
@@ -76,7 +76,6 @@ const renderMonthlyReturnsForm = async (req, res) => {
 
 const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
     try {
-        // Check if the user is an admin
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
@@ -132,7 +131,6 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
 
 const renderMonthlyReturnsForAll = async (req, res) => {
     try {
-        // Check if the user is an admin
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
@@ -187,7 +185,6 @@ const renderMonthlyReturnsForAll = async (req, res) => {
 
 const renderMonthlyReturnsYear = async (req, res) => {
     try {
-        // Check if the user is an admin
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
