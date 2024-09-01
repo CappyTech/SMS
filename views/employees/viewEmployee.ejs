@@ -1,0 +1,16 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <h1 class="display-5">Employee Details</h1>
+        <div class="container-fluid text-center">
+            <p><strong>Name:</strong> <%= employee.name %></p>
+            <p><strong>Position:</strong> <%= employee.position %></p>
+            <a href="/employee/update/<%= employee.id %>" class="btn btn-primary">Edit</a>
+            <form action="/employee/delete/<%= employee.id %>" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
