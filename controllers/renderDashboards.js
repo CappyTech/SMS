@@ -12,6 +12,8 @@ const Clients = require('../models/client');
 const Contacts = require('../models/contact');
 const Jobs = require('../models/job');
 const Locations = require('../models/location');
+const Attendances = require('../models/attendance');
+const Employees = require('../models/employee');
 const path = require('path');
 
 const renderStatsDashboard = async (req, res) => {
@@ -387,6 +389,58 @@ const renderLocationsDashboard = async (req, res) => {
     }
 };
 
+const renderAttendanceDashboard = async (req, res) => {
+    try {
+        // Extract query parameters from the request
+        const { date, employeeId, subcontractorId } = req.query;
+
+        // Build the query conditions
+        let queryConditions = {};
+
+        if (date) {
+            queryConditions.date = date;
+        }
+
+        if (employeeId) {
+            queryConditions.employeeId = employeeId;
+        }
+
+        if (subcontractorId) {
+            queryConditions.subcontractorId = subcontractorId;
+        }
+
+        // Fetch the attendance records based on query conditions
+        const attendances = await Attendances.findAll({
+            where: queryConditions,
+            include: [
+                { model: Employees, required: false },
+                { model: Subcontractors, required: false },
+                { model: Locations, required: false },
+            ],
+        });
+
+        // Fetch all employees, subcontractors, and locations to populate the filters
+        const employees = await Employees.findAll();
+        const subcontractors = await Subcontractors.findAll();
+        const locations = await Locations.findAll();
+
+        // Render the dashboard with the attendance data and filters
+        res.render(path.join('dashboards', 'attendanceDashboard'), {
+            attendances,
+            employees,
+            subcontractors,
+            locations,
+            filters: { date, employeeId, subcontractorId },
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            slimDateTime: helpers.slimDateTime,
+        });
+    } catch (error) {
+        console.error('Error rendering attendance dashboard:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
 router.get('/dashboard/stats/:year?/:month?', renderStatsDashboard);
 router.get('/dashboard/user', renderUserDashboard);
 router.get('/dashboard/subcontractor', renderSubcontractorDashboard);
@@ -397,5 +451,6 @@ router.get('/dashboard/contact', renderContactsDashboard);
 router.get('/dashboard/job', renderJobsDashboard);
 //router.get('/dashboard/archive', renderQuoteArchiveDashboard);
 router.get('/dashboard/location', renderLocationsDashboard);
+router.get('/dashboard/attendance',renderAttendanceDashboard);
 
 module.exports = router;
