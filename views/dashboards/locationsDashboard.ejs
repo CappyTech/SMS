@@ -52,7 +52,11 @@
                         <a class="list-group-item list-group-item-action disabled text-bg-secondary text-center" aria-disabled="true">Location List</a>
                         <% locations.forEach(location => { %>
                             <a href="#<%= location.id %>" class="list-group-item list-group-item-action text-center">
-                                <%= location.address %>
+                                <% if (location.name) { %>
+                                    <%= location.name %>
+                                <% } else { %>
+                                    <%= location.address %>
+                                <% } %>
                             </a>
                         <% }); %>
                     </ul>
@@ -61,11 +65,18 @@
                     <% locations.forEach(location => { %>
                     <div class="card mb-3">
                         <div class="card-header d-flex justify-content-between text-bg-secondary">
-                            <span>Location: <%= location.address %>, <%= location.city %></span>
+                            <span>
+                                <% if (location.name) { %>
+                                    Name: <%= location.name %>
+                                <% } else { %>
+                                    Location: <%= location.address %>, <%= location.city %>
+                                <% } %>
+                            </span>
                             <a class="text-white" href="/location/view/<%= location.id %>">View Location</a>
                         </div>
                         <div class="card-body" id="<%= location.id %>">
                             <ul class="list-group">
+                                <li class="list-group-item">Name: <%= location.name %></li>
                                 <li class="list-group-item">Address: <%= location.address %></li>
                                 <li class="list-group-item">City: <%= location.city %></li>
                                 <li class="list-group-item">Postal Code: <%= location.postalCode %></li>
