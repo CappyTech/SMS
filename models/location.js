@@ -8,6 +8,10 @@ const Locations = sequelize.define('Locations', {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     address: {
         type: DataTypes.STRING,
         allowNull: true,
