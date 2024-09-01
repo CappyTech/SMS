@@ -65,20 +65,9 @@ const Invoices = sequelize.define('Invoices', {
         type: DataTypes.INTEGER,
         allowNull: true
     },
-    createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-    },
-    updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-    },
-    deletedAt: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
 }, {
     paranoid: true,
+    timestamp:true,
 });
 
 module.exports = Invoices;
