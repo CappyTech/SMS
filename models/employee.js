@@ -12,10 +12,6 @@ const Employees = sequelize.define('Employees', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  position: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  }
 }, {
   paranoid: false,
 });
