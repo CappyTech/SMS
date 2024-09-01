@@ -1,0 +1,23 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <h1 class="display-5">Update Employee</h1>
+        <div class="container-fluid text-center">
+            <form action="/employee/update/<%= employee.id %>" method="POST" class="needs-validation">
+
+                <div class="row mb-3">
+                    <label for="name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="name" name="name" class="form-control" value="<%= employee.name %>" required>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-hcs-green">Update Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
