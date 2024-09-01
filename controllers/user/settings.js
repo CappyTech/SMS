@@ -16,7 +16,7 @@ const sessionStore = new MySQLStore({
     database: process.env.DB_DATABASE,
     clearExpired: true,
     checkExpirationInterval: 300000,
-    expiration: 43200000,
+    expiration: 28800000,
     createDatabaseTable: true,
     endConnectionOnClose: true,
     disableTouch: false,
