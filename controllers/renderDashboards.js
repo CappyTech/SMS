@@ -383,9 +383,9 @@ const renderLocationsDashboard = async (req, res) => {
             successMessage: req.flash('success'),
         });
     } catch (error) {
-        logger.error('Error viewing locations: ' + error.message);
-        req.flash('error', 'Error viewing locations: ' + error.message);
-        res.redirect('/dashboard/location');
+        logger.error('Error rendering locations dashboard: ' + error.message);
+        req.flash('error', 'Error rendering locations dashboard: ' + error.message);
+        res.redirect('/');
     }
 };
 
@@ -436,8 +436,31 @@ const renderAttendanceDashboard = async (req, res) => {
             slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
-        console.error('Error rendering attendance dashboard:', error);
-        res.status(500).send('Internal Server Error');
+        logger.error('Error rendering attendance dashboard: ' + error.message);
+        req.flash('error', 'Error rendering attendance dashboard: ' + error.message);
+        res.redirect('/');
+    }
+};
+
+const renderEmployeeDashboard = async (req, res) => {
+    try {
+        // Fetch all employees from the database
+        const employees = await Employees.findAll();
+
+        // Calculate the total number of employees
+        const totalEmployees = employees.length;
+
+        // Render the dashboard view, passing in the employee data
+        res.render('dashboards/employeeDashboard', {
+            employees,
+            totalEmployees,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+        });
+    } catch (error) {
+        logger.error('Error rendering employee dashboard: ' + error.message);
+        req.flash('error', 'Error rendering employee dashboard: ' + error.message);
+        res.redirect('/');
     }
 };
 
@@ -451,6 +474,7 @@ router.get('/dashboard/contact', renderContactsDashboard);
 router.get('/dashboard/job', renderJobsDashboard);
 //router.get('/dashboard/archive', renderQuoteArchiveDashboard);
 router.get('/dashboard/location', renderLocationsDashboard);
-router.get('/dashboard/attendance',renderAttendanceDashboard);
+router.get('/dashboard/attendance', renderAttendanceDashboard);
+router.get('/dashboard/employee',renderEmployeeDashboard);
 
 module.exports = router;
