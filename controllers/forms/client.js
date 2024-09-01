@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
-
 const path = require('path');
 const Clients = require('../../models/client');
 const Contacts = require('../../models/contact');
@@ -87,7 +86,7 @@ const renderClientUpdateForm = async (req, res) => {
     }
 };
 
-router.get('/client/select', selectClient);
+//router.get('/client/select', selectClient);
 router.get('/client/create', renderClientCreateForm);
 router.get('/client/update/:client', renderClientUpdateForm);
 
