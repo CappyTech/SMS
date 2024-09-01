@@ -50,16 +50,14 @@ const renderContactCreateForm = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        // Get the client ID from the route parameters
-        const clientId = req.params.client;
 
         // Find the client by primary key (PK)
-        const clients = await Clients.findByPk(clientId);
+        const clients = await Clients.findAll();
 
         if (!clients) {
             // If the client is not found, send an error message
             req.flash('error', 'Client not found.');
-            return res.redirect('/dashboard');
+            return res.redirect('/dashboard/client');
         }
 
         // Render the create contact form and pass the found client to the view
@@ -103,8 +101,8 @@ const renderContactUpdateForm = async (req, res) => {
     }
 };
 
-router.get('/contact/select', selectContact);
-router.get('/contact/create/:client', renderContactCreateForm);
+//router.get('/contact/select', selectContact);
+router.get('/contact/create/', renderContactCreateForm);
 router.get('/contact/update/:contact', renderContactUpdateForm);
 
 module.exports = router;
