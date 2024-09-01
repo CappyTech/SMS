@@ -1,0 +1,39 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Weekly Attendance</h1>
+            <p>From <%= moment(startDate).format('Do MMMM YYYY') %> to <%= moment(endDate).format('Do MMMM YYYY') %></p>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Person</th>
+                        <% daysOfWeek.forEach(day => { %>
+                            <th><%= moment(day).format('DD/MM/YYYY') %><br><%= moment(day).format('dddd') %></th>
+                        <% }) %>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% Object.keys(groupedAttendance).forEach(person => { %>
+                        <tr>
+                            <td><%= person %></td>
+                            <% daysOfWeek.forEach(day => { %>
+                                <% const record = groupedAttendance[person][day] || {}; %>
+                                <td>
+                                    <% if (record.holidays_taken) { %>
+                                        <span class="badge bg-warning">Holiday</span>
+                                    <% } else if (record.days_without_work) { %>
+                                        <span class="badge bg-danger">Off</span>
+                                    <% } else { %>
+                                        <span><%= record.location || 'Office' %></span>
+                                    <% } %>
+                                </td>
+                            <% }) %>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
