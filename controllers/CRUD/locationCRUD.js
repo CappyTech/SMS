@@ -12,9 +12,10 @@ const createLocation = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const { address, city, postalCode, country, latitude, longitude } = req.body;
+        const {name, address, city, postalCode, country, latitude, longitude } = req.body;
 
         const newLocation = await Locations.create({
+            name,
             address,
             city,
             postalCode,
@@ -68,7 +69,7 @@ const updateLocation = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const { address, city, postalCode, country, latitude, longitude } = req.body;
+        const { name, address, city, postalCode, country, latitude, longitude } = req.body;
         const locationId = req.params.locationId;
 
         const location = await Locations.findByPk(locationId);
@@ -77,6 +78,7 @@ const updateLocation = async (req, res) => {
             return res.redirect('/dashboard/location');
         }
 
+        location.name = name;
         location.address = address;
         location.city = city;
         location.postalCode = postalCode;
