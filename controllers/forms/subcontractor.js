@@ -90,7 +90,7 @@ const renderSubcontractorUpdateForm = async (req, res) => {
     }
 };
 
-router.get('/subcontractor/select', selectSubcontractor);
+//router.get('/subcontractor/select', selectSubcontractor);
 router.get('/subcontractor/create', renderSubcontractorCreateForm);
 router.get('/subcontractor/update/:subcontractor', renderSubcontractorUpdateForm);
 
