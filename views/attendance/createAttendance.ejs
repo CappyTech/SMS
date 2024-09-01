@@ -1,0 +1,75 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <h1 class="display-5">Create Attendance</h1>
+        <div class="container-fluid text-center">
+            <form action="/attendance/create" method="POST" class="needs-validation">
+                <div class="row mb-3">
+                    <label for="date" class="col-sm-3 col-form-label">Date</label>
+                    <div class="col-sm-9">
+                        <input type="date" id="date" name="date" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="locationId" class="col-sm-3 col-form-label">Location</label>
+                    <div class="col-sm-9">
+                        <select id="locationId" name="locationId" class="form-select" required>
+                            <option value="">Select Location</option>
+                            <% locations.forEach(location => { %>
+                                <% if (location.name) { %>
+                                    <option value="<%= location.id %>"><%= location.name %></option>
+                                <% } else { %>
+                                <option value="<%= location.id %>"><%= location.address %>, <%= location.city %>, <%= location.postalCode %></option>
+                                <% } %>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="employeeId" class="col-sm-3 col-form-label">Employee</label>
+                    <div class="col-sm-9">
+                        <select id="employeeId" name="employeeId" class="form-select">
+                            <option value="">N/A</option>
+                            <% employees.forEach(employee => { %>
+                                <option value="<%= employee.id %>"><%= employee.name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="subcontractorId" class="col-sm-3 col-form-label">Subcontractor</label>
+                    <div class="col-sm-9">
+                        <select id="subcontractorId" name="subcontractorId" class="form-select">
+                            <option value="">N/A</option>
+                            <% subcontractors.forEach(subcontractor => { %>
+                                <option value="<%= subcontractor.id %>"><%= subcontractor.company %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="holidays_taken" class="col-sm-3 col-form-label">Holidays Taken</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="0.5" id="holidays_taken" name="holidays_taken" class="form-control" value="0">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="days_without_work" class="col-sm-3 col-form-label">Days Without Work</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="0.5" id="days_without_work" name="days_without_work" class="form-control" value="0">
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-hcs-green">Create Attendance</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
