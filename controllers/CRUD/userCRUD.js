@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
-
 const User = require('../../models/user');
 const helpers = require('../../helpers');
 const logger = require('../../logger');
@@ -95,8 +93,6 @@ const readUser = async (req, res) => {
             user,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
