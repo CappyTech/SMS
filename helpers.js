@@ -351,6 +351,10 @@ async function syncOneDriveToDatabase() {
     }
 }
 
+const getStartOfWeek = (date) => {
+    return moment(date).startOf('isoWeek'); // isoWeek starts on Monday
+};
+
 module.exports = {
     slimDateTime,
     formatCurrency,
@@ -360,6 +364,7 @@ module.exports = {
     getCurrentTaxYear,
     getTaxYearStartEnd,
     getCurrentMonthlyReturn,
+    getStartOfWeek,
     ensureAuthenticated,
     ensurePermission,
     ensureRole,
