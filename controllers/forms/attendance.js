@@ -29,7 +29,8 @@ const renderAttendanceCreateForm = async (req, res) => {
         });
     } catch (error) {
         logger.error('Error rendering Attendance create form: ' + error.message);
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error rendering Attendance create form: ' + error.message);
+         return res.redirect('/');
     }
 };
 
@@ -53,12 +54,16 @@ const renderAttendanceUpdateForm = async (req, res) => {
         res.render(path.join('attendance', 'updateAttendance'), {
             title: 'Update Attendance',
             Attendances,
+            locations: locations,
+            employees: employees,
+            subcontractors: subcontractors,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
         });
     } catch (error) {
         logger.error('Error rendering Attendance update form: ' + error.message);
-        res.status(500).send('Error: ' + error.message);
+        req.flash('error', 'Error rendering Attendance update form: ' + error.message);
+         return res.redirect('/');
     }
 };
 
