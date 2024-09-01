@@ -24,18 +24,14 @@ const createAttendance = async (req, res) => {
             locationId,
             employeeId,
             subcontractorId,
-            holidays_taken,
-            days_without_work,
         } = req.body;
 
         // Creating a new attendance record with the provided data
         await Attendances.create({
             date,
             locationId,
-            employeeId: employeeId || null, // Ensure employeeId is either set or null
-            subcontractorId: subcontractorId || null, // Ensure subcontractorId is either set or null
-            holidays_taken: holidays_taken || 0, // Default to 0 if not provided
-            days_without_work: days_without_work || 0, // Default to 0 if not provided
+            employeeId: employeeId || null,
+            subcontractorId: subcontractorId || null, 
         });
 
         // If successful, display a success message and redirect to the attendance dashboard
@@ -56,10 +52,10 @@ const updateAttendance = async (req, res) => {
             return res.redirect('/');
         }
         const { id } = req.params;
-        const { date, locationId, holidays_taken, days_without_work } = req.body;
+        const { date, locationId } = req.body;
 
         await Attendances.update(
-            { date, locationId, holidays_taken, days_without_work },
+            { date, locationId },
             { where: { id } }
         );
 
