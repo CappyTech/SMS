@@ -1,0 +1,24 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+
+<h1>Attendance for <%= date %></h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Location</th>
+            <th>Person</th>
+            <th>Holidays Taken</th>
+            <th>Days Without Work</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% attendance.forEach(record => { %>
+            <tr>
+                <td><%= record.Location ? record.Location.address : 'N/A' %></td>
+                <td><%= record.Employee ? record.Employee.name : record.Subcontractor.company %></td>
+                <td><%= record.holidays_taken %></td>
+                <td><%= record.days_without_work %></td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
