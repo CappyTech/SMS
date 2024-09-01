@@ -15,6 +15,7 @@ const helpers = require('./helpers');
 const os = require('os');
 const packageJson = require('./package.json');
 const sequelize = require('./db');
+const moment = require('moment');
 // Set up EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -391,6 +392,8 @@ app.use((req, res, next) => {
     res.locals.package = packageJson.version;
     res.locals.node = process.version;
     res.locals.serverPlatform = `${os.type()} ${os.release()} (${os.arch()})`;
+    res.locals.copyrightyearstart = 2023;
+    res.locals.copyrightyear = moment().year();
     next();
 });
 
@@ -456,6 +459,7 @@ const formsContact = require('./controllers/forms/contact');
 const formsJob = require('./controllers/forms/job');
 const formsLocation = require('./controllers/forms/location');
 const formsAttendance = require('./controllers/forms/attendance');
+const formsEmployee = require('./controllers/forms/employee');
 
 const renderDashboard = require('./controllers/renderDashboards');
 
@@ -470,7 +474,7 @@ const quoteCRUD = require('./controllers/CRUD/quoteCRUD');
 const clientCRUD = require('./controllers/CRUD/clientCRUD');
 const contactCRUD = require('./controllers/CRUD/contactCRUD');
 const attendanceCRUD = require('./controllers/CRUD/attendanceCRUD');
-// const employeeCRUD = require('./controllers/CRUD/employeeCRUD');
+const employeeCRUD = require('./controllers/CRUD/employeeCRUD');
 const jobCRUD = require('./controllers/CRUD/jobCRUD');
 const locationCRUD = require('./controllers/CRUD/locationCRUD');
 
@@ -489,6 +493,7 @@ app.use('/', formsUser);
 app.use('/', formsJob);
 app.use('/', formsLocation);
 app.use('/', formsAttendance);
+app.use('/', formsEmployee);
 
 app.use('/', renderDashboard);
 
@@ -503,12 +508,13 @@ app.use('/', quoteCRUD);
 app.use('/', clientCRUD);
 app.use('/', contactCRUD);
 app.use('/', attendanceCRUD);
-// app.use('/', employeeCRUD);
+app.use('/', employeeCRUD);
 app.use('/', jobCRUD);
 app.use('/', locationCRUD);
 
 app.use('/', monthlyReturns);
 app.use('/', yearlyReturns);
+
 if (process.env.NODE_ENV === 'development') {
     app.listen(80, '127.0.0.1', () => {
         logger.info(`Server is running development`);
