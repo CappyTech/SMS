@@ -103,7 +103,7 @@ const sessionStore = new MySQLStore({
     database: process.env.DB_DATABASE,
     clearExpired: true,
     checkExpirationInterval: 300000,
-    expiration: 43200000,
+    expiration: 28800000,
     createDatabaseTable: true,
     endConnectionOnClose: true,
     disableTouch: false,
@@ -127,7 +127,7 @@ app.use(session({
     cookie: {
         secure: false,
         httpOnly: true,
-        maxAge: 600000,
+        maxAge: 28800000,
         sameSite: 'strict',
     }
 }));
@@ -329,6 +329,7 @@ Attendances.belongsTo(Locations, {
     }
 })();
 
+/*
 const cron = require('node-cron');
 
 cron.schedule('0 * * * *', async () => {  // Runs every hour
@@ -340,6 +341,7 @@ cron.schedule('0 * * * *', async () => {  // Runs every hour
         logger.error('Error during OneDrive sync: ' + error.message);
     }
 });
+*/
 
 app.use(async (req, res, next) => {
     try {
@@ -453,6 +455,7 @@ const formsClient = require('./controllers/forms/client');
 const formsContact = require('./controllers/forms/contact');
 const formsJob = require('./controllers/forms/job');
 const formsLocation = require('./controllers/forms/location');
+const formsAttendance = require('./controllers/forms/attendance');
 
 const renderDashboard = require('./controllers/renderDashboards');
 
@@ -466,7 +469,7 @@ const invoiceCRUD = require('./controllers/CRUD/invoiceCRUD');
 const quoteCRUD = require('./controllers/CRUD/quoteCRUD');
 const clientCRUD = require('./controllers/CRUD/clientCRUD');
 const contactCRUD = require('./controllers/CRUD/contactCRUD');
-// const attendanceCRUD = require('./controllers/CRUD/attendanceCRUD');
+const attendanceCRUD = require('./controllers/CRUD/attendanceCRUD');
 // const employeeCRUD = require('./controllers/CRUD/employeeCRUD');
 const jobCRUD = require('./controllers/CRUD/jobCRUD');
 const locationCRUD = require('./controllers/CRUD/locationCRUD');
@@ -485,6 +488,7 @@ app.use('/', formsSubcontractor);
 app.use('/', formsUser);
 app.use('/', formsJob);
 app.use('/', formsLocation);
+app.use('/', formsAttendance);
 
 app.use('/', renderDashboard);
 
@@ -498,14 +502,19 @@ app.use('/', invoiceCRUD);
 app.use('/', quoteCRUD);
 app.use('/', clientCRUD);
 app.use('/', contactCRUD);
-// app.use('/', attendanceCRUD);
+app.use('/', attendanceCRUD);
 // app.use('/', employeeCRUD);
 app.use('/', jobCRUD);
 app.use('/', locationCRUD);
 
 app.use('/', monthlyReturns);
 app.use('/', yearlyReturns);
-
-app.listen(443, '0.0.0.0', () => {
-    logger.info(`Server is running`);
-});
+if (process.env.NODE_ENV === 'development') {
+    app.listen(80, '127.0.0.1', () => {
+        logger.info(`Server is running development`);
+    });
+} else {
+    app.listen(443, '0.0.0.0', () => {
+        logger.info(`Server is running production`);
+    });
+}
