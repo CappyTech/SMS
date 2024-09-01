@@ -7,6 +7,13 @@
         <div class="container-fluid text-center">
             <form action="/location/update/<%= location.id %>" method="POST" class="needs-validation" novalidate>
                 <div class="row mb-3">
+                    <label for="address" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="name" name="name" class="form-control" value="<%= location.name %>">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
                     <label for="address" class="col-sm-3 col-form-label">Address</label>
                     <div class="col-sm-9">
                         <input type="text" id="address" name="address" class="form-control" value="<%= location.address %>" required>
@@ -19,7 +26,7 @@
                 <div class="row mb-3">
                     <label for="city" class="col-sm-3 col-form-label">City</label>
                     <div class="col-sm-9">
-                        <input type="text" id="city" name="city" class="form-control" value="<%= location.city %>" required>
+                        <input type="text" id="city" name="city" class="form-control" value="<%= location.city %>">
                         <div class="invalid-feedback">
                             Please provide a valid city.
                         </div>
@@ -29,7 +36,7 @@
                 <div class="row mb-3">
                     <label for="postalCode" class="col-sm-3 col-form-label">Postal Code</label>
                     <div class="col-sm-9">
-                        <input type="text" id="postalCode" name="postalCode" class="form-control" value="<%= location.postalCode %>" required>
+                        <input type="text" id="postalCode" name="postalCode" class="form-control" value="<%= location.postalCode %>">
                         <div class="invalid-feedback">
                             Please provide a valid postal code.
                         </div>
@@ -39,7 +46,7 @@
                 <div class="row mb-3">
                     <label for="country" class="col-sm-3 col-form-label">Country</label>
                     <div class="col-sm-9">
-                        <input type="text" id="country" name="country" class="form-control" value="<%= location.country %>" required>
+                        <input type="text" id="country" name="country" class="form-control" value="<%= location.country %>">
                         <div class="invalid-feedback">
                             Please provide a valid country.
                         </div>
