@@ -1,0 +1,26 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+
+<h1>Monthly Attendance for <%= startDate.format('MMMM YYYY') %></h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Person</th>
+            <th>Holidays Taken</th>
+            <th>Days Without Work</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% attendance.forEach(record => { %>
+            <tr>
+                <td><%= record.date %></td>
+                <td><%= record.Location ? record.Location.address : 'N/A' %></td>
+                <td><%= record.Employee ? record.Employee.name : record.Subcontractor.company %></td>
+                <td><%= record.holidays_taken %></td>
+                <td><%= record.days_without_work %></td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
