@@ -107,6 +107,24 @@ const deleteClient = async (req, res) => {
     }
 };
 
+router.get('/fetch/client/:clientId', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const clients = await Clients.findAll({
+            where: { id: req.params.clientId },
+            order: [['createdAt', 'ASC']],
+        });
+
+        res.json({ clients });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch clients' });
+    }
+});
+
 router.post('/client/create/', createClient);
 router.get('/client/read/:clientId', readClient);
 router.post('/client/update/:clientId', updateClient);
