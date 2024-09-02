@@ -35,7 +35,8 @@ const createInvoice = async (req, res) => {
             reverseCharge: amounts.reverseCharge,
             month: taxMonth,
             year: taxYear,
-            subcontractorId: req.params.selected
+            subcontractorId: req.params.selected,
+            cisRate: amounts.cisRate
         });
 
         res.redirect(`/invoice/read/${newInvoice.id}`);
@@ -196,6 +197,24 @@ const deleteInvoice = async (req, res) => {
         res.redirect('/error');
     }
 };
+
+router.get('/fetch/invoice/:id', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const invoice = await Invoice.findAll({
+            where: { id: req.params.id },
+            order: [['createdAt', 'ASC']],
+        });
+
+        res.json({ invoice });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch invoice' });
+    }
+});
 
 router.post('/invoice/create/:selected', createInvoice);
 router.get('/invoice/read/:invoice', readInvoice);
