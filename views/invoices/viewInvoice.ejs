@@ -29,6 +29,7 @@
                                 <li class="list-group-item">Tax Month</li>
                                 <li class="list-group-item">Tax Year</li>
                                 <li class="list-group-item">Submission Date</li>
+                                <li class="list-group-item">CIS Rate</li>
                             </ul>
                         </div>
                         <div class="col-6">
@@ -47,7 +48,8 @@
                                 <% } %>
                                 <li class="list-group-item"><%= invoice.month %></li>
                                 <li class="list-group-item"><%= invoice.year %></li>
-                                <li class="list-group-item"><%= slimDateTime(invoice.submissionDate) %></li
+                                <li class="list-group-item"><%= slimDateTime(invoice.submissionDate) %></li>
+                                <li class="list-group-item"><%= invoice.cisRate * 100 %></li>
                             </ul>
                         </div>
                     </div>
