@@ -123,6 +123,24 @@ const deleteLocation = async (req, res) => {
     }
 };
 
+router.get('/fetch/location/:id', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const location = await Locations.findAll({
+            where: { id: req.params.id },
+            order: [['createdAt', 'ASC']],
+        });
+
+        res.json({ location });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch location' });
+    }
+});
+
 // Define routes
 router.post('/location/create', createLocation);
 router.get('/location/read/:id', readLocation);
