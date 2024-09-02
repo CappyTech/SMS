@@ -199,6 +199,24 @@ const getMonthlyAttendance = async (req, res) => {
     }
 };
 
+router.get('/fetch/attendance/:id', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const attendance = await Attendances.findAll({
+            where: { id: req.params.id },
+            order: [['createdAt', 'ASC']],
+        });
+
+        res.json({ attendance });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch attendance' });
+    }
+});
+
 router.post('/attendance/create', createAttendance);
 router.post('/attendance/edit/:attendance', updateAttendance);
 router.post('/attendance/delete/:attendance', deleteAttendance);
