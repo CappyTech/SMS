@@ -223,6 +223,24 @@ const deleteUser = async (req, res) => {
     }
 };
 
+router.get('/fetch/user/:id', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const user = await User.findAll({
+            where: { id: req.params.id },
+            order: [['createdAt', 'ASC']],
+        });
+
+        res.json({ user });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch user' });
+    }
+});
+
 router.post('/user/create/:selected', helpers.ensurePermission(['permissionCreateUser']), createUser);
 router.get('/user/read/:id', helpers.ensurePermission(['permissionReadUser']), readUser);
 router.post('/user/update/:id', helpers.ensurePermission(['permissionUpdateUser']), updateUser);
