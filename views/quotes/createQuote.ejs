@@ -118,7 +118,7 @@
         const contactDropdown = document.getElementById('contactId');
         
         if (clientId) {
-            fetch(`/contacts/by-client/${clientId}`)
+            fetch(`/fetch/contact/${clientId}`)
                 .then(response => response.json())
                 .then(data => {
                     contactDropdown.innerHTML = ''; // Clear the current options
