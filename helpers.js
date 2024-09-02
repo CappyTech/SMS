@@ -86,28 +86,35 @@ function validateInvoiceData(data) {
         remittanceDate: value => !value || !isNaN(Date.parse(value)),
         labourCost: value => !isNaN(value) && Number(value) >= 0,
         materialCost: value => !isNaN(value) && Number(value) >= 0,
-        //month: value => !isNaN(value) && Number(value) >= 1 && Number(value) <= 12,
-        //year: value => !isNaN(value) && Number(value) >= 2000
     };
 
+    // Run the validations
     Object.keys(validations).forEach(field => {
         if (!validations[field](data[field])) {
             errors.push(`Invalid or missing value for ${field}`);
         }
     });
 
+    // Handle submissionDate, allowing it to be null
     if (data.submissionDate === '0000-00-00 00:00:00' || !data.submissionDate) {
         data.submissionDate = null;
     }
 
+    // Handle remittanceDate, allowing it to be null
+    if (data.remittanceDate === '0000-00-00 00:00:00' || !data.remittanceDate) {
+        data.remittanceDate = null;
+    }
+
+    // If there are validation errors, log them and throw an error with details
     if (errors.length > 0) {
         const errorMessage = errors.join(', ');
         logger.error(`Validation errors: ${errorMessage}`);
         throw new Error(errorMessage);
     }
 
+    // Return validated data
     return data;
-};
+}
 
 function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber) {
     labourCost = parseFloat(labourCost);
