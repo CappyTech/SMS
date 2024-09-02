@@ -464,7 +464,7 @@ const formsEmployee = require('./controllers/forms/employee');
 const renderDashboard = require('./controllers/renderDashboards');
 
 const userLogin = require('./controllers/user/login');
-//const userRegister = require('./controllers/user/register');
+const userRegister = require('./controllers/user/register');
 const userSettings = require('./controllers/user/settings');
 
 const userCRUD = require('./controllers/CRUD/userCRUD');
@@ -498,7 +498,7 @@ app.use('/', formsEmployee);
 app.use('/', renderDashboard);
 
 app.use('/', userLogin);
-//app.use('/', userRegister);
+app.use('/', userRegister);
 app.use('/', userSettings);
 
 app.use('/', userCRUD);
