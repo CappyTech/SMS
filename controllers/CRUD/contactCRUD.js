@@ -165,15 +165,16 @@ const deleteContact = async (req, res) => {
     }
 };
 
-router.get('/contacts/by-client/:clientId', async (req, res) => {
+router.get('/fetch/contact/:clientId', async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
+
         const contacts = await Contacts.findAll({
             where: { clientId: req.params.clientId },
-            order: [['name', 'ASC']],
+            order: [['createdAt', 'ASC']],
         });
 
         res.json({ contacts });
