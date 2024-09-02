@@ -228,6 +228,24 @@ const deleteSubcontractor = async (req, res) => {
     }
 };
 
+router.get('/fetch/subcontractor/:id', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const subcontractor = await Subcontractors.findAll({
+            where: { id: req.params.id },
+            order: [['createdAt', 'ASC']],
+        });
+
+        res.json({ subcontractor });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch subcontractor' });
+    }
+});
+
 router.post('/subcontractor/create/', createSubcontractor);
 router.get('/subcontractor/read/:id', readSubcontractor);
 router.post('/subcontractor/update/:id', updateSubcontractor);
