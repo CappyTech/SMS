@@ -46,14 +46,6 @@ const Attendances = sequelize.define('Attendances', {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
     },
-    holidays_taken: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-    },
-    days_without_work: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-    },
 }, {
     paranoid: false,
 });
