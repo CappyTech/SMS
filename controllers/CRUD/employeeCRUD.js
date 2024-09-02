@@ -45,6 +45,24 @@ const deleteEmployee = async (req, res) => {
     }
 };
 
+router.get('/fetch/employee/:id', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const employee = await Employees.findAll({
+            where: { id: req.params.id },
+            order: [['createdAt', 'ASC']],
+        });
+
+        res.json({ employee });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch employee' });
+    }
+});
+
 router.post('/employee/create', createEmployee);
 router.post('/employee/update/:employee', updateEmployee);
 router.post('/employee/delete/:employee', deleteEmployee);
