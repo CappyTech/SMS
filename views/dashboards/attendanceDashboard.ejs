@@ -39,24 +39,20 @@
                             <th>Date</th>
                             <th>Person</th>
                             <th>Location</th>
-                            <th>Holidays Taken</th>
-                            <th>Days Without Work</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% if (attendances.length > 0) { %>
                             <% attendances.forEach(attendance => { %>
                                 <tr>
-                                    <td><%= slimDateTime(attendance.date) %></td>
+                                    <td><a href="/attendance/daily/<%= attendance.date %>"><%= slimDateTime(attendance.date) %></a></td>
                                     <% if (attendance.Employee) { %>
-                                    <td><%= attendance.Employee.name %></td>
+                                    <td><a href="/employee/read/<%= attendance.Employee.name %>"><%= attendance.Employee.id %></a></td>
                                     <% } %>
                                     <% if (attendance.Subcontractor) { %>
-                                    <td><%= attendance.Subcontractor.company %></td>
+                                    <td><a href="/subcontractor/read/<%= attendance.Subcontractor.id %>"><%= attendance.Subcontractor.company %></a></td>
                                     <% } %>
-                                    <td><%= attendance.Location ? `${attendance.Location.address}, ${attendance.Location.city}, ${attendance.Location.postalCode}` : 'N/A' %></td>
-                                    <td><%= attendance.holidays_taken %></td>
-                                    <td><%= attendance.days_without_work %></td>
+                                    <td><a href="/location/read/<%= attendance.Location.id %>"><%= attendance.Location ? `${attendance.Location.address}, ${attendance.Location.city}, ${attendance.Location.postalCode}` : 'N/A' %></a></td>
                                 </tr>
                             <% }); %>
                         <% } else { %>
