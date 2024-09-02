@@ -170,6 +170,24 @@ const deleteQuote = async (req, res) => {
     }
 };
 
+router.get('/fetch/quote/:quoteId', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const quotes = await Quotes.findAll({
+            where: { id: req.params.quoteId },
+            order: [['createdAt', 'ASC']],
+        });
+
+        res.json({ quotes });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch quotes' });
+    }
+});
+
 
 router.post('/quote/create/:client', createQuote);
 router.get('/quote/read/:quoteId', readQuote);
