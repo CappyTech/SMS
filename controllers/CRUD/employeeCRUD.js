@@ -35,7 +35,13 @@ const updateEmployee = async (req, res) => {
 // Delete Employee
 const deleteEmployee = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
         await Employees.destroy({ where: { id: req.params.employee } });
+        
         req.flash('success', 'Employee deleted successfully.');
         res.redirect('/employee');
     } catch (error) {
