@@ -49,8 +49,6 @@ const createInvoice = async (req, res) => {
                 title: 'Create Invoice',
                 errorMessages: req.flash('error'),
                 successMessage: req.flash('success'),
-                
-                
             });
         }
         logger.error('Error creating invoice: ' + error.message);
@@ -143,7 +141,6 @@ const updateInvoice = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        helpers.validateInvoiceData(req.body);
 
         const invoice = await Invoice.findByPk(req.params.invoice);
         if (!invoice) {
@@ -159,7 +156,7 @@ const updateInvoice = async (req, res) => {
             throw new Error(`Subcontractor with ID: ${invoice.subcontractorId} not found for invoice ${req.params.invoice}`);
         }
 
-        const amounts = helpers.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
+        const amounts = helpers.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber, subcontractor.isGross, subcontractor.isReverseCharge);
 
         await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
 
@@ -213,6 +210,44 @@ router.get('/fetch/invoice/:id', async (req, res) => {
         res.json({ invoice });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch invoice' });
+    }
+});
+
+router.get('fetch/unpaidinvoices', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const unpaidInvoices = await Invoice.findAll({
+            where: { remittanceDate: null },
+            attributes: ['id', 'kashflowNumber'],
+            order: [['kashflowNumber', 'ASC']]
+        });
+
+        res.json({ unpaidInvoices });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch unpaid invoices' });
+    }
+});
+
+router.get('fetch/unsubmittedinvoices', async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
+        const unsubmittedInvoices = await Invoices.findAll({
+            where: { submissionDate: null },
+            attributes: ['id', 'kashflowNumber'],
+            order: [['kashflowNumber', 'ASC']]
+        });
+
+        res.json({ unsubmittedInvoices });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch unsubmitted invoices' });
     }
 });
 
