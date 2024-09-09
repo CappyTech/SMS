@@ -69,6 +69,18 @@ const Invoices = sequelize.define('Invoices', {
         type: DataTypes.FLOAT,
         allowNull: true,
     },
+    cisAmountZero: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
+    cisAmountTwo: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
+    cisAmountThree: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
 }, {
     paranoid: true,
     timestamp:true,
