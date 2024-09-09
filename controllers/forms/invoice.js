@@ -13,7 +13,9 @@ const renderInvoiceCreateForm = async (req, res) => {
             return res.redirect('/');
         }
         
-        const subcontractors = await Subcontractor.findAll();
+        const subcontractors = await Subcontractor.findAll({
+            order: [['company', 'ASC']]
+        });
         res.render(path.join('invoices', 'createInvoice'), {
             title: 'Create Invoice',
             errorMessages: req.flash('error'),
