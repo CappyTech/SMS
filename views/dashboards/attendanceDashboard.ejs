@@ -52,7 +52,15 @@
                                     <% if (attendance.Subcontractor) { %>
                                     <td><a href="/subcontractor/read/<%= attendance.Subcontractor.id %>"><%= attendance.Subcontractor.company %></a></td>
                                     <% } %>
-                                    <td><a href="/location/read/<%= attendance.Location.id %>"><%= attendance.Location ? `${attendance.Location.address}, ${attendance.Location.city}, ${attendance.Location.postalCode}` : 'N/A' %></a></td>
+                                    <% if (attendance.Location.name) { %>
+                                        <td><a href="/location/read/<%= attendance.Location.id %>"><%= attendance.Location.name %></a></td>
+                                    <% } else { %>
+                                        <td><a href="/location/read/<%= attendance.Location.id %>">
+                                            <%= attendance.Location.address %>,
+                                            <%= attendance.Location.city %>,
+                                            <%= attendance.Location.postalCode %>
+                                        </a></td>
+                                    <% } %>
                                 </tr>
                             <% }); %>
                         <% } else { %>
