@@ -12,13 +12,10 @@ const logger = require('../../logger');
 
 const createAttendance = async (req, res) => {
     try {
-        // Ensure the user is authenticated and has the 'admin' role
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-
-        // Extracting attendance data from the request body
         const {
             date,
             locationId,
@@ -26,7 +23,6 @@ const createAttendance = async (req, res) => {
             subcontractorId,
         } = req.body;
 
-        // Creating a new attendance record with the provided data
         await Attendances.create({
             date,
             locationId,
@@ -34,11 +30,9 @@ const createAttendance = async (req, res) => {
             subcontractorId: subcontractorId || null, 
         });
 
-        // If successful, display a success message and redirect to the attendance dashboard
         req.flash('success', 'Attendance record created successfully.');
         res.redirect('/dashboard/attendance');
     } catch (error) {
-        // Log the error and display an error message if the creation fails
         logger.error('Error creating attendance: ' + error.message);
         req.flash('error', 'Failed to create attendance.');
         res.redirect('/dashboard/attendance');
