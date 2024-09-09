@@ -70,9 +70,8 @@ const updateLocation = async (req, res) => {
             return res.redirect('/');
         }
         const { name, address, city, postalCode, country, latitude, longitude } = req.body;
-        const locationId = req.params.locationId;
 
-        const location = await Locations.findByPk(locationId);
+        const location = await Locations.findByPk(req.params.id);
         if (!location) {
             req.flash('error', 'Location not found.');
             return res.redirect('/dashboard/location');
