@@ -116,7 +116,7 @@ function validateInvoiceData(data) {
     return data;
 }
 
-function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber) {
+function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber, isGross, isReverseCharge, cisAmountZero, cisAmountTwo, cisAmountThree) {
     labourCost = parseFloat(labourCost);
     materialCost = parseFloat(materialCost);
 
@@ -132,6 +132,9 @@ function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber)
     }
 
     const cisAmount = labourCost * cisRate;
+    const cisAmountZero = labourCost * 0.0;
+    const cisAmountTwo = labourCost * 0.2;
+    const cisAmountThree = labourCost * 0.3;
     const netAmount = grossAmount - cisAmount;
     reverseCharge = grossAmount * 0.2;
 
@@ -140,7 +143,10 @@ function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber)
         grossAmount: grossAmount.toFixed(2),
         cisAmount: cisAmount.toFixed(2),
         netAmount: netAmount.toFixed(2),
-        reverseCharge: reverseCharge.toFixed(2)
+        reverseCharge: reverseCharge.toFixed(2),
+        cisAmountZero: cisAmountZero.toFixed(2),
+        cisAmountTwo: cisAmountTwo.toFixed(2),
+        cisAmountThree: cisAmountThree.toFixed(2),
     };
 };
 
