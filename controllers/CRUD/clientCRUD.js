@@ -12,14 +12,22 @@ const Jobs = require('../../models/job');
 
 const createClient = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/');
+        }
+
         const {
             name 
         } = req.body;
+
         const clients = await Clients.create({
             name: name
         });
+
         req.flash('success', 'Client created successfully');
         return res.redirect(`/client/read/${clients.id}`);
+        
     } catch (error) {
         logger.error('Error creating client:' + error.message);
         req.flash('error', 'Error: ' + error.message);
