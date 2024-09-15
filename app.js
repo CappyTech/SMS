@@ -58,7 +58,8 @@ app.use(flash());
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 1500,
+    max: 100,
+    message: "Too many requests, please try again later.",
     keyGenerator: (req) => {
         // Use the IP address for rate-limiting
         return req.ip;
@@ -154,7 +155,7 @@ app.use((req, res, next) => {
     }
     next();
 });
-
+/*
 const { Op } = require("sequelize");
 
 const createDefaultAdmin = async () => {
@@ -188,7 +189,7 @@ const createDefaultAdmin = async () => {
         logger.error('Error creating default admin: ' + error);
     }
 };
-
+*/
 const Users = require('./models/user');
 const Subcontractors = require('./models/subcontractor');
 const Invoices = require('./models/invoice');
@@ -360,6 +361,15 @@ app.use(async (req, res, next) => {
     }
 });
 
+app.use((req, res, next) => {
+    const blockedUserAgents = ['wpbot', 'bot'];
+    const userAgent = req.headers['user-agent'].toLowerCase();
+    if (blockedUserAgents.some(bot => userAgent.includes(bot))) {
+        res.status(403).send('Access Forbidden');
+    } else {
+        next();
+    }
+});
 
 
 app.use(async (req, res, next) => {
