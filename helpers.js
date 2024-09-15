@@ -116,7 +116,7 @@ function validateInvoiceData(data) {
     return data;
 }
 
-function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber, isGross, isReverseCharge, cisAmountZero, cisAmountTwo, cisAmountThree) {
+function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber, isGross, isReverseCharge) {
     labourCost = parseFloat(labourCost);
     materialCost = parseFloat(materialCost);
 
