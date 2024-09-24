@@ -246,9 +246,9 @@ router.get('/fetch/subcontractor/:id', async (req, res) => {
     }
 });
 
-router.post('/subcontractor/create/', createSubcontractor);
-router.get('/subcontractor/read/:id', readSubcontractor);
-router.post('/subcontractor/update/:id', updateSubcontractor);
-router.post('/subcontractor/delete/:id', deleteSubcontractor);
+router.post('/subcontractor/create/', helpers.ensureAuthenticated, createSubcontractor);
+router.get('/subcontractor/read/:id', helpers.ensureAuthenticated, readSubcontractor);
+router.post('/subcontractor/update/:id', helpers.ensureAuthenticated, updateSubcontractor);
+router.post('/subcontractor/delete/:id', helpers.ensureAuthenticated, deleteSubcontractor);
 
 module.exports = router;

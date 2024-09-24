@@ -5,6 +5,7 @@ const Subcontractor = require('../models/subcontractor');
 const { formatCurrency, slimDateTime, rounding } = require('../helpers');
 const logger = require('../logger'); 
 const path = require('path');
+const helpers = require('../helpers');
 
 const renderYearlyReturns = async (req, res) => {
     try {
@@ -81,6 +82,6 @@ const renderYearlyReturns = async (req, res) => {
     }
 };
 
-router.get('/yearly/returns/:year/:id', renderYearlyReturns);
+router.get('/yearly/returns/:year/:id', helpers.ensureAuthenticated, renderYearlyReturns);
 
 module.exports = router;

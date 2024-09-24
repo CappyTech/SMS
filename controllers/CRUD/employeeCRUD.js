@@ -69,8 +69,8 @@ router.get('/fetch/employee/:id', async (req, res) => {
     }
 });
 
-router.post('/employee/create', createEmployee);
-router.post('/employee/update/:employee', updateEmployee);
-router.post('/employee/delete/:employee', deleteEmployee);
+router.post('/employee/create', helpers.ensureAuthenticated, createEmployee);
+router.post('/employee/update/:employee', helpers.ensureAuthenticated, updateEmployee);
+router.post('/employee/delete/:employee', helpers.ensureAuthenticated, deleteEmployee);
 
 module.exports = router;

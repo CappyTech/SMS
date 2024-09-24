@@ -5,6 +5,7 @@ const Subcontractor = require('../models/subcontractor');
 const { formatCurrency, slimDateTime } = require('../helpers');
 const logger = require('../logger');
 const path = require('path');
+const helpers = require('../helpers');
 
 const renderMonthlyReturnsForm = async (req, res) => {
     try {
@@ -233,9 +234,9 @@ const renderMonthlyReturnsYear = async (req, res) => {
     }
 };
 
-router.get('/monthly/returns/form', renderMonthlyReturnsForm);
-router.get('/monthly/returns/:month/:year/:id', renderMonthlyReturnsForOneSubcontactor);
-router.get('/monthly/returns/:year/:month', renderMonthlyReturnsForAll);
-router.get('/monthly/returns/:year', renderMonthlyReturnsYear);
+router.get('/monthly/returns/form', helpers.ensureAuthenticated, renderMonthlyReturnsForm);
+router.get('/monthly/returns/:month/:year/:id', helpers.ensureAuthenticated, renderMonthlyReturnsForOneSubcontactor);
+router.get('/monthly/returns/:year/:month', helpers.ensureAuthenticated, renderMonthlyReturnsForAll);
+router.get('/monthly/returns/:year', helpers.ensureAuthenticated, renderMonthlyReturnsYear);
 
 module.exports = router;

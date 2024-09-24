@@ -32,7 +32,7 @@ function formatCurrency(amount) {
 const ensureAuthenticated = (req, res, next) => {
     logger.info(`Session Data: ${JSON.stringify(req.session)}`);
     if (!req.session.user) {
-        req.flash('error', 'You need to sign in.');
+        req.flash('error', 'Please sign in.');
         logger.info(`Unknown user accessed path ${req.method} ${req.originalUrl}`);
         return res.redirect('/signin');
     }
@@ -45,12 +45,12 @@ const ensureAuthenticated = (req, res, next) => {
 const ensureRole = (roles) => {
     return (req, res, next) => {
         if (!req.session.user) {
-            req.flash('error', 'You need to sign in.');
+            req.flash('error', 'Please sign in.');
             return res.redirect('/signin');
         }
         // Check if user's role is in the list of allowed roles
         if (!roles.includes(req.session.user.role)) {
-            req.flash('error', 'Access denied.');
+            req.flash('error', 'Access denied | You do not have the correct role.');
             return res.redirect('/');
         }
         next();
@@ -61,7 +61,7 @@ const ensureRole = (roles) => {
 const ensurePermission = (requiredPermissions) => {
     return (req, res, next) => {
         if (!req.session.user) {
-            req.flash('error', 'You need to sign in.');
+            req.flash('error', 'Please sign in.');
             return res.redirect('/signin');
         }
 
@@ -70,7 +70,7 @@ const ensurePermission = (requiredPermissions) => {
         const hasPermission = requiredPermissions.every(permission => userPermissions[permission]);
 
         if (!hasPermission) {
-            req.flash('error', 'Access denied.');
+            req.flash('error', 'Access denied | You do not have the correct permissions.');
             return res.redirect('/');
         }
         next();

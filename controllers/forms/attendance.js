@@ -3,6 +3,7 @@ const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
 const path = require('path');
+
 const Attendances = require('../../models/attendance');
 const Locations = require('../../models/location');
 const Employees = require('../../models/employee');
@@ -41,19 +42,19 @@ const renderAttendanceUpdateForm = async (req, res) => {
             return res.redirect('/');
         }
 
-        const Attendances = await Attendances.findByPk(req.params.attendance);
+        const Attendance = await Attendances.findByPk(req.params.attendance);
 
         const locations = await Locations.findAll();
         const employees = await Employees.findAll();
         const subcontractors = await Subcontractors.findAll();
 
-        if (!Attendances) {
+        if (!Attendance) {
             return res.status(404).send('Attendance not found');
         }
 
         res.render(path.join('attendance', 'updateAttendance'), {
             title: 'Update Attendance',
-            Attendances,
+            Attendances: Attendance,
             locations: locations,
             employees: employees,
             subcontractors: subcontractors,
@@ -67,7 +68,7 @@ const renderAttendanceUpdateForm = async (req, res) => {
     }
 };
 
-router.get('/attendance/create', renderAttendanceCreateForm);
-router.get('/attendance/update/:attendance', renderAttendanceUpdateForm);
+router.get('/attendance/create', helpers.ensureAuthenticated, renderAttendanceCreateForm);
+router.get('/attendance/update/:attendance', helpers.ensureAuthenticated, renderAttendanceUpdateForm);
 
 module.exports = router;

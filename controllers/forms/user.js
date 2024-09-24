@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
-
 const path = require('path');
+
 const User = require('../../models/user');
 
 const renderUserCreateForm = async (req, res) => {
@@ -58,7 +58,7 @@ const renderUserUpdateForm = async (req, res) => {
     }
 };
 
-router.get('/user/create', renderUserCreateForm);
-router.get('/user/update/:user', renderUserUpdateForm);
+router.get('/user/create', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderUserCreateForm);
+router.get('/user/update/:user', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderUserUpdateForm);
 
 module.exports = router;

@@ -189,10 +189,10 @@ router.get('/fetch/quote/:quoteId', async (req, res) => {
 });
 
 
-router.post('/quote/create/:client', createQuote);
-router.get('/quote/read/:quoteId', readQuote);
-router.get('/quote/read/:client', readQuotes);
-router.post('/quote/update/:id', updateQuote);
-router.post('/quote/delete/:id', deleteQuote);
+router.post('/quote/create/:client', helpers.ensureAuthenticated, createQuote);
+router.get('/quote/read/:quoteId', helpers.ensureAuthenticated, readQuote);
+router.get('/quote/read/:client', helpers.ensureAuthenticated, readQuotes);
+router.post('/quote/update/:id', helpers.ensureAuthenticated, updateQuote);
+router.post('/quote/delete/:id', helpers.ensureAuthenticated, deleteQuote);
 
 module.exports = router;

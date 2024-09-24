@@ -61,7 +61,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
     }
 };
 
-router.get('/invoice/create/', renderInvoiceCreateForm);
-router.get('/invoice/update/:invoice', renderInvoiceUpdateForm);
+router.get('/invoice/create/', helpers.ensureAuthenticated, renderInvoiceCreateForm);
+router.get('/invoice/update/:invoice', helpers.ensureAuthenticated, renderInvoiceUpdateForm);
 
 module.exports = router;

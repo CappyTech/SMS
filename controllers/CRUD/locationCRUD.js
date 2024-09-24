@@ -141,9 +141,9 @@ router.get('/fetch/location/:id', async (req, res) => {
 });
 
 // Define routes
-router.post('/location/create', createLocation);
-router.get('/location/read/:id', readLocation);
-router.post('/location/update/:id', updateLocation);
-router.post('/location/delete/:id', deleteLocation);
+router.post('/location/create', helpers.ensureAuthenticated, createLocation);
+router.get('/location/read/:id', helpers.ensureAuthenticated, readLocation);
+router.post('/location/update/:id', helpers.ensureAuthenticated, updateLocation);
+router.post('/location/delete/:id', helpers.ensureAuthenticated, deleteLocation);
 
 module.exports = router;

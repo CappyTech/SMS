@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const helpers = require('../../helpers');
 const logger = require('../../logger');
 const path = require('path');
+
 const Locations = require('../../models/location');
+
 
 // Render Location Creation Form
 const renderLocationCreateForm = async (req, res) => {
@@ -56,7 +59,7 @@ const renderLocationUpdateForm = async (req, res) => {
 };
 
 // Define routes for rendering forms
-router.get('/location/create', renderLocationCreateForm);
-router.get('/location/update/:locationId', renderLocationUpdateForm);
+router.get('/location/create', helpers.ensureAuthenticated, renderLocationCreateForm);
+router.get('/location/update/:locationId', helpers.ensureAuthenticated, renderLocationUpdateForm);
 
 module.exports = router;

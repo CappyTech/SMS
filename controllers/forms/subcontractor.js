@@ -3,6 +3,7 @@ const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
 const path = require('path');
+
 const Subcontractor = require('../../models/subcontractor');
 
 const selectSubcontractor = async (req, res) => {
@@ -91,7 +92,7 @@ const renderSubcontractorUpdateForm = async (req, res) => {
 };
 
 //router.get('/subcontractor/select', selectSubcontractor);
-router.get('/subcontractor/create', renderSubcontractorCreateForm);
-router.get('/subcontractor/update/:subcontractor', renderSubcontractorUpdateForm);
+router.get('/subcontractor/create', helpers.ensureAuthenticated, renderSubcontractorCreateForm);
+router.get('/subcontractor/update/:subcontractor', helpers.ensureAuthenticated, renderSubcontractorUpdateForm);
 
 module.exports = router;

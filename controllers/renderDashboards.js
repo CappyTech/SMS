@@ -464,17 +464,17 @@ const renderEmployeeDashboard = async (req, res) => {
     }
 };
 
-router.get('/dashboard/stats/:year?/:month?', renderStatsDashboard);
-router.get('/dashboard/user', renderUserDashboard);
-router.get('/dashboard/subcontractor', renderSubcontractorDashboard);
-router.get('/dashboard/invoice', renderInvoiceDashboard);
-router.get('/dashboard/quote', renderQuotesDashboard);
-router.get('/dashboard/client', renderClientsDashboard);
-router.get('/dashboard/contact', renderContactsDashboard);
-router.get('/dashboard/job', renderJobsDashboard);
+router.get('/dashboard/stats/:year?/:month?', helpers.ensureAuthenticated, renderStatsDashboard);
+router.get('/dashboard/user', helpers.ensureAuthenticated, renderUserDashboard);
+router.get('/dashboard/subcontractor', helpers.ensureAuthenticated, renderSubcontractorDashboard);
+router.get('/dashboard/invoice', helpers.ensureAuthenticated, renderInvoiceDashboard);
+router.get('/dashboard/quote', helpers.ensureAuthenticated, renderQuotesDashboard);
+router.get('/dashboard/client', helpers.ensureAuthenticated, renderClientsDashboard);
+router.get('/dashboard/contact', helpers.ensureAuthenticated, renderContactsDashboard);
+router.get('/dashboard/job', helpers.ensureAuthenticated, renderJobsDashboard);
 //router.get('/dashboard/archive', renderQuoteArchiveDashboard);
-router.get('/dashboard/location', renderLocationsDashboard);
-router.get('/dashboard/attendance', renderAttendanceDashboard);
-router.get('/dashboard/employee',renderEmployeeDashboard);
+router.get('/dashboard/location', helpers.ensureAuthenticated, renderLocationsDashboard);
+router.get('/dashboard/attendance', helpers.ensureAuthenticated, renderAttendanceDashboard);
+router.get('/dashboard/employee', helpers.ensureAuthenticated, renderEmployeeDashboard);
 
 module.exports = router;

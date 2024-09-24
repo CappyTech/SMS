@@ -211,12 +211,12 @@ router.get('/fetch/attendance/:id', async (req, res) => {
     }
 });
 
-router.post('/attendance/create', createAttendance);
-router.post('/attendance/edit/:attendance', updateAttendance);
-router.post('/attendance/delete/:attendance', deleteAttendance);
+router.post('/attendance/create', helpers.ensureAuthenticated, createAttendance);
+router.post('/attendance/edit/:attendance', helpers.ensureAuthenticated, updateAttendance);
+router.post('/attendance/delete/:attendance', helpers.ensureAuthenticated, deleteAttendance);
 
-router.get('/attendance/daily/:date?', getDailyAttendance);
-router.get('/attendance/weekly/:startDate?', getWeeklyAttendance);
-router.get('/attendance/monthly/:year?/:month?', getMonthlyAttendance);
+router.get('/attendance/daily/:date?', helpers.ensureAuthenticated, getDailyAttendance);
+router.get('/attendance/weekly/:startDate?', helpers.ensureAuthenticated, getWeeklyAttendance);
+router.get('/attendance/monthly/:year?/:month?', helpers.ensureAuthenticated, getMonthlyAttendance);
 
 module.exports = router;

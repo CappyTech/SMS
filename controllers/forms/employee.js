@@ -38,7 +38,7 @@ const renderUpdateEmployeeForm = async (req, res) => {
     }
 };
 
-router.get('/employee/create', renderCreateEmployeeForm);
-router.get('/employee/update/:employee', renderUpdateEmployeeForm);
+router.get('/employee/create', helpers.ensureAuthenticated, renderCreateEmployeeForm);
+router.get('/employee/update/:employee', helpers.ensureAuthenticated, renderUpdateEmployeeForm);
 
 module.exports = router;

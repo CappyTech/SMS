@@ -28,9 +28,10 @@ const schema = Joi.object({
 
 const createUser = async (req, res) => {
     try {
-        const { error, value } = schema.validate(req.body);
-        if (error) {
-            req.flash('error', 'Invalid input.' + error);
+        const { errors, value } = schema.validate(req.body);
+
+        if (errors) {
+            req.flash('error', 'Invalid input.' + errors);
             return res.redirect('/');
         }
 
@@ -67,16 +68,6 @@ const createUser = async (req, res) => {
 
 const readUser = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
-        // Check if the logged-in user has permissions.
-        if (!req.session.user.permissionReadUser) {
-            return res.status(403).send('Access denied.');
-        }
-
         // Verify if req.params and req.params.id exist
         if (!req.params || !req.params.id) {
             return res.status(400).send('Bad Request: Missing user id parameter.');
@@ -104,22 +95,6 @@ const readUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
-        // Check if the logged-in user has permissions.
-        if (!req.session.user.permissionUpdateUser) {
-            return res.status(403).send('Access denied.');
-        }
-
-        // Check if User exists and has an update method
-        if (!User || typeof User.update !== 'function') {
-            logger.error('Error: User model or update method not found!');
-            return res.status(500).send('Server Error.');
-        }
-
         // Verify if req.params and req.params.id exist
         if (!req.params || !req.params.id) {
             return res.status(400).send('Bad Request: Missing user id parameter.');
@@ -198,11 +173,6 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         if (req.session.user.id === req.params.id) {
             return res.status(403).send('Access denied. You cannot delete your own account.');
         }
@@ -225,11 +195,6 @@ const deleteUser = async (req, res) => {
 
 router.get('/fetch/user/:id', async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const user = await User.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
@@ -241,9 +206,9 @@ router.get('/fetch/user/:id', async (req, res) => {
     }
 });
 
-router.post('/user/create/:selected', helpers.ensurePermission(['permissionCreateUser']), createUser);
-router.get('/user/read/:id', helpers.ensurePermission(['permissionReadUser']), readUser);
-router.post('/user/update/:id', helpers.ensurePermission(['permissionUpdateUser']), updateUser);
-router.post('/user/delete/:id', helpers.ensurePermission(['permissionDeleteUser']), deleteUser);
+router.post('/user/create/:selected', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionCreateUser']), createUser);
+router.get('/user/read/:id', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionReadUser']), readUser);
+router.post('/user/update/:id', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionUpdateUser']), updateUser);
+router.post('/user/delete/:id', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionDeleteUser']), deleteUser);
 
 module.exports = router;

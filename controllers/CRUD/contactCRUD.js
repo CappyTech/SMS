@@ -183,10 +183,10 @@ router.get('/fetch/contact/:clientId', async (req, res) => {
     }
 });
 
-router.post('/contact/create/:client', createContact);
-router.get('/contact/read/:contact', readContact);
-router.get('/contacts/read/:client', readContacts);
-router.post('/contact/update/:contact', updateContact);
-router.post('/contact/delete/:contact', deleteContact);
+router.post('/contact/create/:client', helpers.ensureAuthenticated, createContact);
+router.get('/contact/read/:contact', helpers.ensureAuthenticated, readContact);
+router.get('/contacts/read/:client', helpers.ensureAuthenticated, readContacts);
+router.post('/contact/update/:contact', helpers.ensureAuthenticated, updateContact);
+router.post('/contact/delete/:contact', helpers.ensureAuthenticated, deleteContact);
 
 module.exports = router;

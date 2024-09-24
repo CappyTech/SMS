@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
-
 const path = require('path');
+
 const Jobs = require('../../models/job');
 const Clients = require('../../models/client');
 const Quotes = require('../../models/quote');
@@ -74,7 +74,7 @@ const renderJobUpdateForm = async (req, res) => {
 };
 
 // Define routes for rendering forms
-router.get('/job/create', renderJobCreateForm);
-router.get('/job/update/:jobId', renderJobUpdateForm);
+router.get('/job/create', helpers.ensureAuthenticated, renderJobCreateForm);
+router.get('/job/update/:jobId', helpers.ensureAuthenticated, renderJobUpdateForm);
 
 module.exports = router;
