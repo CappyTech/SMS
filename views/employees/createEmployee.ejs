@@ -4,9 +4,10 @@
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <h1 class="display-5">Create Employee</h1>
-        <div class="container-fluid text-center">
+        <div class="container-fluid">
             <form action="/employee/create" method="POST" class="needs-validation">
-
+                
+                <!-- Name -->
                 <div class="row mb-3">
                     <label for="name" class="col-sm-3 col-form-label">Name</label>
                     <div class="col-sm-9">
@@ -14,10 +15,74 @@
                     </div>
                 </div>
 
+                <!-- Email -->
+                <div class="row mb-3">
+                    <label for="email" class="col-sm-3 col-form-label">Email</label>
+                    <div class="col-sm-9">
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="row mb-3">
+                    <label for="phoneNumber" class="col-sm-3 col-form-label">Phone Number</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="phoneNumber" name="phoneNumber" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Position -->
+                <div class="row mb-3">
+                    <label for="position" class="col-sm-3 col-form-label">Position</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="position" name="position" class="form-control" required>
+                    </div>
+                </div>
+
+                <!-- Employment Type -->
+                <div class="row mb-3">
+                    <label for="employmentType" class="col-sm-3 col-form-label">Type</label>
+                    <div class="col-sm-9">
+                        <select id="employmentType" name="employmentType" class="form-select" required>
+                            <option value="full-time">Full-Time</option>
+                            <option value="part-time">Part-Time</option>
+                            <option value="contract">Contract</option>
+                            <option value="intern">Intern</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Employment Status -->
+                <div class="row mb-3">
+                    <label for="employmentStatus" class="col-sm-3 col-form-label">Status</label>
+                    <div class="col-sm-9">
+                        <select id="employmentStatus" name="employmentStatus" class="form-select" required>
+                            <option value="active">Active</option>
+                            <option value="on leave">On Leave</option>
+                            <option value="terminated">Terminated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Emergency Contact Name -->
+                <div class="row mb-3">
+                    <label for="contactName" class="col-sm-3 col-form-label">Emergency Contact Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="contactName" name="contactName" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Emergency Contact Number -->
+                <div class="row mb-3">
+                    <label for="contactNumber" class="col-sm-3 col-form-label">Emergency Contact Number</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="contactNumber" name="contactNumber" class="form-control">
+                    </div>
+                </div>
+
                 <div class="d-grid">
                     <button type="submit" class="btn btn-hcs-green">Create Employee</button>
                 </div>
-                
             </form>
         </div>
     </div>
