@@ -312,6 +312,12 @@ Attendances.belongsTo(Locations, {
     allowNull: false,
 });
 
+// Association for Employees and managerId
+Employees.hasMany(Employees, {
+    foreignKey: 'managerId',
+    allowNull: true,
+});
+
 
 (async () => {
     try {
