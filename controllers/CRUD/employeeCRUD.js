@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
 const logger = require('../../logger');
+const path = require('path');
+const moment = require('moment');
+
 const Employees = require('../../models/employee');
 
 // Create Employee
@@ -15,6 +18,29 @@ const createEmployee = async (req, res) => {
         logger.error('Error creating employee: ' + error.message);
         req.flash('error', 'Failed to create employee.');
         res.redirect('/employee/create');
+    }
+};
+
+const readEmployee = async (req, res) => {
+    try {
+        const employee = await Employees.findByPk(req.params.employee);
+
+        if (!employee) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
+
+        res.render(path.join('employees', 'viewEmployee'), {
+            title: 'Employee',
+            employee,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            slimDateTime: helpers.slimDateTime,
+            formatCurrency: helpers.formatCurrency,
+        });
+    } catch (error) {
+        logger.error('Error viewing employee: ' + error.message);
+        req.flash('error', 'Error viewing employee: ' + error.message);
+        res.redirect('/error');
     }
 };
 
@@ -55,6 +81,7 @@ router.get('/fetch/employee/:id', async (req, res) => {
 });
 
 router.post('/employee/create', helpers.ensureAuthenticated, createEmployee);
+router.get('/employee/read/:employee', helpers.ensureAuthenticated, readEmployee)
 router.post('/employee/update/:employee', helpers.ensureAuthenticated, updateEmployee);
 router.post('/employee/delete/:employee', helpers.ensureAuthenticated, deleteEmployee);
 
