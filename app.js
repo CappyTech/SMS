@@ -215,7 +215,6 @@ Subcontractors.belongsTo(Users, {
 Subcontractors.hasMany(Invoices, {
     foreignKey: 'subcontractorId',
     allowNull: false,
-    as: 'invoices',
 });
 Invoices.belongsTo(Subcontractors, {
     foreignKey: 'subcontractorId',
@@ -318,23 +317,55 @@ Employees.hasMany(Employees, {
     allowNull: true,
 });
 
+// Association for Users
+Users.belongsTo(Subcontractors, { foreignKey: 'subcontractorId', as: 'Subcontractor' });
+Subcontractors.hasOne(Users, { foreignKey: 'subcontractorId' });
+
+Users.belongsTo(Clients, { foreignKey: 'clientId', as: 'Client' });
+Clients.hasOne(Users, { foreignKey: 'clientId' });
+
+Users.belongsTo(Employees, { foreignKey: 'employeeId', as: 'Employee' });
+Employees.hasOne(Users, { foreignKey: 'employeeId' });
 
 (async () => {
-    try {
-        // Sync all models at once
-        if (process.env.NODE_ENV === 'development') {
-            await sequelize.sync({ alter: true }); // Use alter to auto-migrate in development
-            logger.info('All models synchronized in development mode.');
-        } else if (process.env.NODE_ENV === 'Production') {
-            await sequelize.sync(); // In production, avoid altering the table structure automatically
-            logger.info('All models synchronized in production mode.');
+  try {
+    // Check for existing tables
+    const tables = await sequelize.getQueryInterface().showAllTables();
+    if (tables.length === 0) {
+        logger.info('The database has no tables.');
+        await sequelize.sync();
+        logger.info('All models synchronized.');
+        const admin = await Users.findOne({
+            where: {
+                [Op.or]: [
+                    { username: 'admin' },
+                    { role: 'admin' }
+                ]
+            }
+        });
+        if (!admin) {
+            await Users.create({
+                username: process.env.ADMIN_USERNAME,
+                email: process.env.ADMIN_EMAIL,
+                password: process.env.ADMIN_PASSWORD,
+                role: 'admin',
+            }, {
+                fields: ['username', 'email', 'password', 'role']
+            });
+            if (process.env.DEBUG) {
+                logger.info('Default admin created.');
+            }
+        } else {
+            if (process.env.DEBUG) {
+                logger.info('Default admin already exists.');
+            }
         }
-        if (process.env.DEV) {
-            await createDefaultAdmin(); // Create default admin user if needed
-        }
-    } catch (error) {
-        logger.error('Error syncing models: ' + error);
+    } else {
+      logger.info(`The database has the following tables: ${tables.join(', ')}`);
     }
+  } catch (error) {
+    logger.error('Error fetching tables / syncing: ' + error);
+  }
 })();
 
 /*
