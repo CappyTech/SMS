@@ -10,7 +10,7 @@ const renderIndex = (req, res) => {
         successMessage: req.flash('success'),
     });
 };
-
+/*
 router.get('/admin/onedrive-sync', async (req, res) => {
     try {
         logger.info('Manual trigger: Running OneDrive sync...');
@@ -21,7 +21,7 @@ router.get('/admin/onedrive-sync', async (req, res) => {
         res.status(500).send('Error during OneDrive sync.');
     }
 });
-
+*/
 router.get('/', renderIndex);
 
 module.exports = router;
