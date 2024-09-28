@@ -345,26 +345,6 @@ const renderJobsDashboard = async (req, res) => {
     }
 };
 
-
-router.get('/dashboard/stats', (req, res) => {
-    try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
-        const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(moment());
-        // Output for debugging
-        logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
-        // Redirect to the dashboard with the calculated tax year and month
-        res.redirect(`/dashboard/stats/${taxYear}/${taxMonth}`);
-    } catch (error) {
-        logger.error('Error rendering jobs dashboard:' + error.message);
-        req.flash('error', 'Error rendering jobs dashboard: ' + error.message);
-        res.redirect('/');
-    }
-});
-
 // Read all locations
 const renderLocationsDashboard = async (req, res) => {
     try {
@@ -456,6 +436,7 @@ const renderEmployeeDashboard = async (req, res) => {
             totalEmployees,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
+            slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
         logger.error('Error rendering employee dashboard: ' + error.message);
@@ -464,6 +445,17 @@ const renderEmployeeDashboard = async (req, res) => {
     }
 };
 
+router.get('/dashboard/stats', helpers.ensureAuthenticated, (req, res) => {
+    try {
+        const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(moment());
+        logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
+        return res.redirect(`/dashboard/stats/${taxYear}/${taxMonth}`);
+    } catch (error) {
+        logger.error('Error rendering jobs dashboard:' + error.message);
+        req.flash('error', 'Error rendering jobs dashboard: ' + error.message);
+        return res.redirect('/');
+    }
+});
 router.get('/dashboard/stats/:year?/:month?', helpers.ensureAuthenticated, renderStatsDashboard);
 router.get('/dashboard/user', helpers.ensureAuthenticated, renderUserDashboard);
 router.get('/dashboard/subcontractor', helpers.ensureAuthenticated, renderSubcontractorDashboard);
