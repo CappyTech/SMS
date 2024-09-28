@@ -1,15 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
-const moment = require('moment');
-const logger = require('../../logger'); 
-const path = require('path');
+const logger = require('../../logger');
 const Employees = require('../../models/employee');
 
+// Create Employee
 const createEmployee = async (req, res) => {
     try {
-        const { name } = req.body;
-        await Employees.create({ name });
+        const { name, email, phoneNumber, position, type, status, contactName, contactNumber } = req.body;
+        await Employees.create({ name, email, phoneNumber, position, type, status, contactName, contactNumber });
         req.flash('success', 'Employee created successfully.');
         res.redirect('/dashboard/employee');
     } catch (error) {
@@ -19,50 +18,36 @@ const createEmployee = async (req, res) => {
     }
 };
 
+// Update Employee
 const updateEmployee = async (req, res) => {
     try {
-        const { name, position } = req.body;
-        await Employees.update({ name, position }, { where: { id: req.params.employee } });
+        const { name, email, phoneNumber, position, type, status, contactName, contactNumber } = req.body;
+        await Employees.update({ name, email, phoneNumber, position, type, status, contactName, contactNumber }, { where: { id: req.params.employee } });
         req.flash('success', 'Employee updated successfully.');
-        res.redirect('/employee');
+        res.redirect('/dashboard/employee');
     } catch (error) {
         logger.error('Error updating employee: ' + error.message);
         req.flash('error', 'Failed to update employee.');
-        res.redirect(`/employee/update/${req.params.id}`);
+        res.redirect(`/employee/update/${req.params.employee}`);
     }
 };
 
 // Delete Employee
 const deleteEmployee = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         await Employees.destroy({ where: { id: req.params.employee } });
-        
         req.flash('success', 'Employee deleted successfully.');
-        res.redirect('/employee');
+        res.redirect('/dashboard/employee');
     } catch (error) {
         logger.error('Error deleting employee: ' + error.message);
         req.flash('error', 'Failed to delete employee.');
-        res.redirect('/employee');
+        res.redirect('/dashboard/employee');
     }
 };
 
 router.get('/fetch/employee/:id', async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
-        const employee = await Employees.findAll({
-            where: { id: req.params.id },
-            order: [['createdAt', 'ASC']],
-        });
-
+        const employee = await Employees.findByPk(req.params.id);
         res.json({ employee });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch employee' });
