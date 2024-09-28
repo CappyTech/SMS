@@ -33,6 +33,31 @@ const Users = sequelize.define('Users', {
         defaultValue: 'subcontractor',
         allowNull: false,
     },
+    // Foreign key fields to link with other models
+    subcontractorId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+            model: 'Subcontractors',
+            key: 'id',
+        }
+    },
+    clientId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+            model: 'Clients',
+            key: 'id',
+        }
+    },
+    employeeId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+            model: 'Employees',
+            key: 'id',
+        }
+    },
     // Permissions for roles
     permissionCreateUser: { type: DataTypes.BOOLEAN, defaultValue: false },
     permissionReadUser: { type: DataTypes.BOOLEAN, defaultValue: false },
@@ -73,6 +98,11 @@ const Users = sequelize.define('Users', {
 Users.beforeCreate(async (user) => {
     if (user.password) {
         user.password = await bcrypt.hash(user.password, 10);
+    }
+    // Ensure only one of these fields is set at a time
+    const count = [user.subcontractorId, user.clientId, user.employeeId].filter(id => id !== null).length;
+    if (count > 1) {
+        throw new Error('User can only be linked to one of subcontractor, client, or employee.');
     }
 });
 
