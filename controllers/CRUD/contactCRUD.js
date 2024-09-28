@@ -45,18 +45,11 @@ const createContact = async (req, res) => {
 
 const readContact = async (req, res) => {
     try {
-        // Check if session exists and session user role is an admin
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/'); // Ensure to return here
-        }
-
         const contact = await Contacts.findByPk(req.params.contact, {
             include: [
                 { model: Clients }
             ]
         });
-
         if (!contact) {
             return res.status(404).json({ error: 'Contact not found' });
         }
@@ -66,8 +59,6 @@ const readContact = async (req, res) => {
             contact,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -80,30 +71,20 @@ const readContact = async (req, res) => {
 
 const readContacts = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const clients = await Clients.findByPk(req.params.client);
-
         const contacts = await Contacts.findAll({
             where: { clientId: req.params.client },
             order: [['name', 'ASC']]
         });
-
         if (!contacts) {
             return res.status(404).json({ error: 'Contacts not found' });
         }
-
         res.render(path.join('contacts', 'viewContacts'), {
             title: 'Contacts',
             clients,
             contacts,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -116,22 +97,16 @@ const readContacts = async (req, res) => {
 
 const updateContact = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const { name, phone, email, note } = req.body;
         const contact = await Contacts.findByPk(req.params.contact);
-
         if (!contact) {
             return res.status(404).send('Contact not found');
         }
-
         contact.name = name;
         contact.phone = phone;
         contact.email = email;
         contact.note = note;
+
         await contact.save();
 
         req.flash('success', 'Contact updated successfully');
@@ -145,17 +120,13 @@ const updateContact = async (req, res) => {
 
 const deleteContact = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
         const contact = await Contacts.findByPk(req.params.contact);
-
         if (!contact) {
             return res.status(404).send('Contact not found');
         }
-
+        
         await contact.destroy();
+
         req.flash('success', 'Contact deleted successfully');
         return res.redirect('/dashboard/client/');
     } catch (error) {
@@ -167,11 +138,6 @@ const deleteContact = async (req, res) => {
 
 router.get('/fetch/contact/:clientId', async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const contacts = await Contacts.findAll({
             where: { clientId: req.params.clientId },
             order: [['createdAt', 'ASC']],
