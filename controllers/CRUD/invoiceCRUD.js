@@ -57,19 +57,38 @@ const createInvoice = async (req, res) => {
     }
 };
 
+const updateInvoice = async (req, res) => {
+    try {
+        const invoice = await Invoice.findByPk(req.params.invoice);
+        if (!invoice) {
+            throw new Error('Invoice not found');
+        }
+        if (!invoice.subcontractorId) {
+            logger.error(`No subcontractorId associated with invoice number: ${req.params.invoice}`);
+        }
+        const subcontractor = await Subcontractor.findByPk(invoice.subcontractorId);
+        if (!subcontractor) {
+            logger.error(`Subcontractor with ID: ${invoice.subcontractorId} not found for invoice ${req.params.invoice}`);
+        }
+        const amounts = helpers.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber, subcontractor.isGross, subcontractor.isReverseCharge);
+
+        await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
+
+        req.flash('success', 'Invoice updated successfully');
+        return res.redirect(`/invoice/read/${req.params.invoice}`);
+    } catch (error) {
+        logger.error(`Error updating invoice with ID: ${req.params.invoice}. Details:` + error.message);
+        req.flash('error', `Error updating invoice with ID: ${req.params.invoice}. Details:` + error.message);
+        return res.redirect(`/invoice/read/${req.params.invoice}`);
+    }
+};
+
 const readInvoice = async (req, res) => {
     try {
-        // Check if session exists and session user role is an admin
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/'); // Ensure to return here
-        }
-
         const invoice = await Invoice.findByPk(req.params.invoice, {
             include: [
                 { model: Subcontractor }
-            ],
-            order: [['invoiceNumber', 'ASC']]
+            ]
         });
 
         if (!invoice) {
@@ -81,8 +100,6 @@ const readInvoice = async (req, res) => {
             invoice,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -95,14 +112,7 @@ const readInvoice = async (req, res) => {
 
 const readInvoices = async (req, res) => {
     try {
-        // Check if session exists and session user role is an admin
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/'); // Ensure to return here
-        }
-
         const subcontractor = await Subcontractor.findByPk(req.params.subcontractor);
-
         const invoices = await Invoice.findAll({
             include: [
                 {
@@ -123,8 +133,6 @@ const readInvoices = async (req, res) => {
             invoices,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -132,40 +140,6 @@ const readInvoices = async (req, res) => {
         logger.error('Error viewing invoices:'+ error.message);
         req.flash('error', 'Error viewing invoices:' + error.message);
         res.redirect('/error');
-    }
-};
-
-const updateInvoice = async (req, res) => {
-    try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
-        const invoice = await Invoice.findByPk(req.params.invoice);
-        if (!invoice) {
-            throw new Error('Invoice not found');
-        }
-
-        if (!invoice.subcontractorId) {
-            throw new Error(`No subcontractorId associated with invoice number: ${req.params.invoice}`);
-        }
-
-        const subcontractor = await Subcontractor.findByPk(invoice.subcontractorId);
-        if (!subcontractor) {
-            throw new Error(`Subcontractor with ID: ${invoice.subcontractorId} not found for invoice ${req.params.invoice}`);
-        }
-
-        const amounts = helpers.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber, subcontractor.isGross, subcontractor.isReverseCharge);
-
-        await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
-
-        req.flash('success', 'Invoice updated successfully');
-        return res.redirect(`/invoice/read/${req.params.invoice}`);
-    } catch (error) {
-        logger.error(`Error updating invoice with ID: ${req.params.invoice}. Details:` + error.message);
-        req.flash('error', `Error updating invoice with ID: ${req.params.invoice}. Details:` + error.message);
-        return res.redirect(`/invoice/read/${req.params.invoice}`);
     }
 };
 
