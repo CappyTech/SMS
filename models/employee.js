@@ -4,47 +4,47 @@ const sequelize = require('../db.js');
 
 const Employees = sequelize.define('Employees', {
   id: {
-    type: DataTypes.UUID,
+    type: DataTypes.CHAR(36), // Match the database column type
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
   name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false,
   },
   email: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false,
     validate: {
       isEmail: true,
     },
   },
   phoneNumber: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: true,
   },
   contactName: {
-    type: DataTypes.STRING, // Store the emergency contact's name separately
+    type: DataTypes.STRING(255),
     allowNull: true,
   },
   contactNumber: {
-    type: DataTypes.STRING, // Store the emergency contact's phone number separately
+    type: DataTypes.STRING(255),
     allowNull: true,
   },
   position: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false,
   },
   type: {
-    type: DataTypes.STRING, // e.g., 'full-time', 'part-time'
+    type: DataTypes.STRING(255),
     allowNull: false,
   },
   status: {
-    type: DataTypes.STRING, // e.g., 'active', 'on leave', 'terminated'
+    type: DataTypes.STRING(255),
     allowNull: false,
   },
   managerId: {
-    type: DataTypes.UUID, // Self-referencing foreign key to Employees
+    type: DataTypes.CHAR(36), // Explicitly set length to 36 to match the database schema
     allowNull: true,
   },
   hireDate: {
