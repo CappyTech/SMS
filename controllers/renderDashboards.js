@@ -19,11 +19,6 @@ const path = require('path');
 const renderStatsDashboard = async (req, res) => {
     try {
         console.log("Session User:", req.session.user);
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         // Fetch the specified year and month from the URL parameters
         const specifiedYear = parseInt(req.params.year);
         const specifiedMonth = parseInt(req.params.month);
