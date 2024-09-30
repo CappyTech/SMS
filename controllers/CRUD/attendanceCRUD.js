@@ -4,6 +4,7 @@ const Attendances = require('../../models/attendance');
 const Locations = require('../../models/location');
 const Employees = require('../../models/employee');
 const Subcontractors = require('../../models/subcontractor');
+const Invoices = require('../../models/invoice');
 const moment = require('moment');
 const { Op } = require('sequelize');
 const helpers = require('../../helpers');
@@ -12,22 +13,20 @@ const logger = require('../../logger');
 
 const createAttendance = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
         const {
             date,
             locationId,
             employeeId,
             subcontractorId,
+            hoursWorked,
         } = req.body;
 
         await Attendances.create({
             date,
             locationId,
             employeeId: employeeId || null,
-            subcontractorId: subcontractorId || null, 
+            subcontractorId: subcontractorId || null,
+            hoursWorked,
         });
 
         req.flash('success', 'Attendance record created successfully.');
@@ -39,35 +38,111 @@ const createAttendance = async (req, res) => {
     }
 };
 
-const updateAttendance = async (req, res) => {
+const readAttendance = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
+        // Fetch the attendance record by primary key (ID) with associations
+        const attendance = await Attendances.findByPk(req.params.attendance, {
+            include: [
+                { model: Employees },  // Include Employee details if associated
+                { model: Subcontractors }, // Include Subcontractor details if associated
+                { model: Locations } // Include Location details
+            ]
+        });
+
+        if (!attendance) {
+            return res.status(404).json({ error: 'Attendance record not found' });
         }
-        const { id } = req.params;
-        const { date, locationId } = req.body;
 
-        await Attendances.update(
-            { date, locationId },
-            { where: { id } }
-        );
-
-        req.flash('success', 'Attendance record updated successfully.');
-        res.redirect('dashboard/attendance');
+        // Render the viewAttendance template
+        res.render(path.join('attendance', 'viewAttendance'), {
+            title: 'Attendance',
+            attendance,
+            errorMessages: req.flash('error'),
+            successMessage: req.flash('success'),
+            slimDateTime: helpers.slimDateTime,
+        });
     } catch (error) {
-        logger.error('Error updating attendance: ' + error.message);
-        req.flash('error', 'Failed to update attendance.');
-        res.redirect('dashboard/attendance');
+        logger.error('Error viewing attendance: ' + error.message);
+        req.flash('error', 'Error viewing attendance: ' + error.message);
+        res.redirect('/error');
     }
 };
 
+const updateAttendance = async (req, res) => {
+    try {
+        const { attendance } = req.params;
+        const {
+            date,
+            locationId,
+            employeeId,
+            subcontractorId,
+            hoursWorked,
+        } = req.body;
+
+        // Convert employeeId and subcontractorId values to null if 'null' is passed as a string or if undefined
+        const updatedEmployeeId = employeeId === 'null' || !employeeId ? null : employeeId;
+        const updatedSubcontractorId = subcontractorId === 'null' || !subcontractorId ? null : subcontractorId;
+
+        // Set locationId to null if it's not provided or set to 'null'
+        const updatedLocationId = locationId === 'null' || !locationId ? null : locationId;
+
+        // Validation: ensure that either employeeId or subcontractorId is set, not both at the same time
+        if (updatedEmployeeId && updatedSubcontractorId) {
+            req.flash('error', 'Please select either an employee or a subcontractor, but not both.');
+            return res.redirect(`/attendance/edit/${attendance}`);
+        }
+
+        // Validation: If employeeId is set, it must exist in the Employees table
+        if (updatedEmployeeId) {
+            const employeeExists = await Employees.findByPk(updatedEmployeeId);
+            if (!employeeExists) {
+                req.flash('error', 'Invalid Employee ID. Please select a valid employee.');
+                return res.redirect(`/attendance/edit/${attendance}`);
+            }
+        }
+
+        // Validation: If subcontractorId is set, it must exist in the Subcontractors table
+        if (updatedSubcontractorId) {
+            const subcontractorExists = await Subcontractors.findByPk(updatedSubcontractorId);
+            if (!subcontractorExists) {
+                req.flash('error', 'Invalid Subcontractor ID. Please select a valid subcontractor.');
+                return res.redirect(`/attendance/edit/${attendance}`);
+            }
+        }
+
+        // If locationId is provided and not null, validate its existence in the Locations table
+        if (updatedLocationId) {
+            const locationExists = await Locations.findByPk(updatedLocationId);
+            if (!locationExists) {
+                req.flash('error', 'Invalid Location ID. Please select a valid location.');
+                return res.redirect(`/attendance/edit/${attendance}`);
+            }
+        }
+
+        // Update the attendance record with validated values
+        await Attendances.update(
+            {
+                date,
+                locationId: updatedLocationId, // Set the validated or null location ID
+                employeeId: updatedEmployeeId, // Set the validated or null employee ID
+                subcontractorId: updatedSubcontractorId, // Set the validated or null subcontractor ID
+                hoursWorked: updatedEmployeeId ? hoursWorked : null, // Set hoursWorked only if it's an employee
+            },
+            { where: { id: attendance } }
+        );
+
+        req.flash('success', 'Attendance record updated successfully.');
+        res.redirect('/dashboard/attendance');
+    } catch (error) {
+        logger.error('Error updating attendance: ' + error.message);
+        req.flash('error', `Failed to update attendance: ${error.message}`);
+        res.redirect(`/attendance/edit/${attendance}`);
+    }
+};
+
+
 const deleteAttendance = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
         const attendance = req.params.attendance;
 
         await Attendances.destroy({ where: { attendance } });
@@ -82,10 +157,6 @@ const deleteAttendance = async (req, res) => {
 };
 
 const getDailyAttendance = async (req, res) => {
-    if (!req.session.user || req.session.user.role !== 'admin') {
-         req.flash('error', 'Access denied.');
-        return res.redirect('/');
-    }
     const date = req.params.date || moment().format('YYYY-MM-DD'); // Default to today
     try {
         const attendance = await Attendances.findAll({
@@ -93,6 +164,7 @@ const getDailyAttendance = async (req, res) => {
             include: [Locations, Employees, Subcontractors]
         });
         res.render(path.join('attendance', 'daily'), {
+            moment,
             attendance,
             date,
             errorMessages: req.flash('error'),
@@ -105,55 +177,162 @@ const getDailyAttendance = async (req, res) => {
 };
 
 const getWeeklyAttendance = async (req, res) => {
-    if (!req.session.user || req.session.user.role !== 'admin') {
-        req.flash('error', 'Access denied.');
-        return res.redirect('/');
-    }
-
-    const startDate = req.params.startDate
-        ? moment(req.params.startDate, 'YYYY-MM-DD')
-        : helpers.getStartOfWeek(moment()); // Default to start of current week (Monday)
-    const endDate = moment(startDate).add(6, 'days');
-
     try {
+        // Get the current tax year and week number based on the provided params or defaults.
+        const year = req.params.year ? parseInt(req.params.year) : helpers.getCurrentTaxYear();
+        const { start: startOfTaxYear } = helpers.getTaxYearStartEnd(year);
+        const taxYearStart = moment.utc(startOfTaxYear, 'Do MMMM YYYY');
+        let firstPayrollWeekStart = taxYearStart.clone().day(1);
+
+        if (firstPayrollWeekStart.isBefore(taxYearStart)) {
+            firstPayrollWeekStart.add(7, 'days');
+        }
+
+        const today = moment.utc();
+        const requestedWeekNumber = req.params.week ? parseInt(req.params.week) : today.diff(firstPayrollWeekStart, 'weeks') + 1;
+        const payrollWeekStart = firstPayrollWeekStart.clone().add((requestedWeekNumber - 1) * 7, 'days');
+        const endDate = payrollWeekStart.clone().add(6, 'days');
+
+        const previousWeek = requestedWeekNumber === 1 ? 52 : requestedWeekNumber - 1;
+        const previousYear = requestedWeekNumber === 1 ? year - 1 : year;
+        const nextWeek = requestedWeekNumber === 52 ? 1 : requestedWeekNumber + 1;
+        const nextYear = requestedWeekNumber === 52 ? year + 1 : year;
+
+        // Fetch attendance records within the payroll week range.
         const attendance = await Attendances.findAll({
             where: {
                 date: {
-                    [Op.between]: [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
                 }
             },
             include: [Locations, Employees, Subcontractors],
-            order: [['date', 'ASC']] // Ensure attendance is ordered by date
+            order: [['date', 'ASC']]
         });
 
-        // Group the attendance records by date and person (employee or subcontractor)
+        // Fetch subcontractor invoices within the week range.
+        const subcontractorInvoices = await Invoices.findAll({
+            where: {
+                invoiceDate: {
+                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                }
+            },
+            include: [Subcontractors]
+        });
+
+        const employeeCount = await Attendances.count({
+            where: {
+                date: {
+                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                },
+                employeeId: { [Op.not]: null }
+            },
+            distinct: true,
+            col: 'employeeId'
+        });
+
+        const subcontractorCount = await Attendances.count({
+            where: {
+                date: {
+                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                },
+                subcontractorId: { [Op.not]: null }
+            },
+            distinct: true,
+            col: 'subcontractorId'
+        });
+
+        const totalEmployeePay = attendance
+            .filter(a => a.employeeId !== null && a.hoursWorked !== null && a.Employee) // Ensure Employee is loaded
+            .reduce((sum, record) => sum + (record.hoursWorked * record.Employee.hourlyRate), 0);
+
+        // Group attendance records by person and date.
         const groupedAttendance = {};
+        let totalEmployeeHours = 0;
+        let totalSubcontractorPay = 0;
+
         attendance.forEach(record => {
             const personName = record.Employee ? record.Employee.name : record.Subcontractor.company;
-            const dateKey = moment(record.date).format('YYYY-MM-DD');
+
             if (!groupedAttendance[personName]) {
-                groupedAttendance[personName] = {};
+                groupedAttendance[personName] = {
+                    employeeId: record.Employee ? record.Employee.id : null,
+                    subcontractorId: record.Subcontractor ? record.Subcontractor.id : null,
+                    totalHoursWorked: 0,
+                    totalPay: 0,
+                    weeklyPay: 0, // Initialize weeklyPay for both employees and subcontractors
+                    dailyRecords: {},
+                    invoices: {}
+                };
             }
-            groupedAttendance[personName][dateKey] = {
-                location: record.Location ? record.Location.address : 'N/A',
-                holidays_taken: record.holidays_taken || 0,
-                days_without_work: record.days_without_work || 0,
+
+            const dateKey = moment(record.date).format('YYYY-MM-DD');
+
+            if (!groupedAttendance[personName].dailyRecords[dateKey]) {
+                groupedAttendance[personName].dailyRecords[dateKey] = {};
+            }
+
+            groupedAttendance[personName].dailyRecords[dateKey][record.id] = {
+                location: record.Location,
+                type: record.type,
+                hoursWorked: record.hoursWorked,
+                weeklyPay: record.Employee ? record.hoursWorked * record.Employee.hourlyRate : 0 // Calculate weeklyPay for employees
             };
+
+            // Track total hours worked and weekly pay for employees.
+            if (record.Employee) {
+                groupedAttendance[personName].totalHoursWorked += record.hoursWorked || 0;
+
+                // Calculate weekly pay for employees.
+                groupedAttendance[personName].weeklyPay += (record.hoursWorked || 0) * record.Employee.hourlyRate;
+                totalEmployeeHours += record.hoursWorked || 0;
+            } else if (record.Subcontractor) {
+                groupedAttendance[personName].totalPay += record.Subcontractor.invoiceAmount || 0;
+                groupedAttendance[personName].weeklyPay += record.Subcontractor.invoiceAmount || 0;
+            }
         });
+
+        // Attach invoices to the corresponding subcontractor in groupedAttendance.
+        subcontractorInvoices.forEach(invoice => {
+            const personName = invoice.Subcontractor.company;
+            const dateKey = moment(invoice.invoiceDate).format('YYYY-MM-DD');
+
+            if (groupedAttendance[personName]) {
+                if (!groupedAttendance[personName].invoices[dateKey]) {
+                    groupedAttendance[personName].invoices[dateKey] = [];
+                }
+
+                groupedAttendance[personName].invoices[dateKey].push(invoice);
+                groupedAttendance[personName].totalPay += invoice.grossAmount;
+                groupedAttendance[personName].weeklyPay += invoice.grossAmount;
+                totalSubcontractorPay += invoice.grossAmount;
+            }
+        });
+
+        console.log('Grouped Attendance:', JSON.stringify(groupedAttendance, null, 2));
 
         const daysOfWeek = [];
         for (let i = 0; i < 7; i++) {
-            daysOfWeek.push(moment(startDate).add(i, 'days').format('YYYY-MM-DD'));
+            daysOfWeek.push(payrollWeekStart.clone().add(i, 'days').format('YYYY-MM-DD'));
         }
 
+        // Render the updated weekly attendance view with the payroll week data.
         res.render(path.join('attendance', 'weekly'), {
             moment,
             groupedAttendance,
             daysOfWeek,
-            startDate: startDate.format('YYYY-MM-DD'),
+            startDate: payrollWeekStart.format('YYYY-MM-DD'),
             endDate: endDate.format('YYYY-MM-DD'),
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
+            previousYear,
+            previousWeek,
+            nextYear,
+            nextWeek,
+            employeeCount,
+            subcontractorCount,
+            totalEmployeePay,
+            totalEmployeeHours,
+            totalSubcontractorPay,
         });
     } catch (error) {
         logger.error('Error fetching weekly attendance: ' + error.message);
@@ -161,12 +340,7 @@ const getWeeklyAttendance = async (req, res) => {
     }
 };
 
-
 const getMonthlyAttendance = async (req, res) => {
-    if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
     const year = req.params.year || moment().year(); // Default to current year
     const month = req.params.month || moment().month() + 1; // Default to current month (note: moment months are 0-indexed)
     const startDate = moment(`${year}-${month}-01`);
@@ -181,6 +355,7 @@ const getMonthlyAttendance = async (req, res) => {
             include: [Locations, Employees, Subcontractors]
         });
         res.render(path.join('attendance', 'monthly'), {
+            moment,
             attendance,
             startDate,
             endDate,
@@ -193,13 +368,8 @@ const getMonthlyAttendance = async (req, res) => {
     }
 };
 
-router.get('/fetch/attendance/:id', async (req, res) => {
+router.get('/fetch/attendance/:id', helpers.ensureAuthenticated, async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const attendance = await Attendances.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
@@ -212,11 +382,36 @@ router.get('/fetch/attendance/:id', async (req, res) => {
 });
 
 router.post('/attendance/create', helpers.ensureAuthenticated, createAttendance);
-router.post('/attendance/edit/:attendance', helpers.ensureAuthenticated, updateAttendance);
+router.get('/attendance/read/:attendance', helpers.ensureAuthenticated, readAttendance);
+router.post('/attendance/update/:attendance', helpers.ensureAuthenticated, updateAttendance);
 router.post('/attendance/delete/:attendance', helpers.ensureAuthenticated, deleteAttendance);
+router.get('/attendance/weekly', helpers.ensureAuthenticated, (req, res) => {
+    try {
+        // Calculate the current tax year
+        const currentTaxYear = helpers.getCurrentTaxYear();
 
-router.get('/attendance/daily/:date?', helpers.ensureAuthenticated, getDailyAttendance);
-router.get('/attendance/weekly/:startDate?', helpers.ensureAuthenticated, getWeeklyAttendance);
+        // Get the start of the current tax year and the first payroll week start date
+        const { start: startOfTaxYear } = helpers.getTaxYearStartEnd(currentTaxYear);
+        const taxYearStart = moment.utc(startOfTaxYear, 'Do MMMM YYYY');
+        let firstPayrollWeekStart = taxYearStart.clone().day(1);
+        if (firstPayrollWeekStart.isBefore(taxYearStart)) {
+            firstPayrollWeekStart.add(7, 'days');
+        }
+
+        // Calculate the current week number within the tax year based on the first payroll week
+        const currentWeekNumber = moment.utc().diff(firstPayrollWeekStart, 'weeks') + 1;
+
+        // Redirect to the correct weekly attendance page based on the calculated year and week number
+        logger.info(`Redirecting to current weekly attendance: Year: ${currentTaxYear}, Week Number: ${currentWeekNumber}`);
+        return res.redirect(`/attendance/weekly/${currentTaxYear}/${currentWeekNumber}`);
+    } catch (error) {
+        logger.error('Error redirecting to current weekly attendance: ' + error.message);
+        req.flash('error', 'Error redirecting to current weekly attendance: ' + error.message);
+        return res.redirect('/');
+    }
+});
+router.get('/attendance/daily/:date', helpers.ensureAuthenticated, getDailyAttendance);
+router.get('/attendance/weekly/:year/:week?', helpers.ensureAuthenticated, getWeeklyAttendance);
 router.get('/attendance/monthly/:year?/:month?', helpers.ensureAuthenticated, getMonthlyAttendance);
 
 module.exports = router;
