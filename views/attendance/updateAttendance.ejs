@@ -1,82 +1,94 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
+
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-        <h1 class="display-5">Create Attendance</h1>
+        <h1 class="display-5">Update Attendance</h1> <!-- Updated title -->
         <div class="container-fluid text-center">
-            <form action="/attendance/create" method="POST" class="needs-validation">
+            <!-- The form action should point to the update route with the attendance ID -->
+            <form action="/attendance/update/<%= attendance.id %>" method="POST" class="needs-validation">
+
+                <!-- Date Input -->
                 <div class="row mb-3">
                     <label for="date" class="col-sm-3 col-form-label">Date</label>
                     <div class="col-sm-9">
-                        <input type="date" id="date" name="date" class="form-control" required>
+                        <input type="date" id="date" name="date" class="form-control" value="<%= attendance.date %>" required>
                     </div>
                 </div>
 
+                <!-- Location Selector -->
                 <div class="row mb-3">
                     <label for="locationId" class="col-sm-3 col-form-label">Location</label>
                     <div class="col-sm-9">
-                        <select id="locationId" name="locationId" class="form-select" required>
+                        <select id="locationId" name="locationId" class="form-select">
                             <option value="">Select Location</option>
                             <% locations.forEach(location => { %>
+                                <% if (location.name) { %>
+                                    <option value="<%= location.id %>"><%= location.name %></option>
+                                <% } else { %>
                                 <option value="<%= location.id %>"><%= location.address %>, <%= location.city %>, <%= location.postalCode %></option>
+                                <% } %>
                             <% }); %>
                         </select>
                     </div>
                 </div>
 
+                <!-- Employee Selector -->
                 <div class="row mb-3">
                     <label for="employeeId" class="col-sm-3 col-form-label">Employee</label>
                     <div class="col-sm-9">
                         <select id="employeeId" name="employeeId" class="form-select">
                             <option value="null">N/A</option>
                             <% employees.forEach(employee => { %>
-                                <option value="<%= employee.id %>"><%= employee.name %></option>
+                                <option value="<%= employee.id %>" <%= employee.id === attendance.employeeId ? 'selected' : '' %>>
+                                    <%= employee.name %>
+                                </option>
                             <% }); %>
                         </select>
                     </div>
                 </div>
 
+                <!-- Subcontractor Selector -->
                 <div class="row mb-3">
                     <label for="subcontractorId" class="col-sm-3 col-form-label">Subcontractor</label>
                     <div class="col-sm-9">
                         <select id="subcontractorId" name="subcontractorId" class="form-select">
                             <option value="null">N/A</option>
                             <% subcontractors.forEach(subcontractor => { %>
-                                <option value="<%= subcontractor.id %>"><%= subcontractor.company %></option>
+                                <option value="<%= subcontractor.id %>" <%= subcontractor.id === attendance.subcontractorId ? 'selected' : '' %>>
+                                    <%= subcontractor.company %>
+                                </option>
                             <% }); %>
                         </select>
                     </div>
                 </div>
 
+                <!-- Type Selector -->
                 <div class="row mb-3">
-                    <label for="holidays_taken" class="col-sm-3 col-form-label">Holidays Taken</label>
+                    <label for="type" class="col-sm-3 col-form-label">Type</label>
                     <div class="col-sm-9">
-                        <input type="number" step="0.5" id="holidays_taken" name="holidays_taken" class="form-control" value="0">
+                        <select id="type" name="type" class="form-select">
+                            <option value="off" <%= attendance.type === 'off' ? 'selected' : '' %>>Off</option>
+                            <option value="work" <%= attendance.type === 'work' ? 'selected' : '' %>>Work</option>
+                            <option value="holiday" <%= attendance.type === 'holiday' ? 'selected' : '' %>>Holiday</option>
+                            <option value="sick" <%= attendance.type === 'sick' ? 'selected' : '' %>>Sick</option>
+                        </select>
                     </div>
                 </div>
 
+                <!-- Hours Worked Input (only shown for employees) -->
                 <div class="row mb-3">
-                    <label for="days_without_work" class="col-sm-3 col-form-label">Days Without Work</label>
+                    <label for="hoursWorked" class="col-sm-3 col-form-label">Hours Worked</label>
                     <div class="col-sm-9">
-                        <input type="number" step="0.5" id="days_without_work" name="days_without_work" class="form-control" value="0">
+                        <input type="number" id="hoursWorked" name="hoursWorked" class="form-control" min="0" step="0.1" value="<%= attendance.hoursWorked %>">
                     </div>
                 </div>
 
+                <!-- Update Button -->
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-hcs-green">Create Attendance</button>
+                    <button type="submit" class="btn btn-hcs-green">Update Attendance</button> <!-- Changed button text -->
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<script>
-    $(document).ready(function(){
-    $('#date').datepicker({
-        format: 'dd/mm/yyyy',  // Ensure this format is recognized
-        autoclose: true,  // Close the picker after date selection
-        todayHighlight: true,  // Highlight today's date
-        orientation: "bottom auto"  // Automatically position the picker
-    }).datepicker('update', new Date());  // Set the default date to today's date
-});
-</script>
