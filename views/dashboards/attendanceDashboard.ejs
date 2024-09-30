@@ -1,5 +1,6 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
+
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
@@ -39,6 +40,7 @@
                             <th>Date</th>
                             <th>Person</th>
                             <th>Location</th>
+                            <th class="text-center">Actions</th> <!-- New column for actions -->
                         </tr>
                     </thead>
                     <tbody>
@@ -46,26 +48,40 @@
                             <% attendances.forEach(attendance => { %>
                                 <tr>
                                     <td><a href="/attendance/daily/<%= attendance.date %>"><%= slimDateTime(attendance.date) %></a></td>
-                                    <% if (attendance.Employee) { %>
-                                    <td><a href="/employee/read/<%= attendance.Employee.name %>"><%= attendance.Employee.id %></a></td>
-                                    <% } %>
-                                    <% if (attendance.Subcontractor) { %>
-                                    <td><a href="/subcontractor/read/<%= attendance.Subcontractor.id %>"><%= attendance.Subcontractor.company %></a></td>
-                                    <% } %>
-                                    <% if (attendance.Location.name) { %>
-                                        <td><a href="/location/read/<%= attendance.Location.id %>"><%= attendance.Location.name %></a></td>
-                                    <% } else { %>
-                                        <td><a href="/location/read/<%= attendance.Location.id %>">
-                                            <%= attendance.Location.address %>,
-                                            <%= attendance.Location.city %>,
-                                            <%= attendance.Location.postalCode %>
-                                        </a></td>
-                                    <% } %>
+                                    
+                                    <!-- Person Column -->
+                                    <td>
+                                        <% if (attendance.Employee) { %>
+                                            <a href="/employee/read/<%= attendance.Employee.id %>"><%= attendance.Employee.name %></a>
+                                        <% } else if (attendance.Subcontractor) { %>
+                                            <a href="/subcontractor/read/<%= attendance.Subcontractor.id %>"><%= attendance.Subcontractor.company %></a>
+                                        <% } else { %>
+                                            N/A
+                                        <% } %>
+                                    </td>
+                                    
+                                    <!-- Location Column -->
+                                    <td>
+                                        <% if (attendance.Location) { %>
+                                            <a href="/location/read/<%= attendance.Location.id %>">
+                                                <%= attendance.Location.name || attendance.Location.address || 'No Location' %>
+                                            </a>
+                                        <% } else { %>
+                                            N/A
+                                        <% } %>
+                                    </td>
+                                    
+                                    <!-- Actions Column with View Icon -->
+                                    <td class="text-center">
+                                        <a href="/attendance/read/<%= attendance.id %>" class="btn btn-outline-secondary">
+                                            <i class="bi bi-eye"></i> <!-- Bootstrap Eye Icon -->
+                                        </a>
+                                    </td>
                                 </tr>
                             <% }); %>
                         <% } else { %>
                             <tr>
-                                <td colspan="6" class="text-center">No attendance records found.</td>
+                                <td colspan="4" class="text-center">No attendance records found.</td> <!-- Update colspan to match new columns -->
                             </tr>
                         <% } %>
                     </tbody>
