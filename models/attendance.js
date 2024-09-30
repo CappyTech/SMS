@@ -16,9 +16,14 @@ const Attendances = sequelize.define('Attendances', {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
+    type: {
+        type: DataTypes.ENUM('off', 'holiday', 'sick', 'work'),
+        defaultValue: 'off',
+        allowNull: false,
+    },
     locationId: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: Locations,
             key: 'id',
@@ -45,6 +50,10 @@ const Attendances = sequelize.define('Attendances', {
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
+    },
+    hoursWorked: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
     },
 }, {
     paranoid: false,
