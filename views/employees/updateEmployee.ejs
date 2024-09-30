@@ -80,6 +80,13 @@
                     </div>
                 </div>
 
+                <div class="row mb-3">
+                    <label for="hourlyRate" class="col-sm-3 col-form-label">Hourly Rate</label>
+                    <div class="col-sm-9">
+                        <input type="number" id="hourlyRate" name="hourlyRate" class="form-control" min="0" step="0.01" value="<%= employee.hourlyRate %>">
+                    </div>
+                </div>
+
                 <div class="d-grid">
                     <button type="submit" class="btn btn-hcs-green">Update Employee</button>
                 </div>
