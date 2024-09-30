@@ -1,21 +1,20 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
+
 <div class="container py-4">
     <div class="mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5">
             <div class="d-flex justify-content-between mb-2">
-                <button class="btn btn-hcs-green" style="transform: rotate(0);"><a class="text-white stretched-link text-decoration-none" href="/dashboard/stats/<%= previousYear %>/<%= previousMonth %>">&laquo; Previous</a></button>
-                <h1 class="display-6"><%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></h1>
-                <button class="btn btn-hcs-green" style="transform: rotate(0);"><a class="text-white stretched-link text-decoration-none" href="/dashboard/stats/<%= nextYear %>/<%= nextMonth %>">Next &raquo;</a></button>
-                <!-- 
-                Identifying the containing block
-                    If the stretched link doesn’t seem to work, the containing block will probably be the cause. The following CSS properties will make an element the containing block:
+                
+                <button class="btn btn-hcs-green" style="transform: rotate(0);">
+                    <a class="text-white stretched-link text-decoration-none" href="/dashboard/stats/<%= previousYear %>/<%= previousMonth %>">&laquo; Previous</a>
+                </button>
 
-                    A position value other than static
-                    A transform or perspective value other than none
-                    A will-change value of transform or perspective
-                    A filter value other than none or a will-change value of filter (only works on Firefox)
-                -->
+                <h1 class="display-6"><%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></h1>
+
+                <button class="btn btn-hcs-green" style="transform: rotate(0);">
+                    <a class="text-white stretched-link text-decoration-none" href="/dashboard/stats/<%= nextYear %>/<%= nextMonth %>">Next &raquo;</a>
+                </button>
             </div>
             <div class="row mb-4">
                 <div class="col-lg-6 col-md-6">
