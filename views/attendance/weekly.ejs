@@ -1,39 +1,116 @@
 <%- include('../partials/successAlert.ejs') %>
 <%- include('../partials/errorAlerts.ejs') %>
+
 <div class="container py-4">
-    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-        <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold text-center">Weekly Attendance</h1>
-            <p>From <%= moment(startDate).format('Do MMMM YYYY') %> to <%= moment(endDate).format('Do MMMM YYYY') %></p>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Person</th>
-                        <% daysOfWeek.forEach(day => { %>
-                            <th><%= moment(day).format('DD/MM/YYYY') %><br><%= moment(day).format('dddd') %></th>
-                        <% }) %>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% Object.keys(groupedAttendance).forEach(person => { %>
+    <div class="mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5 text-center">
+            <div class="d-flex justify-content-between mb-4 d-print-none">
+
+                <button class="btn btn-hcs-green" style="transform: rotate(0);">
+                    <a class="text-white stretched-link text-decoration-none" href="/attendance/weekly/<%= previousYear %>/<%= previousWeek %>">&laquo; Previous Week</a>
+                </button>
+                <h1 class="display-5 text-center">Weekly Attendance</h1>
+                <button class="btn btn-hcs-green" style="transform: rotate(0);">
+                    <a class="text-white stretched-link text-decoration-none" href="/attendance/weekly/<%= nextYear %>/<%= nextWeek %>">Next Week &raquo;</a>
+                </button>
+
+            </div>
+
+            <p class="text-center">From <%= moment(startDate).format('Do MMMM YYYY') %> to <%= moment(endDate).format('Do MMMM YYYY') %></p>
+
+            <!-- Display Weekly Totals -->
+            <div class="row mb-4">
+                <div class="col-lg-6 col-md-6">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h4>Total Employee Hours Worked</h4>
+                            <p class="display-6"><%= totalEmployeeHours %> hours</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h4>Total Subcontractor Payment</h4>
+                            <p class="display-6">£<%= totalSubcontractorPay.toFixed(2) %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-sm">
+                    <thead>
                         <tr>
-                            <td><%= person %></td>
+                            <th class="text-center fw-normal">Person</th>
                             <% daysOfWeek.forEach(day => { %>
-                                <% const record = groupedAttendance[person][day] || {}; %>
-                                <td>
-                                    <% if (record.holidays_taken) { %>
-                                        <span class="badge bg-warning">Holiday</span>
-                                    <% } else if (record.days_without_work) { %>
-                                        <span class="badge bg-danger">Off</span>
+                                <th class="text-center fs-6 fw-normal">
+                                    <%= moment(day).format('DD/MM/YYYY') %><br><%= moment(day).format('dddd') %>
+                                </th>
+                            <% }); %>
+                            <!-- New column for Weekly Pay / Total Hours -->
+                            <th class="text-center fw-normal">Weekly Pay <br>/ Total Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% Object.keys(groupedAttendance).forEach(person => { %>
+                            <tr class="fw-light">
+                                <td><%= person %></td>
+                                <% daysOfWeek.forEach(day => { %>
+                                    <% const dailyRecords = groupedAttendance[person].dailyRecords[day] || {}; %>
+                                    <% const invoices = groupedAttendance[person].invoices[day] || []; %>
+                                    <td class="text-center">
+                                        <!-- Show attendance records if available -->
+                                        <% if (Object.keys(dailyRecords).length > 0) { %>
+                                            <% Object.keys(dailyRecords).forEach(attendanceId => { %>
+                                                <% const record = dailyRecords[attendanceId]; %>
+                                                <a href="/attendance/read/<%= attendanceId %>" class="text-decoration-none">
+                                                    <%= record.location ? (record.location.name || record.location.address || record.type) : record.type %>
+                                                </a><br>
+                                                <% if (record.hoursWorked) { %>
+                                                    <span><%= record.hoursWorked %> hours</span>
+                                                <% } %>
+                                            <% }); %>
+                                        <% } %>
+
+                                        <!-- Show subcontractor invoices if available -->
+                                        <% if (invoices.length > 0) { %>
+                                            <% invoices.forEach(invoice => { %>
+                                                <div>
+                                                    <span><%= invoice.invoiceNumber %></span><br>
+                                                    <span>£<%= invoice.grossAmount.toFixed(2) %></span>
+                                                </div>
+                                            <% }); %>
+                                        <% } else if (Object.keys(dailyRecords).length === 0) { %>
+                                            <!-- If no attendance or invoice records, show a link to create a new attendance for that day and person -->
+                                            <button class="btn btn-secondary" style="transform: rotate(0);">
+                                                <a href="/attendance/create?date=<%= day %><%= groupedAttendance[person].employeeId ? '&employeeId=' + groupedAttendance[person].employeeId : '' %><%= groupedAttendance[person].subcontractorId ? '&subcontractorId=' + groupedAttendance[person].subcontractorId : '' %>" 
+                                                class="text-white stretched-link text-decoration-none">+</a>
+                                            </button>
+                                        <% } %>
+                                    </td>
+                                <% }); %>
+                                <!-- Display weekly pay or total hours at the end of each row -->
+                                <td class="text-center">
+                                    <% if (groupedAttendance[person].totalHoursWorked) { %>
+                                        £<%= groupedAttendance[person].weeklyPay.toFixed(2) %> / <%= groupedAttendance[person].totalHoursWorked %> hours
                                     <% } else { %>
-                                        <span><%= record.location || 'Office' %></span>
+                                        £<%= groupedAttendance[person].weeklyPay.toFixed(2) %>
                                     <% } %>
                                 </td>
-                            <% }) %>
+                            </tr>
+                        <% }); %>
+                        <tr class="fw-light">
+                            <td>
+                                <button class="btn btn-hcs-green" style="transform: rotate(0);">
+                                    <a href="/attendance/create" class="text-white stretched-link text-decoration-none">+</a>
+                                </button>
+                            </td>
                         </tr>
-                    <% }) %>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
