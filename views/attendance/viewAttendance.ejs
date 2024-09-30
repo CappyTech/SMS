@@ -1,0 +1,60 @@
+<!-- views/viewAttendance.ejs -->
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-center">Attendance Record</h1>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between text-bg-secondary">
+                    <span>
+                        <!-- Show the name of the employee or subcontractor -->
+                        <%= attendance.Employee ? attendance.Employee.name : attendance.Subcontractor.company %>
+                    </span>
+                    <a class="text-white" href="<%= attendance.Employee ? '/employee/read/' + attendance.Employee.id : '/subcontractor/read/' + attendance.Subcontractor.id %>">
+                        View <%= attendance.Employee ? 'Employee' : 'Subcontractor' %>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <ul class="list-group">
+                                <li class="list-group-item">Date</li>
+                                <li class="list-group-item">Location</li>
+                                <li class="list-group-item">Type</li>
+                                <li class="list-group-item">Hours Worked</li> <!-- New Hours Worked field -->
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <ul class="list-group">
+                                <!-- Show Date -->
+                                <li class="list-group-item"><%= slimDateTime(attendance.date) %></li>
+                                
+                                <!-- Show Location with link to view location details -->
+                                <li class="list-group-item">
+                                    <% if (attendance.Location) { %>
+                                        <a href="/location/read/<%= attendance.Location.id %>">
+                                            <%= attendance.Location.name || (attendance.Location.address + ', ' + attendance.Location.city + ', ' + attendance.Location.postalCode) %>
+                                        </a>
+                                    <% } else { %>
+                                        N/A
+                                    <% } %>
+                                </li>
+                                
+                                <!-- Show Type -->
+                                <li class="list-group-item"><%= attendance.type %></li>
+                                
+                                <!-- Show Hours Worked (if present) -->
+                                <li class="list-group-item"><%= attendance.hoursWorked ? attendance.hoursWorked + ' hours' : 'N/A' %></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a type="button" class="btn btn-hcs-green btn-sm" href="/attendance/update/<%= attendance.id %>">Update Attendance</a>
+                    <span>Last Updated: <%= slimDateTime(attendance.updatedAt, true) %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
