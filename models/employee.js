@@ -52,6 +52,11 @@ const Employees = sequelize.define('Employees', {
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
+  hourlyRate: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    defaultValue: 0.0, // Default hourly rate
+  },
 }, {
   paranoid: false,
   timestamps: true,
