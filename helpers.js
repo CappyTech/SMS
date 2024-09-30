@@ -368,6 +368,65 @@ const getStartOfWeek = (date) => {
     return moment(date).startOf('isoWeek'); // isoWeek starts on Monday
 };
 
+/**
+ * Fetch attendance records for a given week.
+ * @param {Date} startDate - Start date of the week.
+ * @param {Date} endDate - End date of the week.
+ * @returns {Promise<Array>} - Array of attendance records.
+ */
+async function getAttendanceForWeek(startDate, endDate) {
+  try {
+    // Query attendance records between startDate and endDate
+    const attendanceRecords = await Attendance.findAll({
+      where: {
+        date: {
+          [Op.between]: [startDate.toDate(), endDate.toDate()] // Use the `Op.between` operator to get records within the date range
+        }
+      },
+      include: [
+        { model: Employee},
+        { model: Subcontractor},
+        { model: Location}
+      ],
+      order: [['date', 'ASC'], ['Employee', 'name', 'ASC']]
+    });
+
+    return attendanceRecords;
+  } catch (error) {
+    console.error('Error fetching attendance records:', error);
+    throw new Error('Failed to fetch attendance records for the week');
+  }
+}
+
+/**
+ * Group attendance records by person.
+ * @param {Array} attendanceRecords - Array of attendance records.
+ * @returns {Object} - Grouped attendance records by person name.
+ */
+function groupAttendanceByPerson(attendanceRecords) {
+  const grouped = {};
+
+  attendanceRecords.forEach((record) => {
+    // Determine the person's name: either an Employee's name or a Subcontractor's company name
+    const personName = record.Employee ? record.Employee.name : record.Subcontractor.company;
+
+    // If person is not already in the grouped object, initialize with an empty object
+    if (!grouped[personName]) {
+      grouped[personName] = {};
+    }
+
+    // Store the record in the grouped object, keyed by date (formatted as 'YYYY-MM-DD')
+    const formattedDate = moment(record.date).format('YYYY-MM-DD');
+    grouped[personName][formattedDate] = {
+      holidays_taken: record.holidays_taken || 0,
+      days_without_work: record.days_without_work || 0,
+      location: record.Location ? `${record.Location.address}, ${record.Location.city}, ${record.Location.postalCode}` : 'Office'
+    };
+  });
+
+  return grouped;
+}
+
 module.exports = {
     slimDateTime,
     formatCurrency,
@@ -385,4 +444,6 @@ module.exports = {
     decrypt,
     encrypt,
     syncOneDriveToDatabase,
+    getAttendanceForWeek,
+    groupAttendanceByPerson,
 };
