@@ -10,7 +10,7 @@
                     <a class="text-white stretched-link text-decoration-none" href="/dashboard/stats/<%= previousYear %>/<%= previousMonth %>">&laquo; Previous</a>
                 </button>
 
-                <h1 class="display-6"><%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></h1>
+                <h1 class="display-6">Month <%= specifiedMonth %> | <%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></h1>
 
                 <button class="btn btn-hcs-green" style="transform: rotate(0);">
                     <a class="text-white stretched-link text-decoration-none" href="/dashboard/stats/<%= nextYear %>/<%= nextMonth %>">Next &raquo;</a>
@@ -88,8 +88,8 @@
                 </div>
             </div>
             <div class="row">
+                <h3 class="text-center">Subcontractors</h3>
                 <div class="col-12">
-                    <h3>Subcontractors</h3>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -104,37 +104,69 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% subcontractors.forEach(subcontractor => { %>
-                                <tr>
-                                    <td><a href="/subcontractor/read/<%= subcontractor.id %>"><%= subcontractor.company %></a></td>
-                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].grossTotal) %></td>
-                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].materialTotal) %></td>
-                                    <td><%= formatCurrency(subcontractorTotals[subcontractor.id].cisTotal) %></td>
-                                    <% if (subcontractorTotals[subcontractor.id].reverseChargeTotal) { %>
-                                        <td><%= formatCurrency(subcontractorTotals[subcontractor.id].reverseChargeTotal) %></td>
-                                    <% } else { %>
-                                        <td>N/A</td>
-                                    <% } %>
-                                </tr>
-                                <% }); %>
+                                <% if (subcontractors.length === 0) { %>
+                                    <!-- Display a message when no subcontractors meet the criteria -->
+                                    <tr>
+                                        <td colspan="5" class="text-center">No invoices with paid dates that cover this period.</td>
+                                    </tr>
+                                <% } else { %>
+                                    <% subcontractors.forEach(subcontractor => { %>
+                                    <tr>
+                                        <td><a href="/subcontractor/read/<%= subcontractor.id %>"><%= subcontractor.company %></a></td>
+                                        <td><%= formatCurrency(subcontractorTotals[subcontractor.id].grossTotal) %></td>
+                                        <td><%= formatCurrency(subcontractorTotals[subcontractor.id].materialTotal) %></td>
+                                        <td><%= formatCurrency(subcontractorTotals[subcontractor.id].cisTotal) %></td>
+                                        <% if (subcontractor.isReverseCharge) { %>
+                                            <td><%= formatCurrency(subcontractorTotals[subcontractor.id].reverseChargeTotal) %></td>
+                                        <% } else { %>
+                                            <td><i class="bi bi-dash"></i></td>
+                                        <% } %>
+                                    </tr>
+                                    <% }); %>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
             <div class="row">
+                <% const midIndex = Math.ceil(invoices.length / 2); %> <!-- Calculate the midpoint index -->
+                <h3 class="text-center">Invoices</h3>
+                <!-- First column (first half of invoices) -->
                 <div class="col-6">
-                    <h3>Invoices</h3>
                     <ul class="list-group">
-                        <% invoices.forEach(invoice => { %>
+                        <% invoices.slice(0, midIndex).forEach(invoice => { %>
                         <a href="/invoice/read/<%= invoice.id %>" class="list-group-item list-group-item-action">
                             <%= invoice.kashflowNumber %> | <%= invoice.invoiceNumber %>
                             <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
+                            <% if (invoice.submissionDate !== null || invoice.submissionDate === "0000-00-00 00:00:00") { %>
+                                <i class="bi bi-check hcs-green-text"></i>
+                            <% } else { %>
+                                <i class="bi bi-x hcs-red-text"></i>
+                            <% } %>
+                        </a>
+                        <% }); %>
+                    </ul>
+                </div>
+                
+                <!-- Second column (second half of invoices) -->
+                <div class="col-6">
+                    <ul class="list-group">
+                        <% invoices.slice(midIndex).forEach(invoice => { %>
+                        <a href="/invoice/read/<%= invoice.id %>" class="list-group-item list-group-item-action">
+                            <%= invoice.kashflowNumber %> | <%= invoice.invoiceNumber %>
+                            <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
+                            <% if (invoice.submissionDate !== null) { %>
+                                <i class="bi bi-check hcs-green-text"></i>
+                            <% } else { %>
+                                <i class="bi bi-x hcs-red-text"></i>
+                            <% } %>
                         </a>
                         <% }); %>
                     </ul>
                 </div>
             </div>
+            
         </div>
     </div>
 </div>
