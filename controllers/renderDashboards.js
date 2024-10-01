@@ -106,7 +106,9 @@ const renderStatsDashboard = async (req, res) => {
             allInvoicesSubmitted,
             submissionDate,
             submissionStartDate,
-            submissionEndDate
+            submissionEndDate,
+            specifiedYear,
+            specifiedMonth
         });
     } catch (error) {
         logger.error('Error rendering stats dashboard: ' + error.message);
