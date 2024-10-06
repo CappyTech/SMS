@@ -28,7 +28,7 @@ const Attendances = sequelize.define('Attendances', {
             model: Locations,
             key: 'id',
         },
-        onDelete: 'CASCADE',
+        onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
     },
     employeeId: {
