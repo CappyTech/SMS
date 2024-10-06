@@ -21,13 +21,14 @@
                     <label for="locationId" class="col-sm-3 col-form-label">Location</label>
                     <div class="col-sm-9">
                         <select id="locationId" name="locationId" class="form-select">
-                            <option value="">Select Location</option>
                             <% locations.forEach(location => { %>
-                                <% if (location.name) { %>
-                                    <option value="<%= location.id %>"><%= location.name %></option>
-                                <% } else { %>
-                                <option value="<%= location.id %>"><%= location.address %>, <%= location.city %>, <%= location.postalCode %></option>
-                                <% } %>
+                                <option value="<%= location.id %>" <%= attendance.locationId === location.id ? 'selected' : '' %>>
+                                    <% if (location.name) { %>
+                                        <%= location.name %>
+                                    <% } else { %>
+                                        <%= location.address %>, <%= location.city %>, <%= location.postalCode %>
+                                    <% } %>
+                                </option>
                             <% }); %>
                         </select>
                     </div>
