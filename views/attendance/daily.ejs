@@ -2,7 +2,20 @@
 <%- include('../partials/errorAlerts.ejs') %>
 
 <div class="container py-4">
-    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+    <div class="mb-4 bg-body-tertiary rounded-3">
+        <!-- Vertical Navigation Tabs for Daily, Weekly, Monthly -->
+        <ul class="nav nav-tabs justify-content-center mb-4">
+            <li class="nav-item">
+                <a href="/attendance/daily" class="nav-link <%= currentTab === 'daily' ? 'active' : '' %>">Daily</a>
+            </li>
+            <li class="nav-item">
+                <a href="/attendance/weekly" class="nav-link <%= currentTab === 'weekly' ? 'active' : '' %>">Weekly</a>
+            </li>
+            <li class="nav-item">
+                <a href="/attendance/monthly" class="nav-link <%= currentTab === 'monthly' ? 'active' : '' %>">Monthly</a>
+            </li>
+        </ul>
+
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Daily Attendance for <%= moment(date).format('Do MMMM YYYY') %></h1>
             <table class="table table-bordered table-striped">
@@ -72,6 +85,13 @@
                             <td colspan="5" class="text-center">No attendance records found for this day.</td>
                         </tr>
                     <% } %>
+                    <tr class="fw-light">
+                        <td>
+                            <button class="btn btn-hcs-green" style="transform: rotate(0);">
+                                <a href="/attendance/create?date=<%= date %>" class="text-white stretched-link text-decoration-none">+</a>
+                            </button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
