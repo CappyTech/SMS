@@ -1,21 +1,12 @@
 const express = require('express');
-const app = express();
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
-const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
 const flash = require('express-flash');
-const helmet = require('helmet');
-const xss = require('xss-clean');
-const rateLimit = require('express-rate-limit');
 const logger = require('./logger');
-const fs = require('fs');
 require('dotenv').config();
-const helpers = require('./helpers');
-const os = require('os');
-const packageJson = require('./package.json');
-const sequelize = require('./db');
-const moment = require('moment');
+
+const app = express();
+
 // Set up EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -25,171 +16,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
-app.use(xss());
-app.set('trust proxy', 1);
-const useragent = require('useragent');
-const logRequestDetails = (req, res, next) => {
-    // Safely parse the user-agent
-    const agent = req.headers['user-agent'] ? useragent.parse(req.headers['user-agent']) : null;
-
-    const logData = {
-        method: req.method,
-        url: req.originalUrl,
-        ip: req.ip,
-        userAgent: agent ? {
-            browser: agent.toAgent(),
-            os: agent.os.toString(),
-        } : 'Unknown',
-        headers: req.headers,
-        referer: req.headers['referer'] || 'N/A',
-        host: req.headers['host'] || 'N/A',
-        xForwardedFor: req.headers['x-forwarded-for'] || 'N/A',
-        timestamp: new Date().toISOString(),
-    };
-
-    logger.info('Incoming Request Details: ' + JSON.stringify(logData, null, 2));
-
-    next();
-};
-
-app.use(logRequestDetails);
-
 app.use(flash());
 
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: "Too many requests, please try again later.",
-    keyGenerator: (req) => {
-        // Use the IP address for rate-limiting
-        return req.ip;
-    },
-});
-app.use(limiter);
+// Middleware
+app.use(require('./middlewares/logRequestDetails'));
+app.use(require('./middlewares/rateLimiter'));
+app.use(require('./middlewares/security'));
+app.use(require('./middlewares/session'));
+// app.use(require('./middlewares/createDefaultAdmin'));
 
-app.use(helmet());
-app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: ["'self'", "https://sms.heroncs.co.uk"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "https://unpkg.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com"],
-            fontSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
-            imgSrc: [
-                "'self'",
-                "data:",
-                "otpauth:",
-                "https://i.creativecommons.org",
-                "https://licensebuttons.net",
-                "https://sms.heroncs.co.uk",
-                "https://a.tile.openstreetmap.org",
-                "https://b.tile.openstreetmap.org",
-                "https://c.tile.openstreetmap.org",
-                "https://unpkg.com"
-            ],
-            connectSrc: [
-                "'self'",
-                "https://sms.heroncs.co.uk",
-                "https://nominatim.openstreetmap.org",
-                "https://api.openstreetmap.org"
-            ]
-        },
-    })
-);
-
-const sessionStore = new MySQLStore({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    clearExpired: true,
-    checkExpirationInterval: 300000,
-    expiration: 28800000,
-    createDatabaseTable: true,
-    endConnectionOnClose: true,
-    disableTouch: false,
-    charset: 'utf8mb4_bin',
-    schema: {
-        tableName: 'sessions',
-        columnNames: {
-            session_id: 'session_id',
-            expires: 'expires',
-            data: 'data'
-        }
-    }
-});
-
-app.use(session({
-    key: 'session_cookie_name',
-    secret: process.env.SESSION_SECRET,
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,
-        httpOnly: true,
-        maxAge: 28800000,
-        sameSite: 'strict',
-    }
-}));
-
-sessionStore.onReady().then(() => {
-    logger.info('MySQLStore ready');
-}).catch(error => {
-    logger.error(error);
-});
-
-app.use((req, res, next) => {
-    res.locals.session = req.session;
-    logger.info(`Session Data: ${JSON.stringify(req.session)}`);
-    const username = req.session.user ? req.session.user.username : 'unknown user';
-    const logMessage = `${username} accessed path ${req.method} ${req.path}`;
-
-    if (req.path.includes('/update/')) {
-        logger.warn(`-------- Warn: ${logMessage}`);
-    } else if (req.path.includes('/delete/')) {
-        logger.error(`------- Danger: ${logMessage}`);
-    } else {
-        logger.info(`${logMessage}`);
-    }
-    next();
-});
-/*
-const { Op } = require("sequelize");
-
-const createDefaultAdmin = async () => {
-    try {
-        const admin = await Users.findOne({
-            where: {
-                [Op.or]: [
-                    { username: 'admin' },
-                    { role: 'admin' }
-                ]
-            }
-        });
-        if (!admin) {
-            await Users.create({
-                username: process.env.ADMIN_USERNAME,
-                email: process.env.ADMIN_EMAIL,
-                password: process.env.ADMIN_PASSWORD,
-                role: 'admin',
-            }, {
-                fields: ['username', 'email', 'password', 'role']
-            });
-            if (process.env.DEBUG) {
-                logger.info('Default admin created.');
-            }
-        } else {
-            if (process.env.DEBUG) {
-                logger.info('Default admin already exists.');
-            }
-        }
-    } catch (error) {
-        logger.error('Error creating default admin: ' + error);
-    }
-};
-*/
 const Users = require('./models/user');
 const Subcontractors = require('./models/subcontractor');
 const Invoices = require('./models/invoice');
@@ -328,86 +163,9 @@ Clients.hasOne(Users, { foreignKey: 'clientId' });
 Users.belongsTo(Employees, { foreignKey: 'employeeId', as: 'Employee' });
 Employees.hasOne(Users, { foreignKey: 'employeeId' });
 
-(async () => {
-  try {
-    // Check for existing tables
-    const tables = await sequelize.getQueryInterface().showAllTables();
-    if (tables.length === 0) {
-        logger.info('The database has no tables.');
-        await sequelize.sync();
-        logger.info('All models synchronized.');
-        const admin = await Users.findOne({
-            where: {
-                [Op.or]: [
-                    { username: 'admin' },
-                    { role: 'admin' }
-                ]
-            }
-        });
-        if (!admin) {
-            await Users.create({
-                username: process.env.ADMIN_USERNAME,
-                email: process.env.ADMIN_EMAIL,
-                password: process.env.ADMIN_PASSWORD,
-                role: 'admin',
-            }, {
-                fields: ['username', 'email', 'password', 'role']
-            });
-            if (process.env.DEBUG) {
-                logger.info('Default admin created.');
-            }
-        } else {
-            if (process.env.DEBUG) {
-                logger.info('Default admin already exists.');
-            }
-        }
-    } else {
-      logger.info(`The database has the following tables: ${tables.join(', ')}`);
-    }
-  } catch (error) {
-    logger.error('Error fetching tables / syncing: ' + error);
-  }
-})();
-
-/*
-const cron = require('node-cron');
-
-cron.schedule('0 * * * *', async () => {  // Runs every hour
-    try {
-        logger.info('Starting OneDrive sync...');
-        await helpers.syncOneDriveToDatabase();
-        logger.info('OneDrive sync completed successfully.');
-    } catch (error) {
-        logger.error('Error during OneDrive sync: ' + error.message);
-    }
-});
-*/
-
-app.use(async (req, res, next) => {
-    try {
-        res.locals.invoicesWithoutSubmissionDate = await Invoices.findAll({
-            where: {
-                submissionDate: null
-            },
-            attributes: ['id', 'kashflowNumber'],
-            order: [['kashflowNumber', 'ASC']]
-        });
-        next();
-    } catch (error) {
-        logger.error('Error fetching invoices without submission date: ' + error);
-        next();
-    }
-});
-
-app.use((req, res, next) => {
-    const blockedUserAgents = ['wpbot', 'bot'];
-    const userAgent = req.headers['user-agent'].toLowerCase();
-    if (blockedUserAgents.some(bot => userAgent.includes(bot))) {
-        res.status(403).send('Access Forbidden');
-    } else {
-        next();
-    }
-});
+app.use(require('./middlewares/syncDatabase'));
+app.use(require('./middlewares/oneDriveSync')());
+app.use(require('./middlewares/blockBot'));
 
 
 app.use(async (req, res, next) => {
@@ -445,28 +203,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Error handling middleware
-const errorHandler = (err, req, res, next) => {
-    logger.error(err.stack);
-    const status = err.status || 500;
-    const errorViewPath = path.join(__dirname, 'views', `${status}.ejs`);
-
-    fs.access(errorViewPath, fs.constants.F_OK, (fsErr) => {
-        if (fsErr) {
-            res.status(status).render('error', {
-                message: err.message,
-                error: err
-            });
-        } else {
-            res.status(status).render(String(status), {
-                message: err.message,
-                error: err
-            });
-        }
-    });
-};
-
-app.use(errorHandler);
+app.use(require('./middlewares/errorHandler'));
 
 app.disable('x-powered-by');
 app.use((req, res, next) => {
@@ -495,7 +232,7 @@ if (process.env.NODE_ENV === 'development') {
     }
 }
 
-const render = require('./controllers/renderForms');
+const index = require('./controllers/renderIndex');
 
 const formsUser = require('./controllers/forms/user');
 const formsSubcontractor = require('./controllers/forms/subcontractor');
@@ -529,7 +266,7 @@ const locationCRUD = require('./controllers/CRUD/locationCRUD');
 const monthlyReturns = require('./controllers/monthlyReturns');
 const yearlyReturns = require('./controllers/yearlyReturns');
 
-app.use('/', render);
+app.use('/', index);
 
 app.use('/', formsClient);
 app.use('/', formsContact);
