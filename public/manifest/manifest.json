@@ -1,0 +1,25 @@
+{
+  "name": "Heron CS LTD",
+  "short_name": "HeronCSLTD",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2b9e1b",
+  "icons": [
+    {
+      "src": "/images/HCS-Logo-v4-Icon322.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/HCS-Logo-v4-Icon64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/HCS-Logo-v4-Icon256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ]
+}
