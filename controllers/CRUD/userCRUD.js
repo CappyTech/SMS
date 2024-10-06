@@ -29,34 +29,27 @@ const schema = Joi.object({
 const createUser = async (req, res) => {
     try {
         const { errors, value } = schema.validate(req.body);
-
         if (errors) {
             req.flash('error', 'Invalid input.' + errors);
             return res.redirect('/');
         }
-
         const { username, email, password, role } = value;
-
         const existingUser = await User.findOne({
             where: {
                 [Op.or]: [{ username }, { email }],
             },
         });
-
         if (existingUser) {
             req.flash('error', 'Registration failed.');
             return res.redirect('/');
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
-
         await User.create({
             username,
             email,
             password: hashedPassword,
             role,
         });
-
         req.flash('success', 'User created successfully.');
         res.redirect('/');
     } catch (error) {
