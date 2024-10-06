@@ -7,7 +7,7 @@ const Locations = require('../../models/location');
 const Jobs = require('../../models/job');
 const helpers = require('../../helpers');
 const moment = require('moment');
-const logger = require('../../logger');
+const logger = require('../../services/loggerService');
 const path = require('path');
 
 const createQuote = async (req, res) => {
