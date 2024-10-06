@@ -1,6 +1,6 @@
 // models/invoice.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
+const { sequelize, Sequelize } = require('../services/databaseService');
 
 const Invoices = sequelize.define('Invoices', {
     id: {

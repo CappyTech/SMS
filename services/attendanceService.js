@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
+const logger = require('./loggerService');
 const Attendance = require('../models/attendance'); // Adjust the path as necessary
 const Employee = require('../models/employee'); // Adjust the path as necessary
 const Subcontractor = require('../models/subcontractor'); // Adjust the path as necessary
@@ -16,7 +17,7 @@ const getAttendanceForDay = async (date, include) => {
 
         return attendanceRecords;
     } catch (error) {
-        console.error('Error fetching attendance records:', error);
+        logger.error('Error fetching attendance records: ' + error);
         throw new Error('Failed to fetch attendance records for the day');
     }
 };
@@ -44,7 +45,7 @@ const getAttendanceForWeek = async (startDate, endDate) => {
 
         return attendanceRecords;
     } catch (error) {
-        console.error('Error fetching attendance records:', error);
+        logger.error('Error fetching attendance records: ' + error);
         throw new Error('Failed to fetch attendance records for the week');
     }
 };

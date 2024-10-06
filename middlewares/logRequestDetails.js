@@ -1,5 +1,5 @@
 const useragent = require('useragent');
-const logger = require('../logger');
+const logger = require('../services/loggerService');
 
 const logRequestDetails = (req, res, next) => {
     const agent = req.headers['user-agent'] ? useragent.parse(req.headers['user-agent']) : null;

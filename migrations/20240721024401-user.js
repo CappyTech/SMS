@@ -4,17 +4,17 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Users', {
       id: {
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
       username: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
         unique: true,
       },
       email: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -22,83 +22,83 @@ module.exports = {
         },
       },
       password: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       role: {
-        type: Sequelize.ENUM('subcontractor', 'employee', 'accountant', 'hmrc', 'admin'),
+        type: ENUM('subcontractor', 'employee', 'accountant', 'hmrc', 'admin'),
         defaultValue: 'subcontractor',
       },
       permissionCreateUser: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionReadUser: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionUpdateUser: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionDeleteUser: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionCreateSubcontractor: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionReadSubcontractor: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionUpdateSubcontractor: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionDeleteSubcontractor: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionCreateInvoice: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionReadInvoice: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionUpdateInvoice: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       permissionDeleteInvoice: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
     });

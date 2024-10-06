@@ -10,7 +10,7 @@ module.exports = {
     // Add locationId to Quotes table if it doesn't exist
     if (!tableInfoQuotes.locationId) {
       await queryInterface.addColumn('Quotes', 'locationId', {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: true,
         references: {
           model: 'Locations',
@@ -24,7 +24,7 @@ module.exports = {
     // Add locationId to Jobs table if it doesn't exist
     if (!tableInfoJobs.locationId) {
       await queryInterface.addColumn('Jobs', 'locationId', {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: true,
         references: {
           model: 'Locations',
@@ -38,7 +38,7 @@ module.exports = {
     // Add locationId to Attendances table if it doesn't exist
     if (!tableInfoAttendances.locationId) {
       await queryInterface.addColumn('Attendances', 'locationId', {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: true,
         references: {
           model: 'Locations',
@@ -64,17 +64,17 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     // Reverse migration: Add back the location strings and remove locationId columns
     await queryInterface.addColumn('Quotes', 'location', {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: true,
     });
 
     await queryInterface.addColumn('Jobs', 'location', {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: true,
     });
 
     await queryInterface.addColumn('Attendances', 'location', {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: true,
     });
 

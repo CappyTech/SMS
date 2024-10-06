@@ -1,14 +1,13 @@
 // models/user.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
+const { sequelize, Sequelize } = require('../services/databaseService');
 const bcrypt = require('bcrypt');
-const helpers = require('../helpers');
+const encryptionService = require('../services/encryptionService');
 
-// Define the Users model
 const Users = sequelize.define('Users', {
     id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: Sequelize.DataTypes.UUIDV4,
         primaryKey: true,
     },
     username: {
@@ -77,12 +76,12 @@ const Users = sequelize.define('Users', {
         allowNull: true, // Can be null until TOTP is enabled
         set(value) {
             if (value) {
-                this.setDataValue('totpSecret', helpers.encrypt(value)); // Encrypt secret before storing
+                this.setDataValue('totpSecret', encryptionService.encrypt(value));
             }
         },
         get() {
             const encrypted = this.getDataValue('totpSecret');
-            return encrypted ? helpers.decrypt(encrypted) : null; // Decrypt when retrieving
+            return encrypted ? encryptionService.decrypt(encrypted) : null;
         }
     },
     totpEnabled: {

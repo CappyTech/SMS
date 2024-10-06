@@ -3,29 +3,29 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Quotes', {
       id: {
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
         allowNull: false,
         primaryKey: true
       },
       date: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true
       },
       quote_ref: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true
       },
       job_ref: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true
       },
       location: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true
       },
       clientId: {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: false,
         references: {
           model: 'Clients',
@@ -35,37 +35,37 @@ module.exports = {
         onUpdate: 'CASCADE'
       },
       contact_ref: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true
       },
       value: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: true
       },
       desc: {
-        type: Sequelize.TEXT,
+        type: TEXT,
         allowNull: true
       },
       invoice_no: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true
       },
       invoice_date: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
         defaultValue: Sequelize.NOW
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
         defaultValue: Sequelize.NOW
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true
       }
     });

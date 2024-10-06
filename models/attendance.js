@@ -1,6 +1,7 @@
 // models/attendance.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
+const { sequelize, Sequelize } = require('../services/databaseService');
+
 const Locations = require('./location');
 const Employees = require('./employee');
 const Subcontractors = require('./subcontractor');

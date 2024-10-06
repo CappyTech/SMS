@@ -4,28 +4,28 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Attendances', {
       id: {
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
       date: {
-        type: Sequelize.DATEONLY,
+        type: DATEONLY,
         allowNull: false,
       },
       location: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       holidays_taken: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: true,
       },
       days_without_work: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: true,
       },
       workerId: {
-        type: Sequelize.UUID,
+        type: UUID,
         references: {
           model: 'Workers',
           key: 'id',
@@ -35,7 +35,7 @@ module.exports = {
         allowNull: true,
       },
       subcontractorId: {
-        type: Sequelize.UUID,
+        type: UUID,
         references: {
           model: 'Subcontractors',
           key: 'id',
@@ -46,14 +46,14 @@ module.exports = {
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
     });

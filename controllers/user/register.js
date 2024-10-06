@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require("../../models/user");
 const { Op } = require("sequelize");
-const logger = require('../../logger'); 
+const logger = require('../../services/loggerService'); 
 const path = require('path');
 
 const renderRegistrationForm = (req, res) => {

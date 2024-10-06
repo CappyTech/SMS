@@ -10,22 +10,22 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('Clients', 'contact', {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: true,
     });
     await queryInterface.addColumn('Clients', 'email', {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: true,
       validate: {
         isEmail: true,
       },
     });
     await queryInterface.addColumn('Clients', 'phone', {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: true,
     });
     await queryInterface.addColumn('Clients', 'address', {
-      type: Sequelize.TEXT,
+      type: TEXT,
       allowNull: true,
     });
   }

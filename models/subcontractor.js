@@ -1,7 +1,7 @@
 // models/subcontractor.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
-const logger = require('../logger'); 
+const { sequelize, Sequelize } = require('../services/databaseService');
+const logger = require('../services/loggerService'); 
 
 const Subcontractors = sequelize.define('Subcontractors', {
     id: {

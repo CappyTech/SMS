@@ -1,4 +1,4 @@
-const logger = require('../logger');
+const logger = require('./loggerService');
 
 /**
  * Validates invoice data to ensure all required fields are present and correctly formatted.

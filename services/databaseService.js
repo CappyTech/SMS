@@ -1,7 +1,7 @@
 // db.js
 require('dotenv').config();
 const Sequelize = require('sequelize');
-const logger = require('./logger');
+const logger = require('./loggerService');
 
 /**
  * Initializes a Sequelize instance with the database configuration.
@@ -31,4 +31,4 @@ sequelize
         logger.error('Details:', error);
     });
 
-module.exports = sequelize;
+module.exports = { sequelize, Sequelize };

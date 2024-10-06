@@ -6,11 +6,11 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
       },
       clientId: {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: false,
         references: {
           model: 'Clients',
@@ -20,23 +20,23 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
       contactName: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       phone: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
       },
     });
   },

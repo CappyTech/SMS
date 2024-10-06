@@ -4,15 +4,15 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
 
     await queryInterface.addColumn('Contacts', 'name', {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: false,
     });
     await queryInterface.addColumn('Contacts', 'email', {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: true,
     });
     await queryInterface.addColumn('Contacts', 'note', {
-      type: Sequelize.TEXT,
+      type: TEXT,
       allowNull: true,
     });
   },

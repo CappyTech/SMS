@@ -1,4 +1,4 @@
-const logger = require('../logger');
+const logger = require('./loggerService');
 
 /**
  * Formats a given amount as a currency string in GBP (£).

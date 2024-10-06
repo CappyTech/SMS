@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('Quotes', 'isAccepted', {
-      type: Sequelize.BOOLEAN,
+      type: BOOLEAN,
       allowNull: false,
       defaultValue: false,
     });

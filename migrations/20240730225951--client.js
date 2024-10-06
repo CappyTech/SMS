@@ -6,42 +6,42 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
       },
       name: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       contact: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       email: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
         validate: {
           isEmail: true,
         },
       },
       phone: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       address: {
-        type: Sequelize.TEXT,
+        type: TEXT,
         allowNull: true,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
       },
     });
   },

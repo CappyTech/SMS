@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('Quotes', 'clientId', {
-      type: Sequelize.UUID,
+      type: UUID,
       allowNull: false,
       references: {
         model: 'Clients', // name of Target model
@@ -18,7 +18,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('Quotes', 'client', {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: true,
     });
 

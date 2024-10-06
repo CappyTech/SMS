@@ -1,6 +1,6 @@
 // models/employees.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
+const { sequelize, Sequelize } = require('../services/databaseService');
 
 const Employees = sequelize.define('Employees', {
   id: {
@@ -44,7 +44,7 @@ const Employees = sequelize.define('Employees', {
     allowNull: false,
   },
   managerId: {
-    type: DataTypes.CHAR(36), // Explicitly set length to 36 to match the database schema
+    type: DataTypes.CHAR(36),
     allowNull: true,
   },
   hireDate: {
@@ -55,7 +55,7 @@ const Employees = sequelize.define('Employees', {
   hourlyRate: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
-    defaultValue: 0.0, // Default hourly rate
+    defaultValue: 0.0,
   },
 }, {
   paranoid: false,

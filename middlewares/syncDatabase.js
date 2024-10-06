@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
-const sequelize = require('../db'); // Adjust the path as necessary
-const Users = require('../models/Users'); // Adjust the path as necessary
-const logger = require('../logger');
+const sequelize = require('dbConnection');
+const Users = require('../models/Users');
+const logger = require('../services/loggerService');
 
 const syncDatabase = async (req, res, next) => {
     try {

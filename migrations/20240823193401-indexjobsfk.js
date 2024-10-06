@@ -3,18 +3,18 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Jobs', {
       id: {
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
         allowNull: false,
         primaryKey: true,
       },
       job_ref: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
         unique: true,
       },
       locationId: {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: true,
         references: {
           model: 'Locations',
@@ -24,7 +24,7 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
       clientId: {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: true,
         references: {
           model: 'Clients',
@@ -34,7 +34,7 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
       quoteId: {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: true,
         references: {
           model: 'Quotes',
@@ -44,32 +44,32 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
       value: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: true,
       },
       status: {
-        type: Sequelize.ENUM('pending', 'in_progress', 'completed', 'archived'),
+        type: ENUM('pending', 'in_progress', 'completed', 'archived'),
         allowNull: false,
         defaultValue: 'pending',
       },
       desc: {
-        type: Sequelize.TEXT,
+        type: TEXT,
         allowNull: true,
       },
       completionDate: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       }
     });

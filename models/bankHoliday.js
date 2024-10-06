@@ -1,10 +1,10 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
+const { sequelize, Sequelize } = require('../services/databaseService');
 
 const BankHoliday = sequelize.define('BankHoliday', {
     id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: sequelize.DataTypes.UUIDV4,
         primaryKey: true,
         allowNull: false,
     },

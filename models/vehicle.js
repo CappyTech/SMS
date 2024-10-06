@@ -1,11 +1,11 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
+const { sequelize, Sequelize } = require('../services/databaseService');
 
 const Vehicles = sequelize.define('Vehicles', {
   id: {
     type: DataTypes.CHAR(36),
     primaryKey: true,
-    defaultValue: DataTypes.UUIDV4,
+    defaultValue: sequelize.DataTypes.UUIDV4,
   },
   employeeId: {
     type: DataTypes.CHAR(36),

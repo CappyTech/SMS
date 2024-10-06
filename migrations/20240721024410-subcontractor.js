@@ -4,82 +4,82 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Subcontractors', {
       id: {
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
       name: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       company: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       line1: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       line2: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       city: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       county: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       postalCode: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       cisNumber: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
         unique: true,
       },
       utrNumber: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
         unique: true,
       },
       deduction: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: false,
       },
       vatNumber: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
         unique: true,
       },
       isGross: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       isCIS: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       isReverseCharge: {
-        type: Sequelize.BOOLEAN,
+        type: BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
     });

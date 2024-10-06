@@ -1,4 +1,4 @@
-const logger = require('../logger');
+const logger = require('./loggerService');
 
 /**
  * Middleware to ensure the user is authenticated.

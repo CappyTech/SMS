@@ -1,6 +1,7 @@
 // models/quote.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
+const { sequelize, Sequelize } = require('../services/databaseService');
+
 const Clients = require('./client');
 const Contacts = require('./contact');
 const Locations = require('./location');

@@ -3,22 +3,22 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Jobs', {
       id: {
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
         allowNull: false,
         primaryKey: true
       },
       job_ref: {  
-        type: Sequelize.INTEGER, // Changed to INTEGER for numerical job reference
+        type: INTEGER, // Changed to INTEGER for numerical job reference
         allowNull: false,  // Job reference must always be there
         unique: true  // Ensures unique job references
       },
       location: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       clientId: {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: false,
         references: {
           model: 'Clients', // References the Clients table
@@ -28,7 +28,7 @@ module.exports = {
         onUpdate: 'CASCADE'
       },
       quoteId: {
-        type: Sequelize.UUID,
+        type: UUID,
         allowNull: true,
         references: {
           model: 'Quotes', // References the Quotes table
@@ -38,34 +38,34 @@ module.exports = {
         onUpdate: 'CASCADE'
       },
       value: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: true,
       },
       status: {
-        type: Sequelize.ENUM('pending', 'in_progress', 'completed', 'archived'),
+        type: ENUM('pending', 'in_progress', 'completed', 'archived'),
         allowNull: false,
         defaultValue: 'pending'
       },
       desc: {
-        type: Sequelize.TEXT,
+        type: TEXT,
         allowNull: true,
       },
       completionDate: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
         defaultValue: Sequelize.NOW
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
         defaultValue: Sequelize.NOW
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true
       }
     });

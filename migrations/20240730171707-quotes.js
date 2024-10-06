@@ -4,61 +4,61 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Quotes', {
       id: {
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
         allowNull: false,
       },
       date: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
       quote_ref: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       job_ref: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       location: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       client: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       contact_ref: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       value: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: true,
       },
       desc: {
-        type: Sequelize.TEXT,
+        type: TEXT,
         allowNull: true,
       },
       invoice_no: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: true,
       },
       invoice_date: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       }
     });

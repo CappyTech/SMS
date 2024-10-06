@@ -4,57 +4,57 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Invoices', {
       id: {
-        type: Sequelize.UUID,
+        type: UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
       invoiceNumber: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
       },
       kashflowNumber: {
-        type: Sequelize.STRING,
+        type: STRING,
         allowNull: false,
         unique: true,
       },
       invoiceDate: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
       remittanceDate: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
       grossAmount: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: false,
       },
       labourCost: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: false,
       },
       materialCost: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: false,
       },
       cisAmount: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: false,
       },
       netAmount: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: false,
       },
       submissionDate: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
       reverseCharge: {
-        type: Sequelize.FLOAT,
+        type: FLOAT,
         allowNull: true,
       },
       month: {
-        type: Sequelize.INTEGER,
+        type: INTEGER,
         allowNull: false,
         validate: {
           min: 1,
@@ -62,19 +62,19 @@ module.exports = {
         },
       },
       year: {
-        type: Sequelize.INTEGER,
+        type: INTEGER,
         allowNull: false,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: DATE,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DATE,
         allowNull: true,
       },
     });

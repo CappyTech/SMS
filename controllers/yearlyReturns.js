@@ -3,7 +3,7 @@ const router = express.Router();
 const Invoice = require('../models/invoice');
 const Subcontractor = require('../models/subcontractor');
 const { formatCurrency, slimDateTime, rounding } = require('../helpers');
-const logger = require('../logger'); 
+const logger = require('../services/loggerService'); 
 const path = require('path');
 const helpers = require('../helpers');
 

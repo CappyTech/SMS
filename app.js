@@ -4,8 +4,8 @@ const expressLayouts = require('express-ejs-layouts');
 const flash = require('express-flash');
 const logger = require('./services/loggerService');
 require('dotenv').config();
-const sequelize = require('./middlewares/dbConnection');
 
+const sequelize = require('./services/databaseService');
 const app = express();
 
 // Set up EJS
@@ -164,9 +164,9 @@ Clients.hasOne(Users, { foreignKey: 'clientId' });
 Users.belongsTo(Employees, { foreignKey: 'employeeId', as: 'Employee' });
 Employees.hasOne(Users, { foreignKey: 'employeeId' });
 
-app.use(require('./middlewares/syncDatabase'));
-app.use(require('./middlewares/oneDriveSync')());
-app.use(require('./middlewares/blockBot'));
+//app.use(require('./middlewares/syncDatabase'));
+//app.use(require('./middlewares/oneDriveSync')());
+//app.use(require('./middlewares/blockBot'));
 
 
 app.use(async (req, res, next) => {

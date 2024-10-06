@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const Users = require('../models/Users'); // Adjust the path as necessary
-const logger = require('../logger');
+const logger = require('../services/loggerService');
 
 const createDefaultAdmin = async (req, res, next) => {
     try {
