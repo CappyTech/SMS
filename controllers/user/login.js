@@ -21,8 +21,7 @@ const renderSigninForm = (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const { usernameOrEmail, password } = req.body;
-        logger.info('Login attempt:', JSON.stringify(req.body, null, 2));
-        
+
         if (!usernameOrEmail || !password) {
             req.flash('error', 'Username and password are required.');
             return res.redirect('/signin');
