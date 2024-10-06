@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const helpers = require('../../helpers');
-const logger = require('../../logger');
+const logger = require('../../services/loggerService');
 const path = require('path');
 
 const Quote = require('../../models/quote')
