@@ -170,6 +170,21 @@ Employees.hasOne(Users, { foreignKey: 'employeeId' });
 //app.use(require('./middlewares/oneDriveSync')());
 //app.use(require('./middlewares/blockBot'));
 
+app.use((req, res, next) => {
+    res.locals.session = req.session;
+    logger.info(`Session Data: ${JSON.stringify(req.session)}`);
+    const username = req.session.user ? req.session.user.username : 'unknown user';
+    const logMessage = `${username} accessed path ${req.method} ${req.path}`;
+
+    if (req.path.includes('/update/')) {
+        logger.warn(`-------- Warn: ${logMessage}`);
+    } else if (req.path.includes('/delete/')) {
+        logger.error(`------- Danger: ${logMessage}`);
+    } else {
+        logger.info(`${logMessage}`);
+    }
+    next();
+});
 
 app.use(async (req, res, next) => {
     try {
