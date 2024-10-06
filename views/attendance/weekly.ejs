@@ -3,9 +3,21 @@
 
 <div class="container py-4">
     <div class="mb-4 bg-body-tertiary rounded-3">
+        <!-- Vertical Navigation Tabs for Daily, Weekly, Monthly -->
+        <ul class="nav nav-tabs justify-content-center mb-4">
+            <li class="nav-item">
+                <a href="/attendance/daily" class="nav-link <%= currentTab === 'daily' ? 'active' : '' %>">Daily</a>
+            </li>
+            <li class="nav-item">
+                <a href="/attendance/weekly" class="nav-link <%= currentTab === 'weekly' ? 'active' : '' %>">Weekly</a>
+            </li>
+            <li class="nav-item">
+                <a href="/attendance/monthly" class="nav-link <%= currentTab === 'monthly' ? 'active' : '' %>">Monthly</a>
+            </li>
+        </ul>
         <div class="container-fluid py-5 text-center">
             <div class="d-flex justify-content-between mb-4 d-print-none">
-
+                <!-- Navigation buttons for Previous and Next week -->
                 <button class="btn btn-hcs-green" style="transform: rotate(0);">
                     <a class="text-white stretched-link text-decoration-none" href="/attendance/weekly/<%= previousYear %>/<%= previousWeek %>">&laquo; Previous Week</a>
                 </button>
@@ -13,7 +25,6 @@
                 <button class="btn btn-hcs-green" style="transform: rotate(0);">
                     <a class="text-white stretched-link text-decoration-none" href="/attendance/weekly/<%= nextYear %>/<%= nextWeek %>">Next Week &raquo;</a>
                 </button>
-
             </div>
 
             <p class="text-center">From <%= moment(startDate).format('Do MMMM YYYY') %> to <%= moment(endDate).format('Do MMMM YYYY') %></p>
@@ -23,8 +34,8 @@
                 <div class="col-lg-6 col-md-6">
                     <div class="card text-center">
                         <div class="card-body">
-                            <h4>Total Employee Hours Worked</h4>
-                            <p class="display-6"><%= totalEmployeeHours %> hours</p>
+                            <h4>Total Employee Payment</h4>
+                            <p class="display-6">£<%= totalEmployeePay.toFixed(2) %> <small class="fs-6">gross</small></p>
                         </div>
                     </div>
                 </div>
@@ -32,7 +43,18 @@
                     <div class="card text-center">
                         <div class="card-body">
                             <h4>Total Subcontractor Payment</h4>
-                            <p class="display-6">£<%= totalSubcontractorPay.toFixed(2) %></p>
+                            <p class="display-6">£<%= totalSubcontractorPay.toFixed(2) %> <small class="fs-6">net</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-lg-6 col-md-6">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h4>Total Employee Hours Worked</h4>
+                            <p class="display-6"><%= totalEmployeeHours %> hours</p>
                         </div>
                     </div>
                 </div>
@@ -71,23 +93,26 @@
                                                 <% if (record.hoursWorked) { %>
                                                     <span><%= record.hoursWorked %> hours</span>
                                                 <% } %>
+                                                <!-- TODO: add holiday hours (hoursHoliday) -->
+                                                <!-- TODO: add sickpay rules --> 
                                             <% }); %>
+                                        <% } %>
+                                        <% if (Object.keys(dailyRecords).length === 0) { %>
+                                            <!-- If no attendance or invoice records, show a link to create a new attendance for that day and person -->
+                                            <button class="btn btn-secondary" style="transform: rotate(0);">
+                                                <a href="/attendance/create?date=<%= day %><%= groupedAttendance[person].employeeId ? '&employeeId=' + groupedAttendance[person].employeeId : '' %><%= groupedAttendance[person].subcontractorId ? '&subcontractorId=' + groupedAttendance[person].subcontractorId : '' %>" 
+                                                class="text-white stretched-link text-decoration-none">+</a>
+                                            </button>
                                         <% } %>
 
                                         <!-- Show subcontractor invoices if available -->
                                         <% if (invoices.length > 0) { %>
                                             <% invoices.forEach(invoice => { %>
                                                 <div>
-                                                    <span><%= invoice.invoiceNumber %></span><br>
-                                                    <span>£<%= invoice.grossAmount.toFixed(2) %></span>
+                                                    <span><a href="/invoice/read/<%= invoice.id %>"><%= invoice.invoiceNumber %></a></span><br>
+                                                    <span>£<%= invoice.netAmount.toFixed(2) %></span>
                                                 </div>
                                             <% }); %>
-                                        <% } else if (Object.keys(dailyRecords).length === 0) { %>
-                                            <!-- If no attendance or invoice records, show a link to create a new attendance for that day and person -->
-                                            <button class="btn btn-secondary" style="transform: rotate(0);">
-                                                <a href="/attendance/create?date=<%= day %><%= groupedAttendance[person].employeeId ? '&employeeId=' + groupedAttendance[person].employeeId : '' %><%= groupedAttendance[person].subcontractorId ? '&subcontractorId=' + groupedAttendance[person].subcontractorId : '' %>" 
-                                                class="text-white stretched-link text-decoration-none">+</a>
-                                            </button>
                                         <% } %>
                                     </td>
                                 <% }); %>
