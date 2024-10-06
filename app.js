@@ -2,8 +2,9 @@ const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('express-flash');
-const logger = require('./logger');
+const logger = require('./services/loggerService');
 require('dotenv').config();
+const sequelize = require('./middlewares/dbConnection');
 
 const app = express();
 
