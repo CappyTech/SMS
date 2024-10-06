@@ -6,7 +6,7 @@ const Jobs = require('../../models/job');
 const Locations = require('../../models/location');
 const helpers = require('../../helpers');
 const moment = require('moment');
-const logger = require('../../logger');
+const logger = require('../../services/loggerService');
 const path = require('path');
 
 const createJob = async (req, res) => {
