@@ -4,10 +4,12 @@ const expressLayouts = require('express-ejs-layouts');
 const flash = require('express-flash');
 const logger = require('./services/loggerService');
 require('dotenv').config();
-
-const sequelize = require('./services/databaseService');
+const packageJson = require('./package.json');
+const os = require('os');
+const moment = require('moment');
+//const sequelize = require('./services/databaseService');
 const app = express();
-
+app.set('trust proxy', true);
 // Set up EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
