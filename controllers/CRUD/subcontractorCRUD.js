@@ -4,7 +4,7 @@ const router = express.Router();
 const Subcontractor = require('../../models/subcontractor');
 const helpers = require('../../helpers');
 const { Op } = require('sequelize');
-const logger = require('../../logger'); 
+const logger = require('../../services/loggerService'); 
 const path = require('path');
 
 const createSubcontractor = async (req, res) => {
