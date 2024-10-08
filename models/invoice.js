@@ -82,8 +82,10 @@ const Invoices = sequelize.define('Invoices', {
         allowNull: true,
     },
 }, {
+    timestamps: true,
     paranoid: true,
-    timestamp:true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = Invoices;

@@ -16,9 +16,7 @@ const Contacts = sequelize.define('Contacts', {
         references: {
             model: Clients,
             key: 'id',
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+        }
     },
     name: {
         type: DataTypes.STRING,
@@ -37,7 +35,10 @@ const Contacts = sequelize.define('Contacts', {
         allowNull: true,
     },
 }, {
-    paranoid: false,
+    timestamps: true,
+    paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = Contacts;

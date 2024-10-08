@@ -89,8 +89,10 @@ const Users = sequelize.define('Users', {
         defaultValue: false,
     },
 }, {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
-    paranoid: false, // Set to true if you want soft deletes (deletedAt)
+    timestamps: true,
+    paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 // Hook to hash the password before creating the user

@@ -69,21 +69,12 @@ const Subcontractors = sequelize.define('Subcontractors', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
-    },
-    createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-    },
-    updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-    },
-    deletedAt: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
+    }
 }, {
+    timestamps: true,
     paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 Subcontractors.beforeValidate((subcontractor, options) => {

@@ -45,7 +45,10 @@ const Locations = sequelize.define('Locations', {
         type: DataTypes.DATE,
     },
 }, {
+    timestamps: true,
     paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = Locations;

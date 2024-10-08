@@ -28,9 +28,7 @@ const Attendances = sequelize.define('Attendances', {
         references: {
             model: Locations,
             key: 'id',
-        },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
+        }
     },
     employeeId: {
         type: DataTypes.UUID,
@@ -38,9 +36,7 @@ const Attendances = sequelize.define('Attendances', {
         references: {
             model: Employees,
             key: 'id',
-        },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
+        }
     },
     subcontractorId: {
         type: DataTypes.UUID,
@@ -48,16 +44,17 @@ const Attendances = sequelize.define('Attendances', {
         references: {
             model: Subcontractors,
             key: 'id',
-        },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
+        }
     },
     hoursWorked: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: true,
     },
 }, {
-    paranoid: false,
+    timestamps: true,
+    paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = Attendances;

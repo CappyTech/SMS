@@ -26,9 +26,7 @@ const Quotes = sequelize.define('Quotes', {
         references: {
             model: Locations,
             key: 'id',
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+        }
     },
     clientId: {
         type: DataTypes.UUID,
@@ -36,9 +34,7 @@ const Quotes = sequelize.define('Quotes', {
         references: {
             model: Clients,
             key: 'id',
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+        }
     },
     contactId: {
         type: DataTypes.UUID,
@@ -46,9 +42,7 @@ const Quotes = sequelize.define('Quotes', {
         references: {
             model: Contacts,
             key: 'id',
-        },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
+        }
     },
     value: {
         type: DataTypes.FLOAT,
@@ -84,7 +78,10 @@ const Quotes = sequelize.define('Quotes', {
         allowNull: true,
     },
 }, {
+    timestamps: true,
     paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = Quotes;

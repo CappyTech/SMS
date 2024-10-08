@@ -29,8 +29,10 @@ const BankHoliday = sequelize.define('BankHoliday', {
         allowNull: false,
     },
 }, {
-    tableName: 'bank_holidays',
-    timestamps: false,
+    timestamps: true,
+    paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = BankHoliday;

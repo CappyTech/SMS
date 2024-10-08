@@ -14,9 +14,7 @@ const VehicleChecks = sequelize.define('VehicleChecks', {
     references: {
       model: 'Vehicles',
       key: 'id',
-    },
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    }
   },
   date: {
     type: DataTypes.DATE,
@@ -42,10 +40,9 @@ const VehicleChecks = sequelize.define('VehicleChecks', {
   },
 }, {
   timestamps: true,
-  tableName: 'vehicleChecks',
-  underscored: true,
-  charset: 'latin1',
-  collate: 'latin1_bin',
+    paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = VehicleChecks;

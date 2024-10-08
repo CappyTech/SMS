@@ -58,8 +58,10 @@ const Employees = sequelize.define('Employees', {
     defaultValue: 0.0,
   },
 }, {
-  paranoid: false,
   timestamps: true,
+  paranoid: true,
+  charset: 'latin1',
+  collate: 'latin1_bin',
 });
 
 module.exports = Employees;

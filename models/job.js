@@ -22,9 +22,7 @@ const Jobs = sequelize.define('Jobs', {
         references: {
             model: Locations,
             key: 'id',
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+        }
     },
     clientId: {
         type: DataTypes.UUID,
@@ -32,9 +30,7 @@ const Jobs = sequelize.define('Jobs', {
         references: {
             model: Clients,
             key: 'id',
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+        }
     },
     quoteId: {
         type: DataTypes.UUID,
@@ -42,9 +38,7 @@ const Jobs = sequelize.define('Jobs', {
         references: {
             model: Quotes,
             key: 'id',
-        },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
+        }
     },
     value: {
         type: DataTypes.FLOAT,
@@ -62,27 +56,12 @@ const Jobs = sequelize.define('Jobs', {
     completionDate: {
         type: DataTypes.DATE,
         allowNull: true,
-    },
-    createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-    },
-    updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-    },
-    deletedAt: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
+    }
 }, {
+    timestamps: true,
     paranoid: true,
-    indexes: [
-        // Add a composite index instead of separate indexes for locationId and clientId
-        {
-            fields: ['locationId', 'clientId'],
-        },
-    ],
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = Jobs;

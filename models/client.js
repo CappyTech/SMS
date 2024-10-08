@@ -13,7 +13,10 @@ const Clients = sequelize.define('Clients', {
         allowNull: false,
     },
 }, {
-    paranoid: false,
+    timestamps: true,
+    paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = Clients;

@@ -13,9 +13,7 @@ const Vehicles = sequelize.define('Vehicles', {
     references: {
       model: 'Employees',
       key: 'id',
-    },
-    onDelete: 'SET NULL',
-    onUpdate: 'CASCADE',
+    }
   },
   subcontractorId: {
     type: DataTypes.CHAR(36),
@@ -23,9 +21,7 @@ const Vehicles = sequelize.define('Vehicles', {
     references: {
       model: 'Subcontractors',
       key: 'id',
-    },
-    onDelete: 'SET NULL',
-    onUpdate: 'CASCADE',
+    }
   },
   make: {
     type: DataTypes.STRING(100),
@@ -118,10 +114,9 @@ const Vehicles = sequelize.define('Vehicles', {
   },
 }, {
   timestamps: true,
-  tableName: 'vehicles',
-  underscored: true,
-  charset: 'latin1',
-  collate: 'latin1_bin',
+    paranoid: true,
+    charset: 'latin1',
+    collate: 'latin1_bin',
 });
 
 module.exports = Vehicles;
