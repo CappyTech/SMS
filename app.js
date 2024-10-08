@@ -214,8 +214,6 @@ app.use(async (req, res, next) => {
 app.use((req, res, next) => {
     res.locals.session = req.session;
     res.locals.package = packageJson.version;
-    res.locals.node = process.version;
-    res.locals.serverPlatform = `${os.type()} ${os.release()} (${os.arch()})`;
     res.locals.copyrightyearstart = 2023;
     res.locals.copyrightyear = moment().year();
     next();
