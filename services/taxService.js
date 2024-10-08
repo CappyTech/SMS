@@ -146,6 +146,7 @@ const calculateTaxYearAndMonth = (date) => {
 };
 
 module.exports = {
+    getBankHoliday,
     getCurrentTaxYear,
     getTaxYearStartEnd,
     getCurrentMonthlyReturn,
