@@ -31,8 +31,8 @@
                                 <li class="list-group-item"><strong>Email:</strong> <%= employee.email %></li>
                                 <li class="list-group-item"><strong>Phone Number:</strong> <%= employee.phoneNumber ? employee.phoneNumber : 'N/A' %></li>
                                 <li class="list-group-item"><strong>Position:</strong> <%= employee.position %></li>
-                                <li class="list-group-item"><strong>Employment Type:</strong> <%= employee.employmentType %></li>
-                                <li class="list-group-item"><strong>Employment Status:</strong> <%= employee.employmentStatus %></li>
+                                <li class="list-group-item"><strong>Type:</strong> <%= employee.type %></li>
+                                <li class="list-group-item"><strong>Status:</strong> <%= employee.status %></li>
                                 <li class="list-group-item">
                                     <strong>Emergency Contact:</strong>
                                     <% if (employee.contactName && employee.contactNumber) { %>
