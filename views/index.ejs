@@ -3,6 +3,238 @@
 <%- include('./partials/successAlert.ejs') %>
 <%- include('./partials/errorAlerts.ejs') %>
 
+<div class="container mt-5">
+    <div class="row">
+
+        <!-- New Section -->
+        <div class="col-md-12s mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <p class="display-7">
+                         New
+                    </p>
+                </div>
+                <div class="card-body">
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/invoice/create">
+                                <i class="bi bi-receipt me-2"></i>Invoice
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/subcontractor/create">
+                                <i class="bi bi-people me-2"></i>Subcontractor
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/quote/create">
+                                <i class="bi bi-file-earmark-text me-2"></i>Quote
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/client/create">
+                                <i class="bi bi-people me-2"></i>Client
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contact/create">
+                                <i class="bi bi-telephone me-2"></i>Contact
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/location/create">
+                                <i class="bi bi-pin-map-fill me-2"></i>Location
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/attendance/create">
+                                <i class="bi bi-person-raised-hand"></i>Attendance
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/employee/create">
+                                <i class="bi bi-person-standing"></i>Employee
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+
+    <!-- Dashboards Section -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <div class="display-7"> Dashboards</div>
+        </div>
+        <div class="card-body">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a href="/dashboard/stats" class="nav-link hcs-green-text">
+                <i class="bi bi-binoculars me-2"></i>Overview
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/attendance/weekly" class="nav-link hcs-green-text">
+                <i class="bi bi-person-raised-hand"></i>Weekly Attendance
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Construction Industry Scheme Section -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <div class="display-7"> Construction Industry Scheme</div>
+        </div>
+        <div class="card-body">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a href="/dashboard/invoice" class="nav-link hcs-green-text">
+                <i class="bi bi-receipt me-2"></i>Invoices
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/subcontractor" class="nav-link hcs-green-text">
+                <i class="bi bi-people me-2"></i>Subcontractors
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/monthly/returns/form" class="nav-link hcs-green-text">
+                <i class="bi bi-file-spreadsheet-fill me-2"></i>Monthly Returns
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract Management Section -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <div class="display-7"> Contract Management</div>
+        </div>
+        <div class="card-body">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a href="/dashboard/quote" class="nav-link hcs-green-text">
+                <i class="bi bi-file-earmark-text me-2"></i>Quotes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/job" class="nav-link hcs-green-text">
+                <i class="bi bi-briefcase me-2"></i>Jobs
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/client" class="nav-link hcs-green-text">
+                <i class="bi bi-people me-2"></i>Clients
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/contact" class="nav-link hcs-green-text">
+                <i class="bi bi-telephone me-2"></i>Contacts
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/location" class="nav-link hcs-green-text">
+                <i class="bi bi-pin-map-fill me-2"></i>Locations
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payroll Section -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <div class="display-7"> Payroll</div>
+        </div>
+        <div class="card-body">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a href="/dashboard/attendance" class="nav-link hcs-green-text">
+                <i class="bi bi-person-raised-hand"></i>Attendance
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/employee" class="nav-link hcs-green-text">
+                <i class="bi bi-person-standing"></i>Employees
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
+    <!-- Administration Section -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <div class="display-7"> Administration</div>
+        </div>
+        <div class="card-body bg-body-tertiary">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="/user/create">
+                    <i class="bi bi-person me-2"></i>User
+                </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/user" class="nav-link hcs-green-text">
+                <i class="bi bi-person me-2"></i>Users
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <% } %>
+    
+    <!-- My Account Section -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+            <div class="display-7"> My Account</div>
+        </div>
+        <div class="card-body bg-body-tertiary">
+            <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link hcs-green-text" href="/account">
+                <i class="bi bi-gear-wide me-2"></i>Settings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link hcs-red-text" href="/logout">
+                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </a>
+            </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5 text-center">
