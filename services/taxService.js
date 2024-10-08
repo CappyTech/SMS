@@ -1,4 +1,57 @@
 const moment = require('moment');
+const axios = require('axios');
+const BankHoliday = require('../models/bankHoliday');
+
+/**
+ * Fetches bank holiday data from the given URL, checks for changes, and updates the database if necessary.
+ * 
+ * @returns {Promise<void>} A promise that resolves when the operation is complete.
+ */
+async function getBankHoliday() {
+    try {
+        // Fetch JSON data
+        const response = await axios.get('https://www.gov.uk/bank-holidays.json');
+        const data = response.data;
+
+        // Extract events from all divisions
+        const events = [];
+        for (const division in data) {
+            data[division].events.forEach(event => {
+                events.push({
+                    title: event.title,
+                    date: event.date,
+                    notes: event.notes,
+                    bunting: event.bunting,
+                    division: division
+                });
+            });
+        }
+
+        // Fetch existing data from the database
+        const existingData = await BankHoliday.findAll();
+
+        // Check if data has changed
+        const hasChanged = events.some(event => {
+            return !existingData.some(existingEvent => 
+                existingEvent.title === event.title &&
+                existingEvent.date === event.date &&
+                existingEvent.notes === event.notes &&
+                existingEvent.bunting === event.bunting &&
+                existingEvent.division === event.division
+            );
+        });
+
+        if (hasChanged) {
+            // Drop existing data
+            await BankHoliday.destroy({ where: {}, truncate: true });
+
+            // Insert new data
+            await BankHoliday.bulkCreate(events);
+        }
+    } catch (error) {
+        console.error('Error fetching or updating bank holidays:', error);
+    }
+}
 
 /**
  * Gets the current tax year based on today's date.

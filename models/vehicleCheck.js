@@ -1,12 +1,12 @@
 // models/vehicleChecks.js
 const { DataTypes } = require('sequelize');
-const { sequelize, Sequelize } = require('../services/databaseService');
+const { sequelize } = require('../services/databaseService');
 
 const VehicleChecks = sequelize.define('VehicleChecks', {
   id: {
     type: DataTypes.CHAR(36),
     primaryKey: true,
-    defaultValue: sequelize.DataTypes.UUIDV4,
+    defaultValue: DataTypes.UUIDV4,
   },
   vehicleId: {
     type: DataTypes.CHAR(36),
@@ -19,7 +19,7 @@ const VehicleChecks = sequelize.define('VehicleChecks', {
   date: {
     type: DataTypes.DATE,
     allowNull: false,
-    defaultValue: sequelize.DataTypes.NOW,
+    defaultValue: DataTypes.NOW,
   },
   typeOfCheck: {
     type: DataTypes.ENUM('Daily', 'Weekly', 'Monthly', 'Pre-Trip', 'Post-Trip', 'Safety'),

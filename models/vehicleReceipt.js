@@ -1,12 +1,12 @@
 // models/vehicleReceipts.js
 const { DataTypes } = require('sequelize');
-const { sequelize, Sequelize } = require('../services/databaseService');
+const { sequelize } = require('../services/databaseService');
 
 const VehicleReceipts = sequelize.define('VehicleReceipts', {
   id: {
     type: DataTypes.CHAR(36),
     primaryKey: true,
-    defaultValue: sequelize.DataTypes.UUIDV4, // Automatically generate UUID
+    defaultValue: DataTypes.UUIDV4,
   },
   vehicleId: {
     type: DataTypes.CHAR(36),
@@ -19,7 +19,7 @@ const VehicleReceipts = sequelize.define('VehicleReceipts', {
   date: {
     type: DataTypes.DATE,
     allowNull: false,
-    defaultValue: sequelize.DataTypes.NOW,
+    defaultValue: DataTypes.NOW,
   },
   fuelType: {
     type: DataTypes.ENUM('Petrol', 'Diesel'),

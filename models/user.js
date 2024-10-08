@@ -1,13 +1,14 @@
 // models/user.js
 const { DataTypes } = require('sequelize');
-const { sequelize, Sequelize } = require('../services/databaseService');
+const { sequelize } = require('../services/databaseService');
+
 const bcrypt = require('bcrypt');
 const encryptionService = require('../services/encryptionService');
 
 const Users = sequelize.define('Users', {
     id: {
         type: DataTypes.UUID,
-        defaultValue: Sequelize.DataTypes.UUIDV4,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
     username: {

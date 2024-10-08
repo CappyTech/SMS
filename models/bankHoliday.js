@@ -1,10 +1,10 @@
 const { DataTypes } = require('sequelize');
-const { sequelize, Sequelize } = require('../services/databaseService');
+const { sequelize } = require('../services/databaseService');
 
 const BankHoliday = sequelize.define('BankHoliday', {
     id: {
         type: DataTypes.UUID,
-        defaultValue: sequelize.DataTypes.UUIDV4,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
         allowNull: false,
     },
@@ -30,7 +30,7 @@ const BankHoliday = sequelize.define('BankHoliday', {
     },
 }, {
     timestamps: true,
-    paranoid: true,
+    paranoid: false,
     charset: 'latin1',
     collate: 'latin1_bin',
 });

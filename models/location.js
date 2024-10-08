@@ -1,6 +1,6 @@
 // models/location.js
 const { DataTypes } = require('sequelize');
-const { sequelize, Sequelize } = require('../services/databaseService');
+const { sequelize } = require('../services/databaseService');
 
 const Locations = sequelize.define('Locations', {
     id: {
