@@ -11,6 +11,8 @@ const helpers = require('../../helpers');
 const path = require('path');
 const logger = require('../../services/loggerService');
 const attendanceService = require('../../services/attendanceService');
+const authService = require('../../services/authService');
+const taxService = require('../../services/taxService');
 
 const createAttendance = async (req, res) => {
     try {
@@ -182,8 +184,8 @@ const getDailyAttendance = async (req, res) => {
 
 const getWeeklyAttendance = async (req, res) => {
     try {
-        // Get the current tax year and week number based on the provided params or defaults.
-        const year = req.params.year ? parseInt(req.params.year) : helpers.getCurrentTaxYear();
+
+        const year = req.params.year ? parseInt(req.params.year) : taxService.getCurrentTaxYear();
         const { start: startOfTaxYear } = helpers.getTaxYearStartEnd(year);
         const taxYearStart = moment.utc(startOfTaxYear, 'Do MMMM YYYY');
         let firstPayrollWeekStart = taxYearStart.clone().day(1); 
@@ -245,6 +247,14 @@ const getWeeklyAttendance = async (req, res) => {
             col: 'subcontractorId'
         });
 
+        const {
+            groupedAttendance,
+            totalEmployeeHours,
+            totalEmployeePay,
+            totalSubcontractorPay,
+            daysOfWeek,
+        } = attendanceService.groupAttendanceByPerson(attendance, subcontractorInvoices, payrollWeekStart, endDate);
+    /*
         const totalEmployeePay = attendance
             .filter(a => a.employeeId !== null && a.hoursWorked !== null && a.Employee) // Ensure Employee is loaded
             .reduce((sum, record) => sum + (parseFloat(record.hoursWorked) * parseFloat(record.Employee.hourlyRate)), 0);
@@ -327,7 +337,7 @@ const getWeeklyAttendance = async (req, res) => {
         for (let i = 0; i < 7; i++) {
             daysOfWeek.push(payrollWeekStart.clone().add(i, 'days').format('YYYY-MM-DD'));
         }
-
+    */
         // Render the updated weekly attendance view with the payroll week data.
         res.render(path.join('attendance', 'weekly'), {
             moment,
@@ -346,7 +356,8 @@ const getWeeklyAttendance = async (req, res) => {
             totalEmployeePay,
             totalEmployeeHours,
             totalSubcontractorPay,
-            currentTab: 'weekly'
+            currentTab: 'weekly',
+            daysOfWeek,
         });
     } catch (error) {
         logger.error('Error fetching weekly attendance: ' + error.message);
@@ -465,7 +476,7 @@ const getMonthlyAttendance = async (req, res) => {
     }
 };
 
-router.get('/fetch/attendance/:id', helpers.ensureAuthenticated, async (req, res) => {
+router.get('/fetch/attendance/:id', authService.ensureAuthenticated, async (req, res) => {
     try {
         const attendance = await Attendances.findAll({
             where: { id: req.params.id },
@@ -478,17 +489,17 @@ router.get('/fetch/attendance/:id', helpers.ensureAuthenticated, async (req, res
     }
 });
 
-router.post('/attendance/create', helpers.ensureAuthenticated, createAttendance);
-router.get('/attendance/read/:attendance', helpers.ensureAuthenticated, readAttendance);
-router.post('/attendance/update/:attendance', helpers.ensureAuthenticated, updateAttendance);
-router.post('/attendance/delete/:attendance', helpers.ensureAuthenticated, deleteAttendance);
-router.get('/attendance/weekly', helpers.ensureAuthenticated, (req, res) => {
+router.post('/attendance/create', authService.ensureAuthenticated, createAttendance);
+router.get('/attendance/read/:attendance', authService.ensureAuthenticated, readAttendance);
+router.post('/attendance/update/:attendance', authService.ensureAuthenticated, updateAttendance);
+router.post('/attendance/delete/:attendance', authService.ensureAuthenticated, deleteAttendance);
+router.get('/attendance/weekly', authService.ensureAuthenticated, (req, res) => {
     try {
         // Calculate the current tax year
-        const currentTaxYear = helpers.getCurrentTaxYear();
+        const currentTaxYear = taxService.getCurrentTaxYear();
 
         // Get the start of the current tax year and the first payroll week start date
-        const { start: startOfTaxYear } = helpers.getTaxYearStartEnd(currentTaxYear);
+        const { start: startOfTaxYear } = taxService.getTaxYearStartEnd(currentTaxYear);
         const taxYearStart = moment.utc(startOfTaxYear, 'Do MMMM YYYY');
         let firstPayrollWeekStart = taxYearStart.clone().day(1);
         if (firstPayrollWeekStart.isBefore(taxYearStart)) {
@@ -507,8 +518,8 @@ router.get('/attendance/weekly', helpers.ensureAuthenticated, (req, res) => {
         return res.redirect('/');
     }
 });
-router.get('/attendance/daily/:date?', helpers.ensureAuthenticated, getDailyAttendance);
-router.get('/attendance/weekly/:year?/:week?', helpers.ensureAuthenticated, getWeeklyAttendance);
-router.get('/attendance/monthly/:year?/:month?', helpers.ensureAuthenticated, getMonthlyAttendance);
+router.get('/attendance/daily/:date?', authService.ensureAuthenticated, getDailyAttendance);
+router.get('/attendance/weekly/:year?/:week?', authService.ensureAuthenticated, getWeeklyAttendance);
+router.get('/attendance/monthly/:year?/:month?', authService.ensureAuthenticated, getMonthlyAttendance);
 
 module.exports = router;
