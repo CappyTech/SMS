@@ -10,8 +10,8 @@ const Employees = require('../../models/employee');
 // Create Employee
 const createEmployee = async (req, res) => {
     try {
-        const { name, email, phoneNumber, position, type, status, contactName, contactNumber, hourlyRate } = req.body;
-        await Employees.create({ name, email: email || null, phoneNumber: phoneNumber || null, position:position || null, type, status, contactName: contactName || null, contactNumber: contactNumber || null, hourlyRate });
+        const { name, email, phoneNumber, position, type, status, contactName, contactNumber, hourlyRate, hireDate } = req.body;
+        await Employees.create({ name, email: email || null, phoneNumber: phoneNumber || null, position:position || null, type, status, contactName: contactName || null, contactNumber: contactNumber || null, hourlyRate, hireDate: hireDate || moment().NOW });
         req.flash('success', 'Employee created successfully.');
         res.redirect('/dashboard/employee');
     } catch (error) {
@@ -47,8 +47,8 @@ const readEmployee = async (req, res) => {
 // Update Employee
 const updateEmployee = async (req, res) => {
     try {
-        const { name, email, phoneNumber, position, type, status, contactName, contactNumber, hourlyRate } = req.body;
-        await Employees.update({ name, email, phoneNumber, position, type, status, contactName, contactNumber, hourlyRate }, { where: { id: req.params.employee } });
+        const { name, email, phoneNumber, position, type, status, contactName, contactNumber, hourlyRate, hireDate } = req.body;
+        await Employees.update({ name, email: email || null, phoneNumber: phoneNumber || null, position:position || null, type, status, contactName: contactName || null, contactNumber: contactNumber || null, hourlyRate, hireDate }, { where: { id: req.params.employee } });
         req.flash('success', 'Employee updated successfully.');
         res.redirect('/dashboard/employee');
     } catch (error) {
