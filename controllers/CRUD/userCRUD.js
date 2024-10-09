@@ -199,7 +199,7 @@ router.get('/fetch/user/:id', async (req, res) => {
     }
 });
 
-router.post('/user/create/:selected', helpers.ensureAuthenticated, createUser);
+router.post('/user/create/', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionCreateUser']), createUser);
 router.get('/user/read/:id', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionReadUser']), readUser);
 router.post('/user/update/:id', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionUpdateUser']), updateUser);
 router.post('/user/delete/:id', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionDeleteUser']), deleteUser);
