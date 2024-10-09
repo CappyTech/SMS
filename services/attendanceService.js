@@ -71,7 +71,7 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
 
         const allEmployees = await Employees.findAll({
             where: {
-                status: 'Active'
+                status: 'active'
             }
         });
 
@@ -141,12 +141,12 @@ const groupAttendanceByPerson = (attendanceRecords, subcontractorInvoices, payro
         const hourlyRate = record.Employee ? parseFloat(record.Employee.hourlyRate) || 0 : 0;
         
         // Log debug information for troubleshooting
-        logger.info(`Debug - Employee Name: ${personName}`);
-        logger.info(`Debug - Hours Worked: ${hoursWorked}, Hourly Rate: £${hourlyRate}, Type of Hours Worked: ${typeof hoursWorked}, Type of Hourly Rate: ${typeof hourlyRate}`);
+        //logger.info(`Debug - Employee Name: ${personName}`);
+        //logger.info(`Debug - Hours Worked: ${hoursWorked}, Hourly Rate: £${hourlyRate}, Type of Hours Worked: ${typeof hoursWorked}, Type of Hourly Rate: ${typeof hourlyRate}`);
 
         const calculatedWeeklyPay = hoursWorked * hourlyRate;
 
-        logger.info(`Debug - Calculated Weekly Pay: £${calculatedWeeklyPay}`);
+        //logger.info(`Debug - Calculated Weekly Pay: £${calculatedWeeklyPay}`);
 
         groupedAttendance[personName].dailyRecords[dateKey][record.id] = {
             location: record.Location,
@@ -181,7 +181,7 @@ const groupAttendanceByPerson = (attendanceRecords, subcontractorInvoices, payro
         }
     });
 
-    logger.info('Grouped Attendance:', JSON.stringify(groupedAttendance, null, 2));
+    //logger.info('Grouped Attendance:', JSON.stringify(groupedAttendance, null, 2));
 
     const daysOfWeek = [];
     for (let i = 0; i < 7; i++) {
