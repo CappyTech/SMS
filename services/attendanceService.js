@@ -33,7 +33,7 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
         const attendanceRecords = await Attendances.findAll({
             where: {
                 date: {
-                    [Op.between]: [startDate.toDate(), endDate.toDate()]
+                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
                 }
             },
             include: [Employees, Subcontractors, Locations],
