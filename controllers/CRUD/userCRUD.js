@@ -55,7 +55,7 @@ const createUser = async (req, res) => {
     } catch (error) {
         logger.error('Error creating user: ' + error.message);
         req.flash('error', 'An error occurred.');
-        res.redirect('/error');
+        res.redirect('/');
     }
 };
 
@@ -160,7 +160,7 @@ const updateUser = async (req, res) => {
     } catch (error) {
         logger.error('Error updating user:  ', error.message);
         req.flash('error', 'Error updating user: ' + error.message);
-        res.redirect('/error');
+        res.redirect('/');
     }
 };
 
@@ -182,7 +182,7 @@ const deleteUser = async (req, res) => {
     } catch (error) {
         logger.error('Error deleting user:  ', error.message);
         req.flash('error', 'Error deleting user: ' + error.message);
-        res.redirect('/error');
+        res.redirect('/');
     }
 };
 
