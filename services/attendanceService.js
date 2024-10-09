@@ -168,7 +168,13 @@ const groupAttendanceByPerson = (attendanceRecords, subcontractorInvoices, payro
         daysOfWeek.push(payrollWeekStart.clone().add(i, 'days').format('YYYY-MM-DD'));
     }
 
-    return groupedAttendance, totalEmployeeHours, totalEmployeePay, totalSubcontractorPay, daysOfWeek;
+    return {
+        groupedAttendance,
+        totalEmployeeHours,
+        totalEmployeePay,
+        totalSubcontractorPay,
+        daysOfWeek,
+    };
 };
 
 module.exports = {
