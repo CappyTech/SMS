@@ -178,7 +178,8 @@ const getDailyAttendance = async (req, res) => {
         });
     } catch (error) {
         logger.error('Error fetching daily attendance: ' + error.message);
-        res.status(500).send('Internal Server Error');
+        req.flash('error', 'Error fetching daily attendance: ' + error.message);
+        return res.redirect('/');
     }
 };
 
@@ -320,7 +321,8 @@ const getWeeklyAttendance = async (req, res) => {
         });
     } catch (error) {
         logger.error('Error fetching weekly attendance: ' + error.message);
-        res.status(500).send('Internal Server Error');
+        req.flash('error', 'Error fetching weekly attendance: ' + error.message);
+        return res.redirect('/');
     }
 };
 
@@ -431,7 +433,8 @@ const getMonthlyAttendance = async (req, res) => {
         });
     } catch (error) {
         logger.error('Error fetching monthly attendance: ' + error.message);
-        res.status(500).send('Internal Server Error');
+        req.flash('error', 'Error fetching monthly attendance: ' + error.message);
+        return res.redirect('/');
     }
 };
 
