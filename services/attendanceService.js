@@ -1,10 +1,11 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
 const logger = require('./loggerService');
-const Attendances = require('../models/attendance'); // Adjust the path as necessary
-const Employees = require('../models/employee'); // Adjust the path as necessary
-const Subcontractors = require('../models/subcontractor'); // Adjust the path as necessary
-const Locations = require('../models/location'); // Adjust the path as necessary
+const Attendances = require('../models/attendance');
+const Employees = require('../models/employee');
+const Subcontractors = require('../models/subcontractor');
+const Invoices = require('../models/invoice');
+const Locations = require('../models/location');
 
 const getAttendanceForDay = async (date) => {
     try {
