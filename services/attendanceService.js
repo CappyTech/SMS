@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const moment = require('moment');
 const logger = require('./loggerService');
 const Attendances = require('../models/attendance');
@@ -69,11 +69,18 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
             col: 'subcontractorId'
         });
 
+        const allEmployees = await Employees.findAll({
+            where: {
+                status: 'Active'
+            }
+        });
+
         return {
             attendanceRecords,
             subcontractorInvoices,
             employeeCount,
-            subcontractorCount
+            subcontractorCount,
+            allEmployees
         };
     } catch (error) {
         logger.error('Error fetching attendance records: ' + error);
@@ -86,7 +93,7 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
  * @param {Array} attendanceRecords - Array of attendance records.
  * @returns {Object} - Grouped attendance records by person name.
  */
-const groupAttendanceByPerson = (attendanceRecords, subcontractorInvoices, payrollWeekStart, endDate) => {
+const groupAttendanceByPerson = (attendanceRecords, subcontractorInvoices, payrollWeekStart, endDate, allEmployees) => {
     
     const totalEmployeePay = attendanceRecords
             .filter(a => a.employeeId !== null && a.hoursWorked !== null && a.Employee) // Ensure Employee is loaded
@@ -94,6 +101,19 @@ const groupAttendanceByPerson = (attendanceRecords, subcontractorInvoices, payro
     const groupedAttendance = {};
     let totalEmployeeHours = 0;
     let totalSubcontractorPay = 0;
+
+    // Initialize groupedAttendance with all employees
+    allEmployees.forEach(employee => {
+        groupedAttendance[employee.name] = {
+            employeeId: employee.id,
+            subcontractorId: null,
+            totalHoursWorked: 0,
+            totalPay: 0,
+            weeklyPay: 0,
+            dailyRecords: {},
+            invoices: {}
+        };
+    });
 
     attendanceRecords.forEach(record => {
         const personName = record.Employee ? record.Employee.name : record.Subcontractor.company;
