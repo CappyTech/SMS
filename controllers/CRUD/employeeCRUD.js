@@ -11,7 +11,7 @@ const Employees = require('../../models/employee');
 const createEmployee = async (req, res) => {
     try {
         const { name, email, phoneNumber, position, type, status, contactName, contactNumber, hourlyRate } = req.body;
-        await Employees.create({ name, email, phoneNumber, position, type, status, contactName, contactNumber, hourlyRate });
+        await Employees.create({ name, email: email || null, phoneNumber: phoneNumber || null, position:position || null, type, status, contactName: contactName || null, contactNumber: contactNumber || null, hourlyRate });
         req.flash('success', 'Employee created successfully.');
         res.redirect('/dashboard/employee');
     } catch (error) {
