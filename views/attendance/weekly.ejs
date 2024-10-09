@@ -91,7 +91,9 @@
                                                     <%= record.location ? (record.location.name || record.location.address || record.type) : record.type %>
                                                 </a><br>
                                                 <% if (record.hoursWorked) { %>
-                                                    <span><%= record.hoursWorked %> hours</span>
+                                                    <a href="/attendance/read/<%= attendanceId %>" class="text-decoration-none">
+                                                        <span><%= record.hoursWorked %> hours</span>
+                                                    </a>
                                                 <% } %>
                                                 <!-- TODO: add holiday hours (hoursHoliday) -->
                                                 <!-- TODO: add sickpay rules --> 
