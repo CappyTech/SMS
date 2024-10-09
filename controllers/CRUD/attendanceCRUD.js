@@ -184,71 +184,31 @@ const getDailyAttendance = async (req, res) => {
 
 const getWeeklyAttendance = async (req, res) => {
     try {
-
         const year = req.params.year ? parseInt(req.params.year) : taxService.getCurrentTaxYear();
         const { start: startOfTaxYear } = helpers.getTaxYearStartEnd(year);
         const taxYearStart = moment.utc(startOfTaxYear, 'Do MMMM YYYY');
         let firstPayrollWeekStart = taxYearStart.clone().day(1); 
-
         if (firstPayrollWeekStart.isBefore(taxYearStart)) {
             firstPayrollWeekStart.add(7, 'days');
         }
-
         const today = moment.utc();
         const requestedWeekNumber = req.params.week ? parseInt(req.params.week) : today.diff(firstPayrollWeekStart, 'weeks') + 1;
         const payrollWeekStart = firstPayrollWeekStart.clone().add((requestedWeekNumber - 1) * 7, 'days');
         const endDate = payrollWeekStart.clone().add(6, 'days');
-
         const previousWeek = requestedWeekNumber === 1 ? 52 : requestedWeekNumber - 1;
         const previousYear = requestedWeekNumber === 1 ? year - 1 : year;
         const nextWeek = requestedWeekNumber === 52 ? 1 : requestedWeekNumber + 1;
         const nextYear = requestedWeekNumber === 52 ? year + 1 : year;
 
-        // Fetch attendance records within the payroll week range.
-        const attendance = await Attendances.findAll({
-            where: {
-                date: {
-                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
-                }
-            },
-            include: [Locations, Employees, Subcontractors],
-            order: [['date', 'ASC']]
-        });
-
-        // Fetch subcontractor invoices within the week range.
-        const subcontractorInvoices = await Invoices.findAll({
-            where: {
-                invoiceDate: {
-                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
-                }
-            },
-            include: [Subcontractors]
-        });
-
-        const employeeCount = await Attendances.count({
-            where: {
-                date: {
-                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
-                },
-                employeeId: { [Op.not]: null }
-            },
-            distinct: true,
-            col: 'employeeId'
-        });
-
-        const subcontractorCount = await Attendances.count({
-            where: {
-                date: {
-                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
-                },
-                subcontractorId: { [Op.not]: null }
-            },
-            distinct: true,
-            col: 'subcontractorId'
-        });
+        const {
+            attendanceRecords,
+            subcontractorInvoices,
+            employeeCount,
+            subcontractorCount,
+        } = attendanceService.getAttendanceForWeek(payrollWeekStart, endDate);
 
         const {
-            groupedAttendance,
+            attendance,
             totalEmployeeHours,
             totalEmployeePay,
             totalSubcontractorPay,
@@ -341,8 +301,7 @@ const getWeeklyAttendance = async (req, res) => {
         // Render the updated weekly attendance view with the payroll week data.
         res.render(path.join('attendance', 'weekly'), {
             moment,
-            groupedAttendance,
-            daysOfWeek,
+            attendance,
             startDate: payrollWeekStart.format('YYYY-MM-DD'),
             endDate: endDate.format('YYYY-MM-DD'),
             errorMessages: req.flash('error'),
