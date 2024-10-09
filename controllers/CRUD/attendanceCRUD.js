@@ -201,14 +201,14 @@ const getWeeklyAttendance = async (req, res) => {
         const nextYear = requestedWeekNumber === 52 ? year + 1 : year;
 
         const {
-            attendanceRecords,
+            attendance,
             subcontractorInvoices,
             employeeCount,
             subcontractorCount,
-        } = attendanceService.getAttendanceForWeek(payrollWeekStart, endDate);
+        } = await attendanceService.getAttendanceForWeek(payrollWeekStart, endDate);
 
         const {
-            attendance,
+            groupedAttendance,
             totalEmployeeHours,
             totalEmployeePay,
             totalSubcontractorPay,
@@ -301,7 +301,7 @@ const getWeeklyAttendance = async (req, res) => {
         // Render the updated weekly attendance view with the payroll week data.
         res.render(path.join('attendance', 'weekly'), {
             moment,
-            attendance,
+            groupedAttendance,
             startDate: payrollWeekStart.format('YYYY-MM-DD'),
             endDate: endDate.format('YYYY-MM-DD'),
             errorMessages: req.flash('error'),
