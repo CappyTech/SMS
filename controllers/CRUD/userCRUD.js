@@ -49,6 +49,9 @@ const createUser = async (req, res) => {
             email,
             password: hashedPassword,
             role,
+            subcontractorId: null,
+            employeeId: null,
+            clientId: null,
         });
         req.flash('success', 'User created successfully.');
         res.redirect('/');
