@@ -78,27 +78,32 @@
                     <tbody>
                         <% Object.keys(groupedAttendance).forEach(person => { %>
                             <tr class="fw-light">
-                                <td><%= person %></td>
+                                <td>
+                                    <% if (groupedAttendance[person].employeeId) { %>
+                                        <a href="/employee/read/<%= groupedAttendance[person].employeeId %>" class="text-decoration-none"><%= person %></a>
+                                    <% } else if (groupedAttendance[person].subcontractorId) { %>
+                                        <a href="/subcontractor/read/<%= groupedAttendance[person].subcontractorId %>" class="text-decoration-none"><%= person %></a>
+                                    <% } else { %>
+                                        <%= person %>
+                                    <% } %>
+                                </td>
                                 <% daysOfWeek.forEach(day => { %>
                                     <% const dailyRecords = groupedAttendance[person].dailyRecords[day] || {}; %>
                                     <% const invoices = groupedAttendance[person].invoices[day] || []; %>
                                     <td class="text-center">
-                                        <!-- Show attendance records if available -->
-                                        <% if (Object.keys(dailyRecords).length > 0) { %>
-                                            <% Object.keys(dailyRecords).forEach(attendanceId => { %>
-                                                <% const record = dailyRecords[attendanceId]; %>
+                                        <% Object.keys(dailyRecords).forEach(attendanceId => { %>
+                                            <% const record = dailyRecords[attendanceId]; %>
+                                            <a href="/attendance/read/<%= attendanceId %>" class="text-decoration-none">
+                                                <%= record.location ? (record.location.name || record.location.address || record.type) : record.type %>
+                                            </a><br>
+                                            <% if (record.hoursWorked) { %>
                                                 <a href="/attendance/read/<%= attendanceId %>" class="text-decoration-none">
-                                                    <%= record.location ? (record.location.name || record.location.address || record.type) : record.type %>
-                                                </a><br>
-                                                <% if (record.hoursWorked) { %>
-                                                    <a href="/attendance/read/<%= attendanceId %>" class="text-decoration-none">
-                                                        <span><%= record.hoursWorked %> hours</span>
-                                                    </a>
-                                                <% } %>
-                                                <!-- TODO: add holiday hours (hoursHoliday) -->
-                                                <!-- TODO: add sickpay rules --> 
-                                            <% }); %>
-                                        <% } %>
+                                                    <span><%= record.hoursWorked %> hours</span>
+                                                </a>
+                                            <% } %>
+                                            <!-- TODO: add holiday hours (hoursHoliday) -->
+                                            <!-- TODO: add sickpay rules --> 
+                                        <% }); %>
                                         <% if (Object.keys(dailyRecords).length === 0) { %>
                                             <!-- If no attendance or invoice records, show a link to create a new attendance for that day and person -->
                                             <button class="btn btn-secondary" style="transform: rotate(0);">
