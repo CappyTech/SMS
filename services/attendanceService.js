@@ -1,18 +1,18 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
 const logger = require('./loggerService');
-const Attendance = require('../models/attendance'); // Adjust the path as necessary
-const Employee = require('../models/employee'); // Adjust the path as necessary
-const Subcontractor = require('../models/subcontractor'); // Adjust the path as necessary
-const Location = require('../models/location'); // Adjust the path as necessary
+const Attendances = require('../models/attendance'); // Adjust the path as necessary
+const Employees = require('../models/employee'); // Adjust the path as necessary
+const Subcontractors = require('../models/subcontractor'); // Adjust the path as necessary
+const Locations = require('../models/location'); // Adjust the path as necessary
 
 const getAttendanceForDay = async (date) => {
     try {
-        const attendanceRecords = await Attendance.findAll({
+        const attendanceRecords = await Attendances.findAll({
             where: {
                 date: date
             },
-            include: [Employee, Subcontractor, Location],
+            include: [Employees, Subcontractors, Locations],
             order: [['date', 'ASC']]
         });
 
@@ -30,17 +30,45 @@ const getAttendanceForDay = async (date) => {
  */
 const getAttendanceForWeek = async (startDate, endDate) => {
     try {
-        const attendanceRecords = await Attendance.findAll({
+        const attendanceRecords = await Attendances.findAll({
             where: {
                 date: {
                     [Op.between]: [startDate.toDate(), endDate.toDate()]
                 }
             },
-            include: [Employee, Subcontractor, Location],
+            include: [Employees, Subcontractors, Locations],
             order: [['date', 'ASC']]
         });
+        const subcontractorInvoices = await Invoices.findAll({
+            where: {
+                invoiceDate: {
+                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                }
+            },
+            include: [Subcontractors]
+        });
+        const employeeCount = await Attendances.count({
+            where: {
+                date: {
+                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                },
+                employeeId: { [Op.not]: null }
+            },
+            distinct: true,
+            col: 'employeeId'
+        });
+        const subcontractorCount = await Attendances.count({
+            where: {
+                date: {
+                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                },
+                subcontractorId: { [Op.not]: null }
+            },
+            distinct: true,
+            col: 'subcontractorId'
+        });
 
-        return attendanceRecords;
+        return attendanceRecords, subcontractorInvoices, employeeCount, subcontractorCount;
     } catch (error) {
         logger.error('Error fetching attendance records: ' + error);
         throw new Error('Failed to fetch attendance records for the week');
