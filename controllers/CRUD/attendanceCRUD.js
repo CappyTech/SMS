@@ -35,11 +35,11 @@ const createAttendance = async (req, res) => {
         });
 
         req.flash('success', 'Attendance record created successfully.');
-        res.redirect('/dashboard/attendance');
+        res.redirect('/attendance/weekly');
     } catch (error) {
         logger.error('Error creating attendance: ' + error.message);
         req.flash('error', 'Failed to create attendance.');
-        res.redirect('/dashboard/attendance');
+        res.redirect('/');
     }
 };
 
@@ -69,7 +69,7 @@ const readAttendance = async (req, res) => {
     } catch (error) {
         logger.error('Error viewing attendance: ' + error.message);
         req.flash('error', 'Error viewing attendance: ' + error.message);
-        res.redirect('/error');
+        res.redirect('/');
     }
 };
 
@@ -95,7 +95,7 @@ const updateAttendance = async (req, res) => {
         // Validation: ensure that either employeeId or subcontractorId is set, not both at the same time
         if (updatedEmployeeId && updatedSubcontractorId) {
             req.flash('error', 'Please select either an employee or a subcontractor, but not both.');
-            return res.redirect(`/attendance/edit/${attendance}`);
+            return res.redirect(`/attendance/update/${attendance}`);
         }
 
         // Validation: If employeeId is set, it must exist in the Employees table
@@ -103,7 +103,7 @@ const updateAttendance = async (req, res) => {
             const employeeExists = await Employees.findByPk(updatedEmployeeId);
             if (!employeeExists) {
                 req.flash('error', 'Invalid Employee ID. Please select a valid employee.');
-                return res.redirect(`/attendance/edit/${attendance}`);
+                return res.redirect(`/attendance/update/${attendance}`);
             }
         }
 
@@ -112,7 +112,7 @@ const updateAttendance = async (req, res) => {
             const subcontractorExists = await Subcontractors.findByPk(updatedSubcontractorId);
             if (!subcontractorExists) {
                 req.flash('error', 'Invalid Subcontractor ID. Please select a valid subcontractor.');
-                return res.redirect(`/attendance/edit/${attendance}`);
+                return res.redirect(`/attendance/update/${attendance}`);
             }
         }
 
@@ -121,7 +121,7 @@ const updateAttendance = async (req, res) => {
             const locationExists = await Locations.findByPk(updatedLocationId);
             if (!locationExists) {
                 req.flash('error', 'Invalid Location ID. Please select a valid location.');
-                return res.redirect(`/attendance/edit/${attendance}`);
+                return res.redirect(`/attendance/update/${attendance}`);
             }
         }
 
@@ -143,7 +143,7 @@ const updateAttendance = async (req, res) => {
     } catch (error) {
         logger.error('Error updating attendance: ' + error.message);
         req.flash('error', `Failed to update attendance: ${error.message}`);
-        res.redirect(`/attendance/update/${attendance}`);
+        res.redirect(`/`);
     }
 };
 
@@ -155,11 +155,11 @@ const deleteAttendance = async (req, res) => {
         await Attendances.destroy({ where: { attendance } });
 
         req.flash('success', 'Attendance record deleted successfully.');
-        res.redirect('dashboard/attendance');
+        res.redirect('/dashboard/attendance');
     } catch (error) {
         logger.error('Error deleting attendance: ' + error.message);
         req.flash('error', 'Failed to delete attendance.');
-        res.redirect('dashboard/attendance');
+        res.redirect('/');
     }
 };
 
