@@ -14,7 +14,7 @@ const Employees = sequelize.define('Employees', {
   },
   email: {
     type: DataTypes.STRING(255),
-    allowNull: false,
+    allowNull: true,
     validate: {
       isEmail: true,
     },
@@ -33,7 +33,7 @@ const Employees = sequelize.define('Employees', {
   },
   position: {
     type: DataTypes.STRING(255),
-    allowNull: false,
+    allowNull: true,
   },
   type: {
     type: DataTypes.STRING(255),
