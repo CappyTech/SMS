@@ -206,6 +206,7 @@ const getWeeklyAttendance = async (req, res) => {
             subcontractorInvoices,
             employeeCount,
             subcontractorCount,
+            allEmployees,
         } = await attendanceService.getAttendanceForWeek(payrollWeekStart, endDate);
 
         const {
@@ -214,7 +215,7 @@ const getWeeklyAttendance = async (req, res) => {
             totalEmployeePay,
             totalSubcontractorPay,
             daysOfWeek,
-        } = attendanceService.groupAttendanceByPerson(attendanceRecords, subcontractorInvoices, payrollWeekStart, endDate);
+        } = attendanceService.groupAttendanceByPerson(attendanceRecords, subcontractorInvoices, payrollWeekStart, endDate, allEmployees);
     /*
         const totalEmployeePay = attendance
             .filter(a => a.employeeId !== null && a.hoursWorked !== null && a.Employee) // Ensure Employee is loaded
