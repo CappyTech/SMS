@@ -28,7 +28,7 @@ const getAttendanceForDay = async (date) => {
  * @param {Date} endDate - End date of the week.
  * @returns {Promise<Array>} - Array of attendance records.
  */
-const getAttendanceForWeek = async (startDate, endDate) => {
+const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
     try {
         const attendanceRecords = await Attendances.findAll({
             where: {
@@ -68,7 +68,12 @@ const getAttendanceForWeek = async (startDate, endDate) => {
             col: 'subcontractorId'
         });
 
-        return attendanceRecords, subcontractorInvoices, employeeCount, subcontractorCount;
+        return {
+            attendanceRecords,
+            subcontractorInvoices,
+            employeeCount,
+            subcontractorCount
+        };
     } catch (error) {
         logger.error('Error fetching attendance records: ' + error);
         throw new Error('Failed to fetch attendance records for the week');
