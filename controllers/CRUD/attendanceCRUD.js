@@ -139,11 +139,11 @@ const updateAttendance = async (req, res) => {
         );
 
         req.flash('success', 'Attendance record updated successfully.');
-        res.redirect('/dashboard/attendance');
+        res.redirect('/attendance/weekly');
     } catch (error) {
         logger.error('Error updating attendance: ' + error.message);
         req.flash('error', `Failed to update attendance: ${error.message}`);
-        res.redirect(`/attendance/edit/${attendance}`);
+        res.redirect(`/attendance/update/${attendance}`);
     }
 };
 
