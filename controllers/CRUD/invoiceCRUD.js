@@ -213,7 +213,7 @@ router.get('fetch/unsubmittedinvoices', async (req, res) => {
             return res.redirect('/');
         }
 
-        const unsubmittedInvoices = await Invoices.findAll({
+        const unsubmittedInvoices = await Invoice.findAll({
             where: { submissionDate: null },
             attributes: ['id', 'kashflowNumber'],
             order: [['kashflowNumber', 'ASC']]
