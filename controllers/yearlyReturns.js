@@ -57,7 +57,7 @@ const renderYearlyReturns = async (req, res) => {
             invoicesByMonth: invoicesByMonth
         });
 
-        const pageBreakMonths = req.query.pagebreaks
+        const pageBreakMonths = req.query.page
             ? req.query.page.split(',').map(Number)
             : [];
 
