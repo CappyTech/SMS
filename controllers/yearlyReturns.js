@@ -9,11 +9,6 @@ const helpers = require('../helpers');
 
 const renderYearlyReturns = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const { year, id } = req.params;
 
         if (!year || !id) {
@@ -62,19 +57,22 @@ const renderYearlyReturns = async (req, res) => {
             invoicesByMonth: invoicesByMonth
         });
 
+        const pageBreakMonths = req.query.pagebreaks
+            ? req.query.pagebreaks.split(',').map(Number)
+            : [];
+
         res.render(path.join('monthlyreturns', 'yearlyReturns'), {
             title: 'Yearly Returns',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             rounding: rounding,
             subcontractor: subcontractor,
             year: year,
             invoicesByMonth: invoicesByMonth,
-            monthNames: monthNames
+            monthNames: monthNames,
+            pageBreakMonths: pageBreakMonths
         });
     } catch (error) {
         logger.error("Error rendering yearly returns:", error.message);
