@@ -1,14 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Quotes = require('../../models/quote');
-const Clients = require('../../models/client');
-const Contacts = require('../../models/contact');
-const Locations = require('../../models/location');
-const Jobs = require('../../models/job');
 const helpers = require('../../helpers');
 const moment = require('moment');
 const logger = require('../../services/loggerService');
 const path = require('path');
+const db = require('../../services/sequelizeDatabaseService');
 
 const createQuote = async (req, res) => {
     try {
@@ -29,13 +25,13 @@ const createQuote = async (req, res) => {
             return res.redirect('/quote/create');
         }
 
-        const locationExists = await Locations.findByPk(locationId);
+        const locationExists = await db.Locations.findByPk(locationId);
         if (!locationExists) {
             req.flash('error', 'Selected location does not exist.');
             return res.redirect('/quote/create');
         }
 
-        const newQuote = await Quotes.create({
+        const newQuote = await db.Quotes.create({
             date: date,
             quote_ref: quote_ref,
             job_ref: job_ref,
@@ -66,14 +62,14 @@ const readQuote = async (req, res) => {
             return res.redirect('/');
         }
 
-        const quote = await Quotes.findByPk(req.params.quoteId, {
+        const quote = await db.Quotes.findByPk(req.params.quoteId, {
             include: [
                 {
-                    model: Locations
+                    model: db.Locations
                 },
                 {
-                    model: Clients,
-                    include: [Contacts] // Assuming Contacts are associated with Clients
+                    model: db.Clients,
+                    include: [db.Contacts]
                 }
             ]
         });
@@ -106,10 +102,10 @@ const readQuotes = async (req, res) => {
             return res.redirect('/');
         }
 
-        const quotes = await Quotes.findAll({
+        const quotes = await db.Quotes.findAll({
             where: { clientId: req.params.client },
             order: [['date', 'DESC']],
-            include: [Clients]
+            include: [db.Clients]
         });
 
         res.render(path.join('quotes', 'viewQuotes'), {
@@ -129,7 +125,7 @@ const readQuotes = async (req, res) => {
 
 const updateQuote = async (req, res) => {
     try {
-        const quote = await Quotes.findByPk(req.params.id);
+        const quote = await db.Quotes.findByPk(req.params.id);
         if (!quote) {
             throw new Error('Quote not found');
         }
@@ -152,7 +148,7 @@ const deleteQuote = async (req, res) => {
             return res.redirect('/');
         }
 
-        const quote = await Quotes.findByPk(req.params.id);
+        const quote = await db.Quotes.findByPk(req.params.id);
 
         if (!quote) {
             req.flash('error', 'Quote not found');
@@ -177,7 +173,7 @@ router.get('/fetch/quote/:quoteId', async (req, res) => {
             return res.redirect('/');
         }
 
-        const quotes = await Quotes.findAll({
+        const quotes = await db.Quotes.findAll({
             where: { id: req.params.quoteId },
             order: [['createdAt', 'ASC']],
         });

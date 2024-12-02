@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-
-const Subcontractor = require('../../models/subcontractor');
 const helpers = require('../../helpers');
 const { Op } = require('sequelize');
 const logger = require('../../services/loggerService'); 
 const path = require('path');
+const db = require('../../services/sequelizeDatabaseService');
 
 const createSubcontractor = async (req, res) => {
     try {
@@ -31,7 +30,7 @@ const createSubcontractor = async (req, res) => {
         } = req.body;
 
         // Check if the subcontractor already exists
-        const existingSubcontractor = await Subcontractor.findOne({
+        const existingSubcontractor = await db.Subcontractors.findOne({
             where: {
                 [Op.or]: [{ utrNumber }],
             },
@@ -82,7 +81,7 @@ const readSubcontractor = async (req, res) => {
             return res.redirect('/');
         }
 
-        const subcontractor = await Subcontractor.findByPk(req.params.id);
+        const subcontractor = await db.Subcontractors.findByPk(req.params.id);
 
         if (!subcontractor) {
             return res.status(404).send('Subcontractor not found');
@@ -129,7 +128,7 @@ const updateSubcontractor = async (req, res) => {
         } = req.body;
 
         // Find the subcontractor by ID
-        const subcontractor = await Subcontractor.findByPk(req.params.id);
+        const subcontractor = await db.Subcontractors.findByPk(req.params.id);
 
         // If subcontractor is not found
         if (!subcontractor) {
@@ -140,7 +139,7 @@ const updateSubcontractor = async (req, res) => {
 
         // Check for unique utrNumber only if it's provided and different from the existing one
         if (utrNumber && subcontractor.utrNumber !== utrNumber) {
-            const existingUtr = await Subcontractor.findOne({
+            const existingUtr = await db.Subcontractor.findOne({
                 where: { utrNumber, id: { [Op.ne]: req.params.id } }
             });
             if (existingUtr) {
@@ -151,7 +150,7 @@ const updateSubcontractor = async (req, res) => {
 
         // Check for unique vatNumber only if it's provided and different from the existing one
         if (vatNumber && subcontractor.vatNumber !== vatNumber) {
-            const existingVat = await Subcontractor.findOne({
+            const existingVat = await db.Subcontractor.findOne({
                 where: { vatNumber, id: { [Op.ne]: req.params.id } }
             });
             if (existingVat) {
@@ -178,7 +177,7 @@ const updateSubcontractor = async (req, res) => {
         };
 
         // Update subcontractor with sanitized data
-        await Subcontractor.update(updatedData, { where: { id: req.params.id } });
+        await db.Subcontractor.update(updatedData, { where: { id: req.params.id } });
 
         // Flash success message and redirect
         req.flash('success', 'Subcontractor updated successfully.');
@@ -208,7 +207,7 @@ const deleteSubcontractor = async (req, res) => {
             return res.redirect('/');
         }
 
-        const subcontractor = await Subcontractor.findByPk(req.params.id);
+        const subcontractor = await db.Subcontractors.findByPk(req.params.id);
 
         if (!subcontractor) {
             req.flash('error', 'Subcontractor not found');
@@ -235,7 +234,7 @@ router.get('/fetch/subcontractor/:id', async (req, res) => {
             return res.redirect('/');
         }
 
-        const subcontractor = await Subcontractors.findAll({
+        const subcontractor = await db.Subcontractors.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
         });

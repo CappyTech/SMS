@@ -1,18 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const Attendances = require('../../models/attendance');
-const Locations = require('../../models/location');
-const Employees = require('../../models/employee');
-const Subcontractors = require('../../models/subcontractor');
-const Invoices = require('../../models/invoice');
 const moment = require('moment');
 const { Op } = require('sequelize');
-const helpers = require('../../helpers');
 const path = require('path');
 const logger = require('../../services/loggerService');
 const attendanceService = require('../../services/attendanceService');
 const authService = require('../../services/authService');
 const taxService = require('../../services/taxService');
+const db = require('../../services/sequelizeDatabaseService');
+const dateService = require('../../services/dateService');
 
 const createAttendance = async (req, res) => {
     try {
@@ -25,7 +21,7 @@ const createAttendance = async (req, res) => {
             hoursWorked,
         } = req.body;
 
-        await Attendances.create({
+        await db.Attendances.create({
             date,
             locationId,
             employeeId: employeeId || null,
@@ -45,12 +41,11 @@ const createAttendance = async (req, res) => {
 
 const readAttendance = async (req, res) => {
     try {
-        // Fetch the attendance record by primary key (ID) with associations
-        const attendance = await Attendances.findByPk(req.params.attendance, {
+        const attendance = await db.Attendances.findByPk(req.params.attendance, {
             include: [
-                { model: Employees },  // Include Employee details if associated
-                { model: Subcontractors }, // Include Subcontractor details if associated
-                { model: Locations } // Include Location details
+                { model: db.Employees },
+                { model: db.Subcontractors },
+                { model: db.Locations }
             ]
         });
 
@@ -58,13 +53,12 @@ const readAttendance = async (req, res) => {
             return res.status(404).json({ error: 'Attendance record not found' });
         }
 
-        // Render the viewAttendance template
         res.render(path.join('attendance', 'viewAttendance'), {
             title: 'Attendance',
             attendance,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            slimDateTime: helpers.slimDateTime,
+            slimDateTime: dateService.slimDateTime,
         });
     } catch (error) {
         logger.error('Error viewing attendance: ' + error.message);
@@ -100,7 +94,7 @@ const updateAttendance = async (req, res) => {
 
         // Validation: If employeeId is set, it must exist in the Employees table
         if (updatedEmployeeId) {
-            const employeeExists = await Employees.findByPk(updatedEmployeeId);
+            const employeeExists = await db.Employees.findByPk(updatedEmployeeId);
             if (!employeeExists) {
                 req.flash('error', 'Invalid Employee ID. Please select a valid employee.');
                 return res.redirect(`/attendance/update/${attendance}`);
@@ -109,7 +103,7 @@ const updateAttendance = async (req, res) => {
 
         // Validation: If subcontractorId is set, it must exist in the Subcontractors table
         if (updatedSubcontractorId) {
-            const subcontractorExists = await Subcontractors.findByPk(updatedSubcontractorId);
+            const subcontractorExists = await db.Subcontractors.findByPk(updatedSubcontractorId);
             if (!subcontractorExists) {
                 req.flash('error', 'Invalid Subcontractor ID. Please select a valid subcontractor.');
                 return res.redirect(`/attendance/update/${attendance}`);
@@ -118,7 +112,7 @@ const updateAttendance = async (req, res) => {
 
         // If locationId is provided and not null, validate its existence in the Locations table
         if (updatedLocationId) {
-            const locationExists = await Locations.findByPk(updatedLocationId);
+            const locationExists = await db.Locations.findByPk(updatedLocationId);
             if (!locationExists) {
                 req.flash('error', 'Invalid Location ID. Please select a valid location.');
                 return res.redirect(`/attendance/update/${attendance}`);
@@ -126,7 +120,7 @@ const updateAttendance = async (req, res) => {
         }
 
         // Update the attendance record with validated values
-        await Attendances.update(
+        await db.Attendances.update(
             {
                 date,
                 locationId: updatedLocationId, // Set the validated or null location ID
@@ -152,7 +146,7 @@ const deleteAttendance = async (req, res) => {
     try {
         const attendance = req.params.attendance;
 
-        await Attendances.destroy({ where: { attendance } });
+        await db.Attendances.destroy({ where: { attendance } });
 
         req.flash('success', 'Attendance record deleted successfully.');
         res.redirect('/dashboard/attendance');
@@ -166,7 +160,7 @@ const deleteAttendance = async (req, res) => {
 const getDailyAttendance = async (req, res) => {
     const date = req.params.date || moment().format('YYYY-MM-DD'); // Default to today
     try {
-        const attendance = attendanceService.getAttendanceForDay(date,[Locations, Employees, Subcontractors]);
+        const attendance = attendanceService.getAttendanceForDay(date,[db.Locations, db.Employees, db.Subcontractors]);
         
         res.render(path.join('attendance', 'daily'), {
             moment,
@@ -186,7 +180,7 @@ const getDailyAttendance = async (req, res) => {
 const getWeeklyAttendance = async (req, res) => {
     try {
         const year = req.params.year ? parseInt(req.params.year) : taxService.getCurrentTaxYear();
-        const { start: startOfTaxYear } = helpers.getTaxYearStartEnd(year);
+        const { start: startOfTaxYear } = taxService.getTaxYearStartEnd(year);
         const taxYearStart = moment.utc(startOfTaxYear, 'Do MMMM YYYY');
         let firstPayrollWeekStart = taxYearStart.clone().day(1); 
         if (firstPayrollWeekStart.isBefore(taxYearStart)) {
@@ -328,12 +322,12 @@ const getWeeklyAttendance = async (req, res) => {
 };
 
 const getMonthlyAttendance = async (req, res) => {
-    // Determine the current tax year and month using helper functions
-    const year = req.params.year ? parseInt(req.params.year) : helpers.getCurrentTaxYear();
+    // Determine the current tax year and month using taxService functions
+    const year = req.params.year ? parseInt(req.params.year) : taxService.getCurrentTaxYear();
     const month = req.params.month ? parseInt(req.params.month) : moment().month() + 1; // Default to current month (1-based)
 
     // Get the start and end date for the selected month in the context of the UK tax year
-    const { periodStart, periodEnd, periodStartDisplay, periodEndDisplay } = helpers.getCurrentMonthlyReturn(year, month);
+    const { periodStart, periodEnd, periodStartDisplay, periodEndDisplay } = taxService.getCurrentMonthlyReturn(year, month);
 
     // Calculate previous and next month/year values
     const previousPeriod = moment(periodStart).subtract(1, 'months');
@@ -346,13 +340,13 @@ const getMonthlyAttendance = async (req, res) => {
 
     try {
         // Fetch attendance records within the period range
-        const attendance = await Attendances.findAll({
+        const attendance = await db.Attendances.findAll({
             where: {
                 date: {
                     [Op.between]: [periodStart, periodEnd]
                 }
             },
-            include: [Locations, Employees, Subcontractors],
+            include: [db.Locations, db.Employees, db.Subcontractors],
             order: [['date', 'ASC']]
         });
 
@@ -441,7 +435,7 @@ const getMonthlyAttendance = async (req, res) => {
 
 router.get('/fetch/attendance/:id', authService.ensureAuthenticated, async (req, res) => {
     try {
-        const attendance = await Attendances.findAll({
+        const attendance = await db.Attendances.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
         });

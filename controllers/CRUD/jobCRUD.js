@@ -1,13 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Quotes = require('../../models/quote');
-const Clients = require('../../models/client');
-const Jobs = require('../../models/job');
-const Locations = require('../../models/location');
 const helpers = require('../../helpers');
 const moment = require('moment');
 const logger = require('../../services/loggerService');
 const path = require('path');
+const db = require('../../services/sequelizeDatabaseService');
 
 const createJob = async (req, res) => {
     try {
@@ -15,7 +12,7 @@ const createJob = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const quote = await Quotes.findByPk(req.params.quoteId, {
+        const quote = await db.Quotes.findByPk(req.params.quoteId, {
             include: [Clients]
         });
 
@@ -24,7 +21,7 @@ const createJob = async (req, res) => {
             return res.redirect('/dashboard/quote');
         }
 
-        const job = await Jobs.create({
+        const job = await db.Jobs.create({
             job_ref: `JOB-${quote.quote_ref}`,
             locationId: quote.locationId,
             clientId: quote.clientId,
@@ -52,8 +49,8 @@ const readJob = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const job = await Jobs.findByPk(req.params.jobId, {
-            include: [Clients, Quotes, Locations]
+        const job = await db.Jobs.findByPk(req.params.jobId, {
+            include: [db.Clients, db.Quotes, db.Locations]
         });
 
         if (!job) {
@@ -83,7 +80,7 @@ const updateJob = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const job = await Jobs.findByPk(req.params.jobId);
+        const job = await db.Jobs.findByPk(req.params.jobId);
 
         if (!job) {
             req.flash('error', 'Job not found');
@@ -107,7 +104,7 @@ const deleteJob = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const job = await Jobs.findByPk(req.params.jobId);
+        const job = await db.Jobs.findByPk(req.params.jobId);
 
         if (!job) {
             req.flash('error', 'Job not found');
@@ -132,7 +129,7 @@ router.get('/fetch/job/:id', async (req, res) => {
             return res.redirect('/');
         }
 
-        const job = await Jobs.findAll({
+        const job = await db.Jobs.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
         });

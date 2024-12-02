@@ -4,11 +4,7 @@ const helpers = require('../../helpers');
 const moment = require('moment');
 const logger = require('../../services/loggerService');
 const path = require('path');
-const Clients = require('../../models/client');
-const Contacts = require('../../models/contact');
-const Quotes = require('../../models/quote');
-const Locations = require('../../models/location');
-const Jobs = require('../../models/job');
+const db = require('../../services/sequelizeDatabaseService');
 
 const createClient = async (req, res) => {
     try {
@@ -21,7 +17,7 @@ const createClient = async (req, res) => {
             name 
         } = req.body;
 
-        const clients = await Clients.create({
+        const clients = await db.Clients.create({
             name: name
         });
 
@@ -44,18 +40,18 @@ const readClient = async (req, res) => {
 
         const clientId = req.params.clientId;
 
-        const clients = await Clients.findByPk(clientId, {
+        const clients = await db.Clients.findByPk(clientId, {
             include: [
                 {
-                    model: Contacts,
+                    model: db.Contacts,
                 },
                 {
-                    model: Quotes,
-                    include: [Locations],
+                    model: db.Quotes,
+                    include: [db.Locations],
                 },
                 {
-                    model: Jobs,
-                    include: [Locations],
+                    model: db.Jobs,
+                    include: [db.Locations],
                 },
             ],
         });
@@ -81,7 +77,7 @@ const readClient = async (req, res) => {
 
 const updateClient = async (req, res) => {
     try {
-        const clients = await Clients.findByPk(req.params.clientId);
+        const clients = await db.Clients.findByPk(req.params.clientId);
 
         if (!clients) {
             return res.status(404).send('Client not found');
@@ -99,7 +95,7 @@ const updateClient = async (req, res) => {
 
 const deleteClient = async (req, res) => {
     try {
-        const clients = await Clients.findByPk(req.params.clientId);
+        const clients = await db.Clients.findByPk(req.params.clientId);
 
         if (!clients) {
             return res.status(404).send('Client not found');
@@ -122,7 +118,7 @@ router.get('/fetch/client/:clientId', async (req, res) => {
             return res.redirect('/');
         }
 
-        const clients = await Clients.findAll({
+        const clients = await db.Clients.findAll({
             where: { id: req.params.clientId },
             order: [['createdAt', 'ASC']],
         });

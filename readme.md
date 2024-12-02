@@ -39,3 +39,9 @@ Attendance Table
 > clientId column (foreign key)
 > locationId column (foreign key)
 - date column
+
+
+// Make Last Fetched
+
+When Admin, have button that goes to the fetch route.
+When User, have button to send email reminder to relevant email.

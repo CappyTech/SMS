@@ -1,19 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
 const path = require('path');
-const Clients = require('../../models/client');
-const Contacts = require('../../models/contact');
+const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
+const currencyService = require('../../services/currencyService');
+const dateService = require('../../services/dateService');
 
 const selectClient = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-        
-        const clients = await Clients.findAll({});
+        const clients = await db.Clients.findAll({});
         
         if (clients.length === 0) {
             req.flash('error', 'Error: No Clients exist, Or you don\'t have access to any Clients.');
@@ -27,8 +23,8 @@ const selectClient = async (req, res) => {
             
             
             clients,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            slimDateTime: dateService.slimDateTime,
+            formatCurrency: currencyService.formatCurrency,
         });
     } catch (error) {
         logger.error('Error selecting client:  ', error.message);
@@ -39,17 +35,10 @@ const selectClient = async (req, res) => {
 
 const renderClientCreateForm = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         res.render(path.join('clients', 'createClient'), {
             title: 'Create Client',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
         });
     } catch (error) {
         logger.error('Error rendering client create form:' + error.message);
@@ -59,13 +48,8 @@ const renderClientCreateForm = async (req, res) => {
 
 const renderClientUpdateForm = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
-        const clients = await Clients.findByPk(req.params.client, {
-            include: [{ model: Contacts }]
+        const clients = await db.Clients.findByPk(req.params.client, {
+            include: [{ model: db.Contacts }]
         });
 
         if (!clients) {
@@ -77,8 +61,6 @@ const renderClientUpdateForm = async (req, res) => {
             clients,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
         });
     } catch (error) {
         logger.error('Error rendering client update form:' + error.message);
@@ -87,7 +69,7 @@ const renderClientUpdateForm = async (req, res) => {
 };
 
 //router.get('/client/select', selectClient);
-router.get('/client/create', helpers.ensureAuthenticated, renderClientCreateForm);
-router.get('/client/update/:client', helpers.ensureAuthenticated, renderClientUpdateForm);
+router.get('/client/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderClientCreateForm);
+router.get('/client/update/:client', authService.ensureAuthenticated, authService.ensureRole('admin'), renderClientUpdateForm);
 
 module.exports = router;

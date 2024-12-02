@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Invoice = require('../models/invoice');
-const Subcontractor = require('../models/subcontractor');
 const { formatCurrency, slimDateTime } = require('../helpers');
 const logger = require('../services/loggerService');
 const path = require('path');
 const helpers = require('../helpers');
+const db = require('../services/sequelizeDatabaseService');
 
 const renderMonthlyReturnsForm = async (req, res) => {
     try {
@@ -21,9 +20,9 @@ const renderMonthlyReturnsForm = async (req, res) => {
         ];
 
         // Fetch all subcontractors from the database
-        const subcontractors = await Subcontractor.findAll({
+        const subcontractors = await db.Subcontractors.findAll({
             include: {
-                model: Invoice,
+                model: db.Invoices,
                 as: 'invoices',
                 attributes: ['year', 'month'],
                 group: ['year', 'month'],
@@ -90,13 +89,13 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
 
         const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
 
-        const subcontractor = await Subcontractor.findAll({
+        const subcontractor = await db.Subcontractor.findAll({
             where: {
                 id: id,
                 deletedAt: null
             },
             include: {
-                model: Invoice,
+                model: db.Invoice,
                 as: 'invoices',
                 where: {
                     month: month,
@@ -145,12 +144,12 @@ const renderMonthlyReturnsForAll = async (req, res) => {
 
         const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
 
-        const subcontractors = await Subcontractor.findAll({
+        const subcontractors = await db.Subcontractor.findAll({
             where: {
                 deletedAt: null
             },
             include: {
-                model: Invoice,
+                model: db.Invoice,
                 as: 'invoices',
                 where: {
                     month: month
@@ -199,12 +198,12 @@ const renderMonthlyReturnsYear = async (req, res) => {
 
         const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
 
-        const subcontractors = await Subcontractor.findAll({
+        const subcontractors = await db.Subcontractor.findAll({
             where: {
                 deletedAt: null
             },
             include: {
-                model: Invoice,
+                model: db.Invoice,
                 as: 'invoices',
                 where: {
                     year: year

@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const User = require("../../models/user");
 const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 const logger = require('../../services/loggerService');
@@ -8,6 +7,7 @@ const path = require('path');
 const helpers = require('../../helpers');
 const speakeasy = require('speakeasy');
 const useragent = require('useragent');
+const db = require('../../services/sequelizeDatabaseService');
 
 const renderSigninForm = (req, res) => {
     
@@ -27,7 +27,7 @@ const loginUser = async (req, res) => {
             return res.redirect('/signin');
         }
 
-        const user = await User.findOne({
+        const user = await db.Users.findOne({
             where: {
                 [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
             }
@@ -154,7 +154,7 @@ const verify2FA = async (req, res) => {
         const { totpToken } = req.body;
 
         // Find the user based on the session data
-        const user = await User.findOne({
+        const user = await db.Users.findOne({
             where: { id: req.session.userPending2FA.id }
         });
 

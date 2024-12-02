@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Locations = require('../../models/location');
 const logger = require('../../services/loggerService');
 const path = require('path');
 const helpers = require('../../helpers');
+const db = require('../../services/sequelizeDatabaseService');
 
 // Create a new location
 const createLocation = async (req, res) => {
@@ -14,7 +14,7 @@ const createLocation = async (req, res) => {
         }
         const {name, address, city, postalCode, country, latitude, longitude } = req.body;
 
-        const newLocation = await Locations.create({
+        const newLocation = await db.Locations.create({
             name,
             address,
             city,
@@ -41,7 +41,7 @@ const readLocation = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const location = await Locations.findByPk(req.params.id);
+        const location = await db.Locations.findByPk(req.params.id);
 
         if (!location) {
             req.flash('error', 'Location not found.');
@@ -71,7 +71,7 @@ const updateLocation = async (req, res) => {
         }
         const { name, address, city, postalCode, country, latitude, longitude } = req.body;
 
-        const location = await Locations.findByPk(req.params.id);
+        const location = await db.Locations.findByPk(req.params.id);
         if (!location) {
             req.flash('error', 'Location not found.');
             return res.redirect('/dashboard/location');
@@ -104,7 +104,7 @@ const deleteLocation = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const location = await Locations.findByPk(req.params.id);
+        const location = await db.Locations.findByPk(req.params.id);
 
         if (!location) {
             req.flash('error', 'Location not found.');
@@ -129,7 +129,7 @@ router.get('/fetch/location/:id', async (req, res) => {
             return res.redirect('/');
         }
 
-        const location = await Locations.findAll({
+        const location = await db.Locations.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
         });

@@ -11,9 +11,6 @@
             <li class="nav-item">
                 <a href="/attendance/weekly" class="nav-link <%= currentTab === 'weekly' ? 'active' : '' %>">Weekly</a>
             </li>
-            <li class="nav-item">
-                <a href="/attendance/monthly" class="nav-link <%= currentTab === 'monthly' ? 'active' : '' %>">Monthly</a>
-            </li>
         </ul>
         <div class="container-fluid py-5 text-center">
             <div class="d-flex justify-content-between mb-4 d-print-none">
@@ -65,10 +62,10 @@
                 <table class="table table-bordered table-striped table-sm">
                     <thead>
                         <tr>
-                            <th class="text-center fw-normal">Person</th>
+                            <th class="text-center fw-normal"></th>
                             <% daysOfWeek.forEach(day => { %>
                                 <th class="text-center fs-6 fw-normal">
-                                    <%= moment(day).format('DD/MM/YYYY') %><br><%= moment(day).format('dddd') %>
+                                    <a href="/attendance/daily/<%= day %>"><%= moment(day).format('DD/MM/YYYY') %></a><br><%= moment(day).format('dddd') %>
                                 </th>
                             <% }); %>
                             <!-- New column for Weekly Pay / Total Hours -->

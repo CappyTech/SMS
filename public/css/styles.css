@@ -4,11 +4,14 @@ body {
 strong {
   font-family: "Lato:b", sans-serif;
 }
+.hcs-blue {
+  background-color: #007bff !important;
+}
 .hcs-red {
   background-color: #a0333d !important;
 }
 .hcs-green {
-  background-color: #8bc441 !important;
+  background-color: #2b9e1b !important;
 }
 .hcs-black {
   background-color: #4e4e4e !important;
@@ -24,6 +27,9 @@ strong {
 }
 .hcs-black.lighten-4 {
   background-color: #e6e7e8 !important;
+}
+.hcs-blue-text {
+  color: #007bff !important;
 }
 .hcs-red-text {
   color: #a0333d !important;

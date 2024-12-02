@@ -1,22 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
 const path = require('path');
-
-const Subcontractor = require('../../models/subcontractor');
+const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
+const currencyService = require('../../services/currencyService');
+const dateService = require('../../services/dateService');
 
 const selectSubcontractor = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
         let subcontractors;
         if (req.session.user.role === 'admin') {
-            subcontractors = await Subcontractor.findAll({});
+            subcontractors = await db.Subcontractor.findAll({});
         } else {
-            subcontractors = await Subcontractor.findAll({
+            subcontractors = await db.Subcontractor.findAll({
                 where: {
                     userId: req.session.user.id
                 }
@@ -33,8 +30,8 @@ const selectSubcontractor = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             subcontractors,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            slimDateTime: dateService.slimDateTime,
+            formatCurrency: currencyService.formatCurrency,
         });
     } catch (error) {
         logger.error('Error selecting subcontractor:' + error.message);
@@ -45,18 +42,13 @@ const selectSubcontractor = async (req, res) => {
 
 const renderSubcontractorCreateForm = (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         res.render(path.join('subcontractors', 'createSubcontractor'), {
             title: 'Create Subcontractor',
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),  
         });
     } catch (error) {
-        logger.error('Error rendering subcontractor create form:' + error.message);
+        logger.error('Error rendering subcontractor create form: ' + error.message);
         req.flash('error', 'Error rendering subcontractor create form: ' + error.message);
         return res.redirect('/');
     }
@@ -64,13 +56,8 @@ const renderSubcontractorCreateForm = (req, res) => {
 
 const renderSubcontractorUpdateForm = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const subcontractorId = req.params.subcontractor;
-        const subcontractor = await Subcontractor.findByPk(subcontractorId);
+        const subcontractor = await db.Subcontractor.findByPk(subcontractorId);
 
         if (!subcontractor) {
             return res.status(404).send('Subcontractor not found');
@@ -81,18 +68,18 @@ const renderSubcontractorUpdateForm = async (req, res) => {
             subcontractor,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            slimDateTime: dateService.slimDateTime,
+            formatCurrency: currencyService.formatCurrency,
         });
     } catch (error) {
-        logger.error('Error rendering subcontractor update form:' + error.message);
+        logger.error('Error rendering subcontractor update form: ' + error.message);
         req.flash('error', 'Error rendering subcontractor update form: ' + error.message);
         return res.redirect('/');
     }
 };
 
 //router.get('/subcontractor/select', selectSubcontractor);
-router.get('/subcontractor/create', helpers.ensureAuthenticated, renderSubcontractorCreateForm);
-router.get('/subcontractor/update/:subcontractor', helpers.ensureAuthenticated, renderSubcontractorUpdateForm);
+router.get('/subcontractor/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorCreateForm);
+router.get('/subcontractor/update/:subcontractor', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorUpdateForm);
 
 module.exports = router;

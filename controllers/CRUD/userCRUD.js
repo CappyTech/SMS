@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../../models/user');
 const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
 const path = require('path');
 const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
-
 const schema = Joi.object({
     username: Joi.string().min(1).required(),
     email: Joi.string().email().required(),
@@ -25,6 +23,7 @@ const schema = Joi.object({
     permissionUpdateInvoice: Joi.boolean(),
     permissionDeleteInvoice: Joi.boolean(),
 });
+const db = require('../../services/sequelizeDatabaseService');
 
 const createUser = async (req, res) => {
     try {
@@ -34,7 +33,7 @@ const createUser = async (req, res) => {
             return res.redirect('/');
         }
         const { username, email, password, role } = value;
-        const existingUser = await User.findOne({
+        const existingUser = await db.Users.findOne({
             where: {
                 [Op.or]: [{ username }, { email }],
             },
@@ -44,7 +43,7 @@ const createUser = async (req, res) => {
             return res.redirect('/');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({
+        await db.Users.create({
             username,
             email,
             password: hashedPassword,
@@ -69,7 +68,7 @@ const readUser = async (req, res) => {
             return res.status(400).send('Bad Request: Missing user id parameter.');
         }
 
-        const user = await User.findByPk(req.params.id);
+        const user = await db.Users.findByPk(req.params.id);
 
         if (!user) {
             return res.status(404).send('User not found');
@@ -120,7 +119,7 @@ const updateUser = async (req, res) => {
         } = req.body;
 
         // Then update the user data.
-        const updatedUser = await User.update({
+        const updatedUser = await Users.update({
             username,
             email,
             role,
@@ -173,7 +172,7 @@ const deleteUser = async (req, res) => {
             return res.status(403).send('Access denied. You cannot delete your own account.');
         }
 
-        const user = await User.findByPk(req.params.id);
+        const user = await db.Users.findByPk(req.params.id);
         if (!user) {
             req.flash('error', 'User not found');
             res.redirect('/dashboard/user');
@@ -191,7 +190,7 @@ const deleteUser = async (req, res) => {
 
 router.get('/fetch/user/:id', async (req, res) => {
     try {
-        const user = await User.findAll({
+        const user = await db.Users.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
         });

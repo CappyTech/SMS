@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
-const moment = require('moment');
-const logger = require('../../services/loggerService'); 
+const logger = require('../../services/loggerService');
 const path = require('path');
-const Employees = require('../../models/employee');
+const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 const renderCreateEmployeeForm = (req, res) => {
     try {
@@ -21,7 +20,7 @@ const renderCreateEmployeeForm = (req, res) => {
 
 const renderUpdateEmployeeForm = async (req, res) => {
     try {
-        const employee = await Employees.findByPk(req.params.employee);
+        const employee = await db.Employees.findByPk(req.params.employee);
         if (!employee) {
             req.flash('error', 'Employee not found.');
             return res.redirect('/employee');
@@ -38,7 +37,7 @@ const renderUpdateEmployeeForm = async (req, res) => {
     }
 };
 
-router.get('/employee/create', helpers.ensureAuthenticated, renderCreateEmployeeForm);
-router.get('/employee/update/:employee', helpers.ensureAuthenticated, renderUpdateEmployeeForm);
+router.get('/employee/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderCreateEmployeeForm);
+router.get('/employee/update/:employee', authService.ensureAuthenticated, authService.ensureRole('admin'), renderUpdateEmployeeForm);
 
 module.exports = router;

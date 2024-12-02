@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Invoice = require('../models/invoice');
-const Subcontractor = require('../models/subcontractor');
 const { formatCurrency, slimDateTime, rounding } = require('../helpers');
 const logger = require('../services/loggerService'); 
 const path = require('path');
 const helpers = require('../helpers');
+const db = require('../services/sequelizeDatabaseService');
 
 const renderYearlyReturns = async (req, res) => {
     try {
@@ -19,13 +18,13 @@ const renderYearlyReturns = async (req, res) => {
         const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
 
         // Fetch subcontractor data for the given year and ID
-        const subcontractor = await Subcontractor.findOne({
+        const subcontractor = await db.Subcontractor.findOne({
             where: {
                 id: id,
                 deletedAt: null
             },
             include: {
-                model: Invoice,
+                model: db.Invoice,
                 as: 'invoices',
                 where: {
                     year: year

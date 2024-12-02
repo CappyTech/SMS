@@ -28,143 +28,134 @@ app.use(require('./middlewares/security'));
 app.use(require('./middlewares/session'));
 // app.use(require('./middlewares/createDefaultAdmin'));
 
-const Users = require('./models/user');
-const Subcontractors = require('./models/subcontractor');
-const Invoices = require('./models/invoice');
-const Employees = require('./models/employee');
-const Attendances = require('./models/attendance');
-const Quotes = require('./models/quote');
-const Clients = require('./models/client');
-const Contacts = require('./models/contact');
-const Jobs = require('./models/job');
-const Locations = require('./models/location');
+const db = require('./services/sequelizeDatabaseService');
 
 // Association for Users and Subcontractors
-Users.hasMany(Subcontractors, {
+db.Users.hasMany(db.Subcontractors, {
     foreignKey: 'userId',
     allowNull: false,
 });
-Subcontractors.belongsTo(Users, {
+db.Subcontractors.belongsTo(db.Users, {
     foreignKey: 'userId',
     allowNull: false,
 });
 
 // Association for Subcontractors and Invoices
-Subcontractors.hasMany(Invoices, {
+db.Subcontractors.hasMany(db.Invoices, {
     foreignKey: 'subcontractorId',
     allowNull: false,
     as: 'invoices',
 });
-Invoices.belongsTo(Subcontractors, {
+db.Invoices.belongsTo(db.Subcontractors, {
     foreignKey: 'subcontractorId',
     allowNull: false,
 });
 
 // Association for Employees and Attendances
-Employees.hasMany(Attendances, {
+db.Employees.hasMany(db.Attendances, {
     foreignKey: 'employeeId',
     allowNull: false,
 });
-Attendances.belongsTo(Employees, {
+db.Attendances.belongsTo(db.Employees, {
     foreignKey: 'employeeId',
     allowNull: false,
 });
 
 // Association for Subcontractors and Attendances
-Subcontractors.hasMany(Attendances, {
+db.Subcontractors.hasMany(db.Attendances, {
     foreignKey: 'subcontractorId',
     allowNull: false,
 });
-Attendances.belongsTo(Subcontractors, {
+db.Attendances.belongsTo(db.Subcontractors, {
     foreignKey: 'subcontractorId',
     allowNull: false,
 });
 
 // Association for Clients and Quotes
-Clients.hasMany(Quotes, {
+db.Clients.hasMany(db.Quotes, {
     foreignKey: 'clientId',
     allowNull: false,
 });
-Quotes.belongsTo(Clients, {
+db.Quotes.belongsTo(db.Clients, {
     foreignKey: 'clientId',
     allowNull: false,
 });
 
 // Association for Clients and Contacts
-Clients.hasMany(Contacts, {
+db.Clients.hasMany(db.Contacts, {
     foreignKey: 'clientId',
     allowNull: false,
 });
-Contacts.belongsTo(Clients, {
+db.Contacts.belongsTo(db.Clients, {
     foreignKey: 'clientId',
     allowNull: false,
 });
 
 // Association for Clients and Jobs
-Clients.hasMany(Jobs, {
+db.Clients.hasMany(db.Jobs, {
     foreignKey: 'clientId',
     allowNull: false,
 });
-Jobs.belongsTo(Clients, {
+db.Jobs.belongsTo(db.Clients, {
     foreignKey: 'clientId',
     allowNull: false,
 });
 
 // Association for Quotes and Jobs
-Quotes.hasMany(Jobs, {
+db.Quotes.hasMany(db.Jobs, {
     foreignKey: 'quoteId',
     allowNull: false,
 });
-Jobs.belongsTo(Quotes, {
+db.Jobs.belongsTo(db.Quotes, {
     foreignKey: 'quoteId',
     allowNull: false,
 });
 
 // Association for Jobs and Locations
-Locations.hasMany(Jobs, {
+db.Locations.hasMany(db.Jobs, {
     foreignKey: 'locationId',
     allowNull: false,
 });
-Jobs.belongsTo(Locations, {
+db.Jobs.belongsTo(db.Locations, {
     foreignKey: 'locationId',
     allowNull: false,
 });
 
 // Association for Quotes and Locations
-Locations.hasMany(Quotes, {
+db.Locations.hasMany(db.Quotes, {
     foreignKey: 'locationId',
     allowNull: false,
 });
-Quotes.belongsTo(Locations, {
+db.Quotes.belongsTo(db.Locations, {
     foreignKey: 'locationId',
     allowNull: false,
 });
 
 // Association for Attendances and Locations
-Locations.hasMany(Attendances, {
+db.Locations.hasMany(db.Attendances, {
     foreignKey: 'locationId',
     allowNull: false,
 });
-Attendances.belongsTo(Locations, {
+db.Attendances.belongsTo(db.Locations, {
     foreignKey: 'locationId',
     allowNull: false,
 });
 
 // Association for Employees and managerId
-Employees.hasMany(Employees, {
+db.Employees.hasMany(db.Employees, {
     foreignKey: 'managerId',
     allowNull: true,
 });
 
 // Association for Users
-Users.belongsTo(Subcontractors, { foreignKey: 'subcontractorId', as: 'Subcontractor' });
-Subcontractors.hasOne(Users, { foreignKey: 'subcontractorId' });
+db.Users.belongsTo(db.Subcontractors, { foreignKey: 'subcontractorId', as: 'Subcontractor' });
+db.Subcontractors.hasOne(db.Users, { foreignKey: 'subcontractorId' });
 
-Users.belongsTo(Clients, { foreignKey: 'clientId', as: 'Client' });
-Clients.hasOne(Users, { foreignKey: 'clientId' });
+db.Users.belongsTo(db.Clients, { foreignKey: 'clientId', as: 'Client' });
+db.Clients.hasOne(db.Users, { foreignKey: 'clientId' });
 
-Users.belongsTo(Employees, { foreignKey: 'employeeId', as: 'Employee' });
-Employees.hasOne(Users, { foreignKey: 'employeeId' });
+db.Users.belongsTo(db.Employees, { foreignKey: 'employeeId', as: 'Employee' });
+db.Employees.hasOne(db.Users, { foreignKey: 'employeeId' });
 
 //app.use(require('./middlewares/syncDatabase'));
 //app.use(require('./middlewares/oneDriveSync')());
@@ -188,23 +179,27 @@ app.use((req, res, next) => {
 
 app.use(async (req, res, next) => {
     try {
-        const unpaidInvoices = await Invoices.findAll({
-            where: { remittanceDate: null },
-            attributes: ['id', 'kashflowNumber'],
-            order: [['kashflowNumber', 'ASC']]
-        });
-
-        const unsubmittedInvoices = await Invoices.findAll({
-            where: { submissionDate: null },
-            attributes: ['id', 'kashflowNumber'],
-            order: [['kashflowNumber', 'ASC']]
-        });
-
-        res.locals.unpaidInvoices = unpaidInvoices;
-        res.locals.unsubmittedInvoices = unsubmittedInvoices;
-        res.locals.totalNotifications = unpaidInvoices.length + unsubmittedInvoices.length;
-
-        next();
+        if (req.session && req.session.user) {
+            const unpaidInvoices = await db.Invoices.findAll({
+                where: { remittanceDate: null },
+                attributes: ['id', 'kashflowNumber'],
+                order: [['kashflowNumber', 'ASC']]
+            });
+            const unsubmittedInvoices = await db.Invoices.findAll({
+                where: { submissionDate: null },
+                attributes: ['id', 'kashflowNumber'],
+                order: [['kashflowNumber', 'ASC']]
+            });
+            res.locals.unpaidInvoices = unpaidInvoices;
+            res.locals.unsubmittedInvoices = unsubmittedInvoices;
+            res.locals.totalNotifications = unpaidInvoices.length + unsubmittedInvoices.length;
+            next();
+        } else {
+            res.locals.unpaidInvoices = {};
+            res.locals.unsubmittedInvoices = {};
+            res.locals.totalNotifications = 0;
+            next();
+        }
     } catch (error) {
         logger.error('Error fetching invoices: ' + error);
         next();
@@ -234,17 +229,17 @@ if (process.env.NODE_ENV === 'development') {
     if (process.env.ENCRYPTION_KEY === '') {
         // Generate a 32-byte random key for AES-256
         const encryptionKey = crypto.randomBytes(32).toString('hex');
-        console.log('Your Encryption Key:', encryptionKey);
-        console.log('ENCRYPTION_KEY length:', encryptionKey.length);
+        //console.log('Your Encryption Key:', encryptionKey);
+        //console.log('ENCRYPTION_KEY length:', encryptionKey.length);
         const encryptionKeyHEX = Buffer.from(encryptionKey, 'hex');
-        console.log('Your Encryption Key:', encryptionKeyHEX);
-        console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
+        //console.log('Your Encryption Key:', encryptionKeyHEX);
+        //console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
     } else {
-        console.log('Encryption Key:', process.env.ENCRYPTION_KEY);
-        console.log('ENCRYPTION_KEY length:', process.env.ENCRYPTION_KEY.length);
+        //console.log('Encryption Key:', process.env.ENCRYPTION_KEY);
+        //console.log('ENCRYPTION_KEY length:', process.env.ENCRYPTION_KEY.length);
         const encryptionKeyHEX = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
-        console.log('Encryption Key:', encryptionKeyHEX);
-        console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
+        //console.log('Encryption Key:', encryptionKeyHEX);
+        //console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
     }
 }
 
@@ -282,6 +277,11 @@ const locationCRUD = require('./controllers/CRUD/locationCRUD');
 const monthlyReturns = require('./controllers/monthlyReturns');
 const yearlyReturns = require('./controllers/yearlyReturns');
 
+const dailyAttendance = require('./controllers/dailyAttendance');
+const weeklyAttendance = require('./controllers/weeklyAttendance');
+
+const kashflowRoutes = require('./kf/routes')
+
 app.use('/', index);
 
 app.use('/', formsClient);
@@ -315,6 +315,11 @@ app.use('/', locationCRUD);
 
 app.use('/', monthlyReturns);
 app.use('/', yearlyReturns);
+
+app.use('/', dailyAttendance);
+app.use('/', weeklyAttendance);
+
+app.use('/', kashflowRoutes);
 
 if (process.env.NODE_ENV === 'development') {
     app.listen(80, '127.0.0.1', () => {

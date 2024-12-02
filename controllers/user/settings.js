@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../../models/user');
 const helpers = require('../../helpers');
 const logger = require('../../services/loggerService'); 
 const path = require('path');
@@ -30,11 +29,12 @@ const sessionStore = new MySQLStore({
         }
     }
 });
+const db = require('../../services/sequelizeDatabaseService');
 
 // Display the account page
 const getAccountPage = async (req, res) => {
     try {
-        const user = await User.findOne({
+        const user = await db.User.findOne({
             where: { id: req.session.user.id }
         });
 
@@ -129,7 +129,7 @@ const updateAccountSettings = async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({ where: { id: req.session.user.id } });
+        const user = await db.User.findOne({ where: { id: req.session.user.id } });
 
         if (!user) {
             req.flash('error', 'User not found');

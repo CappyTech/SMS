@@ -1,6 +1,6 @@
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 const logger = require('../services/loggerService');
 
 const options = {
@@ -43,7 +43,7 @@ const sessionMiddleware = session({
 });
 
 sessionStore.onReady().then(() => {
-    logger.info('MySQLStore ready');
+    //logger.info('MySQLStore ready');
 }).catch(error => {
     logger.error(error);
 });

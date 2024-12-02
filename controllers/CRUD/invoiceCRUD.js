@@ -4,13 +4,12 @@ const helpers = require('../../helpers');
 const moment = require('moment');
 const logger = require('../../services/loggerService'); 
 const path = require('path');
-const Invoice = require('../../models/invoice');
-const Subcontractor = require('../../models/subcontractor');
+const db = require('../../services/sequelizeDatabaseService');
 
 const createInvoice = async (req, res) => {
     try {
         const validatedData = helpers.validateInvoiceData(req.body);
-        const subcontractor = await Subcontractor.findByPk(req.params.selected);
+        const subcontractor = await db.Subcontractors.findByPk(req.params.selected);
         const amounts = helpers.calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
 
         // If remittanceDate or submissionDate are not provided, set them to null
@@ -21,7 +20,7 @@ const createInvoice = async (req, res) => {
         const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(validatedData.remittanceDate);
 
         // Create invoice record
-        const newInvoice = await Invoice.create({
+        const newInvoice = await db.Invoice.create({
             invoiceNumber: validatedData.invoiceNumber,
             kashflowNumber: validatedData.kashflowNumber,
             invoiceDate: validatedData.invoiceDate,
@@ -59,14 +58,14 @@ const createInvoice = async (req, res) => {
 
 const updateInvoice = async (req, res) => {
     try {
-        const invoice = await Invoice.findByPk(req.params.invoice);
+        const invoice = await db.Invoices.findByPk(req.params.invoice);
         if (!invoice) {
             throw new Error('Invoice not found');
         }
         if (!invoice.subcontractorId) {
             logger.error(`No subcontractorId associated with invoice number: ${req.params.invoice}`);
         }
-        const subcontractor = await Subcontractor.findByPk(invoice.subcontractorId);
+        const subcontractor = await db.Subcontractors.findByPk(invoice.subcontractorId);
         if (!subcontractor) {
             logger.error(`Subcontractor with ID: ${invoice.subcontractorId} not found for invoice ${req.params.invoice}`);
         }
@@ -85,9 +84,9 @@ const updateInvoice = async (req, res) => {
 
 const readInvoice = async (req, res) => {
     try {
-        const invoice = await Invoice.findByPk(req.params.invoice, {
+        const invoice = await db.Invoices.findByPk(req.params.invoice, {
             include: [
-                { model: Subcontractor }
+                { model: db.Subcontractors }
             ]
         });
 
@@ -112,11 +111,11 @@ const readInvoice = async (req, res) => {
 
 const readInvoices = async (req, res) => {
     try {
-        const subcontractor = await Subcontractor.findByPk(req.params.subcontractor);
-        const invoices = await Invoice.findAll({
+        const subcontractor = await db.Subcontractors.findByPk(req.params.subcontractor);
+        const invoices = await db.Invoices.findAll({
             include: [
                 {
-                    model: Subcontractor,
+                    model: db.Subcontractors,
                     where: { id: req.params.subcontractor }
                 }
             ],
@@ -151,7 +150,7 @@ const deleteInvoice = async (req, res) => {
             return res.redirect('/');
         }
         // TODO: Add subcontractorId to the invoice model and refer back to the /invoices/read/:id route
-        const invoice = await Invoice.findByPk(req.params.invoice);
+        const invoice = await db.Invoices.findByPk(req.params.invoice);
 
         if (!invoice) {
             req.flash('error', 'Invoice not found');
@@ -176,7 +175,7 @@ router.get('/fetch/invoice/:id', async (req, res) => {
             return res.redirect('/');
         }
 
-        const invoice = await Invoice.findAll({
+        const invoice = await db.Invoices.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
         });
@@ -194,7 +193,7 @@ router.get('fetch/unpaidinvoices', async (req, res) => {
             return res.redirect('/');
         }
 
-        const unpaidInvoices = await Invoice.findAll({
+        const unpaidInvoices = await db.Invoices.findAll({
             where: { remittanceDate: null },
             attributes: ['id', 'kashflowNumber'],
             order: [['kashflowNumber', 'ASC']]
@@ -213,7 +212,7 @@ router.get('fetch/unsubmittedinvoices', async (req, res) => {
             return res.redirect('/');
         }
 
-        const unsubmittedInvoices = await Invoice.findAll({
+        const unsubmittedInvoices = await db.Invoices.findAll({
             where: { submissionDate: null },
             attributes: ['id', 'kashflowNumber'],
             order: [['kashflowNumber', 'ASC']]

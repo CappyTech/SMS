@@ -1,6 +1,6 @@
 const moment = require('moment');
 const axios = require('axios');
-const BankHoliday = require('../models/bankHoliday');
+const db = require('./sequelizeDatabaseService');
 
 /**
  * Fetches bank holiday data from the given URL, checks for changes, and updates the database if necessary.
@@ -28,7 +28,7 @@ async function getBankHoliday() {
         }
 
         // Fetch existing data from the database
-        const existingData = await BankHoliday.findAll();
+        const existingData = await db.BankHoliday.findAll();
 
         // Check if data has changed
         const hasChanged = events.some(event => {
@@ -43,10 +43,10 @@ async function getBankHoliday() {
 
         if (hasChanged) {
             // Drop existing data
-            await BankHoliday.destroy({ where: {}, truncate: true });
+            await db.BankHoliday.destroy({ where: {}, truncate: true });
 
             // Insert new data
-            await BankHoliday.bulkCreate(events);
+            await db.BankHoliday.bulkCreate(events);
         }
     } catch (error) {
         console.error('Error fetching or updating bank holidays:', error);

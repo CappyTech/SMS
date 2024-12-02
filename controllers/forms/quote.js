@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
 const path = require('path');
-
-const Quote = require('../../models/quote')
-const Clients = require('../../models/client');
-const Contacts = require('../../models/contact');
-const Locations = require('../../models/location');
+const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
+const currencyService = require('../../services/currencyService');
+const dateService = require('../../services/dateService');
 
 const renderQuoteCreateForm = async (req, res) => {
     try {
@@ -16,12 +14,12 @@ const renderQuoteCreateForm = async (req, res) => {
             return res.redirect('/');
         }
 
-        const clients = await Clients.findAll({
-            include: [Contacts],
+        const clients = await db.Clients.findAll({
+            include: [db.Contacts],
             order: [['createdAt', 'DESC']],
         });
 
-        const locations = await Locations.findAll({
+        const locations = await db.Locations.findAll({
             order: [['createdAt', 'DESC']],
         });
 
@@ -39,7 +37,6 @@ const renderQuoteCreateForm = async (req, res) => {
     }
 };
 
-
 const renderQuoteUpdateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
@@ -47,10 +44,10 @@ const renderQuoteUpdateForm = async (req, res) => {
             return res.redirect('/');
         }
 
-        const quote = await Quote.findByPk(req.params.quote, {
+        const quote = await db.Quote.findByPk(req.params.quote, {
             include: [{
-                model: Clients,
-                include: [Contacts]
+                model: db.Clients,
+                include: [db.Contacts]
             }]
         });
 
@@ -60,7 +57,7 @@ const renderQuoteUpdateForm = async (req, res) => {
         }
 
         // Fetch all locations to populate the dropdown
-        const locations = await Locations.findAll({
+        const locations = await db.Locations.findAll({
             order: [['createdAt', 'DESC']],
         });
 
@@ -70,8 +67,8 @@ const renderQuoteUpdateForm = async (req, res) => {
             locations,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            slimDateTime: dateService.slimDateTime,
+            formatCurrency: currencyService.formatCurrency,
         });
     } catch (error) {
         logger.error('Error rendering quote update form:  ', error.message);
@@ -80,8 +77,7 @@ const renderQuoteUpdateForm = async (req, res) => {
     }
 };
 
-
-router.get('/quote/create/', helpers.ensureAuthenticated, renderQuoteCreateForm);
-router.get('/quote/update/:quote', helpers.ensureAuthenticated, renderQuoteUpdateForm);
+router.get('/quote/create/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteCreateForm);
+router.get('/quote/update/:quote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteUpdateForm);
 
 module.exports = router;

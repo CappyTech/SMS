@@ -1,0 +1,93 @@
+<style>
+    .spinner-green {
+        color: #2b9e1b;
+    }
+</style>
+<div class="container my-5">
+    <h1 class="text-center mb-4">Gathering KashFlow Data</h1>
+
+    <!-- Loading Spinner -->
+    <div id="loadingContainer" class="text-center d-none">
+        <div class="spinner-border spinner-green mb-3" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p id="loadingMessage">Initializing data fetch...</p>
+    </div>
+
+    <!-- Status Messages -->
+    <div id="statusContainer" class="d-none">
+        <ul id="statusList" class="list-group mb-3"></ul>
+        <div class="text-center">
+            <button id="retryFetchBtn" class="btn btn-danger d-none" onclick="location.reload();">Retry</button>
+            <a id="viewDataBtn" href="/tables" class="btn btn-success d-none">View Data</a>
+        </div>
+    </div>
+
+    <!-- Start Fetch Button -->
+    <div id="startContainer" class="text-center">
+        <button id="startFetchBtn" class="btn btn-hcs-green">Start Fetch</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const startFetchBtn = document.getElementById('startFetchBtn');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const statusContainer = document.getElementById('statusContainer');
+        const statusList = document.getElementById('statusList');
+        const retryFetchBtn = document.getElementById('retryFetchBtn');
+        const viewDataBtn = document.getElementById('viewDataBtn');
+
+        let ws;
+
+        startFetchBtn.addEventListener('click', () => {
+            if (isFetching) return; // Prevent multiple clicks
+            isFetching = true;
+            startFetchBtn.disabled = true;
+            loadingMessage.textContent = 'Connecting to the server...';
+
+            // Open WebSocket connection
+            ws = new WebSocket(`ws://${window.location.host}/fetch-kashflow-data`);
+
+            ws.onopen = () => {
+                loadingMessage.textContent = 'Starting data fetch...';
+                ws.send(JSON.stringify({ action: 'startFetch' }));
+            };
+
+            ws.onmessage = (event) => {
+                const { type, message } = JSON.parse(event.data);
+
+                if (type === 'info' || type === 'success' || type === 'error') {
+                    const li = document.createElement('li');
+                    li.className = `list-group-item ${
+                        type === 'success'
+                            ? 'list-group-item-success'
+                            : type === 'error'
+                            ? 'list-group-item-danger'
+                            : ''
+                    }`;
+                    li.textContent = message;
+                    statusList.appendChild(li);
+
+                    if (type === 'success') {
+                        viewDataBtn.classList.remove('d-none');
+                        retryFetchBtn.classList.add('d-none');
+                    } else if (type === 'error') {
+                        retryFetchBtn.classList.remove('d-none');
+                    }
+                }
+            };
+
+            ws.onerror = () => {
+                loadingMessage.textContent = 'Connection error. Please try again.';
+                retryFetchBtn.classList.remove('d-none');
+            };
+
+            ws.onclose = () => {
+                loadingMessage.textContent = 'Connection closed.';
+                isFetching = false;
+                startFetchBtn.disabled = false;
+            };
+        });
+    });
+</script>

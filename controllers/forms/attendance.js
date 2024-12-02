@@ -1,20 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
 const path = require('path');
-const moment = require('moment');
-const Attendances = require('../../models/attendance');
-const Locations = require('../../models/location');
-const Employees = require('../../models/employee');
-const Subcontractors = require('../../models/subcontractor');
+const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 const renderAttendanceCreateForm = async (req, res) => {
     try {
         const { date, employeeId, subcontractorId } = req.query;
-        const locations = await Locations.findAll();
-        const employees = await Employees.findAll();
-        const subcontractors = await Subcontractors.findAll();
+        const locations = await db.Locations.findAll();
+        const employees = await db.Employees.findAll();
+        const subcontractors = await db.Subcontractors.findAll();
 
         res.render(path.join('attendance', 'createAttendance'), {
             date: date ? moment(date).format('YYYY-MM-DD') : '', // Format the date for input[type="date"]
@@ -36,11 +32,11 @@ const renderAttendanceCreateForm = async (req, res) => {
 
 const renderAttendanceUpdateForm = async (req, res) => {
     try {
-        const attendance = await Attendances.findByPk(req.params.attendance);
+        const attendance = await db.Attendances.findByPk(req.params.attendance);
 
-        const locations = await Locations.findAll();
-        const employees = await Employees.findAll();
-        const subcontractors = await Subcontractors.findAll();
+        const locations = await db.Locations.findAll();
+        const employees = await db.Employees.findAll();
+        const subcontractors = await db.Subcontractors.findAll();
 
         if (!attendance) {
             return res.status(404).send('Attendance not found');
@@ -62,7 +58,7 @@ const renderAttendanceUpdateForm = async (req, res) => {
     }
 };
 
-router.get('/attendance/create', helpers.ensureAuthenticated, renderAttendanceCreateForm);
-router.get('/attendance/update/:attendance', helpers.ensureAuthenticated, renderAttendanceUpdateForm);
+router.get('/attendance/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceCreateForm);
+router.get('/attendance/update/:attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceUpdateForm);
 
 module.exports = router;

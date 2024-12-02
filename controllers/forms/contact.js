@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
-
 const path = require('path');
-const Clients = require('../../models/client');
-const Contacts = require('../../models/contact');
+const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
+const currencyService = require('../../services/currencyService');
+const dateService = require('../../services/dateService');
 
 const selectContact = async (req, res) => {
     try {
@@ -13,8 +13,8 @@ const selectContact = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const contacts = await Contacts.findAll({
-            include: [{ model: Clients, attributes: ['name'] }]
+        const contacts = await db.Contacts.findAll({
+            include: [{ model: db.Clients, attributes: ['name'] }]
         });
 
         if (contacts.length === 0) {
@@ -34,8 +34,8 @@ const selectContact = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             contacts: contactList,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            slimDateTime: dateService.slimDateTime,
+            formatCurrency: currencyService.formatCurrency,
         });
     } catch (error) {
         logger.error('Error selecting contact:  ', error.message);
@@ -52,7 +52,7 @@ const renderContactCreateForm = async (req, res) => {
         }
 
         // Find the client by primary key (PK)
-        const clients = await Clients.findAll();
+        const clients = await db.Clients.findAll();
 
         if (!clients) {
             // If the client is not found, send an error message
@@ -80,8 +80,8 @@ const renderContactUpdateForm = async (req, res) => {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const contact = await Contacts.findByPk(req.params.contact, {
-            include: [{ model: Clients }]
+        const contact = await db.Contacts.findByPk(req.params.contact, {
+            include: [{ model: db.Clients }]
         });
 
         if (!contact) {
@@ -102,7 +102,7 @@ const renderContactUpdateForm = async (req, res) => {
 };
 
 //router.get('/contact/select', selectContact);
-router.get('/contact/create/', helpers.ensureAuthenticated, renderContactCreateForm);
-router.get('/contact/update/:contact', helpers.ensureAuthenticated, renderContactUpdateForm);
+router.get('/contact/create/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderContactCreateForm);
+router.get('/contact/update/:contact', authService.ensureAuthenticated, authService.ensureRole('admin'), renderContactUpdateForm);
 
 module.exports = router;

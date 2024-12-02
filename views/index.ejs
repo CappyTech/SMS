@@ -1,312 +1,259 @@
-<!-- views/index.ejs: -->
-
 <%- include('./partials/successAlert.ejs') %>
-<%- include('./partials/errorAlerts.ejs') %>
-
-<div class="container mt-5">
-    <div class="row">
-
-        <!-- New Section -->
-        <div class="col-md-12s mb-4">
+  <%- include('./partials/errorAlerts.ejs') %>
+  <% if (typeof session.user !=='undefined' ) { %>
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col-md-12 mb-4">
+          <div class="card">
+            <div class="card-header">
+              <div class="display-7 text-center">Create</div>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                
+                <!-- Financial Group -->
+                <div class="col-md-4">
+                  <div class="list-group">
+                    <a class="list-group-item list-group-item-action hcs-blue-text" href="/invoice/create">
+                      <i class="bi bi-receipt me-2"></i>Invoice
+                    </a>
+                    <a class="list-group-item list-group-item-action hcs-blue-text" href="/quote/create">
+                      <i class="bi bi-file-earmark-text me-2"></i>Quote
+                    </a>
+                  </div>
+                </div>
+                
+                <!-- People Group -->
+                <div class="col-md-4">
+                  <div class="list-group">
+                    <% if (typeof session.user !=='undefined' && session.user.role==='admin' ) { %>
+                    <a class="list-group-item list-group-item-action hcs-blue-text" href="/user/create">
+                      <i class="bi bi-person me-2"></i>User
+                    </a>
+                    <% } %>
+                    <a class="list-group-item list-group-item-action hcs-blue-text" href="/subcontractor/create">
+                      <i class="bi bi-people me-2"></i>Subcontractor
+                    </a>
+                    <a class="list-group-item list-group-item-action hcs-blue-text" href="/client/create">
+                      <i class="bi bi-people me-2"></i>Client
+                    </a>
+                    <a class="list-group-item list-group-item-action hcs-blue-text" href="/contact/create">
+                      <i class="bi bi-telephone me-2"></i>Contact
+                    </a>
+                  </div>
+                </div>
+        
+                <!-- HR Group -->
+                <div class="col-md-4">
+                  <div class="list-group">
+                    <a class="list-group-item list-group-item-action hcs-blue-text" href="/attendance/create">
+                      <i class="bi bi-person-raised-hand me-2"></i>Attendance
+                    </a>
+                    <a class="list-group-item list-group-item-action hcs-blue-text" href="/employee/create">
+                      <i class="bi bi-person-standing me-2"></i>Employee
+                    </a>
+                    <a class="list-group-item list-group-item-action hcs-blue-text" href="/location/create">
+                      <i class="bi bi-pin-map-fill me-2"></i>Location
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <!-- Dashboards Section -->
+        <div class="col-md-12 mb-4">
+          <div class="card">
+            <div class="card-header">
+              <div class="display-7 text-center">Dashboards</div>
+            </div>
+            <div class="card-body">
+              <div class="list-group">
+                <a href="/dashboard/stats" class="list-group-item list-group-item-action hcs-green-text">
+                  <i class="bi bi-binoculars me-2"></i>Overview
+                </a>
+                <a href="/attendance/weekly" class="list-group-item list-group-item-action hcs-green-text">
+                  <i class="bi bi-person-raised-hand me-2"></i>Weekly Attendance
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+        <div class="row">
+          <!-- Construction Industry Scheme Section -->
+          <div class="col-md-6 mb-4">
             <div class="card">
-                <div class="card-header">
-                    <p class="display-7">
-                         New
-                    </p>
+              <div class="card-header">
+                <div class="display-7 text-center">Construction Industry Scheme</div>
+              </div>
+              <div class="card-body">
+                <div class="list-group">
+                  <a href="/dashboard/invoice" class="list-group-item list-group-item-action hcs-green-text">
+                    <i class="bi bi-receipt me-2"></i>Invoices
+                  </a>
+                  <a href="/dashboard/subcontractor" class="list-group-item list-group-item-action hcs-green-text">
+                    <i class="bi bi-people me-2"></i>Subcontractors
+                  </a>
+                  <a href="/monthly/returns/form" class="list-group-item list-group-item-action hcs-green-text">
+                    <i class="bi bi-file-spreadsheet-fill me-2"></i>CIS Monthly Returns
+                  </a>
                 </div>
-                <div class="card-body">
-                    <ul class="nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/invoice/create">
-                                <i class="bi bi-receipt me-2"></i>Invoice
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/subcontractor/create">
-                                <i class="bi bi-people me-2"></i>Subcontractor
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/quote/create">
-                                <i class="bi bi-file-earmark-text me-2"></i>Quote
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/client/create">
-                                <i class="bi bi-people me-2"></i>Client
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/contact/create">
-                                <i class="bi bi-telephone me-2"></i>Contact
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/location/create">
-                                <i class="bi bi-pin-map-fill me-2"></i>Location
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/attendance/create">
-                                <i class="bi bi-person-raised-hand"></i>Attendance
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/employee/create">
-                                <i class="bi bi-person-standing"></i>Employee
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+              </div>
             </div>
-        </div>
-
-    </div>
-    <div class="row">
-
-    <!-- Dashboards Section -->
-    <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-header">
-          <div class="display-7"> Dashboards</div>
-        </div>
-        <div class="card-body">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a href="/dashboard/stats" class="nav-link hcs-green-text">
-                <i class="bi bi-binoculars me-2"></i>Overview
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/attendance/weekly" class="nav-link hcs-green-text">
-                <i class="bi bi-person-raised-hand"></i>Weekly Attendance
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Construction Industry Scheme Section -->
-    <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-header">
-          <div class="display-7"> Construction Industry Scheme</div>
-        </div>
-        <div class="card-body">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a href="/dashboard/invoice" class="nav-link hcs-green-text">
-                <i class="bi bi-receipt me-2"></i>Invoices
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/dashboard/subcontractor" class="nav-link hcs-green-text">
-                <i class="bi bi-people me-2"></i>Subcontractors
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/monthly/returns/form" class="nav-link hcs-green-text">
-                <i class="bi bi-file-spreadsheet-fill me-2"></i>Monthly Returns
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contract Management Section -->
-    <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-header">
-          <div class="display-7"> Contract Management</div>
-        </div>
-        <div class="card-body">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a href="/dashboard/quote" class="nav-link hcs-green-text">
-                <i class="bi bi-file-earmark-text me-2"></i>Quotes
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/dashboard/job" class="nav-link hcs-green-text">
-                <i class="bi bi-briefcase me-2"></i>Jobs
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/dashboard/client" class="nav-link hcs-green-text">
-                <i class="bi bi-people me-2"></i>Clients
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/dashboard/contact" class="nav-link hcs-green-text">
-                <i class="bi bi-telephone me-2"></i>Contacts
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/dashboard/location" class="nav-link hcs-green-text">
-                <i class="bi bi-pin-map-fill me-2"></i>Locations
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Payroll Section -->
-    <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-header">
-          <div class="display-7"> Payroll</div>
-        </div>
-        <div class="card-body">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a href="/dashboard/attendance" class="nav-link hcs-green-text">
-                <i class="bi bi-person-raised-hand"></i>Attendance
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/dashboard/employee" class="nav-link hcs-green-text">
-                <i class="bi bi-person-standing"></i>Employees
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
-    <!-- Administration Section -->
-    <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-header">
-          <div class="display-7"> Administration</div>
-        </div>
-        <div class="card-body bg-body-tertiary">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link" href="/user/create">
-                    <i class="bi bi-person me-2"></i>User
+          </div>
+          <!-- Contract Management Section -->
+          <div class="col-md-6 mb-4">
+            <div class="card">
+              <div class="card-header">
+                <div class="display-7 text-center">Contract Management</div>
+              </div>
+              <div class="card-body">
+                <div class="list-group">
+                  <a href="/dashboard/quote" class="list-group-item list-group-item-action hcs-green-text">
+                    <i class="bi bi-file-earmark-text me-2"></i>Quotes
+                  </a>
+                  <a href="/dashboard/job" class="list-group-item list-group-item-action hcs-green-text">
+                    <i class="bi bi-briefcase me-2"></i>Jobs
+                  </a>
+                  <a href="/dashboard/client" class="list-group-item list-group-item-action hcs-green-text">
+                    <i class="bi bi-people me-2"></i>Clients
+                  </a>
+                  <a href="/dashboard/contact" class="list-group-item list-group-item-action hcs-green-text">
+                    <i class="bi bi-telephone me-2"></i>Contacts
+                  </a>
+                  <a href="/dashboard/location" class="list-group-item list-group-item-action hcs-green-text">
+                    <i class="bi bi-pin-map-fill me-2"></i>Locations
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> 
+        <div class="row">
+        <!-- Payroll Section -->
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-header">
+              <div class="display-7 text-center">Payroll</div>
+            </div>
+            <div class="card-body">
+              <div class="list-group">
+                <a href="/dashboard/attendance" class="list-group-item list-group-item-action hcs-green-text">
+                  <i class="bi bi-person-raised-hand me-2"></i>Attendance
                 </a>
-            </li>
-            <li class="nav-item">
-              <a href="/dashboard/user" class="nav-link hcs-green-text">
-                <i class="bi bi-person me-2"></i>Users
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <% } %>
-    
-    <!-- My Account Section -->
-    <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-header">
-            <div class="display-7"> My Account</div>
-        </div>
-        <div class="card-body bg-body-tertiary">
-            <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link hcs-green-text" href="/account">
-                <i class="bi bi-gear-wide me-2"></i>Settings
+                <a href="/dashboard/employee" class="list-group-item list-group-item-action hcs-green-text">
+                  <i class="bi bi-person-standing me-2"></i>Employees
                 </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link hcs-red-text" href="/logout">
-                <i class="bi bi-box-arrow-right me-2"></i>Logout
-                </a>
-            </li>
-            </ul>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+        <% if (typeof session.user !=='undefined' && session.user.role==='admin' ) { %>
+        <!-- Administration Section -->
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-header">
+              <div class="display-7 text-center">HR</div>
+            </div>
+            <div class="card-body">
+              <div class="list-group">
+                <a href="/user/create" class="list-group-item list-group-item-action hcs-green-text">
+                  <i class="bi bi-person me-2"></i>User
+                </a>
+                <a href="/dashboard/user" class="list-group-item list-group-item-action hcs-green-text">
+                  <i class="bi bi-person me-2"></i>Users
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } %>
     </div>
-
   </div>
-</div>
-
-<div class="container py-4">
-    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+<% } %>
+    <div class="container py-4">
+      <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <div class="container-fluid py-5 text-center">
-            <h1 class="display-5 fw-bold">Subcontractor Management System<br>
-                <small class="lead fw-light text-body-secondary">Developed by Heron Constructive Solutions LTD</small>
-            </h1>
-            <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-                <div class="col">
-                    <div class="card h-100 d-flex flex-column">
-                        <div class="card-body">
-                            <h5 class="card-header-pills">Accurate Record-Keeping</h5>
-                            <p class="card-text">With features that facilitate efficient data entry and manage important details, the system ensures accurate and up-to-date record-keeping.</p>
-                        </div>
-                    </div>
+          <h1 class="display-5 fw-bold">Subcontractor Management System<br>
+            <small class="lead fw-light text-body-secondary">Developed by Heron Constructive Solutions LTD</small>
+          </h1>
+          <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+            <div class="col">
+              <div class="card h-100 d-flex flex-column">
+                <div class="card-body">
+                  <h5 class="card-header-pills">Accurate Record-Keeping</h5>
+                  <p class="card-text">With features that facilitate efficient data entry and manage important details,
+                    the system ensures accurate and up-to-date record-keeping.</p>
                 </div>
-
-                <div class="col">
-                    <div class="card h-100 d-flex flex-column">
-                        <div class="card-body">
-                            <h5 class="card-header-pills">Regulatory Compliance</h5>
-                            <p class="card-text">SMS automates monthly returns, aiding in maintaining CIS & HMRC compliance. This feature aims to ease financial and tax reporting tasks, ensuring businesses stay within the law.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card h-100 d-flex flex-column">
-                        <div class="card-body">
-                            <h5 class="card-header-pills">Payment Tracking</h5>
-                            <p class="card-text">Detailed invoice records allow you to track payments and manage deductions effectively.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card h-100 d-flex flex-column">
-                        <div class="card-body">
-                            <h5 class="card-header-pills">Subcontractor Verification</h5>
-                            <p class="card-text">The system can perform subcontractor verification, allowing only valid and vetted subcontractors to participate, thereby reducing project risks.</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- User Access Control Card -->
-                <div class="col">
-                    <div class="card h-100 d-flex flex-column">
-                        <div class="card-body">
-                            <h5 class="card-header-pills">User Access Control</h5>
-                            <p class="card-text">SMS supports the creation and management of user profiles. Admin and subcontractor roles allow for role-based access control ensuring more secure and efficient project management.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Effective Communication Card -->
-                <div class="col">
-                    <div class="card h-100 d-flex flex-column">
-                        <div class="card-body">
-                            <h5 class="card-header-pills">Effective Communication</h5>
-                            <p class="card-text">It enhances communication among project managers, ensuring that everyone is kept up-to-date on project developments.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Efficiency and Transparency Card -->
-                <div class="col">
-                    <div class="card h-100 d-flex flex-column">
-                        <div class="card-body">
-                            <h5 class="card-header-pills">Efficiency and Transparency</h5>
-                            <p class="card-text">Through structured and automated data handling, the system enhances the overall efficiency of subcontractor management, providing transparency for every stakeholder involved.</p>
-                        </div>
-                    </div>
-                </div>
+              </div>
             </div>
+
+            <div class="col">
+              <div class="card h-100 d-flex flex-column">
+                <div class="card-body">
+                  <h5 class="card-header-pills">Regulatory Compliance</h5>
+                  <p class="card-text">SMS automates monthly returns, aiding in maintaining CIS & HMRC compliance. This
+                    feature aims to ease financial and tax reporting tasks, ensuring businesses stay within the law.</p>
+                </div>
+              </div>
             </div>
+
+            <div class="col">
+              <div class="card h-100 d-flex flex-column">
+                <div class="card-body">
+                  <h5 class="card-header-pills">Payment Tracking</h5>
+                  <p class="card-text">Detailed invoice records allow you to track payments and manage deductions
+                    effectively.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="card h-100 d-flex flex-column">
+                <div class="card-body">
+                  <h5 class="card-header-pills">Subcontractor Verification</h5>
+                  <p class="card-text">The system can perform subcontractor verification, allowing only valid and vetted
+                    subcontractors to participate, thereby reducing project risks.</p>
+                </div>
+              </div>
+            </div>
+            <!-- User Access Control Card -->
+            <div class="col">
+              <div class="card h-100 d-flex flex-column">
+                <div class="card-body">
+                  <h5 class="card-header-pills">User Access Control</h5>
+                  <p class="card-text">SMS supports the creation and management of user profiles. Admin and
+                    subcontractor roles allow for role-based access control ensuring more secure and efficient project
+                    management.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Effective Communication Card -->
+            <div class="col">
+              <div class="card h-100 d-flex flex-column">
+                <div class="card-body">
+                  <h5 class="card-header-pills">Effective Communication</h5>
+                  <p class="card-text">It enhances communication among project managers, ensuring that everyone is kept
+                    up-to-date on project developments.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Efficiency and Transparency Card -->
+            <div class="col">
+              <div class="card h-100 d-flex flex-column">
+                <div class="card-body">
+                  <h5 class="card-header-pills">Efficiency and Transparency</h5>
+                  <p class="card-text">Through structured and automated data handling, the system enhances the overall
+                    efficiency of subcontractor management, providing transparency for every stakeholder involved.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-</div>

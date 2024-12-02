@@ -1,68 +1,79 @@
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
-    <i class="bi bi-speedometer"></i> Dashboards
+    <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationDropdown" role="button"
+        data-bs-toggle="dropdown" aria-expanded="true">
+        <i class="bi bi-speedometer"></i> Dashboards
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-        <li><h6 class="dropdown-header">Dashboards</h6></li>
+        <li>
+            <h6 class="dropdown-header">Dashboards</h6>
+        </li>
         <li>
             <a class="dropdown-item" href="/dashboard/stats">
-            Statistics
+                Statistics
             </a>
         </li>
         <li class="dropdown-divider"></li>
-        <li><h6 class="dropdown-header">CIS Returns</h6></li>
+        <li>
+            <h6 class="dropdown-header">CIS Returns</h6>
+        </li>
         <li>
             <a class="dropdown-item" href="/dashboard/invoice">
-            Invoices
+                Invoices
             </a>
         </li>
         <li>
             <a class="dropdown-item" href="/dashboard/subcontractor">
-            Subcontractors
+                Subcontractors
             </a>
         </li>
         <li class="dropdown-divider"></li>
-        <li><h6 class="dropdown-header">Management</h6></li>
+        <li>
+            <h6 class="dropdown-header">Management</h6>
+        </li>
         <li>
             <a class="dropdown-item" href="/dashboard/quote">
-            Quotes
+                Quotes
             </a>
         </li>
         <li>
             <a class="dropdown-item" href="/dashboard/jobs">
-            Jobs
+                Jobs
             </a>
         </li>
         <li>
             <a class="dropdown-item" href="/dashboard/client">
-            Clients
+                Clients
             </a>
         </li>
         <li>
             <a class="dropdown-item" href="/dashboard/contact">
-            Contacts
+                Contacts
             </a>
         </li>
         <li class="dropdown-divider"></li>
-        <li><h6 class="dropdown-header">Payroll</h6></li>
+        <li>
+            <h6 class="dropdown-header">Payroll</h6>
+        </li>
         <li>
             <a class="dropdown-item" href="/dashboard/attendance">
-            Attendances
+                Attendances
             </a>
         </li>
         <li>
             <a class="dropdown-item" href="/dashboard/employee">
-            Employees
+                Employees
             </a>
         </li>
-        <% if (typeof session.user !== 'undefined' && session.user.role === 'admin') { %>
-        <li class="dropdown-divider"></li>
-        <li><h6 class="dropdown-header">Administration</h6></li>
-        <li>
-            <a class="dropdown-item" href="/dashboard/user">
-            Users
-            </a>
-        </li>
-        <% } %>
+        <% if (typeof session.user !=='undefined' && session.user.role==='admin' ) { %>
+            <li class="dropdown-divider"></li>
+            <li>
+                <h6 class="dropdown-header">Administration</h6>
+            </li>
+            <li>
+                <a class="dropdown-item" href="/dashboard/user">
+                    Users
+                </a>
+            </li>
+            <% } %>
     </ul>
 </li>

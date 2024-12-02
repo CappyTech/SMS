@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 const ENCRYPTION_KEY = crypto.scryptSync(process.env.ENCRYPTION_KEY, 'salt', 32); // Use a secure key derivation function
 const IV_LENGTH = 16; // AES block size is 16 bytes

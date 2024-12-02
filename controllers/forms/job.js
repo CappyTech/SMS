@@ -1,15 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
 const path = require('path');
+const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
-const Jobs = require('../../models/job');
-const Clients = require('../../models/client');
-const Quotes = require('../../models/quote');
-const Locations = require('../../models/location');
-
-// Render Job Creation Form
 const renderJobCreateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
@@ -17,8 +12,8 @@ const renderJobCreateForm = async (req, res) => {
             return res.redirect('/');
         }
 
-        const clients = await Clients.findAll({
-            include: [Quotes],
+        const clients = await db.Clients.findAll({
+            include: [db.Quotes],
             order: [['createdAt', 'DESC']],
         });
 
@@ -45,15 +40,14 @@ const renderJobCreateForm = async (req, res) => {
     }
 };
 
-// Render Job Update Form
 const renderJobUpdateForm = async (req, res) => {
     try {
         if (!req.session.user || req.session.user.role !== 'admin') {
             req.flash('error', 'Access denied.');
             return res.redirect('/');
         }
-        const job = await Jobs.findByPk(req.params.jobId, {
-            include: [Clients, Locations, Quotes],
+        const job = await db.Jobs.findByPk(req.params.jobId, {
+            include: [db.Clients, db.Locations, db.Quotes],
         });
 
         if (!job) {
@@ -73,8 +67,7 @@ const renderJobUpdateForm = async (req, res) => {
     }
 };
 
-// Define routes for rendering forms
-router.get('/job/create', helpers.ensureAuthenticated, renderJobCreateForm);
-router.get('/job/update/:jobId', helpers.ensureAuthenticated, renderJobUpdateForm);
+router.get('/job/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderJobCreateForm);
+router.get('/job/update/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), renderJobUpdateForm);
 
 module.exports = router;

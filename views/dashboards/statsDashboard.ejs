@@ -140,9 +140,9 @@
                             <%= invoice.kashflowNumber %> | <%= invoice.invoiceNumber %>
                             <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
                             <% if (invoice.submissionDate !== null || invoice.submissionDate === "0000-00-00 00:00:00") { %>
-                                <i class="bi bi-check hcs-green-text"></i>
-                            <% } else { %>
                                 <i class="bi bi-x hcs-red-text"></i>
+                            <% } else { %>
+                                <i class="bi bi-check hcs-green-text"></i>
                             <% } %>
                         </a>
                         <% }); %>

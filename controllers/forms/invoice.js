@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
 const path = require('path');
-const Invoice = require('../../models/invoice');
-const Subcontractor = require('../../models/subcontractor');
+const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
+const currencyService = require('../../services/currencyService');
+const dateService = require('../../services/dateService');
 
 const renderInvoiceCreateForm = async (req, res) => {
     try {
@@ -13,7 +14,7 @@ const renderInvoiceCreateForm = async (req, res) => {
             return res.redirect('/');
         }
         
-        const subcontractors = await Subcontractor.findAll({
+        const subcontractors = await db.Subcontractors.findAll({
             order: [['company', 'ASC']]
         });
         res.render(path.join('invoices', 'createInvoice'), {
@@ -21,8 +22,8 @@ const renderInvoiceCreateForm = async (req, res) => {
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
             subcontractors,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            slimDateTime: dateService.slimDateTime,
+            formatCurrency: currencyService.formatCurrency,
         });
     } catch (error) {
         logger.error('Error rendering invoice create form:' + error.message);
@@ -38,7 +39,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
             return res.redirect('/');
         }
 
-        const invoice = await Invoice.findByPk(req.params.invoice);
+        const invoice = await db.Invoices.findByPk(req.params.invoice);
 
         if (!invoice) {
             return res.status(404).send('Invoice not found');
@@ -49,10 +50,8 @@ const renderInvoiceUpdateForm = async (req, res) => {
             invoice,
             errorMessages: req.flash('error'),
             successMessage: req.flash('success'),
-            
-            
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            slimDateTime: dateService.slimDateTime,
+            formatCurrency: currencyService.formatCurrency,
         });
     } catch (error) {
         logger.error('Error rendering invoice update form:  ', error.message);
@@ -61,7 +60,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
     }
 };
 
-router.get('/invoice/create/', helpers.ensureAuthenticated, renderInvoiceCreateForm);
-router.get('/invoice/update/:invoice', helpers.ensureAuthenticated, renderInvoiceUpdateForm);
+router.get('/invoice/create/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderInvoiceCreateForm);
+router.get('/invoice/update/:invoice', authService.ensureAuthenticated, authService.ensureRole('admin'), renderInvoiceUpdateForm);
 
 module.exports = router;

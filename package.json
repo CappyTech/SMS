@@ -1,6 +1,6 @@
 {
   "name": "sms",
-  "version": "3.2.2",
+  "version": "3.5.0",
   "description": "SMS, developed by Heron CS LTD, is a comprehensive web-based application designed to streamline the management of subcontractors in construction projects. It facilitates efficient data entry, automates monthly returns for CIS/HMRC compliance, tracks payments, manages deductions, and enables subcontractor verification. SMS ensures accurate record-keeping, regulatory compliance, and effective communication among project stakeholders, enhancing overall subcontractor management efficiency and transparency.",
   "main": "app.js",
   "scripts": {
@@ -15,6 +15,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "axios": "^1.7.5",
+    "basic-auth": "^2.0.1",
     "bcrypt": "^5.1.1",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
@@ -39,13 +40,16 @@
     "qrcode": "^1.5.4",
     "querystring": "^0.2.1",
     "sequelize": "^6.37.3",
+    "soap": "^1.1.5",
     "speakeasy": "^2.0.0",
     "useragent": "^2.3.0",
     "uuid": "^10.0.0",
     "winston": "^3.14.1",
+    "ws": "^8.18.0",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
+    "mongoose": "^8.7.2",
     "nodemon": "^3.1.4",
     "sequelize-cli": "^6.6.0"
   }

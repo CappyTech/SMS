@@ -1,19 +1,15 @@
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 const moment = require('moment');
 const logger = require('./loggerService');
-const Attendances = require('../models/attendance');
-const Employees = require('../models/employee');
-const Subcontractors = require('../models/subcontractor');
-const Invoices = require('../models/invoice');
-const Locations = require('../models/location');
+const db = require('./sequelizeDatabaseService');
 
 const getAttendanceForDay = async (date) => {
     try {
-        const attendanceRecords = await Attendances.findAll({
+        const attendanceRecords = await db.Attendances.findAll({
             where: {
                 date: date
             },
-            include: [Employees, Subcontractors, Locations],
+            include: [db.Employees, db.Subcontractors, db.Locations],
             order: [['date', 'ASC']]
         });
 
@@ -31,24 +27,24 @@ const getAttendanceForDay = async (date) => {
  */
 const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
     try {
-        const attendanceRecords = await Attendances.findAll({
+        const attendanceRecords = await db.Attendances.findAll({
             where: {
                 date: {
                     [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
                 }
             },
-            include: [Employees, Subcontractors, Locations],
+            include: [db.Employees, db.Subcontractors, db.Locations],
             order: [['date', 'ASC']]
         });
-        const subcontractorInvoices = await Invoices.findAll({
+        const subcontractorInvoices = await db.Invoices.findAll({
             where: {
                 invoiceDate: {
                     [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
                 }
             },
-            include: [Subcontractors]
+            include: [db.Subcontractors]
         });
-        const employeeCount = await Attendances.count({
+        const employeeCount = await db.Attendances.count({
             where: {
                 date: {
                     [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
@@ -58,7 +54,7 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
             distinct: true,
             col: 'employeeId'
         });
-        const subcontractorCount = await Attendances.count({
+        const subcontractorCount = await db.Attendances.count({
             where: {
                 date: {
                     [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
@@ -69,7 +65,7 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
             col: 'subcontractorId'
         });
 
-        const allEmployees = await Employees.findAll({
+        const allEmployees = await db.Employees.findAll({
             where: {
                 status: 'active'
             }

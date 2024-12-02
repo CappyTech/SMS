@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
-
 const helpers = require('../../helpers');
 const moment = require('moment');
 const logger = require('../../services/loggerService');
 const path = require('path');
-const Contacts = require('../../models/contact');
-const Clients = require('../../models/client');
+const db = require('../../services/sequelizeDatabaseService');
 
 const createContact = async (req, res) => {
     try {
@@ -22,7 +20,7 @@ const createContact = async (req, res) => {
             req.flash('erorr', 'Client wasn\'t specificied.');
             return res.redirect('/');
         } else {
-            const contact = await Contacts.create({
+            const contact = await db.Contacts.create({
                 clientId:clientId,
                 name:name,
                 phone:phone,
@@ -45,9 +43,9 @@ const createContact = async (req, res) => {
 
 const readContact = async (req, res) => {
     try {
-        const contact = await Contacts.findByPk(req.params.contact, {
+        const contact = await db.Contacts.findByPk(req.params.contact, {
             include: [
-                { model: Clients }
+                { model: db.Clients }
             ]
         });
         if (!contact) {
@@ -71,8 +69,8 @@ const readContact = async (req, res) => {
 
 const readContacts = async (req, res) => {
     try {
-        const clients = await Clients.findByPk(req.params.client);
-        const contacts = await Contacts.findAll({
+        const clients = await db.Clients.findByPk(req.params.client);
+        const contacts = await db.Contacts.findAll({
             where: { clientId: req.params.client },
             order: [['name', 'ASC']]
         });
@@ -98,7 +96,7 @@ const readContacts = async (req, res) => {
 const updateContact = async (req, res) => {
     try {
         const { name, phone, email, note } = req.body;
-        const contact = await Contacts.findByPk(req.params.contact);
+        const contact = await db.Contacts.findByPk(req.params.contact);
         if (!contact) {
             return res.status(404).send('Contact not found');
         }
@@ -120,7 +118,7 @@ const updateContact = async (req, res) => {
 
 const deleteContact = async (req, res) => {
     try {
-        const contact = await Contacts.findByPk(req.params.contact);
+        const contact = await db.Contacts.findByPk(req.params.contact);
         if (!contact) {
             return res.status(404).send('Contact not found');
         }
@@ -138,7 +136,7 @@ const deleteContact = async (req, res) => {
 
 router.get('/fetch/contact/:clientId', async (req, res) => {
     try {
-        const contacts = await Contacts.findAll({
+        const contacts = await db.Contacts.findAll({
             where: { clientId: req.params.clientId },
             order: [['createdAt', 'ASC']],
         });
