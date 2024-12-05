@@ -18,13 +18,13 @@ const renderYearlyReturns = async (req, res) => {
         const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
 
         // Fetch subcontractor data for the given year and ID
-        const subcontractor = await db.Subcontractor.findOne({
+        const subcontractor = await db.Subcontractors.findOne({
             where: {
                 id: id,
                 deletedAt: null
             },
             include: {
-                model: db.Invoice,
+                model: db.Invoices,
                 as: 'invoices',
                 where: {
                     year: year
@@ -62,8 +62,7 @@ const renderYearlyReturns = async (req, res) => {
 
         res.render(path.join('monthlyreturns', 'yearlyReturns'), {
             title: 'Yearly Returns',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             slimDateTime: slimDateTime,
             formatCurrency: formatCurrency,
             rounding: rounding,
@@ -74,7 +73,7 @@ const renderYearlyReturns = async (req, res) => {
             pageBreakMonths: pageBreakMonths
         });
     } catch (error) {
-        logger.error("Error rendering yearly returns:", error.message);
+        logger.error("Error rendering yearly returns: "+ error.message);
         res.status(500).send("Internal Server Error");
     }
 };

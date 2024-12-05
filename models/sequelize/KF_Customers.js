@@ -35,5 +35,12 @@ module.exports = (sequelize, DataTypes) => {
         collate: 'latin1_bin',
     });
 
+    KF_Customers.associate = (models) => {
+        KF_Customers.hasMany(models.KF_Invoices, { foreignKey: 'CustomerID', as: 'invoices' });
+        KF_Customers.hasMany(models.KF_Quotes, { foreignKey: 'CustomerID', as: 'quotes' });
+        KF_Customers.hasMany(models.KF_Receipts, { foreignKey: 'CustomerID', as: 'receipts' });
+        KF_Customers.hasMany(models.KF_Projects, { foreignKey: 'CustomerID', as: 'projects' });
+    };
+
     return KF_Customers;
 };

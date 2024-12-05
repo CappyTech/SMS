@@ -20,8 +20,7 @@ const renderAttendanceCreateForm = async (req, res) => {
             locations: locations,
             employees: employees,
             subcontractors: subcontractors,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering Attendance create form: ' + error.message);
@@ -48,8 +47,7 @@ const renderAttendanceUpdateForm = async (req, res) => {
             locations: locations,
             employees: employees,
             subcontractors: subcontractors,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering Attendance update form: ' + error.message);

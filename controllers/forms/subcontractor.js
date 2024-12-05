@@ -11,9 +11,9 @@ const selectSubcontractor = async (req, res) => {
     try {
         let subcontractors;
         if (req.session.user.role === 'admin') {
-            subcontractors = await db.Subcontractor.findAll({});
+            subcontractors = await db.Subcontractors.findAll({});
         } else {
-            subcontractors = await db.Subcontractor.findAll({
+            subcontractors = await db.Subcontractors.findAll({
                 where: {
                     userId: req.session.user.id
                 }
@@ -27,11 +27,9 @@ const selectSubcontractor = async (req, res) => {
 
         res.render(path.join('subcontractors', 'selectSubcontractor'), {
             title: 'Select Subcontractor',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             subcontractors,
-            slimDateTime: dateService.slimDateTime,
-            formatCurrency: currencyService.formatCurrency,
+
         });
     } catch (error) {
         logger.error('Error selecting subcontractor:' + error.message);
@@ -44,8 +42,7 @@ const renderSubcontractorCreateForm = (req, res) => {
     try {
         res.render(path.join('subcontractors', 'createSubcontractor'), {
             title: 'Create Subcontractor',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),  
+              
         });
     } catch (error) {
         logger.error('Error rendering subcontractor create form: ' + error.message);
@@ -57,7 +54,7 @@ const renderSubcontractorCreateForm = (req, res) => {
 const renderSubcontractorUpdateForm = async (req, res) => {
     try {
         const subcontractorId = req.params.subcontractor;
-        const subcontractor = await db.Subcontractor.findByPk(subcontractorId);
+        const subcontractor = await db.Subcontractors.findByPk(subcontractorId);
 
         if (!subcontractor) {
             return res.status(404).send('Subcontractor not found');
@@ -66,10 +63,8 @@ const renderSubcontractorUpdateForm = async (req, res) => {
         res.render(path.join('subcontractors', 'updateSubcontractor'), {
             title: 'Update Subcontractor',
             subcontractor,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            slimDateTime: dateService.slimDateTime,
-            formatCurrency: currencyService.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering subcontractor update form: ' + error.message);

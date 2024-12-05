@@ -160,6 +160,7 @@ db.Employees.hasOne(db.Users, { foreignKey: 'employeeId' });
 //app.use(require('./middlewares/syncDatabase'));
 //app.use(require('./middlewares/oneDriveSync')());
 //app.use(require('./middlewares/blockBot'));
+//app.use(require('./middlewares/maintenance'));
 
 app.use((req, res, next) => {
     res.locals.session = req.session;
@@ -193,6 +194,11 @@ app.use(async (req, res, next) => {
             res.locals.unpaidInvoices = unpaidInvoices;
             res.locals.unsubmittedInvoices = unsubmittedInvoices;
             res.locals.totalNotifications = unpaidInvoices.length + unsubmittedInvoices.length;
+
+            const lastfetched = await db.KF_Meta.findOne({
+                order: [['lastFetchedAt', 'DESC']]
+            })
+            res.locals.lastfetched = lastfetched || null;
             next();
         } else {
             res.locals.unpaidInvoices = {};
@@ -206,11 +212,19 @@ app.use(async (req, res, next) => {
     }
 });
 
+const { slimDateTime } = require('./services/dateService');
+const { formatCurrency,rounding } = require('./services/currencyService');
+
 app.use((req, res, next) => {
     res.locals.session = req.session;
     res.locals.package = packageJson.version;
     res.locals.copyrightyearstart = 2023;
     res.locals.copyrightyear = moment().year();
+    res.locals.slimDateTime = slimDateTime;
+    res.locals.formatCurrency = formatCurrency;
+    res.locals.rounding = rounding;
+    res.locals.errorMessages = req.flash('error');
+    res.locals.successMessage = req.flash('success');
     next();
 });
 

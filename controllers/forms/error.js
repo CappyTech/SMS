@@ -6,8 +6,7 @@ const e500 = async (req, res) => {
     try {
         res.render(path.join('errors', '500'), {
             title: '500',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             
             
         });
@@ -22,8 +21,7 @@ const e404 = async (req, res) => {
     try {
         res.render(path.join('errors', '404'), {
             title: '404',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             
             
         });
@@ -38,8 +36,7 @@ const e403 = async (req, res) => {
     try {
         res.render(path.join('errors', '403'), {
             title: '403',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             
             
         });

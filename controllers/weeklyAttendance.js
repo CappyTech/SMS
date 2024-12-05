@@ -130,8 +130,7 @@ const getWeeklyAttendance = async (req, res) => {
             groupedAttendance,
             startDate: payrollWeekStart.format('YYYY-MM-DD'),
             endDate: endDate.format('YYYY-MM-DD'),
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             previousYear,
             previousWeek,
             nextYear,

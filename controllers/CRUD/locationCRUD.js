@@ -52,8 +52,7 @@ const readLocation = async (req, res) => {
             title: 'View Location',
             location,
             slimDateTime: helpers.slimDateTime,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error viewing location: ' + error.message);

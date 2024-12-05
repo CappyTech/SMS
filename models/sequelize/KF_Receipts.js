@@ -48,6 +48,10 @@ module.exports = (sequelize, DataTypes) => {
         CISRCNetAmount: DataTypes.DECIMAL(10, 2),
         CISRCVatAmount: DataTypes.DECIMAL(10, 2),
         IsCISReverseCharge: DataTypes.BOOLEAN,
+        Lines: {
+            type: DataTypes.JSON,
+            allowNull: true,
+        },
     }, {
         tableName: 'KF_Receipts',
         timestamps: true,
@@ -55,6 +59,14 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'latin1',
         collate: 'latin1_bin',
     });
+
+    KF_Receipts.associate = (models) => {
+        KF_Receipts.belongsTo(models.KF_Customers, {
+            foreignKey: 'CustomerID',
+            as: 'customer'
+        });
+        KF_Receipts.belongsTo(models.KF_Projects, { foreignKey: 'ProjectID', as: 'project' });
+    };
 
     return KF_Receipts;
 };

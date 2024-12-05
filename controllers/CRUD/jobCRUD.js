@@ -61,8 +61,7 @@ const readJob = async (req, res) => {
         res.render(path.join('jobs', 'viewJob'), {
             title: 'Job',
             job,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             moment: moment,
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency

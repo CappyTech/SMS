@@ -15,6 +15,7 @@ function getReceiptsForSupplier(client, supplierID) {
       // Check if the result and the Invoice field are not null
       if (result && result.GetReceiptsForSupplierResult && result.GetReceiptsForSupplierResult.Invoice) {
         const receipts = result.GetReceiptsForSupplierResult.Invoice;
+        console.log(`Total number of receipts; ${result.GetReceiptsForSupplierResult.length}, for SupplierID ${supplierID}.`);
         resolve(receipts);
       } else {
         console.log(`No receipts found for SupplierID ${supplierID}.`);

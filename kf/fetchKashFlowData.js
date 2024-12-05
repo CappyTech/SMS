@@ -6,11 +6,12 @@ const getQuotes = require('./getQuotes');
 const getSuppliers = require('./getSuppliers');
 const getInvoicesByDate = require('./getInvoicesByDate');
 const getReceiptsForSupplier = require('./getReceiptsForSupplier');
+const logger = require('../services/loggerService');
 
 // Upsert function with KF_Meta table update
-async function upsertData(model, data, uniqueKey, metaModel, broadcastMessage) {
+async function upsertData(model, data, uniqueKey, metaModel) {
     try {
-        broadcastMessage('info', `Upserting data into ${model.name}...`);
+        logger.info(`Upserting data into ${model.name}...`);
         let createdCount = 0;
         let updatedCount = 0;
 
@@ -33,25 +34,24 @@ async function upsertData(model, data, uniqueKey, metaModel, broadcastMessage) {
             lastFetchedAt: new Date(),
         });
 
-        broadcastMessage(
-            'success',
-            `Upsert complete for ${model.name}. Created: ${createdCount}, Updated: ${updatedCount}`
-        );
+        logger.info(`Upsert complete for ${model.name}. Created: ${createdCount}, Updated: ${updatedCount}`);
     } catch (error) {
-        broadcastMessage('error', `Error upserting into ${model.name}: ${error.message}`);
+        logger.info(`Error upserting into ${model.name}: ${error.message}`);
     }
 }
 
 let isFetching = false;
 
-exports.fetchKashFlowData = async (broadcastMessage) => {
+exports.fetchKashFlowData = async () => {
     if (isFetching) {
-        broadcastMessage('error', 'A fetch operation is already in progress.');
+        logger.info('A fetch operation is already in progress.');
         return;
     }
     try {
         isFetching = true;
-        broadcastMessage('info', 'Authenticating SOAP API...');
+        isMaintenanceMode = true;
+        logger.info('Maintenance mode enabled.');
+        logger.info('Authenticating SOAP API...');
         const client = await new Promise((resolve, reject) => {
             authenticate((err, client) => {
                 if (err) {
@@ -62,78 +62,133 @@ exports.fetchKashFlowData = async (broadcastMessage) => {
             });
         });
 
-        broadcastMessage('success', 'SOAP API authenticated successfully.');
+        logger.info('SOAP API authenticated successfully.');
 
         const KF_Meta = db.KF_Meta;
 
         // Fetch and upsert customers
-        broadcastMessage('info', 'Fetching customers...');
+        logger.info('Fetching customers...');
         const customers = await getCustomers(client);
         if (customers.length > 0) {
-            broadcastMessage('info', `Fetched ${customers.length} customers.`);
-            await upsertData(db.KF_Customers, customers, 'CustomerID', KF_Meta, broadcastMessage);
+            logger.info(`Fetched ${customers.length} customers.`);
+            await upsertData(db.KF_Customers, customers, 'CustomerID', KF_Meta);
         } else {
-            broadcastMessage('info', 'No customers found.');
+            logger.info('No customers found.');
         }
 
         // Fetch and upsert projects
-        broadcastMessage('info', 'Fetching projects...');
+        logger.info('Fetching projects...');
         const projects = await getProjects(client);
         if (projects.length > 0) {
-            broadcastMessage('info', `Fetched ${projects.length} projects.`);
-            await upsertData(db.KF_Projects, projects, 'ID', KF_Meta, broadcastMessage);
+            logger.info(`Fetched ${projects.length} projects.`);
+            await upsertData(db.KF_Projects, projects, 'ID', KF_Meta);
         } else {
-            broadcastMessage('info', 'No projects found.');
+            logger.info('No projects found.');
         }
 
         // Fetch and upsert quotes
-        broadcastMessage('info', 'Fetching quotes...');
+        logger.info('Fetching quotes...');
         const quotes = await getQuotes(client);
         if (quotes.length > 0) {
-            broadcastMessage('info', `Fetched ${quotes.length} quotes.`);
-            await upsertData(db.KF_Quotes, quotes, 'InvoiceDBID', KF_Meta, broadcastMessage);
+            logger.info(`Fetched ${quotes.length} quotes.`);
+            await upsertData(
+                db.KF_Quotes,
+                quotes.map((quote) => ({
+                    ...quote,
+                    Lines: quote.Lines?.anyType?.map((line) => ({
+                        LineID: line.LineID,
+                        Quantity: line.Quantity,
+                        Description: line.Description,
+                        Rate: line.Rate,
+                        ChargeType: line.ChargeType,
+                        VatRate: line.VatRate,
+                        VatAmount: line.VatAmount,
+                        ProductID: line.ProductID,
+                        Sort: line.Sort,
+                        ProjID: line.ProjID,
+                    })),
+                })),
+                'InvoiceDBID',
+                KF_Meta
+            );
         } else {
-            broadcastMessage('info', 'No quotes found.');
+            logger.info('No quotes found.');
         }
 
         // Fetch and upsert suppliers
-        broadcastMessage('info', 'Fetching suppliers...');
+        logger.info('Fetching suppliers...');
         const suppliers = await getSuppliers(client);
         if (suppliers.length > 0) {
-            broadcastMessage('info', `Fetched ${suppliers.length} suppliers.`);
-            await upsertData(db.KF_Suppliers, suppliers, 'SupplierID', KF_Meta, broadcastMessage);
+            logger.info(`Fetched ${suppliers.length} suppliers.`);
+            await upsertData(db.KF_Suppliers, suppliers, 'SupplierID', KF_Meta);
         } else {
-            broadcastMessage('info', 'No suppliers found.');
+            logger.info('No suppliers found.');
         }
 
         // Fetch and upsert invoices
         const startDate = new Date('2014-01-01');
         const endDate = new Date();
-        broadcastMessage('info', 'Fetching invoices...');
+        logger.info('Fetching invoices...');
         const invoices = await getInvoicesByDate(client, startDate, endDate);
         if (invoices.length > 0) {
-            broadcastMessage('info', `Fetched ${invoices.length} invoices.`);
-            await upsertData(db.KF_Invoices, invoices, 'InvoiceDBID', KF_Meta, broadcastMessage);
+            logger.info(`Fetched ${invoices.length} invoices.`);
+            await upsertData(db.KF_Invoices, invoices.map((invoice) => ({
+                ...invoice,
+                Lines: invoice.Lines?.anyType?.map((line) => ({
+                    LineID: line.LineID,
+                    Quantity: line.Quantity,
+                    Description: line.Description,
+                    Rate: line.Rate,
+                    ChargeType: line.ChargeType,
+                    VatRate: line.VatRate,
+                    VatAmount: line.VatAmount,
+                    ProductID: line.ProductID,
+                    Sort: line.Sort,
+                    ProjID: line.ProjID,
+                })),
+            })), 'InvoiceDBID', KF_Meta);
         } else {
-            broadcastMessage('info', 'No invoices found.');
+            logger.info('No invoices found.');
         }
 
         // Fetch and upsert receipts for each supplier
         for (const supplier of suppliers) {
-            broadcastMessage('info', `Fetching receipts for supplier: ${supplier.Name}...`);
+            logger.info(`Fetching receipts for supplier: ${supplier.Name}...`);
             const receipts = await getReceiptsForSupplier(client, supplier.SupplierID);
             if (receipts && receipts.length > 0) {
-                broadcastMessage('info', `Fetched ${receipts.length} receipts for supplier: ${supplier.Name}`);
-                await upsertData(db.KF_Receipts, receipts, 'InvoiceDBID', KF_Meta, broadcastMessage);
+                logger.info(`Fetched ${receipts.length} receipts for supplier: ${supplier.Name}`);
+                await upsertData(
+                    db.KF_Receipts,
+                    receipts.map((receipt) => ({
+                        ...receipt,
+                        Lines: receipt.Lines?.anyType?.map((line) => ({
+                            LineID: line.LineID,
+                            Quantity: line.Quantity,
+                            Description: line.Description,
+                            Rate: line.Rate,
+                            ChargeType: line.ChargeType,
+                            VatRate: line.VatRate,
+                            VatAmount: line.VatAmount,
+                            ProductID: line.ProductID,
+                            Sort: line.Sort,
+                            ProjID: line.ProjID,
+                        })),
+                    })),
+                    'InvoiceDBID',
+                    KF_Meta
+                );
             } else {
-                broadcastMessage('info', `No receipts found for supplier: ${supplier.Name}`);
+                logger.info(`No receipts found for supplier: ${supplier.Name}`);
             }
         }
-
-        broadcastMessage('success', 'Data fetch and upsert completed.');
+        isMaintenanceMode = false;
+        logger.info('Maintenance mode disabled.');
+        logger.info('Data fetch and upsert completed.');
     } catch (error) {
-        broadcastMessage('error', `An error occurred during fetch: ${error.message}`);
+        logger.error(`An error occurred during fetch: ${error.message}`);
     } finally {
         isFetching = false;
+        isMaintenanceMode = false;
+        logger.info('Maintenance mode disabled.');
     }
 };

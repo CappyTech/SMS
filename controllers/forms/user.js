@@ -11,8 +11,7 @@ const renderUserCreateForm = async (req, res) => {
     try {
         res.render(path.join('users', 'createUser'), {
             title: 'Create User',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering user create form: ' + error.message);
@@ -31,10 +30,8 @@ const renderUserUpdateForm = async (req, res) => {
         res.render(path.join('users', 'updateUser'), {
             title: 'Update User',
             user,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            slimDateTime: dateService.slimDateTime,
-            formatCurrency: currencyService.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering user update form: ' + error.message);

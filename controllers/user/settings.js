@@ -107,8 +107,7 @@ const getAccountPage = async (req, res) => {
             qrCodeUrl: qrCodeUrl,
             secret: secret, // This will be shown in case manual input is needed
             user: user,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             sessions: activeSessions,
         });
     } catch (error) {

@@ -27,8 +27,7 @@ const renderQuoteCreateForm = async (req, res) => {
             title: 'Create Quote',
             clients,
             locations,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering quote create form: ' + error.message);
@@ -65,10 +64,8 @@ const renderQuoteUpdateForm = async (req, res) => {
             title: 'Update Quote',
             quote,
             locations,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            slimDateTime: dateService.slimDateTime,
-            formatCurrency: currencyService.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering quote update form:  ', error.message);

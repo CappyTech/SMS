@@ -30,8 +30,7 @@ const renderJobCreateForm = async (req, res) => {
             title: 'Create Job',
             clients,
             locations,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering job create form: ' + error.message);
@@ -58,8 +57,7 @@ const renderJobUpdateForm = async (req, res) => {
         res.render(path.join('jobs', 'updateJob'), {
             title: 'Update Job',
             job,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         req.flash('error', 'Error loading the job update form: ' + error.message);

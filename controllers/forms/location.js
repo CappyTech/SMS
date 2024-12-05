@@ -17,8 +17,7 @@ const renderLocationCreateForm = async (req, res) => {
 
         return res.render(path.join('locations', 'createLocation'), {
             title: 'Create Location',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering location create form: ' + error.message);
@@ -44,8 +43,7 @@ const renderLocationUpdateForm = async (req, res) => {
         return res.render(path.join('locations', 'updateLocation'), {
             title: 'Update Location',
             location,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering location update form: ' + error.message);

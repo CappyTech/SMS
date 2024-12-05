@@ -97,8 +97,7 @@ const readInvoice = async (req, res) => {
         res.render(path.join('invoices', 'viewInvoice'), {
             title: 'Invoice',
             invoice,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -130,8 +129,7 @@ const readInvoices = async (req, res) => {
             title: 'Invoices',
             subcontractor,
             invoices,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });

@@ -90,8 +90,7 @@ const readSubcontractor = async (req, res) => {
         res.render(path.join('subcontractors', 'viewSubcontractor'), {
             title: 'Subcontractor',
             subcontractor,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -139,7 +138,7 @@ const updateSubcontractor = async (req, res) => {
 
         // Check for unique utrNumber only if it's provided and different from the existing one
         if (utrNumber && subcontractor.utrNumber !== utrNumber) {
-            const existingUtr = await db.Subcontractor.findOne({
+            const existingUtr = await db.Subcontractors.findOne({
                 where: { utrNumber, id: { [Op.ne]: req.params.id } }
             });
             if (existingUtr) {
@@ -150,7 +149,7 @@ const updateSubcontractor = async (req, res) => {
 
         // Check for unique vatNumber only if it's provided and different from the existing one
         if (vatNumber && subcontractor.vatNumber !== vatNumber) {
-            const existingVat = await db.Subcontractor.findOne({
+            const existingVat = await db.Subcontractors.findOne({
                 where: { vatNumber, id: { [Op.ne]: req.params.id } }
             });
             if (existingVat) {
@@ -177,7 +176,7 @@ const updateSubcontractor = async (req, res) => {
         };
 
         // Update subcontractor with sanitized data
-        await db.Subcontractor.update(updatedData, { where: { id: req.params.id } });
+        await db.Subcontractors.update(req.body, { where: { id: req.params.id } });
 
         // Flash success message and redirect
         req.flash('success', 'Subcontractor updated successfully.');

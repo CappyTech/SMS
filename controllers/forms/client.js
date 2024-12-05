@@ -18,13 +18,11 @@ const selectClient = async (req, res) => {
 
         res.render(path.join('clients', 'selectClient'), {
             title: 'Select Client',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             
             
             clients,
-            slimDateTime: dateService.slimDateTime,
-            formatCurrency: currencyService.formatCurrency,
+
         });
     } catch (error) {
         logger.error('Error selecting client:  ', error.message);
@@ -37,8 +35,7 @@ const renderClientCreateForm = async (req, res) => {
     try {
         res.render(path.join('clients', 'createClient'), {
             title: 'Create Client',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering client create form:' + error.message);
@@ -59,8 +56,7 @@ const renderClientUpdateForm = async (req, res) => {
         res.render(path.join('clients', 'updateClient'), {
             title: 'Update Client',
             clients,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering client update form:' + error.message);

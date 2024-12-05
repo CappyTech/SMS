@@ -8,8 +8,7 @@ const authService = require('../../services/authService');
 const renderCreateEmployeeForm = (req, res) => {
     try {
         res.render(path.join('employees', 'createEmployee'), {
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error creating employee: ' + error.message);
@@ -27,8 +26,7 @@ const renderUpdateEmployeeForm = async (req, res) => {
         }
         res.render(path.join('employees', 'updateEmployee'), {
             employee,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error fetching employee: ' + error.message);

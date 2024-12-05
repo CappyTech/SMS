@@ -19,11 +19,9 @@ const renderInvoiceCreateForm = async (req, res) => {
         });
         res.render(path.join('invoices', 'createInvoice'), {
             title: 'Create Invoice',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             subcontractors,
-            slimDateTime: dateService.slimDateTime,
-            formatCurrency: currencyService.formatCurrency,
+
         });
     } catch (error) {
         logger.error('Error rendering invoice create form:' + error.message);
@@ -48,10 +46,8 @@ const renderInvoiceUpdateForm = async (req, res) => {
         res.render(path.join('invoices', 'updateInvoice'), {
             title: 'Update Invoice',
             invoice,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            slimDateTime: dateService.slimDateTime,
-            formatCurrency: currencyService.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering invoice update form:  ', error.message);

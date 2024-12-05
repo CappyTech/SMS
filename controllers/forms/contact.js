@@ -31,11 +31,9 @@ const selectContact = async (req, res) => {
 
         res.render(path.join('contacts', 'selectContact'), {
             title: 'Select Contact',
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             contacts: contactList,
-            slimDateTime: dateService.slimDateTime,
-            formatCurrency: currencyService.formatCurrency,
+
         });
     } catch (error) {
         logger.error('Error selecting contact:  ', error.message);
@@ -64,8 +62,7 @@ const renderContactCreateForm = async (req, res) => {
         res.render(path.join('contacts', 'createContact'), {
             title: 'Create Contact',
             clients, // Pass the specific client to the view
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering contact create form: ' + error.message);
@@ -92,8 +89,7 @@ const renderContactUpdateForm = async (req, res) => {
             title: 'Update Contact',
             contact,
             clients: contact.Clients,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering contact update form:' + error.message);

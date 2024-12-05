@@ -6,6 +6,10 @@ const logger = require('../services/loggerService');
 const { Op } = require("sequelize");
 const path = require('path');
 const db = require('../services/sequelizeDatabaseService');
+const taxService = require('../services/taxService');
+const currencyService = require('../services/currencyService');
+const dateService = require('../services/dateService');
+const authService = require('../services/authService');
 
 const renderStatsDashboard = async (req, res) => {
     try {
@@ -24,8 +28,8 @@ const renderStatsDashboard = async (req, res) => {
         const invoices = await db.Invoices.findAll({ order: [['updatedAt', 'ASC']] });
 
         // Determine the tax year start and end dates and the current monthly return period
-        const taxYear = helpers.getTaxYearStartEnd(specifiedYear);
-        const currentMonthlyReturn = helpers.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
+        const taxYear = taxService.getTaxYearStartEnd(specifiedYear);
+        const currentMonthlyReturn = taxService.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
 
         // Filter invoices for the current monthly return period
         const filteredInvoices = invoices.filter(invoice =>
@@ -52,12 +56,12 @@ const renderStatsDashboard = async (req, res) => {
                 };
             }
 
-            subcontractorTotals[invoice.subcontractorId].grossTotal = helpers.rounding(subcontractorTotals[invoice.subcontractorId].grossTotal + invoice.grossAmount, false);
-            subcontractorTotals[invoice.subcontractorId].materialTotal = helpers.rounding(subcontractorTotals[invoice.subcontractorId].materialTotal + invoice.materialCost, false);
-            subcontractorTotals[invoice.subcontractorId].cisTotal = helpers.rounding(subcontractorTotals[invoice.subcontractorId].cisTotal + invoice.cisAmount, false);
+            subcontractorTotals[invoice.subcontractorId].grossTotal = currencyService.rounding(subcontractorTotals[invoice.subcontractorId].grossTotal + invoice.grossAmount, false);
+            subcontractorTotals[invoice.subcontractorId].materialTotal = currencyService.rounding(subcontractorTotals[invoice.subcontractorId].materialTotal + invoice.materialCost, false);
+            subcontractorTotals[invoice.subcontractorId].cisTotal = currencyService.rounding(subcontractorTotals[invoice.subcontractorId].cisTotal + invoice.cisAmount, false);
 
             if (invoice.reverseCharge) {
-                subcontractorTotals[invoice.subcontractorId].reverseChargeTotal = helpers.rounding(subcontractorTotals[invoice.subcontractorId].reverseChargeTotal + invoice.reverseCharge, false);
+                subcontractorTotals[invoice.subcontractorId].reverseChargeTotal = currencyService.rounding(subcontractorTotals[invoice.subcontractorId].reverseChargeTotal + invoice.reverseCharge, false);
             }
         });
 
@@ -84,10 +88,8 @@ const renderStatsDashboard = async (req, res) => {
             subcontractors: filteredSubcontractors,
             invoices: filteredInvoices,
             subcontractorTotals,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            
+
             taxYear,
             currentMonthlyReturn,
             previousYear,
@@ -110,21 +112,14 @@ const renderStatsDashboard = async (req, res) => {
 
 const renderUserDashboard = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const users = await db.Users.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'usersDashboard'), {
             title: 'Users',
             users,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
             
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering users dashboard: ' + error.message);
@@ -135,21 +130,14 @@ const renderUserDashboard = async (req, res) => {
 
 const renderInvoiceDashboard = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const invoices = await db.Invoices.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'invoicesDashboard'), {
             title: 'Invoices',
             invoices,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
             
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering invoices dashboard:' + error.message);
@@ -160,21 +148,14 @@ const renderInvoiceDashboard = async (req, res) => {
 
 const renderSubcontractorDashboard = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const subcontractors = await db.Subcontractors.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'subcontractorsDashboard'), {
             title: 'Subcontractors',
             subcontractors,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
             
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering subcontractors dashboard:' + error.message);
@@ -185,11 +166,6 @@ const renderSubcontractorDashboard = async (req, res) => {
 
 const renderQuotesDashboard = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const quotes = await db.Quotes.findAll({
             order: [['createdAt', 'DESC']],
             include: [
@@ -206,10 +182,8 @@ const renderQuotesDashboard = async (req, res) => {
         res.render(path.join('dashboards', 'quotesDashboard'), {
             title: 'Quotes',
             quotes,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering quotes dashboard: ' + error.message);
@@ -221,21 +195,14 @@ const renderQuotesDashboard = async (req, res) => {
 
 const renderClientsDashboard = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const clients = await db.Clients.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'clientsDashboard'), {
             title: 'Clients',
             clients,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
             
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering clients dashboard:' + error.message);
@@ -246,21 +213,14 @@ const renderClientsDashboard = async (req, res) => {
 
 const renderContactsDashboard = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const contacts = await db.Contacts.findAll({ order: [['createdAt', 'DESC']], include: [db.Clients] });
 
         res.render(path.join('dashboards', 'contactsDashboard'), {
             title: 'Contacts',
             contacts,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
             
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            
+
         });
     } catch (error) {
         logger.error('Error rendering contacts dashboard:' + error.message);
@@ -271,11 +231,6 @@ const renderContactsDashboard = async (req, res) => {
 
 const renderJobsDashboard = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         // Fetch jobs with a non-empty job_ref
         const jobs = await db.Jobs.findAll({
             where: {
@@ -320,10 +275,8 @@ const renderJobsDashboard = async (req, res) => {
         res.render(path.join('dashboards', 'jobsDashboard'), {
             title: 'Jobs',
             jobs: jobsWithAssociations,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
+            
+
         });
     } catch (error) {
         // Log the error
@@ -336,19 +289,12 @@ const renderJobsDashboard = async (req, res) => {
 // Read all locations
 const renderLocationsDashboard = async (req, res) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-        
         const locations = await db.Locations.findAll({ order: [['createdAt', 'DESC']] });
 
         res.render(path.join('dashboards', 'locationsDashboard'), {
             title: 'Locations',
             locations,
-            slimDateTime: helpers.slimDateTime,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
         });
     } catch (error) {
         logger.error('Error rendering locations dashboard: ' + error.message);
@@ -399,9 +345,7 @@ const renderAttendanceDashboard = async (req, res) => {
             subcontractors,
             locations,
             filters: { date, employeeId, subcontractorId },
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            slimDateTime: helpers.slimDateTime,
+            
         });
     } catch (error) {
         logger.error('Error rendering attendance dashboard: ' + error.message);
@@ -422,9 +366,7 @@ const renderEmployeeDashboard = async (req, res) => {
         res.render('dashboards/employeeDashboard', {
             employees,
             totalEmployees,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
-            slimDateTime: helpers.slimDateTime,
+            
         });
     } catch (error) {
         logger.error('Error rendering employee dashboard: ' + error.message);
@@ -433,9 +375,69 @@ const renderEmployeeDashboard = async (req, res) => {
     }
 };
 
-router.get('/dashboard/stats', helpers.ensureAuthenticated, (req, res) => {
+const renderKFInvoicesDashboard = async (req, res) => {
     try {
-        const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(moment());
+
+    } catch (error) {
+        logger.error('Error rendering KFInvoices dashboard: ' + error.message);
+        req.flash('error', 'Error rendering KFInvoices dashboard: ' + error.message);
+        res.redirect('/');
+    }
+};
+
+const renderKFCustomersDashboard = async (req, res) => {
+    try {
+
+    } catch (error) {
+        logger.error('Error rendering KFCustomers dashboard: ' + error.message);
+        req.flash('error', 'Error rendering KFCustomers dashboard: ' + error.message);
+        res.redirect('/');
+    }
+};
+
+const renderKFProjectsDashboard = async (req, res) => {
+    try {
+
+    } catch (error) {
+        logger.error('Error rendering KFProjects dashboard: ' + error.message);
+        req.flash('error', 'Error rendering KFProjects dashboard: ' + error.message);
+        res.redirect('/');
+    }
+};
+
+const renderKFQuotesDashboard = async (req, res) => {
+    try {
+
+    } catch (error) {
+        logger.error('Error rendering KFQuotes dashboard: ' + error.message);
+        req.flash('error', 'Error rendering KFQuotes dashboard: ' + error.message);
+        res.redirect('/');
+    }
+};
+
+const renderKFReceiptsDashboard = async (req, res) => {
+    try {
+
+    } catch (error) {
+        logger.error('Error rendering KFReceipts dashboard: ' + error.message);
+        req.flash('error', 'Error rendering KFReceipts dashboard: ' + error.message);
+        res.redirect('/');
+    }
+};
+
+const renderKFSuppliersDashboard = async (req, res) => {
+    try {
+
+    } catch (error) {
+        logger.error('Error rendering KFSuppliers dashboard: ' + error.message);
+        req.flash('error', 'Error rendering KFSuppliers dashboard: ' + error.message);
+        res.redirect('/');
+    }
+};
+
+router.get('/dashboard/stats', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
+    try {
+        const { taxYear, taxMonth } = authService.calculateTaxYearAndMonth(moment());
         logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
         return res.redirect(`/dashboard/stats/${taxYear}/${taxMonth}`);
     } catch (error) {
@@ -444,17 +446,17 @@ router.get('/dashboard/stats', helpers.ensureAuthenticated, (req, res) => {
         return res.redirect('/');
     }
 });
-router.get('/dashboard/stats/:year?/:month?', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderStatsDashboard);
-router.get('/dashboard/user', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderUserDashboard);
-router.get('/dashboard/subcontractor', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderSubcontractorDashboard);
-router.get('/dashboard/invoice', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderInvoiceDashboard);
-router.get('/dashboard/quote', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderQuotesDashboard);
-router.get('/dashboard/client', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderClientsDashboard);
-router.get('/dashboard/contact', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderContactsDashboard);
-router.get('/dashboard/job', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderJobsDashboard);
-//router.get('/dashboard/archive', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderQuoteArchiveDashboard);
-router.get('/dashboard/location', helpers.ensureAuthenticated, helpers.ensureRole('admin'), renderLocationsDashboard);
-router.get('/dashboard/attendance', helpers.ensureAuthenticated, helpers.ensureRole('admin'),renderAttendanceDashboard);
-router.get('/dashboard/employee', helpers.ensureAuthenticated, helpers.ensureRole('admin'),renderEmployeeDashboard);
+router.get('/dashboard/stats/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderStatsDashboard);
+router.get('/dashboard/user', authService.ensureAuthenticated, authService.ensureRole('admin'), renderUserDashboard);
+router.get('/dashboard/subcontractor', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorDashboard);
+router.get('/dashboard/invoice', authService.ensureAuthenticated, authService.ensureRole('admin'), renderInvoiceDashboard);
+router.get('/dashboard/quote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuotesDashboard);
+router.get('/dashboard/client', authService.ensureAuthenticated, authService.ensureRole('admin'), renderClientsDashboard);
+router.get('/dashboard/contact', authService.ensureAuthenticated, authService.ensureRole('admin'), renderContactsDashboard);
+router.get('/dashboard/job', authService.ensureAuthenticated, authService.ensureRole('admin'), renderJobsDashboard);
+//router.get('/dashboard/archive', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteArchiveDashboard);
+router.get('/dashboard/location', authService.ensureAuthenticated, authService.ensureRole('admin'), renderLocationsDashboard);
+router.get('/dashboard/attendance', authService.ensureAuthenticated, authService.ensureRole('admin'),renderAttendanceDashboard);
+router.get('/dashboard/employee', authService.ensureAuthenticated, authService.ensureRole('admin'),renderEmployeeDashboard);
 
 module.exports = router;

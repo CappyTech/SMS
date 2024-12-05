@@ -82,8 +82,7 @@ const readQuote = async (req, res) => {
         res.render(path.join('quotes', 'viewQuote'), {
             title: 'Quote Details',
             quote,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             moment: moment,
             slimDateTime: helpers.slimDateTime,
         });
@@ -111,8 +110,7 @@ const readQuotes = async (req, res) => {
         res.render(path.join('quotes', 'viewQuotes'), {
             title: 'Quotes',
             quotes,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             moment: moment,
             slimDateTime: helpers.slimDateTime,
         });

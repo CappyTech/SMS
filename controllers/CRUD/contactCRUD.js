@@ -55,8 +55,7 @@ const readContact = async (req, res) => {
         res.render(path.join('contacts', 'viewContact'), {
             title: 'Contact',
             contact,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
@@ -81,8 +80,7 @@ const readContacts = async (req, res) => {
             title: 'Contacts',
             clients,
             contacts,
-            errorMessages: req.flash('error'),
-            successMessage: req.flash('success'),
+            
             slimDateTime: helpers.slimDateTime,
             formatCurrency: helpers.formatCurrency,
         });
