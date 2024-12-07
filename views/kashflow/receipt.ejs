@@ -1,0 +1,22 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container my-5">
+    <h1 class="mb-4 text-center">Receipts Dashboard</h1>
+    <div class="row">
+        <% receipts.forEach(receipt => { %>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Receipt #<%= receipt.InvoiceNumber %></h5>
+                    <p><strong>Customer:</strong> <%= receipt.customer ? receipt.customer.Name : 'N/A' %></p>
+                    <p><strong>Amount:</strong> £<%= receipt.AmountPaid || 0 %></p>
+                    <p><strong>Date:</strong> <%= new Date(receipt.InvoiceDate).toLocaleDateString() %></p>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="/receipts/view/<%= receipt.uuid %>" class="btn btn-primary btn-sm">View</a>
+                </div>
+            </div>
+        </div>
+        <% }) %>
+    </div>
+</div>

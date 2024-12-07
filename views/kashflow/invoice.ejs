@@ -1,0 +1,41 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container my-5">
+    <h1 class="mb-4 text-center">Invoices Dashboard</h1>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <canvas id="invoiceChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <h4>Total Invoices</h4>
+            <p><strong>Paid:</strong> <%= paidInvoicesCount %></p>
+            <p><strong>Unpaid:</strong> <%= unpaidInvoicesCount %></p>
+        </div>
+    </div>
+    <h3>Recent Invoices</h3>
+    <ul class="list-group">
+        <% invoices.slice(0, 5).forEach(invoice => { %>
+        <li class="list-group-item">
+            Invoice #<%= invoice.InvoiceNumber %> - £<%= invoice.NetAmount %>
+            <% if (invoice.AmountPaid >= invoice.NetAmount) { %>
+            <span class="badge bg-success">Paid</span>
+            <% } else { %>
+            <span class="badge bg-warning">Unpaid</span>
+            <% } %>
+        </li>
+        <% }) %>
+    </ul>
+</div>
+<script>
+    const ctx = document.getElementById('invoiceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Paid', 'Unpaid'],
+            datasets: [{
+                data: [<%= paidInvoicesCount %>, <%= unpaidInvoicesCount %>],
+                backgroundColor: ['#28a745', '#ffc107'],
+            }]
+        },
+    });
+</script>

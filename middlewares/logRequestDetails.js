@@ -1,17 +1,19 @@
-const useragent = require('useragent');
+const useragent = require('express-useragent');
 const logger = require('../services/loggerService');
 
 const logRequestDetails = (req, res, next) => {
-    const agent = req.headers['user-agent'] ? useragent.parse(req.headers['user-agent']) : null;
+    const agent = req.useragent || {};
 
     const logData = {
         method: req.method,
         url: req.originalUrl,
         ip: req.ip,
-        userAgent: agent ? {
-            browser: agent.toAgent(),
-            os: agent.os.toString(),
-        } : 'Unknown',
+        userAgent: {
+            browser: agent.browser || 'Unknown',
+            version: agent.version || 'Unknown',
+            os: agent.os || 'Unknown',
+            platform: agent.platform || 'Unknown',
+        },
         headers: req.headers,
         referer: req.headers['referer'] || 'N/A',
         host: req.headers['host'] || 'N/A',

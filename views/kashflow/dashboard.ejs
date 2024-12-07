@@ -1,0 +1,264 @@
+<div class="container my-5">
+    <h1 class="display-1 text-center mb-4">KashFlow Dashboard</h1>
+
+
+    <div class="row text-center mb-5">
+        <div class="col-md-3">
+            <div class="card mb-3">
+                <div class="card-body bg-body-secondary">
+                    <div class="card-text "><small>Customers</small>
+                    <br><span class="display-4"><%= totalCustomers %></span></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mb-3">
+                <div class="card-body bg-body-tertiary">
+                    <div class="card-text"><small>Quotes</small>
+                    <br><span class="display-4"><%= totalQuotes %></span></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mb-3">
+                <div class="card-body bg-body-tertiary">
+                    <div class="card-text"><small>Invoices</small>
+                    <br><span class="display-4"><%= totalInvoices %></span></div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="col-md-3">
+            <div class="card mb-3">
+                <div class="card-body bg-body-secondary">
+                    <div class="card-text"><small>Suppliers</small>
+                    <br><span class="display-4"><%= totalSuppliers %></span></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mb-3">
+                <div class="card-body bg-body-tertiary">
+                    <div class="card-text"><small>Purchases</small>
+                    <br><span class="display-4"><%= totalReceipts %></span></div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="col-md-3">
+            <div class="card mb-3">
+                <div class="card-body bg-body-secondary">
+                    <div class="card-text"><small>Jobs</small>
+                    <br><span class="display-4"><%= totalProjects %></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card bg-body-tertiary">
+                <div class="card-header display-6 text-center">
+                    Customers by Revenue
+                </div>
+                <div class="card-body">
+                    <canvas id="topCustomersChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-body-tertiary">
+                <div class="card-header display-6 text-center">
+                    Invoice Status
+                </div>
+                <div class="card-body">
+                    <canvas id="outstandingInvoicesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card bg-body-tertiary">
+                <div class="card-header display-6 text-center">
+                    Income vs Expenses (Last 30 Days)
+                </div>
+                <div class="card-body">
+                    <canvas id="incomeExpensesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const getCurrentTheme = () => document.documentElement.getAttribute('data-bs-theme') || 'light';
+
+        const getChartColors = (theme) => {
+            return {
+                income: theme === 'dark' ? '#28a745' : '#28a745', // Green
+                expenses: theme === 'dark' ? '#dc3545' : '#dc3545', // Red
+                paidInvoices: theme === 'dark' ? '#28a745' : '#28a745', // Blue
+                unpaidInvoices: theme === 'dark' ? '#dc3545' : '#dc3545', // Yellow
+                topCustomers: theme === 'dark' ? '#29b6f6' : '#29b6f6', // Cyan
+                grid: theme === 'dark' ? '#4d4d4d' : '#e0e0e0', // Grid lines
+                text: theme === 'dark' ? '#ffffff' : '#000000', // Text color
+            };
+        };
+
+        const destroyChartIfExists = (chart) => {
+            if (chart && typeof chart.destroy === 'function') {
+                chart.destroy();
+            }
+        };
+
+        const renderCharts = () => {
+            const theme = getCurrentTheme();
+            const chartColors = getChartColors(theme);
+
+            const options = {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: chartColors.text,
+                        },
+                    },
+                    title: {
+                        display: true,
+                        color: chartColors.text,
+                    },
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: chartColors.grid,
+                        },
+                        ticks: {
+                            color: chartColors.text,
+                        },
+                    },
+                    y: {
+                        grid: {
+                            color: chartColors.grid,
+                        },
+                        ticks: {
+                            color: chartColors.text,
+                        },
+                    },
+                },
+            };
+
+            // Destroy previous charts before creating new ones
+            destroyChartIfExists(window.incomeExpensesChart);
+            destroyChartIfExists(window.outstandingInvoicesChart);
+            destroyChartIfExists(window.topCustomersChart);
+
+            // Income vs Expenses Chart
+            const incomeExpensesCtx = document.getElementById('incomeExpensesChart').getContext('2d');
+            window.incomeExpensesChart = new Chart(incomeExpensesCtx, {
+                type: 'line', // Change the type to 'line'
+                data: {
+                    labels: <%- JSON.stringify(incomeExpenseData.dates) %>,
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: <%- JSON.stringify(incomeExpenseData.income) %>,
+                            borderColor: chartColors.income, // Use borderColor for line color
+                            backgroundColor: chartColors.income, // Optional: Use for point fill
+                            fill: false, // Prevent filling the area under the line
+                            tension: 0.4, // Smooth curves
+                            borderWidth: 2,
+                        },
+                        {
+                            label: 'Expenses',
+                            data: <%- JSON.stringify(incomeExpenseData.expenses) %>,
+                            borderColor: chartColors.expenses, // Use borderColor for line color
+                            backgroundColor: chartColors.expenses, // Optional: Use for point fill
+                            fill: false, // Prevent filling the area under the line
+                            tension: 0.4, // Smooth curves
+                            borderWidth: 2,
+                        },
+                    ],
+                },
+                options: {
+                    ...options,
+                    plugins: {
+                        ...options.plugins,
+                        title: { text: 'Income vs Expenses' },
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date',
+                            },
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Amount (£)',
+                            },
+                        },
+                    },
+                },
+            });
+
+            // Outstanding Invoices Chart
+            const outstandingInvoicesCtx = document.getElementById('outstandingInvoicesChart').getContext('2d');
+            window.outstandingInvoicesChart = new Chart(outstandingInvoicesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Paid', 'Unpaid'],
+                    datasets: [
+                        {
+                            data: [<%- paidInvoices %>, <%- unpaidInvoices %>],
+                            backgroundColor: [chartColors.paidInvoices, chartColors.unpaidInvoices],
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: chartColors.text } },
+                        title: { text: 'Outstanding Invoices', color: chartColors.text },
+                    },
+                },
+            });
+
+            // Top Customers Chart
+            const topCustomersCtx = document.getElementById('topCustomersChart').getContext('2d');
+            window.topCustomersChart = new Chart(topCustomersCtx, {
+                type: 'bar',
+                data: {
+                    labels: <%- JSON.stringify(topCustomers.names) %>,
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: <%- JSON.stringify(topCustomers.revenue) %>,
+                            backgroundColor: chartColors.topCustomers,
+                        },
+                    ],
+                },
+                options: {
+                    ...options,
+                    plugins: {
+                        ...options.plugins,
+                        title: { text: 'Customers by Revenue' },
+                    },
+                },
+            });
+        };
+
+        // Initial render
+        renderCharts();
+
+        // Re-render charts on theme change
+        document.getElementById('darkModeToggle').addEventListener('change', () => {
+            setTimeout(() => renderCharts(), 100); // Slight delay for theme application
+        });
+    });
+</script>

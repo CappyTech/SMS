@@ -1,0 +1,24 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container my-5">
+    <h1 class="mb-4 text-center">Quotes Timeline</h1>
+    <div class="timeline">
+        <% quotes.forEach(quote => { %>
+        <div class="timeline-item">
+            <h5>Quote #<%= quote.InvoiceNumber %> - <%= quote.Customer %></h5>
+            <p><strong>Date:</strong> <%= new Date(quote.InvoiceDate).toLocaleDateString() %></p>
+        </div>
+        <% }) %>
+    </div>
+</div>
+<style>
+    .timeline {
+        position: relative;
+        padding: 10px 0;
+    }
+    .timeline-item {
+        margin-bottom: 20px;
+        border-left: 2px solid #007bff;
+        padding-left: 20px;
+    }
+</style>

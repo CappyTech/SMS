@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('express-flash');
+const useragent = require('express-useragent');
 const logger = require('./services/loggerService');
 require('dotenv').config();
 const packageJson = require('./package.json');
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use(flash());
+app.use(useragent.express());
 
 // Middleware
 app.use(require('./middlewares/logRequestDetails'));
@@ -160,7 +162,6 @@ db.Employees.hasOne(db.Users, { foreignKey: 'employeeId' });
 //app.use(require('./middlewares/syncDatabase'));
 //app.use(require('./middlewares/oneDriveSync')());
 //app.use(require('./middlewares/blockBot'));
-//app.use(require('./middlewares/maintenance'));
 
 app.use((req, res, next) => {
     res.locals.session = req.session;
@@ -204,6 +205,7 @@ app.use(async (req, res, next) => {
             res.locals.unpaidInvoices = {};
             res.locals.unsubmittedInvoices = {};
             res.locals.totalNotifications = 0;
+            res.locals.lastfetched = null;
             next();
         }
     } catch (error) {
@@ -214,6 +216,7 @@ app.use(async (req, res, next) => {
 
 const { slimDateTime } = require('./services/dateService');
 const { formatCurrency,rounding } = require('./services/currencyService');
+const cronService = require('./services/cronService');
 
 app.use((req, res, next) => {
     res.locals.session = req.session;

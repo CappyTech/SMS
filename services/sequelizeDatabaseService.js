@@ -47,7 +47,6 @@ fs.readdirSync(modelsDirectory)
     .forEach((file) => {
         const model = require(path.join(modelsDirectory, file))(sequelize, Sequelize.DataTypes);
         db[model.name] = model;
-        logger.info(`MySQL Model Loaded: ${model.name}`);
     });
 
 // Set up model associations
@@ -56,8 +55,6 @@ Object.keys(db).forEach((modelName) => {
         db[modelName].associate(db);
     }
 });
-
-logger.info('Loaded Sequelize models:' + Object.keys(db));
 
 // Export the database object with Sequelize instance and models
 db.sequelize = sequelize;

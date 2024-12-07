@@ -1,0 +1,39 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container my-5">
+    <h1 class="mb-4 text-center">Customers Overview</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Customers</h5>
+                    <h2><%= customers.length %></h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>New This Month</h5>
+                    <h2><%= newCustomersCount %></h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>With Discounts</h5>
+                    <h2><%= discountedCustomersCount %></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3 class="mt-5">Recently Added Customers</h3>
+    <ul class="list-group">
+        <% recentCustomers.forEach(customer => { %>
+        <li class="list-group-item">
+            <strong><%= customer.Name %></strong> - <%= customer.Email %>
+        </li>
+        <% }) %>
+    </ul>
+</div>

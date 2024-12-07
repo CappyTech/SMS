@@ -1,0 +1,40 @@
+<%- include('../partials/successAlert.ejs') %>
+<%- include('../partials/errorAlerts.ejs') %>
+<div class="container my-5">
+    <h1 class="mb-4 text-center">Projects Dashboard</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <h4>Active Projects</h4>
+            <ul class="list-group">
+                <% activeProjects.forEach(project => { %>
+                <li class="list-group-item">
+                    <strong><%= project.Name %></strong>
+                    <p><%= project.Description %></p>
+                </li>
+                <% }) %>
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <h4>Pending Projects</h4>
+            <ul class="list-group">
+                <% pendingProjects.forEach(project => { %>
+                <li class="list-group-item">
+                    <strong><%= project.Name %></strong>
+                    <p><%= project.Description %></p>
+                </li>
+                <% }) %>
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <h4>Completed Projects</h4>
+            <ul class="list-group">
+                <% completedProjects.forEach(project => { %>
+                <li class="list-group-item">
+                    <strong><%= project.Name %></strong>
+                    <p><%= project.Description %></p>
+                </li>
+                <% }) %>
+            </ul>
+        </div>
+    </div>
+</div>

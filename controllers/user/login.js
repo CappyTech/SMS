@@ -6,7 +6,6 @@ const logger = require('../../services/loggerService');
 const path = require('path'); 
 const helpers = require('../../helpers');
 const speakeasy = require('speakeasy');
-const useragent = require('useragent');
 const db = require('../../services/sequelizeDatabaseService');
 
 const renderSigninForm = (req, res) => {
@@ -45,14 +44,10 @@ const loginUser = async (req, res) => {
             return res.redirect('/signin');
         }
 
-        // Get user agent and IP address
-        const agent = req.headers['user-agent'] ? useragent.parse(req.headers['user-agent']) : null;
+        const agent = req.useragent || {};
         const ip = req.ip;
 
-        // Check if TOTP is enabled for the user
         if (user.totpEnabled) {
-            // Save user info to the session but don't fully log in yet
-
             req.session.userPending2FA = {
                 id: user.id,
                 username: user.username,
@@ -70,16 +65,19 @@ const loginUser = async (req, res) => {
                 permissionReadInvoice: user.permissionReadInvoice,
                 permissionUpdateInvoice: user.permissionUpdateInvoice,
                 permissionDeleteInvoice: user.permissionDeleteInvoice,
-                loginTime: new Date().toISOString(), // Track login time
-                ip: ip, // Track IP address
-                userAgent: agent ? agent.toAgent() : 'Unknown' // Track browser info
-            }; // make sure this is the same as below.
+                loginTime: new Date().toISOString(),
+                ip: ip,
+                userAgent: {
+                    browser: agent.browser || 'Unknown',
+                    version: agent.version || 'Unknown',
+                    os: agent.os || 'Unknown',
+                    platform: agent.platform || 'Unknown',
+                },
+            };
 
-            // Redirect to the 2FA verification screen
             return res.redirect('/2fa');
         }
 
-        // Save user data in session (when TOTP is not enabled)
         req.session.user = {
             id: user.id,
             username: user.username,
@@ -97,10 +95,15 @@ const loginUser = async (req, res) => {
             permissionReadInvoice: user.permissionReadInvoice,
             permissionUpdateInvoice: user.permissionUpdateInvoice,
             permissionDeleteInvoice: user.permissionDeleteInvoice,
-            loginTime: new Date().toISOString(), // Track login time
-            ip: ip, // Track IP address
-            userAgent: agent ? agent.toAgent() : 'Unknown' // Track browser info
-        }; // make sure this is the same as ABOVE.
+            loginTime: new Date().toISOString(),
+            ip: ip,
+            userAgent: {
+                browser: agent.browser || 'Unknown',
+                version: agent.version || 'Unknown',
+                os: agent.os || 'Unknown',
+                platform: agent.platform || 'Unknown',
+            },
+        };
 
         req.session.save((err) => {
             if (err) {
@@ -127,7 +130,7 @@ const logoutUser = (req, res) => {
             req.flash('error', 'An error occurred while logging out. Please try again.');
             return res.redirect('/');
         }
-        res.clearCookie('connect.sid'); // Clears the session ID cookie
+        res.clearCookie('connect.sid');
         return res.redirect('/signin');
     });
 };
@@ -153,7 +156,6 @@ const verify2FA = async (req, res) => {
 
         const { totpToken } = req.body;
 
-        // Find the user based on the session data
         const user = await db.Users.findOne({
             where: { id: req.session.userPending2FA.id }
         });
@@ -163,17 +165,15 @@ const verify2FA = async (req, res) => {
             return res.redirect('/signin');
         }
 
-        // Get user agent and IP address
-        const agent = req.headers['user-agent'] ? useragent.parse(req.headers['user-agent']) : null;
+        const agent = req.useragent || {};
         const ip = req.ip;
 
-        // Decrypt the TOTP secret and verify the provided token
         const decryptedSecret = helpers.decrypt(user.totpSecret);
         const tokenValidates = speakeasy.totp.verify({
             secret: decryptedSecret,
             encoding: 'base32',
             token: totpToken,
-            window: 1 // Allow for time drift
+            window: 1
         });
 
         if (!tokenValidates) {
@@ -181,7 +181,6 @@ const verify2FA = async (req, res) => {
             return res.redirect('/2fa');
         }
 
-        // Complete the login process by promoting the user to fully logged-in status
         req.session.user = {
             id: req.session.userPending2FA.id,
             username: req.session.userPending2FA.username,
@@ -199,12 +198,16 @@ const verify2FA = async (req, res) => {
             permissionReadInvoice: req.session.userPending2FA.permissionReadInvoice,
             permissionUpdateInvoice: req.session.userPending2FA.permissionUpdateInvoice,
             permissionDeleteInvoice: req.session.userPending2FA.permissionDeleteInvoice,
-            loginTime: new Date().toISOString(), // Track login time
-            ip: ip, // Track IP address
-            userAgent: agent ? agent.toAgent() : 'Unknown' // Track browser info
-        }; // make sure this is the same as the loginUser
+            loginTime: new Date().toISOString(),
+            ip: ip,
+            userAgent: {
+                browser: agent.browser || 'Unknown',
+                version: agent.version || 'Unknown',
+                os: agent.os || 'Unknown',
+                platform: agent.platform || 'Unknown',
+            },
+        };
 
-        // Clear the temporary 2FA session data
         delete req.session.userPending2FA;
 
         req.session.save((err) => {

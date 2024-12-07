@@ -363,7 +363,7 @@ const renderEmployeeDashboard = async (req, res) => {
         const totalEmployees = employees.length;
 
         // Render the dashboard view, passing in the employee data
-        res.render('dashboards/employeeDashboard', {
+        res.render(path.join('dashboards', 'employeeDashboard'), {
             employees,
             totalEmployees,
             
@@ -377,6 +377,20 @@ const renderEmployeeDashboard = async (req, res) => {
 
 const renderKFInvoicesDashboard = async (req, res) => {
     try {
+        const invoices = await db.KF_Invoices.findAll({
+            attributes: ['InvoiceNumber', 'NetAmount', 'AmountPaid', 'InvoiceDate'],
+            order: [['AmountPaid', 'DESC']]
+        });
+
+        const paidInvoicesCount = invoices.filter(invoice => invoice.AmountPaid >= invoice.NetAmount).length;
+        const unpaidInvoicesCount = invoices.length - paidInvoicesCount;
+
+        res.render(path.join('kashflow', 'invoice'), {
+            title: 'Invoices Dashboard',
+            invoices,
+            paidInvoicesCount,
+            unpaidInvoicesCount,
+        });
 
     } catch (error) {
         logger.error('Error rendering KFInvoices dashboard: ' + error.message);
@@ -387,7 +401,29 @@ const renderKFInvoicesDashboard = async (req, res) => {
 
 const renderKFCustomersDashboard = async (req, res) => {
     try {
+        const customers = await db.KF_Customers.findAll({
+            attributes: ['Name', 'Email', 'Created', 'Discount'],
+            order: [['Created', 'DESC']],
+        });
 
+        const totalCustomers = customers.length;
+        const newCustomersCount = customers.filter(customer => {
+            const createdDate = new Date(customer.Created);
+            const now = new Date();
+            return now - createdDate <= 30 * 24 * 60 * 60 * 1000; // Customers created in the last 30 days
+        }).length;
+        const discountedCustomersCount = customers.filter(customer => customer.Discount > 0).length;
+
+        const recentCustomers = customers.slice(0, 5);
+
+        res.render(path.join('kashflow', 'customer'), {
+            title: 'Customers Dashboard',
+            customers,
+            totalCustomers,
+            newCustomersCount,
+            discountedCustomersCount,
+            recentCustomers,
+        });
     } catch (error) {
         logger.error('Error rendering KFCustomers dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFCustomers dashboard: ' + error.message);
@@ -397,7 +433,22 @@ const renderKFCustomersDashboard = async (req, res) => {
 
 const renderKFProjectsDashboard = async (req, res) => {
     try {
+        const projects = await db.KF_Projects.findAll({
+            attributes: ['Name', 'Description', 'Status', 'CustomerID'],
+            include: [{ model: db.KF_Customers, attributes: ['Name'], as: 'customer' }],
+            order: [['Created', 'DESC']]
+        });
 
+        const activeProjects = projects.filter(project => project.Status === 1); // Example status for "Active"
+        const pendingProjects = projects.filter(project => project.Status === 0); // Example status for "Pending"
+        const completedProjects = projects.filter(project => project.Status === 2); // Example status for "Completed"
+
+        res.render(path.join('kashflow', 'project'), {
+            title: 'Projects Dashboard',
+            activeProjects,
+            pendingProjects,
+            completedProjects,
+        });
     } catch (error) {
         logger.error('Error rendering KFProjects dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFProjects dashboard: ' + error.message);
@@ -407,7 +458,15 @@ const renderKFProjectsDashboard = async (req, res) => {
 
 const renderKFQuotesDashboard = async (req, res) => {
     try {
+        const quotes = await db.KF_Quotes.findAll({
+            attributes: ['InvoiceNumber', 'Customer', 'InvoiceDate', 'NetAmount'],
+            order: [['Created', 'DESC']]
+        });
 
+        res.render(path.join('kashflow', 'quote'), {
+            title: 'Quotes Dashboard',
+            quotes,
+        });
     } catch (error) {
         logger.error('Error rendering KFQuotes dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFQuotes dashboard: ' + error.message);
@@ -417,7 +476,16 @@ const renderKFQuotesDashboard = async (req, res) => {
 
 const renderKFReceiptsDashboard = async (req, res) => {
     try {
+        const receipts = await db.KF_Receipts.findAll({
+            attributes: ['InvoiceNumber', 'CustomerID', 'AmountPaid', 'InvoiceDate'],
+            include: [{ model: db.KF_Customers, attributes: ['Name'], as: 'customer' }],
+            order: [['Created', 'DESC']]
+        });
 
+        res.render(path.join('kashflow', 'receipt'), {
+            title: 'Receipts Dashboard',
+            receipts,
+        });
     } catch (error) {
         logger.error('Error rendering KFReceipts dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFReceipts dashboard: ' + error.message);
@@ -427,7 +495,28 @@ const renderKFReceiptsDashboard = async (req, res) => {
 
 const renderKFSuppliersDashboard = async (req, res) => {
     try {
+        const suppliers = await db.KF_Suppliers.findAll({
+            attributes: ['Name', 'Email', 'Telephone', 'Created'],
+            order: [['Created', 'DESC']]
+        });
 
+        const totalSuppliers = suppliers.length;
+
+        const suppliersWithContact = suppliers.filter(
+            (supplier) => supplier.Email || supplier.Telephone
+        ).length;
+
+        const recentSuppliers = suppliers.filter(
+            (supplier) => new Date(supplier.Created) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        ).length;
+
+        res.render(path.join('kashflow', 'supplier'), {
+            title: 'Suppliers Dashboard',
+            suppliers,
+            totalSuppliers,
+            suppliersWithContact,
+            recentSuppliers
+        });
     } catch (error) {
         logger.error('Error rendering KFSuppliers dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFSuppliers dashboard: ' + error.message);
@@ -435,14 +524,66 @@ const renderKFSuppliersDashboard = async (req, res) => {
     }
 };
 
+const renderKashflowDashboard = async (req, res) => {
+    try {
+        // Fetch all necessary data
+        const totalCustomers = await db.KF_Customers.count();
+        const totalInvoices = await db.KF_Invoices.count();
+        const totalReceipts = await db.KF_Receipts.count();
+        const totalQuotes = await db.KF_Quotes.count();
+        const totalSuppliers = await db.KF_Suppliers.count();
+        const totalProjects = await db.KF_Projects.count();
+
+
+        const incomeExpenseData = await currencyService.getIncomeExpenseData(db);
+
+        console.log(incomeExpenseData);
+        // Calculate paid/unpaid invoices
+        const paidInvoices = await db.KF_Invoices.count({ where: { Paid: { [Op.gt]: 0 } } });
+        const unpaidInvoices = totalInvoices - paidInvoices;
+
+        // Get top customers by revenue
+        const topCustomersData = await db.KF_Invoices.findAll({
+            attributes: ['CustomerName', [db.Sequelize.fn('SUM', db.Sequelize.col('NetAmount')), 'totalRevenue']],
+            group: ['CustomerName'],
+            order: [[db.Sequelize.literal('totalRevenue'), 'DESC']],
+            limit: 5,
+        });
+
+        const topCustomers = {
+            names: topCustomersData.map((customer) => customer.CustomerName),
+            revenue: topCustomersData.map((customer) => parseFloat(customer.get('totalRevenue'))),
+        };
+
+        // Render the dashboard
+        res.render(path.join('kashflow', 'dashboard'), {
+            title: 'KashFlow Dashboard',
+            totalCustomers,
+            totalInvoices,
+            totalReceipts,
+            totalQuotes,
+            totalSuppliers,
+            totalProjects,
+            incomeExpenseData,
+            paidInvoices,
+            unpaidInvoices,
+            topCustomers,
+        });
+    } catch (error) {
+        logger.error('Error rendering KashFlow dashboard: ' + error.message);
+        req.flash('error', 'Error rendering dashboard.');
+        res.redirect('/');
+    }
+};
+
 router.get('/dashboard/stats', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
     try {
-        const { taxYear, taxMonth } = authService.calculateTaxYearAndMonth(moment());
+        const { taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(moment());
         logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
         return res.redirect(`/dashboard/stats/${taxYear}/${taxMonth}`);
     } catch (error) {
-        logger.error('Error rendering jobs dashboard:' + error.message);
-        req.flash('error', 'Error rendering jobs dashboard: ' + error.message);
+        logger.error('Error rendering stats dashboard:' + error.message);
+        req.flash('error', 'Error rendering stats dashboard: ' + error.message);
         return res.redirect('/');
     }
 });
@@ -456,7 +597,15 @@ router.get('/dashboard/contact', authService.ensureAuthenticated, authService.en
 router.get('/dashboard/job', authService.ensureAuthenticated, authService.ensureRole('admin'), renderJobsDashboard);
 //router.get('/dashboard/archive', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteArchiveDashboard);
 router.get('/dashboard/location', authService.ensureAuthenticated, authService.ensureRole('admin'), renderLocationsDashboard);
-router.get('/dashboard/attendance', authService.ensureAuthenticated, authService.ensureRole('admin'),renderAttendanceDashboard);
-router.get('/dashboard/employee', authService.ensureAuthenticated, authService.ensureRole('admin'),renderEmployeeDashboard);
+router.get('/dashboard/attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceDashboard);
+router.get('/dashboard/employee', authService.ensureAuthenticated, authService.ensureRole('admin'), renderEmployeeDashboard);
+
+router.get('/dashboard/KFcustomer', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFCustomersDashboard);
+router.get('/dashboard/KFinvoice', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFInvoicesDashboard);
+router.get('/dashboard/KFquote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFQuotesDashboard);
+router.get('/dashboard/KFsupplier', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFSuppliersDashboard);
+router.get('/dashboard/KFreceipt', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFReceiptsDashboard);
+router.get('/dashboard/KFproject', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFProjectsDashboard);
+router.get('/dashboard/KashFlow', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKashflowDashboard);
 
 module.exports = router;
