@@ -10,7 +10,6 @@ const logger = require('./loggerService');
  * @param {Function} next - The next middleware function.
  */
 const ensureAuthenticated = (req, res, next) => {
-    logger.info(`Session Data: ${JSON.stringify(req.session)}`);
     if (!req.session.user) {
         req.flash('error', 'Please sign in.');
         logger.info(`Unknown user accessed path ${req.method} ${req.originalUrl}`);
