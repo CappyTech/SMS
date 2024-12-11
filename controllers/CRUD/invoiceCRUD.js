@@ -4,19 +4,22 @@ const logger = require('../../services/loggerService');
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
+const validationService = require('../../services/validationService');
+const cisService = require('../../services/cisService');
+const taxService = require('../../services/taxService');
 
 const createInvoice = async (req, res) => {
     try {
-        const validatedData = helpers.validateInvoiceData(req.body);
+        const validatedData = validationService.validateInvoiceData(req.body);
         const subcontractor = await db.Subcontractors.findByPk(req.params.selected);
-        const amounts = helpers.calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
+        const amounts = cisService.calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
 
         // If remittanceDate or submissionDate are not provided, set them to null
         validatedData.remittanceDate = validatedData.remittanceDate || null;
         validatedData.submissionDate = validatedData.submissionDate || null;
 
         // Calculate Tax Year and Tax Month
-        const { taxYear, taxMonth } = helpers.calculateTaxYearAndMonth(validatedData.remittanceDate);
+        const { taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(validatedData.remittanceDate);
 
         // Create invoice record
         const newInvoice = await db.Invoice.create({
@@ -68,7 +71,7 @@ const updateInvoice = async (req, res) => {
         if (!subcontractor) {
             logger.error(`Subcontractor with ID: ${invoice.subcontractorId} not found for invoice ${req.params.invoice}`);
         }
-        const amounts = helpers.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber, subcontractor.isGross, subcontractor.isReverseCharge);
+        const amounts = cisService.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber, subcontractor.isGross, subcontractor.isReverseCharge);
 
         await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
 
