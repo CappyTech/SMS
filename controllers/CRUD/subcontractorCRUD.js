@@ -54,7 +54,7 @@ const createSubcontractor = async (req, res) => {
                 nullCheckFields.includes(key) ? value || null : value,
             ])
         );
-        logger.info('Data to be inserted: ' + sanitizedData);
+        logger.info('Data to be inserted: ' +  JSON.stringify(sanitizedData, null, 2));
         await db.Subcontractors.create(sanitizedData);
 
         req.flash('success', 'Subcontractor created.');
