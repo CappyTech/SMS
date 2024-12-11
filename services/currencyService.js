@@ -14,7 +14,7 @@ function formatCurrency(amount) {
         logger.error(errorMessage);
         throw new Error(errorMessage);
     }
-    return '£' + amount.toFixed(2);
+    return '£' + parseFloat(amount).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 /**
