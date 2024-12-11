@@ -22,7 +22,7 @@ const createInvoice = async (req, res) => {
         const { taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(validatedData.remittanceDate);
 
         // Create invoice record
-        const newInvoice = await db.Invoice.create({
+        const newInvoice = await db.Invoices.create({
             invoiceNumber: validatedData.invoiceNumber,
             kashflowNumber: validatedData.kashflowNumber,
             invoiceDate: validatedData.invoiceDate,
@@ -73,7 +73,7 @@ const updateInvoice = async (req, res) => {
         }
         const amounts = cisService.calculateInvoiceAmounts(req.body.labourCost, req.body.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber, subcontractor.isGross, subcontractor.isReverseCharge);
 
-        await Invoice.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
+        await db.Invoices.update({ ...req.body, ...amounts }, { where: { id: req.params.invoice } });
 
         req.flash('success', 'Invoice updated successfully');
         return res.redirect(`/invoice/read/${req.params.invoice}`);
