@@ -55,7 +55,7 @@ const createSubcontractor = async (req, res) => {
             ])
         );
         logger.info('Data to be inserted: ' + sanitizedData);
-        await Subcontractor.create(sanitizedData);
+        await db.Subcontractors.create(sanitizedData);
 
         req.flash('success', 'Subcontractor created.');
         const referer = '/dashboard/subcontractor';
