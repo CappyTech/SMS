@@ -54,12 +54,12 @@ const renderStatsDashboard = async (req, res) => {
                 };
             }
 
-            subcontractorTotals[invoice.subcontractorId].grossTotal = currencyService.rounding(subcontractorTotals[invoice.subcontractorId].grossTotal + invoice.grossAmount, false);
-            subcontractorTotals[invoice.subcontractorId].materialTotal = currencyService.rounding(subcontractorTotals[invoice.subcontractorId].materialTotal + invoice.materialCost, false);
-            subcontractorTotals[invoice.subcontractorId].cisTotal = currencyService.rounding(subcontractorTotals[invoice.subcontractorId].cisTotal + invoice.cisAmount, false);
+            subcontractorTotals[invoice.subcontractorId].grossTotal = subcontractorTotals[invoice.subcontractorId].grossTotal + invoice.grossAmount, false;
+            subcontractorTotals[invoice.subcontractorId].materialTotal = subcontractorTotals[invoice.subcontractorId].materialTotal + invoice.materialCost, false;
+            subcontractorTotals[invoice.subcontractorId].cisTotal = subcontractorTotals[invoice.subcontractorId].cisTotal + invoice.cisAmount, false;
 
             if (invoice.reverseCharge) {
-                subcontractorTotals[invoice.subcontractorId].reverseChargeTotal = currencyService.rounding(subcontractorTotals[invoice.subcontractorId].reverseChargeTotal + invoice.reverseCharge, false);
+                subcontractorTotals[invoice.subcontractorId].reverseChargeTotal = subcontractorTotals[invoice.subcontractorId].reverseChargeTotal + invoice.reverseCharge, false;
             }
         });
 
