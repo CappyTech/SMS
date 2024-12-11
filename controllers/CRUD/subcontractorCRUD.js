@@ -172,7 +172,7 @@ const updateSubcontractor = async (req, res) => {
         };
 
         // Update subcontractor with sanitized data
-        await db.Subcontractors.update(req.body, { where: { id: req.params.id } });
+        await db.Subcontractors.update(updatedData, { where: { id: req.params.id } });
 
         // Flash success message and redirect
         req.flash('success', 'Subcontractor updated successfully.');
