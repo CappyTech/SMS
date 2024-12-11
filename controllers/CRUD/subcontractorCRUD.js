@@ -183,7 +183,7 @@ const updateSubcontractor = async (req, res) => {
         if (error.name === 'SequelizeUniqueConstraintError') {
             logger.error('Unique constraint error: ', error);
             req.flash('error', 'A subcontractor with this UTR or VAT number already exists.');
-            return res.redirect('/subcontractor/update/' + req.params.id);
+            return res.redirect('/');
         }
         logger.error('Error updating subcontractor: ' + error.message);
         req.flash('error', 'Error updating subcontractor: ' + error.message);
