@@ -14,18 +14,18 @@ function formatCurrency(amount) {
         logger.error(errorMessage);
         throw new Error(errorMessage);
     }
-    return '£' + parseFloat(amount).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return '£' + amount;
 }
 
 /**
  * Rounds a given number up or down.
  * 
- * @param {number} number - The number to round.
+ * @param {number} amount - The number to round.
  * @param {boolean} up - If true, rounds the number up; otherwise, rounds the number down.
  * @returns {number} - The rounded number.
  */
-function rounding(number, up) {
-    return up ? Math.ceil(number) : Math.floor(number);
+function rounding(amount, up) {
+    return up ? Math.ceil(amount) : Math.floor(amount);
 }
 
 /**
