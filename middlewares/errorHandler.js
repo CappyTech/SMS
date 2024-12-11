@@ -1,28 +1,26 @@
 const logger = require('../services/loggerService');
 
 const errorHandler = (err, req, res, next) => {
-    // Log the error stack
+    // Log the error details
     logger.error(err.stack);
-
-    // Log additional request details
     logger.error(`Request URL: ${req.originalUrl}`);
     logger.error(`Request Method: ${req.method}`);
     logger.error(`Request Headers: ${JSON.stringify(req.headers)}`);
 
-    // Determine the status code and message
-    let statusCode = err.statusCode || 500;
-    let title = err.name || 'Error';
-    let message = err.message || 'Something broke!';
-    let stack = process.env.NODE_ENV === 'production' ? null : err.stack;
+    // Determine status code, title, and message
+    const statusCode = err.statusCode;
+    let title = `${err.statusCode} - ${err.name}`;
+    const message = err.message || 'Something went wrong.';
+    const stack = process.env.NODE_ENV === 'production' ? null : err.stack;
 
+    // Render the error page
     res.status(statusCode).render('error', {
-        errorMessages: req.flash('error'),
-        successMessage: req.flash('success'),
+        title,
         error: {
             title,
             message,
-            stack
-        }
+            stack,
+        },
     });
 };
 

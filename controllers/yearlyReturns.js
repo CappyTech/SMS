@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { formatCurrency, slimDateTime, rounding } = require('../helpers');
 const logger = require('../services/loggerService'); 
 const path = require('path');
-const helpers = require('../helpers');
 const db = require('../services/sequelizeDatabaseService');
+const authService = require('../services/authService');
 
 const renderYearlyReturns = async (req, res) => {
     try {
@@ -62,10 +61,6 @@ const renderYearlyReturns = async (req, res) => {
 
         res.render(path.join('monthlyreturns', 'yearlyReturns'), {
             title: 'Yearly Returns',
-            
-            slimDateTime: slimDateTime,
-            formatCurrency: formatCurrency,
-            rounding: rounding,
             subcontractor: subcontractor,
             year: year,
             invoicesByMonth: invoicesByMonth,
@@ -78,6 +73,6 @@ const renderYearlyReturns = async (req, res) => {
     }
 };
 
-router.get('/yearly/returns/:year/:id', helpers.ensureAuthenticated, renderYearlyReturns);
+router.get('/yearly/returns/:year/:id', authService.ensureAuthenticated, renderYearlyReturns);
 
 module.exports = router;

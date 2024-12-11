@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
-const moment = require('moment');
 const logger = require('../../services/loggerService');
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 const createQuote = async (req, res) => {
     try {
@@ -82,9 +81,6 @@ const readQuote = async (req, res) => {
         res.render(path.join('quotes', 'viewQuote'), {
             title: 'Quote Details',
             quote,
-            
-            moment: moment,
-            slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
         logger.error('Error viewing quote: ' + error.message);
@@ -110,9 +106,6 @@ const readQuotes = async (req, res) => {
         res.render(path.join('quotes', 'viewQuotes'), {
             title: 'Quotes',
             quotes,
-            
-            moment: moment,
-            slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
         logger.error('Error viewing quotes:' + error.message);
@@ -183,10 +176,10 @@ router.get('/fetch/quote/:quoteId', async (req, res) => {
 });
 
 
-router.post('/quote/create/:client', helpers.ensureAuthenticated, createQuote);
-router.get('/quote/read/:quoteId', helpers.ensureAuthenticated, readQuote);
-router.get('/quote/read/:client', helpers.ensureAuthenticated, readQuotes);
-router.post('/quote/update/:id', helpers.ensureAuthenticated, updateQuote);
-router.post('/quote/delete/:id', helpers.ensureAuthenticated, deleteQuote);
+router.post('/quote/create/:client', authService.ensureAuthenticated, createQuote);
+router.get('/quote/read/:quoteId', authService.ensureAuthenticated, readQuote);
+router.get('/quote/read/:client', authService.ensureAuthenticated, readQuotes);
+router.post('/quote/update/:id', authService.ensureAuthenticated, updateQuote);
+router.post('/quote/delete/:id', authService.ensureAuthenticated, deleteQuote);
 
 module.exports = router;

@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
-const moment = require('moment');
 const logger = require('../../services/loggerService');
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 const createClient = async (req, res) => {
     try {
@@ -64,8 +63,6 @@ const readClient = async (req, res) => {
         res.render(path.join('clients', 'viewClient'), {
             title: 'Client Overview',
             clients,
-            
-            slimDateTime: helpers.slimDateTime,
         });
     } catch (error) {
         logger.error('Error fetching client overview: ' + error.message);
@@ -128,9 +125,9 @@ router.get('/fetch/client/:clientId', async (req, res) => {
     }
 });
 
-router.post('/client/create/', helpers.ensureAuthenticated, createClient);
-router.get('/client/read/:clientId', helpers.ensureAuthenticated, readClient);
-router.post('/client/update/:clientId', helpers.ensureAuthenticated, updateClient);
-router.post('/client/delete/:clientId', helpers.ensureAuthenticated, deleteClient);
+router.post('/client/create/', authService.ensureAuthenticated, createClient);
+router.get('/client/read/:clientId', authService.ensureAuthenticated, readClient);
+router.post('/client/update/:clientId', authService.ensureAuthenticated, updateClient);
+router.post('/client/delete/:clientId', authService.ensureAuthenticated, deleteClient);
 
 module.exports = router;

@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { formatCurrency, slimDateTime } = require('../helpers');
 const logger = require('../services/loggerService');
 const path = require('path');
-const helpers = require('../helpers');
 const db = require('../services/sequelizeDatabaseService');
+const authService = require('../services/authService');
 
 const renderMonthlyReturnsForm = async (req, res) => {
     try {
@@ -59,9 +58,6 @@ const renderMonthlyReturnsForm = async (req, res) => {
         // Render the EJS view, passing in the modified subcontractors data
         res.render(path.join('monthlyreturns', 'monthlyReturnsForm'), {
             title: 'Monthly Returns Form',
-            
-            slimDateTime: slimDateTime,
-            formatCurrency: formatCurrency,
             subcontractorsWithMonths: subcontractorsWithMonths,
             monthNames: monthNames
         });
@@ -88,7 +84,7 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
 
         const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
 
-        const subcontractor = await db.Subcontractor.findAll({
+        const subcontractor = await db.Subcontractors.findAll({
             where: {
                 id: id,
                 deletedAt: null
@@ -111,9 +107,6 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
 
         res.render(path.join('monthlyreturns', 'monthlyReturnsForOneSubcontractor'), {
             title: 'Monthly Returns Subcontractor',
-            
-            slimDateTime: slimDateTime,
-            formatCurrency: formatCurrency,
             month: month,
             year: year,
             subcontractor: subcontractor[0],
@@ -142,7 +135,7 @@ const renderMonthlyReturnsForAll = async (req, res) => {
 
         const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
 
-        const subcontractors = await db.Subcontractor.findAll({
+        const subcontractors = await db.Subcontractors.findAll({
             where: {
                 deletedAt: null
             },
@@ -165,9 +158,6 @@ const renderMonthlyReturnsForAll = async (req, res) => {
 
         res.render(path.join('monthlyreturns', 'monthlyReturnsForAll'), {
             title: 'Monthly Returns',
-            
-            slimDateTime: slimDateTime,
-            formatCurrency: formatCurrency,
             month: month,
             year: year,
             subcontractors: subcontractors,
@@ -195,7 +185,7 @@ const renderMonthlyReturnsYear = async (req, res) => {
 
         const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
 
-        const subcontractors = await db.Subcontractor.findAll({
+        const subcontractors = await db.Subcontractors.findAll({
             where: {
                 deletedAt: null
             },
@@ -214,9 +204,6 @@ const renderMonthlyReturnsYear = async (req, res) => {
 
         res.render(path.join('monthlyreturns', 'renderMonthlyReturnsYear'), {
             title: 'Monthly Returns Report',
-            
-            slimDateTime: slimDateTime,
-            formatCurrency: formatCurrency,
             year: year,
             subcontractors,
             invoices: subcontractors.invoices,
@@ -229,9 +216,9 @@ const renderMonthlyReturnsYear = async (req, res) => {
     }
 };
 
-router.get('/monthly/returns/form', helpers.ensureAuthenticated, renderMonthlyReturnsForm);
-router.get('/monthly/returns/:month/:year/:id', helpers.ensureAuthenticated, renderMonthlyReturnsForOneSubcontactor);
-router.get('/monthly/returns/:year/:month', helpers.ensureAuthenticated, renderMonthlyReturnsForAll);
-router.get('/monthly/returns/:year', helpers.ensureAuthenticated, renderMonthlyReturnsYear);
+router.get('/monthly/returns/form', authService.ensureAuthenticated, renderMonthlyReturnsForm);
+router.get('/monthly/returns/:month/:year/:id', authService.ensureAuthenticated, renderMonthlyReturnsForOneSubcontactor);
+router.get('/monthly/returns/:year/:month', authService.ensureAuthenticated, renderMonthlyReturnsForAll);
+router.get('/monthly/returns/:year', authService.ensureAuthenticated, renderMonthlyReturnsYear);
 
 module.exports = router;

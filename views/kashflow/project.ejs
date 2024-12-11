@@ -1,5 +1,4 @@
-<%- include('../partials/successAlert.ejs') %>
-<%- include('../partials/errorAlerts.ejs') %>
+
 <div class="container my-5">
     <h1 class="mb-4 text-center">Projects Dashboard</h1>
     <div class="row">
@@ -15,9 +14,9 @@
             </ul>
         </div>
         <div class="col-md-4">
-            <h4>Pending Projects</h4>
+            <h4>Completed Projects</h4>
             <ul class="list-group">
-                <% pendingProjects.forEach(project => { %>
+                <% completedProjects.forEach(project => { %>
                 <li class="list-group-item">
                     <strong><%= project.Name %></strong>
                     <p><%= project.Description %></p>
@@ -26,9 +25,9 @@
             </ul>
         </div>
         <div class="col-md-4">
-            <h4>Completed Projects</h4>
+            <h4>Archived Projects</h4>
             <ul class="list-group">
-                <% completedProjects.forEach(project => { %>
+                <% archivedProjects.forEach(project => { %>
                 <li class="list-group-item">
                     <strong><%= project.Name %></strong>
                     <p><%= project.Description %></p>

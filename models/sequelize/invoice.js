@@ -79,6 +79,16 @@ const Invoices = sequelize.define('Invoices', {
         type: DataTypes.FLOAT,
         allowNull: true,
     },
+    /*
+    KashFlowReceiptID: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'KF_Receipts',
+            key: 'InvoiceDBID',
+        },
+    },
+    */
 }, {
     timestamps: true,
     paranoid: true,

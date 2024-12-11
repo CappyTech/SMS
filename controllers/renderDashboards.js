@@ -1,14 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const moment = require('moment');
-const helpers = require('../helpers');
 const logger = require('../services/loggerService');
-const { Op } = require("sequelize");
+
 const path = require('path');
 const db = require('../services/sequelizeDatabaseService');
 const taxService = require('../services/taxService');
 const currencyService = require('../services/currencyService');
-const dateService = require('../services/dateService');
 const authService = require('../services/authService');
 
 const renderStatsDashboard = async (req, res) => {
@@ -88,8 +86,6 @@ const renderStatsDashboard = async (req, res) => {
             subcontractors: filteredSubcontractors,
             invoices: filteredInvoices,
             subcontractorTotals,
-            
-
             taxYear,
             currentMonthlyReturn,
             previousYear,
@@ -182,8 +178,6 @@ const renderQuotesDashboard = async (req, res) => {
         res.render(path.join('dashboards', 'quotesDashboard'), {
             title: 'Quotes',
             quotes,
-            
-
         });
     } catch (error) {
         logger.error('Error rendering quotes dashboard: ' + error.message);
@@ -200,9 +194,6 @@ const renderClientsDashboard = async (req, res) => {
         res.render(path.join('dashboards', 'clientsDashboard'), {
             title: 'Clients',
             clients,
-            
-            
-
         });
     } catch (error) {
         logger.error('Error rendering clients dashboard:' + error.message);
@@ -218,9 +209,6 @@ const renderContactsDashboard = async (req, res) => {
         res.render(path.join('dashboards', 'contactsDashboard'), {
             title: 'Contacts',
             contacts,
-            
-            
-
         });
     } catch (error) {
         logger.error('Error rendering contacts dashboard:' + error.message);
@@ -235,7 +223,7 @@ const renderJobsDashboard = async (req, res) => {
         const jobs = await db.Jobs.findAll({
             where: {
                 job_ref: {
-                    [Op.ne]: ""
+                    [db.Sequelize.Op.ne]: ""
                 }
             },
             order: [['createdAt', 'DESC']],
@@ -275,8 +263,6 @@ const renderJobsDashboard = async (req, res) => {
         res.render(path.join('dashboards', 'jobsDashboard'), {
             title: 'Jobs',
             jobs: jobsWithAssociations,
-            
-
         });
     } catch (error) {
         // Log the error
@@ -294,7 +280,6 @@ const renderLocationsDashboard = async (req, res) => {
         res.render(path.join('dashboards', 'locationsDashboard'), {
             title: 'Locations',
             locations,
-            
         });
     } catch (error) {
         logger.error('Error rendering locations dashboard: ' + error.message);
@@ -436,17 +421,17 @@ const renderKFProjectsDashboard = async (req, res) => {
         const projects = await db.KF_Projects.findAll({
             attributes: ['Name', 'Description', 'Status', 'CustomerID'],
             include: [{ model: db.KF_Customers, attributes: ['Name'], as: 'customer' }],
-            order: [['Created', 'DESC']]
+            order: [['Number', 'DESC']]
         });
 
-        const activeProjects = projects.filter(project => project.Status === 1); // Example status for "Active"
-        const pendingProjects = projects.filter(project => project.Status === 0); // Example status for "Pending"
-        const completedProjects = projects.filter(project => project.Status === 2); // Example status for "Completed"
+        const activeProjects = projects.filter(project => project.Status === 2); // Example status for "Active"
+        const archivedProjects = projects.filter(project => project.Status === 3); // Example status for "Pending"
+        const completedProjects = projects.filter(project => project.Status === 1); // Example status for "Completed"
 
         res.render(path.join('kashflow', 'project'), {
             title: 'Projects Dashboard',
             activeProjects,
-            pendingProjects,
+            archivedProjects,
             completedProjects,
         });
     } catch (error) {
@@ -460,7 +445,7 @@ const renderKFQuotesDashboard = async (req, res) => {
     try {
         const quotes = await db.KF_Quotes.findAll({
             attributes: ['InvoiceNumber', 'Customer', 'InvoiceDate', 'NetAmount'],
-            order: [['Created', 'DESC']]
+            order: [['InvoiceDate', 'DESC']]
         });
 
         res.render(path.join('kashflow', 'quote'), {
@@ -539,7 +524,7 @@ const renderKashflowDashboard = async (req, res) => {
 
         console.log(incomeExpenseData);
         // Calculate paid/unpaid invoices
-        const paidInvoices = await db.KF_Invoices.count({ where: { Paid: { [Op.gt]: 0 } } });
+        const paidInvoices = await db.KF_Invoices.count({ where: { Paid: { [db.Sequelize.Op.gt]: 0 } } });
         const unpaidInvoices = totalInvoices - paidInvoices;
 
         // Get top customers by revenue

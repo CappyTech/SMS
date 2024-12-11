@@ -1,4 +1,5 @@
 // models/subcontractor.js
+const logger = require('../../services/loggerService');
 module.exports = (sequelize, DataTypes) => {
     const Subcontractors = sequelize.define('Subcontractors', {
         id: {
@@ -66,7 +67,15 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
-        }
+        },
+        SupplierID: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'KF_Suppliers',
+                key: 'SupplierID',
+            },
+        },
     }, {
         timestamps: true,
         paranoid: true,

@@ -4,8 +4,6 @@ const logger = require('../../services/loggerService');
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
-const currencyService = require('../../services/currencyService');
-const dateService = require('../../services/dateService');
 
 const renderUserCreateForm = async (req, res) => {
     try {
@@ -23,7 +21,7 @@ const renderUserCreateForm = async (req, res) => {
 const renderUserUpdateForm = async (req, res) => {
     try {
         const userId = req.params.user;
-        const user = await db.User.findByPk(userId);
+        const user = await db.Users.findByPk(userId);
         if (!user) {
             return res.status(404).send('User not found');
         }

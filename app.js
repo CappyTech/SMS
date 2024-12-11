@@ -24,10 +24,10 @@ app.use(flash());
 app.use(useragent.express());
 
 // Middleware
-app.use(require('./middlewares/logRequestDetails'));
-app.use(require('./middlewares/rateLimiter'));
 app.use(require('./middlewares/security'));
 app.use(require('./middlewares/session'));
+app.use(require('./middlewares/logRequestDetails'));
+app.use(require('./middlewares/rateLimiter'));
 // app.use(require('./middlewares/createDefaultAdmin'));
 
 const db = require('./services/sequelizeDatabaseService');
@@ -215,7 +215,7 @@ app.use(async (req, res, next) => {
 });
 
 const { slimDateTime } = require('./services/dateService');
-const { formatCurrency,rounding } = require('./services/currencyService');
+const { formatCurrency, rounding } = require('./services/currencyService');
 const cronService = require('./services/cronService');
 
 app.use((req, res, next) => {
@@ -230,8 +230,6 @@ app.use((req, res, next) => {
     res.locals.successMessage = req.flash('success');
     next();
 });
-
-app.use(require('./middlewares/errorHandler'));
 
 app.disable('x-powered-by');
 app.use((req, res, next) => {
@@ -299,6 +297,8 @@ const weeklyAttendance = require('./controllers/weeklyAttendance');
 
 const kashflowRoutes = require('./kf/routes')
 
+const verificationRoutes  = require('./controllers/renderVerification');
+
 app.use('/', index);
 
 app.use('/', formsClient);
@@ -337,6 +337,18 @@ app.use('/', dailyAttendance);
 app.use('/', weeklyAttendance);
 
 app.use('/', kashflowRoutes);
+
+app.use('/', verificationRoutes);
+
+// Catch 404 errors
+app.use((req, res, next) => {
+    const error = new Error('Page Not Found');
+    error.statusCode = 404;
+    next(error); // Pass to the error handler
+});
+
+// Register the error handler
+app.use(require('./middlewares/errorHandler'));
 
 if (process.env.NODE_ENV === 'development') {
     app.listen(80, '127.0.0.1', () => {

@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+
 const sequelize = require('dbConnection');
 const Users = require('../models/Users');
 const logger = require('../services/loggerService');
@@ -13,7 +13,7 @@ const syncDatabase = async (req, res, next) => {
             logger.info('All models synchronized.');
             const admin = await Users.findOne({
                 where: {
-                    [Op.or]: [
+                    [db.Sequelize.Op.or]: [
                         { username: 'admin' },
                         { role: 'admin' }
                     ]

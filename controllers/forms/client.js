@@ -4,8 +4,6 @@ const logger = require('../../services/loggerService');
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
-const currencyService = require('../../services/currencyService');
-const dateService = require('../../services/dateService');
 
 const selectClient = async (req, res) => {
     try {

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Op } = require("sequelize");
+
 const logger = require('../../services/loggerService'); 
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
@@ -22,7 +22,7 @@ const registerUser = async (req, res) => {
         // Check if the email or username already exists
         const existingUser = await db.User.findOne({
             where: {
-                [Op.or]: [
+                [db.Sequelize.Op.or]: [
                     { username: username },
                     { email: email }
                 ]

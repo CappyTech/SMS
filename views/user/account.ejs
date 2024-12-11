@@ -1,6 +1,5 @@
 <!-- views/account.ejs -->
-<%- include('../partials/successAlert.ejs') %>
-<%- include('../partials/errorAlerts.ejs') %>
+
 
 <!-- TOTP Section -->
 <div class="container py-4">
@@ -65,25 +64,62 @@
 </div>
 
 <div class="container py-4">
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <h1 class="text-center">Change Password</h1>
+        <form action="/account/change-password" method="POST" class="mt-4">
+        <div class="mb-3">
+            <label for="currentPassword" class="form-label">Current Password</label>
+            <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+        </div>
+        <div class="mb-3">
+            <label for="newPassword" class="form-label">New Password</label>
+            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+        </div>
+        <div class="mb-3">
+            <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+            <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" required>
+        </div>
+        <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-hcs-red">Update Password</button>
+        </div>
+        </form>
+    </div>
+  </div>
+  
+
+<div class="container py-4">
     <h1 class="display-5 fw-bold text-center">Active Sessions</h1>
 
     <table class="table table-striped mt-4">
         <thead>
             <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
                 <th>IP Address</th>
                 <th>Browser</th>
+                <th>Platform</th>
                 <th>Login Time</th>
                 <th>Session Expiration</th>
+                <th>Secure</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <% sessions.forEach(session => { %>
             <tr>
+                <td><%= session.username %></td>
+                <td><%= session.email %></td>
+                <td><%= session.role %></td>
                 <td><%= session.ip %></td>
-                <td><%= session.userAgent %></td>
-                <td><%= session.loginTime %></td>
-                <td><%= session.expires %></td>
+                <td><%= session.browser %></td>
+                <td><%= session.platform.replace(/['"]+/g, '') || 'Unknown' %></td>
+
+                <td><%= slimDateTime(session.loginTime, true) %></td>
+                <td><%= slimDateTime(session.expires,true) %><br> (<%= session.timeUntilExpiry %>)</td>
+                <td class="<%= session.secure ? 'secure-yes' : 'secure-no' %>">
+                    <%= session.secure ? 'Yes' : 'No' %>
+                </td>
                 <td>
                     <!-- Option to log out from this session -->
                     <form action="/account/logout-session" method="POST">

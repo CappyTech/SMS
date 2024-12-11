@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 const logger = require('../../services/loggerService');
-const path = require('path'); 
-const helpers = require('../../helpers');
+const path = require('path');
+const encryptionService = require('../../services/encryptionService');
 const speakeasy = require('speakeasy');
 const db = require('../../services/sequelizeDatabaseService');
 
@@ -28,7 +27,7 @@ const loginUser = async (req, res) => {
 
         const user = await db.Users.findOne({
             where: {
-                [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
+                [db.Sequelize.Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
             }
         });
 
@@ -168,7 +167,7 @@ const verify2FA = async (req, res) => {
         const agent = req.useragent || {};
         const ip = req.ip;
 
-        const decryptedSecret = helpers.decrypt(user.totpSecret);
+        const decryptedSecret = encryptionService.decrypt(user.totpSecret);
         const tokenValidates = speakeasy.totp.verify({
             secret: decryptedSecret,
             encoding: 'base32',

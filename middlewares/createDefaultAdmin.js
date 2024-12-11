@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+
 const Users = require('../models/Users'); // Adjust the path as necessary
 const logger = require('../services/loggerService');
 
@@ -6,7 +6,7 @@ const createDefaultAdmin = async (req, res, next) => {
     try {
         const admin = await Users.findOne({
             where: {
-                [Op.or]: [
+                [db.Sequelize.Op.or]: [
                     { username: 'admin' },
                     { role: 'admin' }
                 ]

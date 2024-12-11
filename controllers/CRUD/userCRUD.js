@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
 const path = require('path');
-const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const schema = Joi.object({
@@ -24,6 +22,7 @@ const schema = Joi.object({
     permissionDeleteInvoice: Joi.boolean(),
 });
 const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 const createUser = async (req, res) => {
     try {
@@ -35,7 +34,7 @@ const createUser = async (req, res) => {
         const { username, email, password, role } = value;
         const existingUser = await db.Users.findOne({
             where: {
-                [Op.or]: [{ username }, { email }],
+                [db.Sequelize.Op.or]: [{ username }, { email }],
             },
         });
         if (existingUser) {
@@ -77,9 +76,6 @@ const readUser = async (req, res) => {
         res.render(path.join('users', 'viewUser'), {
             title: 'User',
             user,
-            
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         logger.error('Error reading user:  ', error.message);
@@ -200,9 +196,9 @@ router.get('/fetch/user/:id', async (req, res) => {
     }
 });
 
-router.post('/user/create/', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionCreateUser']), createUser);
-router.get('/user/read/:id', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionReadUser']), readUser);
-router.post('/user/update/:id', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionUpdateUser']), updateUser);
-router.post('/user/delete/:id', helpers.ensureAuthenticated, helpers.ensurePermission(['permissionDeleteUser']), deleteUser);
+router.post('/user/create/', authService.ensureAuthenticated, authService.ensurePermission(['permissionCreateUser']), createUser);
+router.get('/user/read/:id', authService.ensureAuthenticated, authService.ensurePermission(['permissionReadUser']), readUser);
+router.post('/user/update/:id', authService.ensureAuthenticated, authService.ensurePermission(['permissionUpdateUser']), updateUser);
+router.post('/user/delete/:id', authService.ensureAuthenticated, authService.ensurePermission(['permissionDeleteUser']), deleteUser);
 
 module.exports = router;

@@ -340,3 +340,12 @@ body {
     width: auto;
   }
 }
+
+.secure-yes {
+  color: green;
+  font-weight: bold;
+}
+.secure-no {
+  color: red;
+  font-weight: bold;
+}

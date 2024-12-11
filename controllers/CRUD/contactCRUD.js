@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
-const moment = require('moment');
 const logger = require('../../services/loggerService');
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 const createContact = async (req, res) => {
     try {
@@ -55,9 +54,6 @@ const readContact = async (req, res) => {
         res.render(path.join('contacts', 'viewContact'), {
             title: 'Contact',
             contact,
-            
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         logger.error('Error viewing contact:'+ error.message);
@@ -80,9 +76,6 @@ const readContacts = async (req, res) => {
             title: 'Contacts',
             clients,
             contacts,
-            
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         logger.error('Error viewing contacts: ' + error.message);
@@ -145,10 +138,10 @@ router.get('/fetch/contact/:clientId', async (req, res) => {
     }
 });
 
-router.post('/contact/create/:client', helpers.ensureAuthenticated, createContact);
-router.get('/contact/read/:contact', helpers.ensureAuthenticated, readContact);
-router.get('/contacts/read/:client', helpers.ensureAuthenticated, readContacts);
-router.post('/contact/update/:contact', helpers.ensureAuthenticated, updateContact);
-router.post('/contact/delete/:contact', helpers.ensureAuthenticated, deleteContact);
+router.post('/contact/create/:client', authService.ensureAuthenticated, createContact);
+router.get('/contact/read/:contact', authService.ensureAuthenticated, readContact);
+router.get('/contacts/read/:client', authService.ensureAuthenticated, readContacts);
+router.post('/contact/update/:contact', authService.ensureAuthenticated, updateContact);
+router.post('/contact/delete/:contact', authService.ensureAuthenticated, deleteContact);
 
 module.exports = router;

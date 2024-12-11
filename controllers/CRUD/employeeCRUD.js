@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
 const logger = require('../../services/loggerService');
 const path = require('path');
 const moment = require('moment');
 const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 // Create Employee
 const createEmployee = async (req, res) => {
@@ -31,9 +31,6 @@ const readEmployee = async (req, res) => {
         res.render(path.join('employees', 'viewEmployee'), {
             title: 'Employee',
             employee,
-            
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         logger.error('Error viewing employee: ' + error.message);
@@ -78,9 +75,9 @@ router.get('/fetch/employee/:id', async (req, res) => {
     }
 });
 
-router.post('/employee/create', helpers.ensureAuthenticated, createEmployee);
-router.get('/employee/read/:employee', helpers.ensureAuthenticated, readEmployee)
-router.post('/employee/update/:employee', helpers.ensureAuthenticated, updateEmployee);
-router.post('/employee/delete/:employee', helpers.ensureAuthenticated, deleteEmployee);
+router.post('/employee/create', authService.ensureAuthenticated, createEmployee);
+router.get('/employee/read/:employee', authService.ensureAuthenticated, readEmployee)
+router.post('/employee/update/:employee', authService.ensureAuthenticated, updateEmployee);
+router.post('/employee/delete/:employee', authService.ensureAuthenticated, deleteEmployee);
 
 module.exports = router;

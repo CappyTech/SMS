@@ -30,7 +30,7 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
         const attendanceRecords = await db.Attendances.findAll({
             where: {
                 date: {
-                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                    [db.Sequelize.Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
                 }
             },
             include: [db.Employees, db.Subcontractors, db.Locations],
@@ -39,7 +39,7 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
         const subcontractorInvoices = await db.Invoices.findAll({
             where: {
                 invoiceDate: {
-                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                    [db.Sequelize.Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
                 }
             },
             include: [db.Subcontractors]
@@ -47,9 +47,9 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
         const employeeCount = await db.Attendances.count({
             where: {
                 date: {
-                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                    [db.Sequelize.Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
                 },
-                employeeId: { [Op.not]: null }
+                employeeId: { [db.Sequelize.Op.not]: null }
             },
             distinct: true,
             col: 'employeeId'
@@ -57,9 +57,9 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
         const subcontractorCount = await db.Attendances.count({
             where: {
                 date: {
-                    [Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+                    [db.Sequelize.Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
                 },
-                subcontractorId: { [Op.not]: null }
+                subcontractorId: { [db.Sequelize.Op.not]: null }
             },
             distinct: true,
             col: 'subcontractorId'

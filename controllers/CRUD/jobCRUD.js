@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
-const moment = require('moment');
 const logger = require('../../services/loggerService');
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 const createJob = async (req, res) => {
     try {
@@ -61,10 +60,6 @@ const readJob = async (req, res) => {
         res.render(path.join('jobs', 'viewJob'), {
             title: 'Job',
             job,
-            
-            moment: moment,
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency
         });
     } catch (error) {
         logger.error('Error reading job: ' + error.message);
@@ -139,9 +134,9 @@ router.get('/fetch/job/:id', async (req, res) => {
     }
 });
 
-router.get('/job/create/:quoteId', helpers.ensureAuthenticated, createJob);
-router.get('/job/read/:jobId', helpers.ensureAuthenticated, readJob);
-router.post('/job/update/:jobId', helpers.ensureAuthenticated, updateJob);
-router.post('/job/delete/:jobId', helpers.ensureAuthenticated, deleteJob);
+router.get('/job/create/:quoteId', authService.ensureAuthenticated, createJob);
+router.get('/job/read/:jobId', authService.ensureAuthenticated, readJob);
+router.post('/job/update/:jobId', authService.ensureAuthenticated, updateJob);
+router.post('/job/delete/:jobId', authService.ensureAuthenticated, deleteJob);
 
 module.exports = router;

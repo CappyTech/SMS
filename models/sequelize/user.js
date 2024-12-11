@@ -1,3 +1,5 @@
+const encryptionService = require('../../services/encryptionService');
+
 // models/user.js
 module.exports = (sequelize, DataTypes) => {
     const Users = sequelize.define('Users', {
@@ -66,6 +68,24 @@ module.exports = (sequelize, DataTypes) => {
         permissionReadInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
         permissionUpdateInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
         permissionDeleteInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
+        /*
+        permissionCreateEmployee: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionReadEmployee: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionUpdateEmployee: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionDeleteEmployee: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionCreateVehicle: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionReadVehicle: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionUpdateVehicle: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionDeleteVehicle: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionCreateVehicleCheck: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionReadVehicleCheck: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionUpdateVehicleCheck: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionDeleteVehicleCheck: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionCreateVehicleReceipt: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionReadVehicleReceipt: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionUpdateVehicleReceipt: { type: DataTypes.BOOLEAN, defaultValue: false },
+        permissionDeleteVehicleReceipt: { type: DataTypes.BOOLEAN, defaultValue: false },
+        */
         // TOTP fields
         totpSecret: {
             type: DataTypes.STRING,

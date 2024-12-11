@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
-const moment = require('moment');
 const logger = require('../../services/loggerService'); 
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 const createInvoice = async (req, res) => {
     try {
@@ -97,9 +96,6 @@ const readInvoice = async (req, res) => {
         res.render(path.join('invoices', 'viewInvoice'), {
             title: 'Invoice',
             invoice,
-            
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         logger.error('Error viewing invoice: ' + error.message);
@@ -129,9 +125,6 @@ const readInvoices = async (req, res) => {
             title: 'Invoices',
             subcontractor,
             invoices,
-            
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         logger.error('Error viewing invoices:'+ error.message);
@@ -222,10 +215,10 @@ router.get('fetch/unsubmittedinvoices', async (req, res) => {
     }
 });
 
-router.post('/invoice/create/:selected', helpers.ensureAuthenticated, createInvoice);
-router.get('/invoice/read/:invoice', helpers.ensureAuthenticated, readInvoice);
-router.get('/invoices/read/:subcontractor', helpers.ensureAuthenticated, readInvoices);
-router.post('/invoice/update/:invoice', helpers.ensureAuthenticated, updateInvoice);
-router.post('/invoice/delete/:invoice', helpers.ensureAuthenticated, deleteInvoice);
+router.post('/invoice/create/:selected', authService.ensureAuthenticated, createInvoice);
+router.get('/invoice/read/:invoice', authService.ensureAuthenticated, readInvoice);
+router.get('/invoices/read/:subcontractor', authService.ensureAuthenticated, readInvoices);
+router.post('/invoice/update/:invoice', authService.ensureAuthenticated, updateInvoice);
+router.post('/invoice/delete/:invoice', authService.ensureAuthenticated, deleteInvoice);
 
 module.exports = router;

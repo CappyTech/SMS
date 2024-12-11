@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const logger = require('../../services/loggerService');
 const path = require('path');
-const helpers = require('../../helpers');
 const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 // Create a new location
 const createLocation = async (req, res) => {
@@ -50,9 +50,7 @@ const readLocation = async (req, res) => {
 
         res.render(path.join('locations', 'viewLocation'), {
             title: 'View Location',
-            location,
-            slimDateTime: helpers.slimDateTime,
-            
+            location,  
         });
     } catch (error) {
         logger.error('Error viewing location: ' + error.message);
@@ -140,9 +138,9 @@ router.get('/fetch/location/:id', async (req, res) => {
 });
 
 // Define routes
-router.post('/location/create', helpers.ensureAuthenticated, createLocation);
-router.get('/location/read/:id', helpers.ensureAuthenticated, readLocation);
-router.post('/location/update/:id', helpers.ensureAuthenticated, updateLocation);
-router.post('/location/delete/:id', helpers.ensureAuthenticated, deleteLocation);
+router.post('/location/create', authService.ensureAuthenticated, createLocation);
+router.get('/location/read/:id', authService.ensureAuthenticated, readLocation);
+router.post('/location/update/:id', authService.ensureAuthenticated, updateLocation);
+router.post('/location/delete/:id', authService.ensureAuthenticated, deleteLocation);
 
 module.exports = router;

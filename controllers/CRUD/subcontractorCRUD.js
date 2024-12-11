@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
-const { Op } = require('sequelize');
 const logger = require('../../services/loggerService'); 
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
 
 const createSubcontractor = async (req, res) => {
     try {
@@ -32,7 +31,7 @@ const createSubcontractor = async (req, res) => {
         // Check if the subcontractor already exists
         const existingSubcontractor = await db.Subcontractors.findOne({
             where: {
-                [Op.or]: [{ utrNumber }],
+                [db.Sequelize.Op.or]: [{ utrNumber }],
             },
         });
 
@@ -90,9 +89,6 @@ const readSubcontractor = async (req, res) => {
         res.render(path.join('subcontractors', 'viewSubcontractor'), {
             title: 'Subcontractor',
             subcontractor,
-            
-            slimDateTime: helpers.slimDateTime,
-            formatCurrency: helpers.formatCurrency,
         });
     } catch (error) {
         logger.error('Error reading subcontractor:  ', error.message);
@@ -139,7 +135,7 @@ const updateSubcontractor = async (req, res) => {
         // Check for unique utrNumber only if it's provided and different from the existing one
         if (utrNumber && subcontractor.utrNumber !== utrNumber) {
             const existingUtr = await db.Subcontractors.findOne({
-                where: { utrNumber, id: { [Op.ne]: req.params.id } }
+                where: { utrNumber, id: { [db.Sequelize.Op.ne]: req.params.id } }
             });
             if (existingUtr) {
                 req.flash('error', 'A subcontractor with this UTR number already exists.');
@@ -150,7 +146,7 @@ const updateSubcontractor = async (req, res) => {
         // Check for unique vatNumber only if it's provided and different from the existing one
         if (vatNumber && subcontractor.vatNumber !== vatNumber) {
             const existingVat = await db.Subcontractors.findOne({
-                where: { vatNumber, id: { [Op.ne]: req.params.id } }
+                where: { vatNumber, id: { [db.Sequelize.Op.ne]: req.params.id } }
             });
             if (existingVat) {
                 req.flash('error', 'A subcontractor with this VAT number already exists.');
@@ -244,9 +240,9 @@ router.get('/fetch/subcontractor/:id', async (req, res) => {
     }
 });
 
-router.post('/subcontractor/create/', helpers.ensureAuthenticated, createSubcontractor);
-router.get('/subcontractor/read/:id', helpers.ensureAuthenticated, readSubcontractor);
-router.post('/subcontractor/update/:id', helpers.ensureAuthenticated, updateSubcontractor);
-router.post('/subcontractor/delete/:id', helpers.ensureAuthenticated, deleteSubcontractor);
+router.post('/subcontractor/create/', authService.ensureAuthenticated, createSubcontractor);
+router.get('/subcontractor/read/:id', authService.ensureAuthenticated, readSubcontractor);
+router.post('/subcontractor/update/:id', authService.ensureAuthenticated, updateSubcontractor);
+router.post('/subcontractor/delete/:id', authService.ensureAuthenticated, deleteSubcontractor);
 
 module.exports = router;
