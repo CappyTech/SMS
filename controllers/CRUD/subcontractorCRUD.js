@@ -47,11 +47,11 @@ const createSubcontractor = async (req, res) => {
         }
 
         // Null checks for specific fields
-        const nullCheckFields = ['company', 'utrNumber'];
+        const nullCheckFields = ['company', 'utrNumber', 'vatNumber'];
         const sanitizedData = Object.fromEntries(
             Object.entries(req.body).map(([key, value]) => [
                 key,
-                nullCheckFields.includes(key) ? value || null : value,
+                nullCheckFields.includes(key) ? (value || null) : value,
             ])
         );
         logger.info('Data to be inserted: ' +  JSON.stringify(sanitizedData, null, 2));
