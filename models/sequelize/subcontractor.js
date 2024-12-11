@@ -84,7 +84,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Subcontractors.beforeValidate((subcontractor, options) => {
-        logger.info('Before validate: ' + subcontractor + ' ' + options);
+        logger.info('Before validate: ' + JSON.stringify(subcontractor, null, 2) + ' ' + JSON.stringify(options, null, 2));
     });
 
     return Subcontractors;
