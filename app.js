@@ -340,11 +340,11 @@ app.use('/', kashflowRoutes);
 
 app.use('/', verificationRoutes);
 
-// Catch 404 errors
+// Catch undefined routes (404 handler)
 app.use((req, res, next) => {
-    const error = new Error('Page Not Found');
+    const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
     error.statusCode = 404;
-    next(error); // Pass to the error handler
+    next(error);
 });
 
 // Register the error handler
