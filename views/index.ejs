@@ -1,84 +1,78 @@
+<div class="container py-4">
+  <!-- Greeting Section -->
+  <div class="p-5 mb-4 bg-body-tertiary rounded-3 text-center">
+    <% if (isAuthenticated) { %>
+      <h1 class="display-5 fw-bold">Welcome, <%= firstName %>.</h1>
+      <p class="lead fw-light text-body-secondary">
+        Role: <strong><%= role.charAt(0).toUpperCase() + role.slice(1) %></strong>
+      </p>
+    <% } else { %>
+      <h1 class="display-5 fw-bold">Subcontractor Management System</h1>
+      <p class="lead fw-light text-body-secondary">
+        Developed by Heron Constructive Solutions LTD
+      </p>
+    <% } %>
+  </div>
 
-    <div class="container py-4">
-      <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-        <div class="container-fluid py-5 text-center">
-          <h1 class="display-5 fw-bold">Subcontractor Management System<br>
-            <small class="lead fw-light text-body-secondary">Developed by Heron Constructive Solutions LTD</small>
-          </h1>
-          <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-            <div class="col">
-              <div class="card h-100 d-flex flex-column">
-                <div class="card-body">
-                  <h5 class="card-header-pills">Accurate Record-Keeping</h5>
-                  <p class="card-text">With features that facilitate efficient data entry and manage important details,
-                    the system ensures accurate and up-to-date record-keeping.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="col">
-              <div class="card h-100 d-flex flex-column">
-                <div class="card-body">
-                  <h5 class="card-header-pills">Regulatory Compliance</h5>
-                  <p class="card-text">SMS automates monthly returns, aiding in maintaining CIS & HMRC compliance. This
-                    feature aims to ease financial and tax reporting tasks, ensuring businesses stay within the law.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="col">
-              <div class="card h-100 d-flex flex-column">
-                <div class="card-body">
-                  <h5 class="card-header-pills">Payment Tracking</h5>
-                  <p class="card-text">Detailed invoice records allow you to track payments and manage deductions
-                    effectively.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="col">
-              <div class="card h-100 d-flex flex-column">
-                <div class="card-body">
-                  <h5 class="card-header-pills">Subcontractor Verification</h5>
-                  <p class="card-text">The system can perform subcontractor verification, allowing only valid and vetted
-                    subcontractors to participate, thereby reducing project risks.</p>
-                </div>
-              </div>
-            </div>
-            <!-- User Access Control Card -->
-            <div class="col">
-              <div class="card h-100 d-flex flex-column">
-                <div class="card-body">
-                  <h5 class="card-header-pills">User Access Control</h5>
-                  <p class="card-text">SMS supports the creation and management of user profiles. Admin and
-                    subcontractor roles allow for role-based access control ensuring more secure and efficient project
-                    management.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Effective Communication Card -->
-            <div class="col">
-              <div class="card h-100 d-flex flex-column">
-                <div class="card-body">
-                  <h5 class="card-header-pills">Effective Communication</h5>
-                  <p class="card-text">It enhances communication among project managers, ensuring that everyone is kept
-                    up-to-date on project developments.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Efficiency and Transparency Card -->
-            <div class="col">
-              <div class="card h-100 d-flex flex-column">
-                <div class="card-body">
-                  <h5 class="card-header-pills">Efficiency and Transparency</h5>
-                  <p class="card-text">Through structured and automated data handling, the system enhances the overall
-                    efficiency of subcontractor management, providing transparency for every stakeholder involved.</p>
-                </div>
-              </div>
+  <% if (isAuthenticated) { %>
+    <!-- Actions Section -->
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+      <% if (permissions.permissionCreateInvoice) { %>
+        <div class="col">
+          <div class="card h-100 d-flex flex-column">
+            <div class="card-body">
+              <h5 class="card-header-pills">Create Invoice</h5>
+              <p class="card-text">Generate and manage invoices efficiently.</p>
+              <a href="/invoice/create" class="btn btn-primary mt-auto">Create Invoice</a>
             </div>
           </div>
         </div>
-      </div>
+      <% } %>
+
+      <% if (permissions.permissionReadSubcontractor) { %>
+        <div class="col">
+          <div class="card h-100 d-flex flex-column">
+            <div class="card-body">
+              <h5 class="card-header-pills">View Subcontractors</h5>
+              <p class="card-text">Access and manage your subcontractors.</p>
+              <a href="/dashboard/subcontractor" class="btn btn-primary mt-auto">View Subcontractors</a>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (isAdmin) { %>
+        <!-- Admin-Specific Actions -->
+        <div class="col">
+          <div class="card h-100 d-flex flex-column">
+            <div class="card-body">
+              <h5 class="card-header-pills">Manage Users</h5>
+              <p class="card-text">Create and manage user accounts with role-based permissions.</p>
+              <a href="/dashboard/user" class="btn btn-primary mt-auto">Manage Users</a>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (permissions.permissionReadInvoice) { %>
+        <div class="col">
+          <div class="card h-100 d-flex flex-column">
+            <div class="card-body">
+              <h5 class="card-header-pills">View Invoices</h5>
+              <p class="card-text">Track and review all your invoices.</p>
+              <a href="/dashboard/invoice" class="btn btn-primary mt-auto">View Invoices</a>
+            </div>
+          </div>
+        </div>
+      <% } %>
     </div>
+  <% } %>
+
+  <% if (!isAuthenticated) { %>
+    <!-- Non-Authenticated Users -->
+    <div class="text-center">
+      <p class="lead">Sign in to access your dashboard and features.</p>
+      <a href="/signin" class="btn btn-primary">Sign In</a>
+    </div>
+  <% } %>
+</div>
