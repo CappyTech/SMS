@@ -163,12 +163,32 @@ db.Employees.hasOne(db.Users, { foreignKey: 'employeeId' });
 //app.use(require('./middlewares/oneDriveSync')());
 //app.use(require('./middlewares/blockBot'));
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     res.locals.session = req.session;
-    logger.info(`Session Data: ${JSON.stringify(req.session)}`);
+    res.locals.isAuthenticated = false;
+    res.locals.isAdmin = false;
+    res.locals.firstName = null;
+    res.locals.permissions = {};
+    res.locals.role = null;
+
+    try {
+        const user = req.session.user;
+        if (user && user.id) {
+            const dbUser = await db.Users.findByPk(user.id);
+            if (dbUser) {
+                res.locals.isAuthenticated = true;
+                res.locals.isAdmin = dbUser.role === 'admin';
+                res.locals.firstName = dbUser.username.split('.')[0].charAt(0).toUpperCase() + dbUser.username.split('.')[0].slice(1);
+                res.locals.permissions = dbUser.permissions || {};
+                res.locals.role = dbUser.role;
+            }
+        }
+    } catch (error) {
+        logger.error(`Error validating user: ${error.message}`);
+    }
+    
     const username = req.session.user ? req.session.user.username : 'unknown user';
     const logMessage = `${username} accessed path ${req.method} ${req.path}`;
-
     if (req.path.includes('/update/')) {
         logger.warn(`-------- Warn: ${logMessage}`);
     } else if (req.path.includes('/delete/')) {
@@ -176,6 +196,7 @@ app.use((req, res, next) => {
     } else {
         logger.info(`${logMessage}`);
     }
+
     next();
 });
 
@@ -298,6 +319,8 @@ const weeklyAttendance = require('./controllers/weeklyAttendance');
 const kashflowRoutes = require('./kf/routes')
 
 const verificationRoutes  = require('./controllers/renderVerification');
+const { where } = require('sequelize');
+const { ensureAuthenticated } = require('./services/authService');
 
 app.use('/', index);
 
