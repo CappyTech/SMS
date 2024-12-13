@@ -1,6 +1,34 @@
 const encryptionService = require('../../services/encryptionService');
+const bcrypt = require('bcrypt'); // Ensure bcrypt is imported for password hashing
 
-// models/user.js
+// Role-Permission Mapping
+const rolePermissions = {
+    admin: {
+        createUser: true,
+        readUser: true,
+        updateUser: true,
+        deleteUser: true,
+        createInvoice: true,
+        readInvoice: true,
+        updateInvoice: true,
+        deleteInvoice: true,
+    },
+    subcontractor: {
+        readInvoice: true,
+        createInvoice: true,
+    },
+    employee: {
+        readUser: true,
+    },
+    accountant: {
+        readInvoice: true,
+        updateInvoice: true,
+    },
+    hmrc: {
+        readInvoice: true,
+    },
+};
+
 module.exports = (sequelize, DataTypes) => {
     const Users = sequelize.define('Users', {
         id: {
@@ -30,7 +58,11 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 'subcontractor',
             allowNull: false,
         },
-        // Foreign key fields to link with other models
+        permissions: {
+            type: DataTypes.JSON,
+            allowNull: false,
+            defaultValue: {},
+        },
         subcontractorId: {
             type: DataTypes.UUID,
             allowNull: true,
@@ -55,38 +87,6 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id',
             }
         },
-        // Permissions for roles
-        permissionCreateUser: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionReadUser: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionUpdateUser: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionDeleteUser: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionCreateSubcontractor: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionReadSubcontractor: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionUpdateSubcontractor: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionDeleteSubcontractor: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionCreateInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionReadInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionUpdateInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionDeleteInvoice: { type: DataTypes.BOOLEAN, defaultValue: false },
-        /*
-        permissionCreateEmployee: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionReadEmployee: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionUpdateEmployee: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionDeleteEmployee: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionCreateVehicle: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionReadVehicle: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionUpdateVehicle: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionDeleteVehicle: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionCreateVehicleCheck: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionReadVehicleCheck: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionUpdateVehicleCheck: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionDeleteVehicleCheck: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionCreateVehicleReceipt: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionReadVehicleReceipt: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionUpdateVehicleReceipt: { type: DataTypes.BOOLEAN, defaultValue: false },
-        permissionDeleteVehicleReceipt: { type: DataTypes.BOOLEAN, defaultValue: false },
-        */
-        // TOTP fields
         totpSecret: {
             type: DataTypes.STRING,
             allowNull: true, // Can be null until TOTP is enabled
@@ -116,6 +116,10 @@ module.exports = (sequelize, DataTypes) => {
         if (user.password) {
             user.password = await bcrypt.hash(user.password, 10);
         }
+
+        // Assign default permissions based on role
+        user.permissions = rolePermissions[user.role] || {};
+
         // Ensure only one of these fields is set at a time
         const count = [user.subcontractorId, user.clientId, user.employeeId].filter(id => id !== null).length;
         if (count > 1) {
@@ -123,10 +127,15 @@ module.exports = (sequelize, DataTypes) => {
         }
     });
 
-    // Hook to hash the password before updating the user, if the password is being changed
+    // Hook to hash the password before updating the user
     Users.beforeUpdate(async (user) => {
         if (user.changed('password')) {
             user.password = await bcrypt.hash(user.password, 10);
+        }
+
+        // Update permissions if the role changes
+        if (user.changed('role')) {
+            user.permissions = rolePermissions[user.role] || {};
         }
     });
 
