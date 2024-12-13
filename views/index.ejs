@@ -12,12 +12,11 @@
         Developed by Heron Constructive Solutions LTD
       </p>
     <% } %>
-  </div>
 
-  <% if (isAuthenticated) { %>
+    <% if (isAuthenticated) { %>
     <!-- Actions Section -->
     <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-      <% if (permissions.permissionCreateInvoice) { %>
+      <% if (permissions.CreateInvoice) { %>
         <div class="col">
           <div class="card h-100 d-flex flex-column">
             <div class="card-body">
@@ -29,7 +28,7 @@
         </div>
       <% } %>
 
-      <% if (permissions.permissionReadSubcontractor) { %>
+      <% if (permissions.ReadSubcontractor) { %>
         <div class="col">
           <div class="card h-100 d-flex flex-column">
             <div class="card-body">
@@ -54,7 +53,7 @@
         </div>
       <% } %>
 
-      <% if (permissions.permissionReadInvoice) { %>
+      <% if (permissions.ReadInvoice) { %>
         <div class="col">
           <div class="card h-100 d-flex flex-column">
             <div class="card-body">
@@ -66,13 +65,22 @@
         </div>
       <% } %>
     </div>
-  <% } %>
+    <% } %>
 
-  <% if (!isAuthenticated) { %>
+    <!-- Contact Support -->
+    <% if (isAuthenticated) { %>
+    <p class="text-center text-muted mt-4">
+      If you are missing any permissions, please email: 
+      <a href="mailto:<%= contactEmail %>" class="text-primary"><%= contactEmail %></a>.
+    </p>
+    <% } %>
+
+    <% if (!isAuthenticated) { %>
     <!-- Non-Authenticated Users -->
     <div class="text-center">
       <p class="lead">Sign in to access your dashboard and features.</p>
       <a href="/signin" class="btn btn-primary">Sign In</a>
     </div>
-  <% } %>
+    <% } %>
+  </div>
 </div>
