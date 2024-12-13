@@ -37,9 +37,6 @@ const logRequestDetails = (req, res, next) => {
         loginTime: req.session.user?.loginTime || new Date().toISOString(), // Save login time
     };
 
-    // Optional: Log the session updates
-    logger.info('Updated Session User: ' + req.session.user);
-
     // Log Details
     const logData = {
         method: req.method,
@@ -57,7 +54,7 @@ const logRequestDetails = (req, res, next) => {
         timestamp: new Date().toISOString(),
     };
 
-    logger.info('Incoming Request Details: ' + JSON.stringify(logData, null, 2));
+    //logger.info('Incoming Request Details: ' + JSON.stringify(logData, null, 2));
     next();
 };
 
