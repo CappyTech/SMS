@@ -186,7 +186,7 @@ app.use(async (req, res, next) => {
     } catch (error) {
         logger.error(`Error validating user: ${error.message}`);
     }
-    
+
     const username = req.session.user ? req.session.user.username : 'unknown user';
     const logMessage = `${username} accessed path ${req.method} ${req.path}`;
     if (req.path.includes('/update/')) {
@@ -202,25 +202,33 @@ app.use(async (req, res, next) => {
 
 app.use(async (req, res, next) => {
     try {
-        if (req.session && req.session.user) {
-            const unpaidInvoices = await db.Invoices.findAll({
-                where: { remittanceDate: null },
-                attributes: ['id', 'kashflowNumber'],
-                order: [['kashflowNumber', 'ASC']]
-            });
-            const unsubmittedInvoices = await db.Invoices.findAll({
-                where: { submissionDate: null },
-                attributes: ['id', 'kashflowNumber'],
-                order: [['kashflowNumber', 'ASC']]
-            });
-            res.locals.unpaidInvoices = unpaidInvoices;
-            res.locals.unsubmittedInvoices = unsubmittedInvoices;
-            res.locals.totalNotifications = unpaidInvoices.length + unsubmittedInvoices.length;
-
+        if (res.locals.isAuthenticated) {
+            res.locals.unpaidInvoices = {};
+            res.locals.unsubmittedInvoices = {};
+            res.locals.totalNotifications = 0;
+            if (res.locals.permissions.unpaidInvoices) {
+                const unpaidInvoices = await db.Invoices.findAll({
+                    where: { remittanceDate: null },
+                    attributes: ['id', 'kashflowNumber'],
+                    order: [['kashflowNumber', 'ASC']]
+                });
+                res.locals.unpaidInvoices = unpaidInvoices;
+                res.locals.totalNotifications =+ res.locals.unpaidInvoices;
+            }
+            if (res.locals.permissions.unsubmittedInvoices) {
+                const unsubmittedInvoices = await db.Invoices.findAll({
+                    where: { submissionDate: null },
+                    attributes: ['id', 'kashflowNumber'],
+                    order: [['kashflowNumber', 'ASC']]
+                });
+                res.locals.unsubmittedInvoices = unsubmittedInvoices;
+                res.locals.totalNotifications =+ res.locals.unsubmittedInvoices;
+            }
             const lastfetched = await db.KF_Meta.findOne({
                 order: [['lastFetchedAt', 'DESC']]
             })
             res.locals.lastfetched = lastfetched || null;
+            res.locals.contactEmail = process.env.SUPPORTEMAIL;
             next();
         } else {
             res.locals.unpaidInvoices = {};
