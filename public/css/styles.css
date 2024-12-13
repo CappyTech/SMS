@@ -349,3 +349,51 @@ body {
   color: red;
   font-weight: bold;
 }
+
+#cookieConsent {
+  padding: 15px 10px;
+  background-color: #f8f9fa;
+  border-top: 2px solid #2b9e1b;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#cookieConsent {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f8f9fa;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  padding: 10px;
+}
+
+#cookieConsent p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+#cookieConsent a {
+  color: #2b9e1b;
+  text-decoration: underline;
+}
+
+#cookieConsent a:hover {
+  text-decoration: none;
+  color: #196914;
+}
+
+#cookieConsent .btn-hcs-green {
+  background-color: #2b9e1b;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  border-radius: 4px;
+}
+
+#cookieConsent .btn-hcs-green:hover {
+  background-color: #196914;
+  color: white;
+}

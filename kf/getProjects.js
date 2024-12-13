@@ -1,3 +1,4 @@
+const logger = require('../services/loggerService');
 function getProjects(client) {
   return new Promise((resolve, reject) => {
     const projectFullParams = {
@@ -8,17 +9,17 @@ function getProjects(client) {
 
     client.GetProjects_Full(projectFullParams, (err, result) => {
       if (err) {
-        console.error('Error calling GetProjects_Full method:', err);
+        logger.error('Error calling GetProjects_Full method:', err);
         return reject(err); 
       }
 
       const projects = result.GetProjects_FullResult.Project;
 
       if (projects && projects.length) {
-        console.log('Total number of projects:', projects.length);
+        logger.info('Total number of projects: '+ projects.length);
         resolve(projects);
       } else {
-        console.log('No projects found.');
+        logger.info('No projects found.');
         resolve([]);
       }
     });

@@ -44,10 +44,30 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.JSON,
             allowNull: true,
         },
-        UseCustomDeliveryAddress: DataTypes.BOOLEAN,
+        UseCustomDeliveryAddress: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+            get() {
+                return this.getDataValue('UseCustomDeliveryAddress') === 1;
+            },
+            set(value) {
+                this.setDataValue('UseCustomDeliveryAddress', value ? 1 : 0);
+            },
+        },
         CISRCNetAmount: DataTypes.DECIMAL(10, 2),
         CISRCVatAmount: DataTypes.DECIMAL(10, 2),
-        IsCISReverseCharge: DataTypes.BOOLEAN,
+        IsCISReverseCharge: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+            get() {
+                return this.getDataValue('IsCISReverseCharge') === 1;
+            },
+            set(value) {
+                this.setDataValue('IsCISReverseCharge', value ? 1 : 0);
+            },
+        },
         Lines: {
             type: DataTypes.JSON,
             allowNull: true,

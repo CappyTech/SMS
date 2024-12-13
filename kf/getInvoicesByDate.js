@@ -1,3 +1,4 @@
+const logger = require('../services/loggerService');
 function getInvoicesByDate(client, startDate, endDate) {
   return new Promise((resolve, reject) => {
     const invoicesParams = {
@@ -9,17 +10,17 @@ function getInvoicesByDate(client, startDate, endDate) {
 
     client.GetInvoicesByDateRange(invoicesParams, async (err, result) => {
       if (err) {
-        console.error('Error calling GetInvoicesByDateRange method:', err);
+        logger.error('Error calling GetInvoicesByDateRange method:', err);
         return reject(err);
       }
 
       const invoices = result.GetInvoicesByDateRangeResult.Invoice;
 
       if (invoices && invoices.length) {
-        console.log('Total number of invoices:', invoices.length);
+        logger.info('Total number of invoices: '+ invoices.length);
         resolve(invoices);
       } else {
-        console.log('No invoices found.');
+        logger.info('No invoices found.');
         resolve([]);
       }
     });

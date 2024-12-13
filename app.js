@@ -6,9 +6,7 @@ const useragent = require('express-useragent');
 const logger = require('./services/loggerService');
 require('dotenv').config();
 const packageJson = require('./package.json');
-const os = require('os');
 const moment = require('moment');
-//const sequelize = require('./services/databaseService');
 const app = express();
 app.set('trust proxy', true);
 // Set up EJS
@@ -23,13 +21,11 @@ app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use(flash());
 app.use(useragent.express());
 
-// Middleware
-app.use(require('./middlewares/security'));
-app.use(require('./middlewares/session'));
-app.use(require('./middlewares/logRequestDetails'));
-app.use(require('./middlewares/rateLimiter'));
-// app.use(require('./middlewares/createDefaultAdmin'));
-
+app.use(require('./services/securityService'));
+app.use(require('./services/sessionService'));
+app.use(require('./services/logRequestDetailsService'));
+app.use(require('./services/rateLimiterService'));
+app.use(require('./services/cronService'));
 const db = require('./services/sequelizeDatabaseService');
 
 // Association for Users and Subcontractors
@@ -159,10 +155,6 @@ db.Clients.hasOne(db.Users, { foreignKey: 'clientId' });
 db.Users.belongsTo(db.Employees, { foreignKey: 'employeeId', as: 'Employee' });
 db.Employees.hasOne(db.Users, { foreignKey: 'employeeId' });
 
-//app.use(require('./middlewares/syncDatabase'));
-//app.use(require('./middlewares/oneDriveSync')());
-//app.use(require('./middlewares/blockBot'));
-
 app.use(async (req, res, next) => {
     res.locals.session = req.session;
     res.locals.isAuthenticated = false;
@@ -245,7 +237,6 @@ app.use(async (req, res, next) => {
 
 const { slimDateTime } = require('./services/dateService');
 const { formatCurrency, rounding } = require('./services/currencyService');
-const cronService = require('./services/cronService');
 
 app.use((req, res, next) => {
     res.locals.session = req.session;
@@ -379,7 +370,15 @@ app.use((req, res, next) => {
 });
 
 // Register the error handler
-app.use(require('./middlewares/errorHandler'));
+app.use(require('./services/errorHandlerService'));
+
+try {
+    logger.info('Cron job started: Fetching KashFlow data2...');
+    fetchKashFlowData2.fetchKashFlowData2();
+    logger.info('Cron job completed: KashFlow data2 fetched successfully.');
+} catch (error) {
+    logger.error('Cron job failed: ' + error.message);
+}
 
 if (process.env.NODE_ENV === 'development') {
     app.listen(80, '127.0.0.1', () => {

@@ -1,3 +1,4 @@
+const logger = require('../services/loggerService');
 function getReceipts(client) {
   return new Promise((resolve, reject) => {
     const receiptsParams = {
@@ -7,18 +8,18 @@ function getReceipts(client) {
 
     client.GetReceipts(receiptsParams, async (err, result) => {
       if (err) {
-        console.error('Error calling GetReceipts method:', err);
+        logger.error('Error calling GetReceipts method:', err);
         return reject(err);
       }
 
       const receipts = result.GetReceiptsResult.Invoice;
 
       if (receipts && receipts.length) {
-        console.log('Total number of receipts:', receipts.length);
+        logger.info('Total number of receipts: '+ receipts.length);
 
         resolve(receipts);
       } else {
-        console.log('No receipts found.');
+        logger.info('No receipts found.');
         resolve([]);
       }
     });

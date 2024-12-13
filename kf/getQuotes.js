@@ -1,3 +1,4 @@
+const logger = require('../services/loggerService');
 function getQuotes(client) {
   return new Promise((resolve, reject) => {
     const quotesParams = {
@@ -7,17 +8,17 @@ function getQuotes(client) {
 
     client.GetQuotes(quotesParams, async (err, result) => {
       if (err) {
-        console.error('Error calling GetQuotes method:', err);
+        logger.error('Error calling GetQuotes method:', err);
         return reject(err);
       }
 
       const quotes = result.GetQuotesResult.Invoice;
 
       if (quotes && quotes.length) {
-        console.log('Total number of quotes:', quotes.length);
+        logger.info('Total number of quotes: '+ quotes.length);
         resolve(quotes);
       } else {
-        console.log('No quotes found.');
+        logger.info('No quotes found.');
         resolve([]);
       }
     });

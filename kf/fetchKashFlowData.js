@@ -55,7 +55,7 @@ exports.fetchKashFlowData = async () => {
         const client = await new Promise((resolve, reject) => {
             authenticate((err, client) => {
                 if (err) {
-                    broadcastMessage('error', 'Failed to authenticate: ' + err.message);
+                    logger.error('Failed to authenticate: ' + err.message);
                     return reject(err);
                 }
                 resolve(client);

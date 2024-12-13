@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             allowNull: false,
         },
-        ID: { // KashFlow ID
+        ID: {
             type: DataTypes.INTEGER,
             unique: true,
             allowNull: false,
