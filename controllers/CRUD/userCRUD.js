@@ -83,12 +83,7 @@ const updateUser = async (req, res) => {
             return res.status(400).send('Bad Request: Missing user id parameter.');
         }
 
-        const {
-            username,
-            email,
-            role,
-            permissions: incomingPermissions
-        } = req.body;
+        const { username, email, role, permissions: incomingPermissions } = req.body;
 
         // Validate and sanitize permissions
         const validPermissions = rolePermissions[role] || {};
@@ -112,12 +107,14 @@ const updateUser = async (req, res) => {
         };
 
         // Update the user in the database
-        const [affectedRows, [updatedUser]] = await db.Users.update(updateFields, {
+        const [affectedRows, updatedUsers] = await db.Users.update(updateFields, {
             where: { id: req.params.id },
             returning: true,
         });
 
-        if (affectedRows > 0) {
+        if (affectedRows > 0 && updatedUsers.length > 0) {
+            const updatedUser = updatedUsers[0]; // Safely access the updated user
+
             req.flash('success', 'User updated successfully.');
 
             // Update session if the logged-in user is the updated user
@@ -134,11 +131,12 @@ const updateUser = async (req, res) => {
         res.redirect('/user/read/' + req.params.id);
 
     } catch (error) {
-        logger.error('Error updating user: ', error.message);
+        logger.error('Error updating user: ' + error.message);
         req.flash('error', 'Error updating user: ' + error.message);
         res.redirect('/dashboard/user');
     }
 };
+
 
 const deleteUser = async (req, res) => {
     try {
