@@ -141,3 +141,6 @@ module.exports = (sequelize, DataTypes) => {
 
     return Users;
 };
+
+// Export rolePermissions explicitly
+module.exports.rolePermissions = rolePermissions;

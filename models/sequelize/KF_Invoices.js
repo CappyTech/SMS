@@ -13,7 +13,22 @@ module.exports = (sequelize, DataTypes) => {
         },
         InvoiceNumber: DataTypes.INTEGER,
         InvoiceDate: DataTypes.DATE,
-        DueDate: DataTypes.DATE,
+        DueDate: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            set(value) {
+                // Convert placeholder dates to null
+                if (value === '0001-01-01T00:00:00.000Z' || value === '0001-01-01T00:01:15.000Z') {
+                    this.setDataValue('DueDate', null);
+                } else {
+                    this.setDataValue('DueDate', value);
+                }
+            },
+            get() {
+                const value = this.getDataValue('DueDate');
+                return value ? value : null;
+            }
+        },
         Customer: DataTypes.STRING,
         CustomerID: {
             type: DataTypes.INTEGER,
@@ -25,7 +40,17 @@ module.exports = (sequelize, DataTypes) => {
         Paid: DataTypes.DECIMAL(10, 2),
         CustomerReference: DataTypes.STRING,
         EstimateCategory: DataTypes.STRING,
-        SuppressTotal: DataTypes.BOOLEAN,
+        SuppressTotal: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+            get() {
+                return this.getDataValue('SuppressTotal') === 1;
+            },
+            set(value) {
+                this.setDataValue('SuppressTotal', value ? 1 : 0);
+            },
+        },
         ProjectID: {
             type: DataTypes.INTEGER,
             references: {
@@ -71,7 +96,24 @@ module.exports = (sequelize, DataTypes) => {
         Lines: {
             type: DataTypes.JSON,
             allowNull: true,
+            set(value) {
+                // Normalize Lines to ensure it is stored as JSON
+                if (typeof value === 'string') {
+                    try {
+                        this.setDataValue('Lines', JSON.parse(value));
+                    } catch (error) {
+                        this.setDataValue('Lines', null); // Fallback to null on parse error
+                    }
+                } else {
+                    this.setDataValue('Lines', value);
+                }
+            },
+            get() {
+                const value = this.getDataValue('Lines');
+                return value || []; // Default to empty array if null
+            }
         },
+        ReadableString: DataTypes.TEXT,
     }, {
         tableName: 'KF_Invoices',
         timestamps: true,

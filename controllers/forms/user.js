@@ -4,6 +4,7 @@ const logger = require('../../services/loggerService');
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
+const { rolePermissions } = require('../../models/sequelize/user');
 
 const renderUserCreateForm = async (req, res) => {
     try {
@@ -28,8 +29,7 @@ const renderUserUpdateForm = async (req, res) => {
         res.render(path.join('users', 'updateUser'), {
             title: 'Update User',
             user,
-            
-
+            rolePermissions: rolePermissions
         });
     } catch (error) {
         logger.error('Error rendering user update form: ' + error.message);

@@ -4,25 +4,19 @@ const logger = require('../../services/loggerService');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
+const db = require('../../services/sequelizeDatabaseService');
+const authService = require('../../services/authService');
+
+const { rolePermissions } = require('../../models/sequelize/user');
+
 const schema = Joi.object({
     username: Joi.string().min(1).required(),
     email: Joi.string().email().required(),
     role: Joi.string().valid('subcontractor', 'employee', 'accountant', 'hmrc', 'admin').required(),
-    permissionCreateUser: Joi.boolean(),
-    permissionReadUser: Joi.boolean(),
-    permissionUpdateUser: Joi.boolean(),
-    permissionDeleteUser: Joi.boolean(),
-    permissionCreateSubcontractor: Joi.boolean(),
-    permissionReadSubcontractor: Joi.boolean(),
-    permissionUpdateSubcontractor: Joi.boolean(),
-    permissionDeleteSubcontractor: Joi.boolean(),
-    permissionCreateInvoice: Joi.boolean(),
-    permissionReadInvoice: Joi.boolean(),
-    permissionUpdateInvoice: Joi.boolean(),
-    permissionDeleteInvoice: Joi.boolean(),
+    permissions: Joi.object()
+        .pattern(Joi.string(), Joi.boolean()) // Dynamic permissions validation
+        .optional() // Permissions field is optional
 });
-const db = require('../../services/sequelizeDatabaseService');
-const authService = require('../../services/authService');
 
 const createUser = async (req, res) => {
     try {
@@ -85,79 +79,64 @@ const readUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        // Verify if req.params and req.params.id exist
         if (!req.params || !req.params.id) {
             return res.status(400).send('Bad Request: Missing user id parameter.');
-        }
-
-        const { error } = schema.validate(req.body);
-        if (error) {
-            return res.status(400).send(error.details[0].message);
         }
 
         const {
             username,
             email,
             role,
-            permissionCreateUser,
-            permissionReadUser,
-            permissionUpdateUser,
-            permissionDeleteUser,
-            permissionCreateSubcontractor,
-            permissionReadSubcontractor,
-            permissionUpdateSubcontractor,
-            permissionDeleteSubcontractor,
-            permissionCreateInvoice,
-            permissionReadInvoice,
-            permissionUpdateInvoice,
-            permissionDeleteInvoice
+            permissions: incomingPermissions
         } = req.body;
 
-        // Then update the user data.
-        const updatedUser = await Users.update({
+        // Validate and sanitize permissions
+        const validPermissions = rolePermissions[role] || {};
+        const updatedPermissions = {};
+
+        if (incomingPermissions) {
+            // Allow updates only to valid permission keys
+            for (const key in incomingPermissions) {
+                if (validPermissions.hasOwnProperty(key)) {
+                    updatedPermissions[key] = incomingPermissions[key] === 'true' || incomingPermissions[key] === true;
+                }
+            }
+        }
+
+        // Prepare fields for update
+        const updateFields = {
             username,
             email,
             role,
-            permissionCreateUser,
-            permissionReadUser,
-            permissionUpdateUser,
-            permissionDeleteUser,
-            permissionCreateSubcontractor,
-            permissionReadSubcontractor,
-            permissionUpdateSubcontractor,
-            permissionDeleteSubcontractor,
-            permissionCreateInvoice,
-            permissionReadInvoice,
-            permissionUpdateInvoice,
-            permissionDeleteInvoice
-        }, {
+            permissions: updatedPermissions
+        };
+
+        // Update the user in the database
+        const [affectedRows, [updatedUser]] = await db.Users.update(updateFields, {
             where: { id: req.params.id },
-            returning: true, // To get the updated user data
+            returning: true,
         });
 
-        if (updatedUser[0] !== 0) {
-            req.flash('success', 'User updated.');
+        if (affectedRows > 0) {
+            req.flash('success', 'User updated successfully.');
 
-            // Check if the updated user is the same as the logged-in user
+            // Update session if the logged-in user is the updated user
             if (req.session.user.id === req.params.id) {
-                // Check for the existence of updatedUser[1][0].dataValues
-                if (updatedUser[1] && updatedUser[1][0] && updatedUser[1][0].dataValues) {
-                    // Then update the session user properties
-                    req.session.user = {
-                        ...req.session.user,
-                        ...updatedUser[1][0].dataValues
-                    };
-                }
+                req.session.user = {
+                    ...req.session.user,
+                    ...updatedUser.get() // Updated user data
+                };
             }
         } else {
             req.flash('error', 'User not found.');
-            res.redirect('/dashboard/user');
         }
+
         res.redirect('/user/read/' + req.params.id);
+
     } catch (error) {
-        logger.error('Error updating user:  ', error.message);
+        logger.error('Error updating user: ', error.message);
         req.flash('error', 'Error updating user: ' + error.message);
-        res.redirect('/');
+        res.redirect('/dashboard/user');
     }
 };
 
@@ -196,9 +175,9 @@ router.get('/fetch/user/:id', async (req, res) => {
     }
 });
 
-router.post('/user/create/', authService.ensureAuthenticated, authService.ensurePermission(['permissionCreateUser']), createUser);
-router.get('/user/read/:id', authService.ensureAuthenticated, authService.ensurePermission(['permissionReadUser']), readUser);
-router.post('/user/update/:id', authService.ensureAuthenticated, authService.ensurePermission(['permissionUpdateUser']), updateUser);
-router.post('/user/delete/:id', authService.ensureAuthenticated, authService.ensurePermission(['permissionDeleteUser']), deleteUser);
+router.post('/user/create/', authService.ensureAuthenticated, authService.ensureRole('admin'), createUser);
+router.get('/user/read/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), readUser);
+router.post('/user/update/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), updateUser);
+router.post('/user/delete/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteUser);
 
 module.exports = router;

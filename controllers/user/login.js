@@ -3,7 +3,6 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const logger = require('../../services/loggerService');
 const path = require('path');
-const encryptionService = require('../../services/encryptionService');
 const speakeasy = require('speakeasy');
 const db = require('../../services/sequelizeDatabaseService');
 
@@ -52,18 +51,7 @@ const loginUser = async (req, res) => {
                 username: user.username,
                 email: user.email,
                 role: user.role,
-                permissionCreateUser: user.permissionCreateUser,
-                permissionReadUser: user.permissionReadUser,
-                permissionUpdateUser: user.permissionUpdateUser,
-                permissionDeleteUser: user.permissionDeleteUser,
-                permissionCreateSubcontractor: user.permissionCreateSubcontractor,
-                permissionReadSubcontractor: user.permissionReadSubcontractor,
-                permissionUpdateSubcontractor: user.permissionUpdateSubcontractor,
-                permissionDeleteSubcontractor: user.permissionDeleteSubcontractor,
-                permissionCreateInvoice: user.permissionCreateInvoice,
-                permissionReadInvoice: user.permissionReadInvoice,
-                permissionUpdateInvoice: user.permissionUpdateInvoice,
-                permissionDeleteInvoice: user.permissionDeleteInvoice,
+                permissions: user.permissions,
                 loginTime: new Date().toISOString(),
                 ip: ip,
                 userAgent: {
@@ -82,18 +70,7 @@ const loginUser = async (req, res) => {
             username: user.username,
             email: user.email,
             role: user.role,
-            permissionCreateUser: user.permissionCreateUser,
-            permissionReadUser: user.permissionReadUser,
-            permissionUpdateUser: user.permissionUpdateUser,
-            permissionDeleteUser: user.permissionDeleteUser,
-            permissionCreateSubcontractor: user.permissionCreateSubcontractor,
-            permissionReadSubcontractor: user.permissionReadSubcontractor,
-            permissionUpdateSubcontractor: user.permissionUpdateSubcontractor,
-            permissionDeleteSubcontractor: user.permissionDeleteSubcontractor,
-            permissionCreateInvoice: user.permissionCreateInvoice,
-            permissionReadInvoice: user.permissionReadInvoice,
-            permissionUpdateInvoice: user.permissionUpdateInvoice,
-            permissionDeleteInvoice: user.permissionDeleteInvoice,
+            permissions: user.permissions,
             loginTime: new Date().toISOString(),
             ip: ip,
             userAgent: {
@@ -103,7 +80,7 @@ const loginUser = async (req, res) => {
                 platform: agent.platform || 'Unknown',
             },
         };
-
+        
         req.session.save((err) => {
             if (err) {
                 logger.error('Error saving session: ' + err.message);
@@ -167,7 +144,7 @@ const verify2FA = async (req, res) => {
         const agent = req.useragent || {};
         const ip = req.ip;
 
-        const decryptedSecret = encryptionService.decrypt(user.totpSecret);
+        const decryptedSecret = user.totpSecret;
         const tokenValidates = speakeasy.totp.verify({
             secret: decryptedSecret,
             encoding: 'base32',
@@ -181,22 +158,11 @@ const verify2FA = async (req, res) => {
         }
 
         req.session.user = {
-            id: req.session.userPending2FA.id,
-            username: req.session.userPending2FA.username,
-            email: req.session.userPending2FA.email,
-            role: req.session.userPending2FA.role,
-            permissionCreateUser: req.session.userPending2FA.permissionCreateUser,
-            permissionReadUser: req.session.userPending2FA.permissionReadUser,
-            permissionUpdateUser: req.session.userPending2FA.permissionUpdateUser,
-            permissionDeleteUser: req.session.userPending2FA.permissionDeleteUser,
-            permissionCreateSubcontractor: req.session.userPending2FA.permissionCreateSubcontractor,
-            permissionReadSubcontractor: req.session.userPending2FA.permissionReadSubcontractor,
-            permissionUpdateSubcontractor: req.session.userPending2FA.permissionUpdateSubcontractor,
-            permissionDeleteSubcontractor: req.session.userPending2FA.permissionDeleteSubcontractor,
-            permissionCreateInvoice: req.session.userPending2FA.permissionCreateInvoice,
-            permissionReadInvoice: req.session.userPending2FA.permissionReadInvoice,
-            permissionUpdateInvoice: req.session.userPending2FA.permissionUpdateInvoice,
-            permissionDeleteInvoice: req.session.userPending2FA.permissionDeleteInvoice,
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            permissions: user.permissions,
             loginTime: new Date().toISOString(),
             ip: ip,
             userAgent: {

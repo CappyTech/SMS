@@ -11,7 +11,6 @@ const authService = require('../services/authService');
 
 const renderStatsDashboard = async (req, res) => {
     try {
-        console.log("Session User:", req.session.user);
         // Fetch the specified year and month from the URL parameters
         const specifiedYear = parseInt(req.params.year);
         const specifiedMonth = parseInt(req.params.month);
@@ -363,8 +362,7 @@ const renderEmployeeDashboard = async (req, res) => {
 const renderKFInvoicesDashboard = async (req, res) => {
     try {
         const invoices = await db.KF_Invoices.findAll({
-            attributes: ['InvoiceNumber', 'NetAmount', 'AmountPaid', 'InvoiceDate'],
-            order: [['AmountPaid', 'DESC']]
+            order: [['InvoiceDBID', 'DESC']]
         });
 
         const paidInvoicesCount = invoices.filter(invoice => invoice.AmountPaid >= invoice.NetAmount).length;
@@ -419,7 +417,6 @@ const renderKFCustomersDashboard = async (req, res) => {
 const renderKFProjectsDashboard = async (req, res) => {
     try {
         const projects = await db.KF_Projects.findAll({
-            attributes: ['Name', 'Description', 'Status', 'CustomerID'],
             include: [{ model: db.KF_Customers, attributes: ['Name'], as: 'customer' }],
             order: [['Number', 'DESC']]
         });
@@ -444,8 +441,7 @@ const renderKFProjectsDashboard = async (req, res) => {
 const renderKFQuotesDashboard = async (req, res) => {
     try {
         const quotes = await db.KF_Quotes.findAll({
-            attributes: ['InvoiceNumber', 'Customer', 'InvoiceDate', 'NetAmount'],
-            order: [['InvoiceDate', 'DESC']]
+            order: [['InvoiceDBID', 'DESC']]
         });
 
         res.render(path.join('kashflow', 'quote'), {
@@ -462,9 +458,8 @@ const renderKFQuotesDashboard = async (req, res) => {
 const renderKFReceiptsDashboard = async (req, res) => {
     try {
         const receipts = await db.KF_Receipts.findAll({
-            attributes: ['InvoiceNumber', 'CustomerID', 'AmountPaid', 'InvoiceDate'],
-            include: [{ model: db.KF_Customers, attributes: ['Name'], as: 'customer' }],
-            order: [['Created', 'DESC']]
+            include: [{ model: db.KF_Suppliers, attributes: ['Name'], as: 'supplier' }],
+            order: [['InvoiceDBID', 'DESC']]
         });
 
         res.render(path.join('kashflow', 'receipt'), {

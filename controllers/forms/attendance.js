@@ -4,6 +4,7 @@ const logger = require('../../services/loggerService');
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
+const dateService = require('../../services/dateService');
 
 const renderAttendanceCreateForm = async (req, res) => {
     try {
@@ -13,7 +14,7 @@ const renderAttendanceCreateForm = async (req, res) => {
         const subcontractors = await db.Subcontractors.findAll();
 
         res.render(path.join('attendance', 'createAttendance'), {
-            date: date ? moment(date).format('YYYY-MM-DD') : '', // Format the date for input[type="date"]
+            date: date ? dateService.slimDateTime(date, false, true) : '',
             employeeId: employeeId ?? null,
             subcontractorId: subcontractorId ?? null,
             title: 'Create Attendance',

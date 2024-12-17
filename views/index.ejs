@@ -22,7 +22,7 @@
             <div class="card-body">
               <h5 class="card-header-pills">Create Invoice</h5>
               <p class="card-text">Generate and manage invoices efficiently.</p>
-              <a href="/invoice/create" class="btn btn-primary mt-auto">Create Invoice</a>
+              <a href="/invoice/create" class="btn btn-hcs-green mt-auto">Create Invoice</a>
             </div>
           </div>
         </div>
@@ -34,7 +34,7 @@
             <div class="card-body">
               <h5 class="card-header-pills">View Subcontractors</h5>
               <p class="card-text">Access and manage your subcontractors.</p>
-              <a href="/dashboard/subcontractor" class="btn btn-primary mt-auto">View Subcontractors</a>
+              <a href="/dashboard/subcontractor" class="btn btn-hcs-green mt-auto">View Subcontractors</a>
             </div>
           </div>
         </div>
@@ -47,7 +47,7 @@
             <div class="card-body">
               <h5 class="card-header-pills">Manage Users</h5>
               <p class="card-text">Create and manage user accounts with role-based permissions.</p>
-              <a href="/dashboard/user" class="btn btn-primary mt-auto">Manage Users</a>
+              <a href="/dashboard/user" class="btn btn-hcs-green mt-auto">Manage Users</a>
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@
             <div class="card-body">
               <h5 class="card-header-pills">View Invoices</h5>
               <p class="card-text">Track and review all your invoices.</p>
-              <a href="/dashboard/invoice" class="btn btn-primary mt-auto">View Invoices</a>
+              <a href="/dashboard/invoice" class="btn btn-hcs-green mt-auto">View Invoices</a>
             </div>
           </div>
         </div>
@@ -71,7 +71,7 @@
     <% if (isAuthenticated) { %>
     <p class="text-center text-muted mt-4">
       If you are missing any permissions, please email: 
-      <a href="mailto:<%= contactEmail %>" class="text-primary"><%= contactEmail %></a>.
+      <a href="mailto:<%= contactEmail %>" class="hcs-green-text"><%= contactEmail %></a>.
     </p>
     <% } %>
 
@@ -79,7 +79,7 @@
     <!-- Non-Authenticated Users -->
     <div class="text-center">
       <p class="lead">Sign in to access your dashboard and features.</p>
-      <a href="/signin" class="btn btn-primary">Sign In</a>
+      <a href="/signin" class="btn btn-hcs-green">Sign In</a>
     </div>
     <% } %>
   </div>

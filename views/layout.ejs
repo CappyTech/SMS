@@ -21,8 +21,6 @@
         <img src="/images/favicon.png" alt="Favicon" class="me-2" width="32" height="32">
         <span class="d-none d-md-inline">Heron Constructive Solutions LTD</span>
       </a>
-    </div>
-
       <ul class="navbar-nav ms-auto hstack gap-3">
         <% if (isAuthenticated) { %>
           <!-- Dropdown: My Account -->
@@ -101,19 +99,48 @@
               </ul>
             </div>
           </li>
-    
-          <!-- Dropdown: Dashboards -->
+          
           <li class="nav-item dropdown">
             <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-graph-up"></i> Dashboards
+              <i class="bi bi-graph-up"></i> Kashflow
             </button>
             <div class="dropdown-menu p-3 bg-body">
-              <ul class="nav flex-column">
+              <ul class="nav flex-column" aria-labelledby="kashflowDropdown" id="nestedDropdownMenu">
+                <!-- Customers -->
                 <li class="nav-item">
-                  <a href="/dashboard/stats" class="nav-link"><i class="bi bi-binoculars me-2"></i> Overview</a>
+                  <a href="/dashboard/KFcustomer" class="nav-link">
+                    <i class="bi bi-people me-2"></i> Customers
+                  </a>
                 </li>
+                <!-- Invoices -->
                 <li class="nav-item">
-                  <a href="/attendance/weekly" class="nav-link"><i class="bi bi-person-raised-hand me-2"></i> Weekly Attendance</a>
+                  <a href="/dashboard/KFinvoice" class="nav-link">
+                    <i class="bi bi-receipt me-2"></i> Invoices
+                  </a>
+                </li>
+                <!-- Quotes -->
+                <li class="nav-item">
+                  <a href="/dashboard/KFquote" class="nav-link">
+                    <i class="bi bi-card-text me-2"></i> Quotes
+                  </a>
+                </li>
+                <!-- Suppliers -->
+                <li class="nav-item">
+                  <a href="/dashboard/KFsupplier" class="nav-link">
+                    <i class="bi bi-truck me-2"></i> Suppliers
+                  </a>
+                </li>
+                <!-- Receipts -->
+                <li class="nav-item">
+                  <a href="/dashboard/KFreceipt" class="nav-link">
+                    <i class="bi bi-cash-stack me-2"></i> Purchases
+                  </a>
+                </li>
+                <!-- Projects -->
+                <li class="nav-item">
+                  <a href="/dashboard/KFproject" class="nav-link">
+                    <i class="bi bi-kanban me-2"></i> Jobs
+                  </a>
                 </li>
               </ul>
             </div>
@@ -126,6 +153,11 @@
             </button>
             <div class="dropdown-menu p-3 bg-body">
               <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a href="/dashboard/stats" class="nav-link">
+                    <i class="bi bi-binoculars me-2"></i> Overview
+                  </a>
+                </li>
                 <li class="nav-item">
                   <a href="/dashboard/invoice" class="nav-link"><i class="bi bi-receipt me-2"></i> Invoices</a>
                 </li>
@@ -185,6 +217,11 @@
                 <li class="nav-item">
                   <a href="/dashboard/attendance" class="nav-link">
                     <i class="bi bi-person-raised-hand me-2"></i> Attendance
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="/attendance/weekly" class="nav-link">
+                    <i class="bi bi-person-raised-hand me-2"></i> Weekly Attendance
                   </a>
                 </li>
                 <li class="nav-item">
@@ -358,7 +395,6 @@
     }
   </script>
   <script>
-    console.log(<%- JSON.stringify(session) %>);
     window.addEventListener('load', () => {
       const pageLoadTime = performance.now();
       console.log(`Page load time is ${pageLoadTime.toFixed(2)} ms`);

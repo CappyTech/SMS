@@ -36,6 +36,7 @@ strong {
 }
 .hcs-green-text {
   color: #2b9e1b !important;
+  font-weight: 700;
 }
 .hcs-black-text {
   color: #4e4e4e !important;
