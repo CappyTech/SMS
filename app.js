@@ -372,14 +372,6 @@ app.use((req, res, next) => {
 // Register the error handler
 app.use(require('./services/errorHandlerService'));
 
-try {
-    logger.info('Cron job started: Fetching KashFlow data2...');
-    fetchKashFlowData2.fetchKashFlowData2();
-    logger.info('Cron job completed: KashFlow data2 fetched successfully.');
-} catch (error) {
-    logger.error('Cron job failed: ' + error.message);
-}
-
 if (process.env.NODE_ENV === 'development') {
     app.listen(80, '127.0.0.1', () => {
         logger.info(`Server is running development`);
