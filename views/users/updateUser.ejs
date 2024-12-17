@@ -48,7 +48,7 @@
                                             name="permissions[<%= permission %>]" 
                                             id="permission<%= permission %>True" 
                                             value="true" 
-                                            <%= user.permissions && user.permissions[permission] ? 'checked' : '' %>>
+                                            <%= user.permissions && user.permissions[permission] === true ? 'checked' : '' %>>
                                         <label class="form-check-label" for="permission<%= permission %>True">
                                             Enabled
                                         </label>
@@ -60,11 +60,11 @@
                                             name="permissions[<%= permission %>]" 
                                             id="permission<%= permission %>False" 
                                             value="false" 
-                                            <%= !user.permissions || !user.permissions[permission] ? 'checked' : '' %>>
+                                            <%= user.permissions && user.permissions[permission] === false ? 'checked' : '' %>>
                                         <label class="form-check-label" for="permission<%= permission %>False">
                                             Disabled
                                         </label>
-                                    </div>
+                                    </div>                                                                      
                                 </dd>
                             </dl>
                         <% }) %>
