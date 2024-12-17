@@ -1,4 +1,4 @@
-<div class="container py-4">
+<div class="container-fluid py-4">
   <!-- Greeting Section -->
   <div class="p-5 mb-4 bg-body-tertiary rounded-3 text-center">
     <% if (isAuthenticated) { %>
@@ -16,7 +16,7 @@
     <% if (isAuthenticated) { %>
     <!-- Actions Section -->
     <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-      <% if (permissions.CreateInvoice) { %>
+      <% if (permissions.createInvoice) { %>
         <div class="col">
           <div class="card h-100 d-flex flex-column">
             <div class="card-body">
@@ -28,7 +28,7 @@
         </div>
       <% } %>
 
-      <% if (permissions.ReadSubcontractor) { %>
+      <% if (permissions.readSubcontractor) { %>
         <div class="col">
           <div class="card h-100 d-flex flex-column">
             <div class="card-body">
@@ -53,7 +53,7 @@
         </div>
       <% } %>
 
-      <% if (permissions.ReadInvoice) { %>
+      <% if (permissions.readInvoice) { %>
         <div class="col">
           <div class="card h-100 d-flex flex-column">
             <div class="card-body">
