@@ -23,9 +23,14 @@ const renderUserUpdateForm = async (req, res) => {
     try {
         const userId = req.params.user;
         const user = await db.Users.findByPk(userId);
-        if (!user) {
+        if (user) {
+            user.permissions = typeof user.permissions === 'string' 
+                ? JSON.parse(user.permissions) 
+                : user.permissions || {};
+        } else {
             return res.status(404).send('User not found');
         }
+        console.log(user.permissions);
         res.render(path.join('users', 'updateUser'), {
             title: 'Update User',
             user,
