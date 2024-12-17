@@ -12,6 +12,10 @@ const rolePermissions = {
         readInvoice: true,
         updateInvoice: true,
         deleteInvoice: true,
+        createSubcontractor: true,
+        readSubcontractor: true,
+        updateSubcontractor: true,
+        deleteSubcontractor: true,
     },
     subcontractor: {
         readInvoice: true,
@@ -62,6 +66,15 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.JSON,
             allowNull: false,
             defaultValue: {},
+            get() {
+                // Ensure it always returns a parsed object
+                const rawValue = this.getDataValue('permissions');
+                return typeof rawValue === 'string' ? JSON.parse(rawValue) : rawValue;
+            },
+            set(value) {
+                // Ensure proper JSON stringification before saving
+                this.setDataValue('permissions', value);
+            },
         },
         subcontractorId: {
             type: DataTypes.UUID,
