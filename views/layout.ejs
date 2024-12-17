@@ -289,33 +289,33 @@
     </nav>
   </footer>
 
-  <div id="cookieConsent" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: #f8f9fa; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); z-index: 9999; padding: 10px;">
-    <div class="container d-flex justify-content-between align-items-center">
+  <div id="cookieConsent" style="display: none;">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
       <div>
-        <p class="mb-0" style="font-size: 0.9rem; color: #555;">
+        <p class="mb-0">
           This site uses cookies to improve your experience. By using our site, you agree to our
-          <a href="/privacy-policy" target="_blank" style="color: #2b9e1b; text-decoration: underline;">Privacy Policy</a>.
+          <a href="/privacy-policy" target="_blank">Privacy Policy</a>.
         </p>
       </div>
       <button id="acceptCookies" class="btn btn-hcs-green btn-sm">Accept</button>
     </div>
-  </div>  
+  </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const consent = localStorage.getItem('cookieConsent');
+    document.addEventListener('DOMContentLoaded', function () {
       const cookieBanner = document.getElementById('cookieConsent');
+      const acceptButton = document.getElementById('acceptCookies');
 
-      if (!consent) {
+      // Show the banner if cookie not accepted
+      if (!document.cookie.includes('cookieAccepted=true')) {
         cookieBanner.style.display = 'block';
-        document.body.style.paddingBottom = `${cookieBanner.offsetHeight}px`; // Adjust body padding to avoid overlap
-
-        document.getElementById('acceptCookies').addEventListener('click', () => {
-          localStorage.setItem('cookieConsent', 'true');
-          cookieBanner.style.display = 'none';
-          document.body.style.paddingBottom = '0'; // Reset body padding
-        });
       }
+
+      // Accept Cookies Event
+      acceptButton.addEventListener('click', function () {
+        cookieBanner.style.display = 'none';
+        document.cookie = "cookieAccepted=true; path=/; max-age=31536000"; // 1 year
+      });
     });
   </script>
   <script defer src="/node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
