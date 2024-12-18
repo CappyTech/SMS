@@ -9,10 +9,10 @@ const packageJson = require('./package.json');
 const moment = require('moment');
 const app = express();
 app.set('trust proxy', true);
-// Set up EJS
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.set('layout', 'layout'); // default layout
+app.set('layout', 'layout-tailwind'); // default layout
 app.use(expressLayouts);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
