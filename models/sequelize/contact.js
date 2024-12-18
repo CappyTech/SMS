@@ -9,10 +9,6 @@ module.exports = (sequelize, DataTypes) => {
         clientId: {
             type: DataTypes.UUID,
             allowNull: false,
-            references: {
-                model: 'Clients',
-                key: 'id',
-            }
         },
         name: {
             type: DataTypes.STRING,
