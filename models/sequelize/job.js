@@ -13,14 +13,26 @@ const Jobs = sequelize.define('Jobs', {
     locationId: {
         type: DataTypes.UUID,
         allowNull: true,
+        references: {
+            model: 'Locations',
+            key: 'id',
+        }
     },
     clientId: {
         type: DataTypes.UUID,
         allowNull: true,
+        references: {
+            model: 'Clients',
+            key: 'id',
+        }
     },
     quoteId: {
         type: DataTypes.UUID,
         allowNull: true,
+        references: {
+            model: 'Quotes',
+            key: 'id',
+        }
     },
     value: {
         type: DataTypes.FLOAT,
