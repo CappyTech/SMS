@@ -19,26 +19,14 @@ module.exports = (sequelize, DataTypes) => {
         locationId: {
             type: DataTypes.UUID,
             allowNull: true,
-            references: {
-                model: db.Locations,
-                key: 'id',
-            }
         },
         employeeId: {
             type: DataTypes.UUID,
             allowNull: true, // Make it nullable so it can be either employee or subcontractor
-            references: {
-                model: db.Employees,
-                key: 'id',
-            }
         },
         subcontractorId: {
             type: DataTypes.UUID,
             allowNull: true, // Make it nullable so it can be either employee or subcontractor
-            references: {
-                model: db.Subcontractors,
-                key: 'id',
-            }
         },
         hoursWorked: {
             type: DataTypes.DECIMAL(10, 2),
