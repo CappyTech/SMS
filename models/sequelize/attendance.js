@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.UUID,
             allowNull: true,
             references: {
-                model: 'Locations',
+                model: db.Locations,
                 key: 'id',
             }
         },
@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.UUID,
             allowNull: true, // Make it nullable so it can be either employee or subcontractor
             references: {
-                model: 'Employees',
+                model: db.Employees,
                 key: 'id',
             }
         },
@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.UUID,
             allowNull: true, // Make it nullable so it can be either employee or subcontractor
             references: {
-                model: 'Subcontractors',
+                model: db.Subcontractors,
                 key: 'id',
             }
         },
@@ -50,6 +50,20 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'latin1',
         collate: 'latin1_bin',
     });
+
+    Attendances.associate = (db) => {
+        // Attendances -> Employees
+        db.Attendances.belongsTo(db.Employees, { foreignKey: 'employeeId', allowNull: false });
+        db.Employees.hasMany(db.Attendances, { foreignKey: 'employeeId', allowNull: false });
+
+        // Attendances -> Subcontractors
+        db.Attendances.belongsTo(db.Subcontractors, { foreignKey: 'subcontractorId', allowNull: false });
+        db.Subcontractors.hasMany(db.Attendances, { foreignKey: 'subcontractorId', allowNull: false });
+
+        // Attendances -> Locations
+        db.Attendances.belongsTo(db.Locations, { foreignKey: 'locationId', allowNull: false });
+        db.Locations.hasMany(db.Attendances, { foreignKey: 'locationId', allowNull: false });
+    };
 
     return Attendances;
 };
