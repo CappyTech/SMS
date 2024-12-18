@@ -18,7 +18,7 @@ const Quotes = sequelize.define('Quotes', {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-            model: 'Locations',
+            model: db.Locations,
             key: 'id',
         }
     },
@@ -26,7 +26,7 @@ const Quotes = sequelize.define('Quotes', {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-            model: 'Clients',
+            model: db.Clients,
             key: 'id',
         }
     },
@@ -34,7 +34,7 @@ const Quotes = sequelize.define('Quotes', {
         type: DataTypes.UUID,
         allowNull: true,
         references: {
-            model: 'Contacts',
+            model: db.Contacts,
             key: 'id',
         }
     },
