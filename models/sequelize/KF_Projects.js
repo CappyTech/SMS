@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
         Date2: DataTypes.DATE,
         CustomerID: {
             type: DataTypes.INTEGER,
+            references: {
+                model: 'KF_Customers',
+                key: 'CustomerID',
+            },
         },
         Status: DataTypes.INTEGER,
     }, {
