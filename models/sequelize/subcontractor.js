@@ -72,7 +72,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
-                model: db.KF_Suppliers,
+                model: 'KF_Suppliers',
                 key: 'SupplierID',
             },
         },
@@ -82,23 +82,6 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'latin1',
         collate: 'latin1_bin',
     });
-
-    Subcontractors.associate = (db) => {
-        // Subcontractors -> Users
-        db.Subcontractors.hasOne(db.Users, { foreignKey: 'subcontractorId' });
-
-        // Subcontractors -> Invoices
-        db.Subcontractors.hasMany(db.Invoices, {
-            foreignKey: 'subcontractorId',
-            allowNull: false,
-            as: 'invoices',
-        });
-        db.Invoices.belongsTo(db.Subcontractors, { foreignKey: 'subcontractorId', allowNull: false });
-
-        // Subcontractors -> Attendances
-        db.Subcontractors.hasMany(db.Attendances, { foreignKey: 'subcontractorId', allowNull: false });
-        db.Attendance.belongsTo(db.Subcontractors, { foreignKey: 'subcontractorId', allowNull: false });
-    };
 
     Subcontractors.beforeValidate((subcontractor, options) => {
         logger.info('Before validate: ' + JSON.stringify(subcontractor, null, 2) + ' ' + JSON.stringify(options, null, 2));
