@@ -80,7 +80,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.UUID,
             allowNull: true,
             references: {
-                model: db.Subcontractors,
+                model: 'Subcontractors',
                 key: 'id',
             }
         },
@@ -88,7 +88,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.UUID,
             allowNull: true,
             references: {
-                model: db.Clients,
+                model: 'Clients',
                 key: 'id',
             }
         },
@@ -96,7 +96,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.UUID,
             allowNull: true,
             references: {
-                model: db.Employees,
+                model: 'Employees',
                 key: 'id',
             }
         },
@@ -123,20 +123,6 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'latin1',
         collate: 'latin1_bin',
     });
-
-    Users.associate = (db) => {
-        // Association with Subcontractors
-        db.Users.belongsTo(db.Subcontractors, { foreignKey: 'subcontractorId', as: 'Subcontractor' });
-        db.Subcontractors.hasOne(db.Users, { foreignKey: 'subcontractorId' });
-
-        // Association with Clients
-        db.Users.belongsTo(db.Clients, { foreignKey: 'clientId', as: 'Client' });
-        db.Clients.hasOne(db.Users, { foreignKey: 'clientId' });
-
-        // Association with Employees
-        db.Users.belongsTo(db.Employees, { foreignKey: 'employeeId', as: 'Employee' });
-        db.Employees.hasOne(db.Users, { foreignKey: 'employeeId' });
-    };
 
     // Hook to hash the password before creating the user
     Users.beforeCreate(async (user) => {
