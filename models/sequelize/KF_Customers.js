@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
             unique: true,
             allowNull: false,
         },
-        Code: DataTypes.STRING(50),
+        Code: DataTypes.STRING(10),
         Name: DataTypes.STRING(255),
         Contact: DataTypes.STRING(255),
         Telephone: DataTypes.STRING(50),
@@ -46,24 +46,31 @@ module.exports = (sequelize, DataTypes) => {
         },
         PaymentTerms: DataTypes.INTEGER,
         CurrencyID: DataTypes.INTEGER,
-        ContactTitle: DataTypes.STRING(50),
+        ContactTitle: DataTypes.TEXT,
         ContactFirstName: DataTypes.STRING(100),
         ContactLastName: DataTypes.STRING(100),
         CustHasDeliveryAddress: {
             type: DataTypes.INTEGER,
             defaultValue: 0,
             allowNull: false,
+            get() {
+                return this.getDataValue('CustHasDeliveryAddress') === 1;
+            },
+            set(value) {
+                this.setDataValue('CustHasDeliveryAddress', value ? 1 : 0);
+            },
         },
         DeliveryAddress1: DataTypes.TEXT,
         DeliveryAddress2: DataTypes.TEXT,
         DeliveryAddress3: DataTypes.TEXT,
         DeliveryAddress4: DataTypes.TEXT,
         DeliveryCountryName: DataTypes.STRING(100),
-        DeliveryCountryCode: DataTypes.STRING(10),
-        DeliveryPostcode: DataTypes.STRING(50),
+        DeliveryCountryCode: DataTypes.STRING(6),
+        DeliveryPostcode: DataTypes.STRING(8),
         VATNumber: DataTypes.STRING(100),
         Created: DataTypes.DATE,
         Updated: DataTypes.DATE,
+
     }, {
         tableName: 'KF_Customers',
         timestamps: true,
@@ -78,6 +85,21 @@ module.exports = (sequelize, DataTypes) => {
         KF_Customers.hasMany(models.KF_Receipts, { foreignKey: 'CustomerID', as: 'receipts' });
         KF_Customers.hasMany(models.KF_Projects, { foreignKey: 'CustomerID', as: 'projects' });
     };
+
+    for (let i = 1; i <= 20; i++) {
+        KF_Customers[`ExtraText${i}`] = {
+            type: DataTypes.TEXT,
+            defaultValue: "",
+            allowNull: false,
+        }
+    }
+    for (let i = 1; i <= 20; i++) {
+        KF_Customers[`CheckBox${i}`] = {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false,
+        };
+    }
 
     return KF_Customers;
 };
