@@ -19,13 +19,8 @@ module.exports = (sequelize, DataTypes) => {
         Date2: DataTypes.DATE,
         CustomerID: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'KF_Customers',
-                key: 'CustomerID',
-            },
         },
         Status: DataTypes.INTEGER,
-        
     }, {
         tableName: 'KF_Projects',
         timestamps: true,
@@ -34,11 +29,11 @@ module.exports = (sequelize, DataTypes) => {
         collate: 'latin1_bin',
     });
 
-    KF_Projects.associate = (models) => {
-        KF_Projects.belongsTo(models.KF_Customers, { foreignKey: 'CustomerID', as: 'customer' });
-        KF_Projects.hasMany(models.KF_Invoices, { foreignKey: 'ProjectID', as: 'invoices' });
-        KF_Projects.hasMany(models.KF_Quotes, { foreignKey: 'ProjectID', as: 'quotes' });
-        KF_Projects.hasMany(models.KF_Receipts, { foreignKey: 'ProjectID', as: 'receipts' });
+    KF_Projects.associate = (db) => {
+        KF_Projects.belongsTo(db.KF_Customers, { foreignKey: 'CustomerID', as: 'customer' });
+        KF_Projects.hasMany(db.KF_Invoices, { foreignKey: 'ProjectID', as: 'invoices' });
+        KF_Projects.hasMany(db.KF_Quotes, { foreignKey: 'ProjectID', as: 'quotes' });
+        KF_Projects.hasMany(db.KF_Receipts, { foreignKey: 'ProjectID', as: 'receipts' });
     };
 
     return KF_Projects;
