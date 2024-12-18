@@ -1,9 +1,73 @@
 body {
-  font-family: "Lato", sans-serif;
+  font-family: "Lato", serif;
+  font-weight: 400;
+  font-style: normal;
 }
 strong {
-  font-family: "Lato:b", sans-serif;
+  font-family: "Lato", serif;
+  font-weight: 700;
+  font-style: normal;
 }
+.lato-thin {
+  font-family: "Lato", serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.lato-light {
+  font-family: "Lato", serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.lato-regular {
+  font-family: "Lato", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lato-bold {
+  font-family: "Lato", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.lato-black {
+  font-family: "Lato", serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.lato-thin-italic {
+  font-family: "Lato", serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.lato-light-italic {
+  font-family: "Lato", serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.lato-regular-italic {
+  font-family: "Lato", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.lato-bold-italic {
+  font-family: "Lato", serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.lato-black-italic {
+  font-family: "Lato", serif;
+  font-weight: 900;
+  font-style: italic;
+}
+
 .hcs-blue {
   background-color: #007bff !important;
 }
@@ -46,6 +110,7 @@ strong {
 .hcs-black-text:hover {
   color: #a7a9ac !important;
 }
+
 .dropdown:hover .dropdown-menu {
   display: block !important;
 }
@@ -240,9 +305,6 @@ strong {
   align-items: center;
   padding: 10px;
 }
-.bg-second-navbar {
-  background-color: #e6e7e8;
-}
 
 /* Define your custom button classes */
 .btn-hcs-red {
@@ -301,54 +363,6 @@ body {
 }
 .content {
   flex: 1;
-}
-
-@media all and (min-width: 992px) {
-  .dropdown-menu {
-    width: 13rem;
-  }
-  .mega-menu {
-    position: static;
-    left: 0;
-    right: 0;
-    width: 100%;
-  }
-  .mega-submenu {
-    left: 100%;
-    top: 0;
-    min-width: 25rem;
-  }
-  .dropdown-menu li {
-    position: relative;
-  }
-  .dropdown-menu .submenu {
-    display: none;
-    left: 100%;
-    top: 0;
-  }
-  .dropdown-menu > li:hover > .submenu,
-  .dropdown:hover > .dropdown-menu {
-    display: block;
-  }
-}
-
-@media (max-width: 992px) {
-  .dropdown-menu {
-    width: auto;
-  }
-  .mega-menu {
-    position: static;
-    width: auto;
-  }
-}
-
-.secure-yes {
-  color: green;
-  font-weight: bold;
-}
-.secure-no {
-  color: red;
-  font-weight: bold;
 }
 
 /* General Cookie Banner Styles */
