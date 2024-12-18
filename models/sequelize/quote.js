@@ -17,26 +17,14 @@ const Quotes = sequelize.define('Quotes', {
     locationId: {
         type: DataTypes.UUID,
         allowNull: false,
-        references: {
-            model: db.Locations,
-            key: 'id',
-        }
     },
     clientId: {
         type: DataTypes.UUID,
         allowNull: false,
-        references: {
-            model: db.Clients,
-            key: 'id',
-        }
     },
     contactId: {
         type: DataTypes.UUID,
         allowNull: true,
-        references: {
-            model: db.Contacts,
-            key: 'id',
-        }
     },
     value: {
         type: DataTypes.FLOAT,
@@ -70,6 +58,14 @@ const Quotes = sequelize.define('Quotes', {
     deletedAt: {
         type: DataTypes.DATE,
         allowNull: true,
+    },
+    KashFlowID: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'KF_Quotes',
+            key: 'InvoiceNumber',
+        },
     },
 }, {
     timestamps: true,
