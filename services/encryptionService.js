@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-require('dotenv').config(); // Automatically loads `.env` from the project root
+require('dotenv').config();
 
 // Validate environment variable
 if (!process.env.ENCRYPTION_KEY) {
