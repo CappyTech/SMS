@@ -59,14 +59,6 @@ const Quotes = sequelize.define('Quotes', {
         type: DataTypes.DATE,
         allowNull: true,
     },
-    KashFlowID: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-            model: 'KF_Quotes',
-            key: 'InvoiceNumber',
-        },
-    },
 }, {
     timestamps: true,
     paranoid: true,
