@@ -90,7 +90,7 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
                 deletedAt: null
             },
             include: {
-                model: db.Invoice,
+                model: db.Invoices,
                 as: 'invoices',
                 where: {
                     month: month,
@@ -140,7 +140,7 @@ const renderMonthlyReturnsForAll = async (req, res) => {
                 deletedAt: null
             },
             include: {
-                model: db.Invoice,
+                model: db.Invoices,
                 as: 'invoices',
                 where: {
                     month: month
@@ -190,7 +190,7 @@ const renderMonthlyReturnsYear = async (req, res) => {
                 deletedAt: null
             },
             include: {
-                model: db.Invoice,
+                model: db.Invoices,
                 as: 'invoices',
                 where: {
                     year: year
