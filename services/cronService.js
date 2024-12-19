@@ -1,7 +1,15 @@
 const cron = require('node-cron');
+require('dotenv').config();
 const fetchKF = require('../kf/fetchKashFlowData');
 const logger = require('./loggerService');
-const schedule = '0 6-18 * * *'; // Every hour from 6 AM to 6 PM
+
+let schedule;
+
+if (process.env.NODE_ENV === "production") {
+    schedule = '0 6-18 * * *'; // Every hour from 6 AM to 6 PM
+} else {
+    schedule = '0 * * * *'; // Every hour
+}
 
 module.exports = (req, res, next) => {
     cron.schedule(schedule, async () => {
