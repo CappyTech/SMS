@@ -124,7 +124,7 @@ module.exports = (sequelize, DataTypes) => {
 
     KF_Receipts.associate = (models) => {
         KF_Receipts.belongsTo(models.KF_Customers, { foreignKey: 'CustomerID', as: 'customer' });
-        KF_Receipts.belongsTo(models.KF_Projects, { foreignKey: 'ProjectID', as: 'project' });
+        KF_Receipts.hasOne(models.KF_Projects, { foreignKey: 'ProjectID', as: 'project' });
     };
 
     return KF_Receipts;
