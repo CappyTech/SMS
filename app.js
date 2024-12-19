@@ -27,6 +27,7 @@ app.use(require('./services/logRequestDetailsService'));
 app.use(require('./services/rateLimiterService'));
 app.use(require('./services/cronService'));
 const db = require('./services/sequelizeDatabaseService');
+const kf = require('./services/kashflowDatabaseService');
 
 // Association for Users and Subcontractors
 db.Users.hasMany(db.Subcontractors, {
@@ -216,7 +217,7 @@ app.use(async (req, res, next) => {
                 res.locals.unsubmittedInvoices = unsubmittedInvoices;
                 res.locals.totalNotifications =+ res.locals.unsubmittedInvoices;
             }
-            const lastfetched = await db.KF_Meta.findOne({
+            const lastfetched = await kf.KF_Meta.findOne({
                 order: [['lastFetchedAt', 'DESC']]
             })
             res.locals.lastfetched = lastfetched || null;
@@ -318,8 +319,6 @@ const weeklyAttendance = require('./controllers/weeklyAttendance');
 const kashflowRoutes = require('./kf/routes')
 
 const verificationRoutes  = require('./controllers/renderVerification');
-const { where } = require('sequelize');
-const { ensureAuthenticated } = require('./services/authService');
 
 app.use('/', index);
 

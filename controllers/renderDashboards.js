@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const moment = require('moment');
 const logger = require('../services/loggerService');
-
 const path = require('path');
 const db = require('../services/sequelizeDatabaseService');
 const taxService = require('../services/taxService');
 const currencyService = require('../services/currencyService');
 const authService = require('../services/authService');
+const kf = require('../services/kashflowDatabaseService');
 
 const renderStatsDashboard = async (req, res) => {
     try {
@@ -72,6 +72,25 @@ const renderStatsDashboard = async (req, res) => {
         const allInvoicesSubmitted = filteredInvoices.every(invoice => invoice.submissionDate !== null);
         const submissionDate = allInvoicesSubmitted && filteredInvoices.length > 0 ? filteredInvoices[0].submissionDate : null;
 
+        // Iterate through filteredInvoices and log problematic ones
+        const invalidInvoices = filteredInvoices.filter((invoice) => {
+            const isInvalid = !invoice.submissionDate || isNaN(new Date(invoice.submissionDate).getTime());
+            if (isInvalid) {
+                logger.info('Invalid Invoice:', invoice); // Log the full invoice object
+            }
+            return isInvalid;
+        });
+
+        if (invalidInvoices.length > 0) {
+            logger.info(`Found ${invalidInvoices.length} invoice(s) with invalid submission dates:`);
+            invalidInvoices.forEach((invoice) => {
+                logger.info(`Invoice ID: ${invoice.id}, Submission Date: ${invoice.submissionDate}`);
+            });
+        } else {
+            logger.info('All submission dates are valid.');
+        }
+
+        logger.info(submissionDate);
         // Use currentMonthlyReturn.periodEndDisplay to determine the correct submission window
         const periodEnd = moment(currentMonthlyReturn.periodEndDisplay, 'Do MMMM YYYY');
         const submissionStartDate = periodEnd.clone().date(7).format('Do MMMM YYYY');
@@ -361,7 +380,7 @@ const renderEmployeeDashboard = async (req, res) => {
 
 const renderKFInvoicesDashboard = async (req, res) => {
     try {
-        const invoices = await db.KF_Invoices.findAll({
+        const invoices = await kf.KF_Invoices.findAll({
             order: [['InvoiceDBID', 'DESC']]
         });
 
@@ -384,8 +403,7 @@ const renderKFInvoicesDashboard = async (req, res) => {
 
 const renderKFCustomersDashboard = async (req, res) => {
     try {
-        const customers = await db.KF_Customers.findAll({
-            attributes: ['Name', 'Email', 'Created', 'Discount'],
+        const customers = await kf.KF_Customers.findAll({
             order: [['Created', 'DESC']],
         });
 
@@ -416,14 +434,13 @@ const renderKFCustomersDashboard = async (req, res) => {
 
 const renderKFProjectsDashboard = async (req, res) => {
     try {
-        const projects = await db.KF_Projects.findAll({
-            include: [{ model: db.KF_Customers, attributes: ['Name'], as: 'customer' }],
+        const projects = await kf.KF_Projects.findAll({
             order: [['Number', 'DESC']]
         });
 
-        const activeProjects = projects.filter(project => project.Status === 2); // Example status for "Active"
-        const archivedProjects = projects.filter(project => project.Status === 3); // Example status for "Pending"
-        const completedProjects = projects.filter(project => project.Status === 1); // Example status for "Completed"
+        const activeProjects = projects.filter(project => project.Status === 1);
+        const archivedProjects = projects.filter(project => project.Status === 2);
+        const completedProjects = projects.filter(project => project.Status === 0);
 
         res.render(path.join('kashflow', 'project'), {
             title: 'Projects Dashboard',
@@ -440,7 +457,7 @@ const renderKFProjectsDashboard = async (req, res) => {
 
 const renderKFQuotesDashboard = async (req, res) => {
     try {
-        const quotes = await db.KF_Quotes.findAll({
+        const quotes = await kf.KF_Quotes.findAll({
             order: [['InvoiceDBID', 'DESC']]
         });
 
@@ -457,9 +474,9 @@ const renderKFQuotesDashboard = async (req, res) => {
 
 const renderKFReceiptsDashboard = async (req, res) => {
     try {
-        const receipts = await db.KF_Receipts.findAll({
-            include: [{ model: db.KF_Suppliers, attributes: ['Name'], as: 'supplier' }],
-            order: [['InvoiceDBID', 'DESC']]
+        const receipts = await kf.KF_Receipts.findAll({
+            order: [['InvoiceDBID', 'DESC']],
+            limit: 50
         });
 
         res.render(path.join('kashflow', 'receipt'), {
@@ -475,8 +492,7 @@ const renderKFReceiptsDashboard = async (req, res) => {
 
 const renderKFSuppliersDashboard = async (req, res) => {
     try {
-        const suppliers = await db.KF_Suppliers.findAll({
-            attributes: ['Name', 'Email', 'Telephone', 'Created'],
+        const suppliers = await kf.KF_Suppliers.findAll({
             order: [['Created', 'DESC']]
         });
 
@@ -507,26 +523,26 @@ const renderKFSuppliersDashboard = async (req, res) => {
 const renderKashflowDashboard = async (req, res) => {
     try {
         // Fetch all necessary data
-        const totalCustomers = await db.KF_Customers.count();
-        const totalInvoices = await db.KF_Invoices.count();
-        const totalReceipts = await db.KF_Receipts.count();
-        const totalQuotes = await db.KF_Quotes.count();
-        const totalSuppliers = await db.KF_Suppliers.count();
-        const totalProjects = await db.KF_Projects.count();
+        const totalCustomers = await kf.KF_Customers.count();
+        const totalInvoices = await kf.KF_Invoices.count();
+        const totalReceipts = await kf.KF_Receipts.count();
+        const totalQuotes = await kf.KF_Quotes.count();
+        const totalSuppliers = await kf.KF_Suppliers.count();
+        const totalProjects = await kf.KF_Projects.count();
 
 
-        const incomeExpenseData = await currencyService.getIncomeExpenseData(db);
+        const incomeExpenseData = await currencyService.getIncomeExpenseData(kf);
 
         console.log(incomeExpenseData);
         // Calculate paid/unpaid invoices
-        const paidInvoices = await db.KF_Invoices.count({ where: { Paid: { [db.Sequelize.Op.gt]: 0 } } });
+        const paidInvoices = await kf.KF_Invoices.count({ where: { Paid: { [kf.Sequelize.Op.gt]: 0 } } });
         const unpaidInvoices = totalInvoices - paidInvoices;
 
         // Get top customers by revenue
-        const topCustomersData = await db.KF_Invoices.findAll({
-            attributes: ['CustomerName', [db.Sequelize.fn('SUM', db.Sequelize.col('NetAmount')), 'totalRevenue']],
+        const topCustomersData = await kf.KF_Invoices.findAll({
+            attributes: ['CustomerName', [kf.Sequelize.fn('SUM', kf.Sequelize.col('NetAmount')), 'totalRevenue']],
             group: ['CustomerName'],
-            order: [[db.Sequelize.literal('totalRevenue'), 'DESC']],
+            order: [[kf.Sequelize.literal('totalRevenue'), 'DESC']],
             limit: 5,
         });
 

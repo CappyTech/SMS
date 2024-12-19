@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const authenticate = require('./autoAuth');
-const db = require('../services/sequelizeDatabaseService');
+const db = require('../services/kashflowDatabaseService');
 const getCustomers = require('./getCustomers');
 const getProjects = require('./getProjects');
 const getQuotes = require('./getQuotes');
@@ -156,8 +156,7 @@ exports.fetchKashFlowData = async () => {
 
         const modelsToFetch = [
             { name: 'customers', fetchFn: getCustomers, model: db.KF_Customers, uniqueKey: 'CustomerID' },
-            { name: 'projects', fetchFn: getProjects, model: db.KF_Projects, uniqueKey: 'ID' },
-            { name: 'suppliers', fetchFn: getSuppliers, model: db.KF_Suppliers, uniqueKey: 'SupplierID' },
+            { name: 'supplier', fetchFn: getSuppliers, model: db.KF_Suppliers, uniqueKey: 'SupplierID' },
         ];
 
         for (const { name, fetchFn, model, uniqueKey } of modelsToFetch) {
@@ -169,6 +168,38 @@ exports.fetchKashFlowData = async () => {
             } else {
                 logger.info(`No ${name.toLowerCase()} found.`);
             }
+        }
+
+        // Fetch projects for all statuses (0 = Completed, 1 = Active, 2 = Archived)
+        const [completedProjects, activeProjects, archivedProjects] = await Promise.all([
+            getProjects(client, 0), // Completed
+            getProjects(client, 1), // Active
+            getProjects(client, 2), // Archived
+        ]);
+    
+        logger.info('Projects fetched for all statuses:');
+        logger.info(`Completed: ${completedProjects.length}`);
+        logger.info(`Active: ${activeProjects.length}`);
+        logger.info(`Archived: ${archivedProjects.length}`);
+    
+        // Merge or handle the results as needed
+        const allProjects = [
+            ...completedProjects,
+            ...activeProjects,
+            ...archivedProjects,
+        ];
+        if (allProjects.length > 0) {
+            logger.info(`Fetched ${allProjects.length} projects.`);
+            await upsertData(
+                db.KF_Projects,
+                allProjects,
+                'ID',
+                KF_Meta,
+                operationLog,
+                './logs/projects.txt'
+            );
+        } else {
+            logger.info('No projects found.');
         }
 
         const startDate = new Date('2014-01-01');
@@ -270,15 +301,15 @@ exports.fetchKashFlowData = async () => {
 function mapLine(line) {
     return {
         LineID: line.LineID,
-        Quantity: line.Quantity || 0,
+        Quantity: line.Quantity || null,
         Description: line.Description || 'N/A',
-        Rate: line.Rate || 0,
-        ChargeType: line.ChargeType || 0,
-        VatRate: line.VatRate || 0,
-        VatAmount: line.VatAmount || 0,
-        ProductID: line.ProductID || 0,
-        Sort: line.Sort || 0,
-        ProjID: line.ProjID || 0,
+        Rate: line.Rate || null,
+        ChargeType: line.ChargeType || null,
+        VatRate: line.VatRate || null,
+        VatAmount: line.VatAmount || null,
+        ProductID: line.ProductID || null,
+        Sort: line.Sort || null,
+        ProjID: line.ProjID || null,
     };
 }
 

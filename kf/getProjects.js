@@ -1,10 +1,10 @@
 const logger = require('../services/loggerService');
-function getProjects(client) {
+function getProjects(client,ProjStatus) {
   return new Promise((resolve, reject) => {
     const projectFullParams = {
       UserName: process.env.KFUSERNAME,
       Password: process.env.KFPASSWORD,
-      ProjStatus: 2
+      ProjStatus: ProjStatus
     };
 
     client.GetProjects_Full(projectFullParams, (err, result) => {

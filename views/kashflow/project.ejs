@@ -1,39 +1,73 @@
-
 <div class="container my-5">
     <h1 class="mb-4 text-center">Projects Dashboard</h1>
-    <div class="row">
-        <div class="col-md-4">
-            <h4>Active Projects</h4>
-            <ul class="list-group">
-                <% activeProjects.forEach(project => { %>
-                <li class="list-group-item">
-                    <strong><a href="https://app.kashflow.com/editProject.asp?id=<%= project.ID %>" target="_blank"><%= project.Number %> | <%= project.Name %> | <%= project.Reference %></a></strong>
-                    <p><%= project.Description %></p>
-                </li>
-                <% }) %>
-            </ul>
+
+    <!-- Tab navigation -->
+    <ul class="nav" id="projectsTab" role="tablist">
+        <li class="nav-item p-3">
+            <button class="btn btn-warning position-relative active" id="active-projects-tab" data-bs-toggle="tab" data-bs-target="#active-projects" type="button" role="tab" aria-controls="active-projects" aria-selected="true">Active Projects
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-secondary">
+                    <%= activeProjects.length %>
+                </span>
+            </button>
+        </li>
+        <li class="nav-item p-3">
+            <button class="btn btn-success position-relative" id="completed-projects-tab" data-bs-toggle="tab" data-bs-target="#completed-projects" type="button" role="tab" aria-controls="completed-projects" aria-selected="false">Completed Projects
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-secondary">
+                    <%= completedProjects.length %>
+                </span>
+            </button>
+        </li>
+        <li class="nav-item p-3" role="presentation">
+            <button class="btn btn-secondary position-relative" id="archived-projects-tab" data-bs-toggle="tab" data-bs-target="#archived-projects" type="button" role="tab" aria-controls="archived-projects" aria-selected="false">Archived Projects
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-secondary">
+                    <%= archivedProjects.length %>
+                </span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content" id="projectsTabContent">
+        <!-- Active Projects Tab -->
+        <div class="tab-pane fade show active" id="active-projects" role="tabpanel" aria-labelledby="active-projects-tab">
+            <div class="mt-4">
+                <ul class="list-group">
+                    <% activeProjects.forEach(project => { %>
+                    <li class="list-group-item">
+                        <strong><a href="https://app.kashflow.com/editProject.asp?id=<%= project.ID %>" target="_blank"><%= project.Number %> | <%= project.Name %> | <%= project.Reference %></a></strong>
+                        <p><%= project.Description %></p>
+                    </li>
+                    <% }) %>
+                </ul>
+            </div>
         </div>
-        <div class="col-md-4">
-            <h4>Completed Projects</h4>
-            <ul class="list-group">
-                <% completedProjects.forEach(project => { %>
-                <li class="list-group-item">
-                    <strong><a href="https://app.kashflow.com/editProject.asp?id=<%= project.ID %>" target="_blank"><%= project.Number %> | <%= project.Name %> | <%= project.Reference %></a></strong>
-                    <p><%= project.Description %></p>
-                </li>
-                <% }) %>
-            </ul>
+
+        <!-- Completed Projects Tab -->
+        <div class="tab-pane fade" id="completed-projects" role="tabpanel" aria-labelledby="completed-projects-tab">
+            <div class="mt-4">
+                <ul class="list-group">
+                    <% completedProjects.forEach(project => { %>
+                    <li class="list-group-item">
+                        <strong><a href="https://app.kashflow.com/editProject.asp?id=<%= project.ID %>" target="_blank"><%= project.Number %> | <%= project.Name %> | <%= project.Reference %></a></strong>
+                        <p><%= project.Description %></p>
+                    </li>
+                    <% }) %>
+                </ul>
+            </div>
         </div>
-        <div class="col-md-4">
-            <h4>Archived Projects</h4>
-            <ul class="list-group">
-                <% archivedProjects.forEach(project => { %>
-                <li class="list-group-item">
-                    <strong><a href="https://app.kashflow.com/editProject.asp?id=<%= project.ID %>" target="_blank"><%= project.Number %> | <%= project.Name %> | <%= project.Reference %></a></strong>
-                    <p><%= project.Description %></p>
-                </li>
-                <% }) %>
-            </ul>
+
+        <!-- Archived Projects Tab -->
+        <div class="tab-pane fade" id="archived-projects" role="tabpanel" aria-labelledby="archived-projects-tab">
+            <div class="mt-4">
+                <ul class="list-group">
+                    <% archivedProjects.forEach(project => { %>
+                    <li class="list-group-item">
+                        <strong><a href="https://app.kashflow.com/editProject.asp?id=<%= project.ID %>" target="_blank"><%= project.Number %> | <%= project.Name %> | <%= project.Reference %></a></strong>
+                        <p><%= project.Description %></p>
+                    </li>
+                    <% }) %>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

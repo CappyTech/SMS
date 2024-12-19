@@ -16,6 +16,8 @@ const rolePermissions = {
         readSubcontractor: true,
         updateSubcontractor: true,
         deleteSubcontractor: true,
+        unpaidInvoices: true,
+        unsubmittedInvoices: true,
     },
     subcontractor: {
         readInvoice: true,
