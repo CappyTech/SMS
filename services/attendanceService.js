@@ -1,4 +1,3 @@
-const { Op } = require('sequelize');
 const moment = require('moment');
 const logger = require('./loggerService');
 const db = require('./sequelizeDatabaseService');
