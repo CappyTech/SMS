@@ -12,7 +12,7 @@ app.set('trust proxy', true);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.set('layout', 'layout'); // default layout
+app.set('layout', 'layout');
 app.use(expressLayouts);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -166,13 +166,13 @@ app.use(async (req, res, next) => {
     try {
         const user = req.session.user;
         if (user && user.id) {
-            const dbUser = await db.Users.findByPk(user.id);
-            if (dbUser) {
+            const User = await db.Users.findByPk(user.id);
+            if (User) {
                 res.locals.isAuthenticated = true;
-                res.locals.isAdmin = dbUser.role === 'admin';
-                res.locals.firstName = dbUser.username.split('.')[0].charAt(0).toUpperCase() + dbUser.username.split('.')[0].slice(1);
-                res.locals.permissions = dbUser.permissions || {};
-                res.locals.role = dbUser.role;
+                res.locals.isAdmin = User.role === 'admin';
+                res.locals.firstName = User.username.split('.')[0].charAt(0).toUpperCase() + User.username.split('.')[0].slice(1);
+                res.locals.permissions = User.permissions || {};
+                res.locals.role = User.role;
             }
         }
     } catch (error) {
