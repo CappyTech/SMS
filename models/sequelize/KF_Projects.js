@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
             },
         },
         Status: DataTypes.INTEGER,
+        Value: DataTypes.DECIMAL(10, 2),
     }, {
         tableName: 'KF_Projects',
         timestamps: true,
