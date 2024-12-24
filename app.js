@@ -260,6 +260,34 @@ app.use((req, res, next) => {
   next();
 });
 
+const holidayService = require('./services/holidayService');
+
+app.use(async (req, res, next) => {
+    try {
+        // Check if today is a holiday
+        const holidayDetails = await holidayService.isDateHoliday();
+
+        if (holidayDetails?.isHoliday) {
+            console.log(`Holiday detected: ${holidayDetails.reason} (${holidayDetails.startDate} to ${holidayDetails.endDate})`);
+            
+            // Render the holiday notice page if today is a holiday
+            return res.render('holiday', {
+                title: 'Holiday Notice',
+                reason: holidayDetails.reason,
+                startDate: holidayDetails.startDate,
+                endDate: holidayDetails.endDate
+            });
+        }
+        
+        // If not a holiday, proceed to the next middleware
+        next();
+    } catch (error) {
+        console.error('Error checking holiday status:', error.message);
+        next(error); // Pass the error to the error-handling middleware
+    }
+});
+
+
 const crypto = require('crypto');
 if (process.env.NODE_ENV === 'development') {
     if (process.env.ENCRYPTION_KEY === '') {
