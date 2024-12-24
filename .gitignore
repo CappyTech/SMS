@@ -6,3 +6,7 @@ app.log
 *.zip
 /logs/
 /logs
+logs/customers.txt
+logs/invoices.txt
+logs/quotes.txt
+logs/receipts.txt
