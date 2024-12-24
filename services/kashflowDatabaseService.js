@@ -51,10 +51,7 @@ if (process.env.NODE_ENV === "development") {
 // Synchronize database schema
     (async () => {
         try {
-            await sequelize.sync({
-                alter: true,
-                logging: console.log, // Enable query logs (optional)
-            });
+            //await sequelize.sync({alter: true,logging: console.log,});
 
             logger.info('All models were synchronized successfully.');
         } catch (error) {
