@@ -29,7 +29,7 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
 
         for (const item of data) {
             const whereClause = { [uniqueKey]: item[uniqueKey] };
-            logger.debug(`whereClause: ${JSON.stringify(whereClause)}`);
+            //logger.debug(`whereClause: ${JSON.stringify(whereClause)}`);
         
             // Fetch existing record for comparison
             const existing = await model.findOne({ where: whereClause, raw: true });
@@ -43,11 +43,21 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                     const currentValue = existing[key];
                     const newValue = item[key];
         
+                    // Normalize and compare timestamps to the second (ignore microseconds/milliseconds)
+                    if (key.toLowerCase().includes('created') || key.toLowerCase().includes('updated')) {
+                        const normalizedCurrent = currentValue ? new Date(currentValue).toISOString().split('.')[0] : null;
+                        const normalizedNew = newValue ? new Date(newValue).toISOString().split('.')[0] : null;
+
+                        if (normalizedCurrent !== normalizedNew) {
+                            // If the timestamps differ significantly, log the change
+                            changes[key] = { from: currentValue, to: newValue };
+                            hasRealChange = true; // Only set this if the difference is beyond normalization
+                        }
+                        continue; // Skip further checks for timestamps
+                    }
+
                     // Skip placeholder dates or redundant type differences
-                    if (
-                        key.toLowerCase().includes('date') &&
-                        (newValue === '0001-01-01T00:00:00.000Z' || newValue === '2001-01-01T00:01:15.000Z')
-                    ) {
+                    if (key.toLowerCase().includes('date') && (newValue === '0001-01-01T00:00:00.000Z' || newValue === '2001-01-01T00:01:15.000Z')) {
                         continue;
                     }
         
