@@ -5,3 +5,4 @@
 app.log
 *.zip
 /logs/
+/logs
