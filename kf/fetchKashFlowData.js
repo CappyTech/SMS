@@ -29,75 +29,65 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
 
         for (const item of data) {
             const whereClause = { [uniqueKey]: item[uniqueKey] };
-
-            try {
-                const existing = await model.findOne({ where: whereClause, raw: false });
-
-                if (existing) {
-                    checkedCount++;
-                    const changes = {};
-                    let isEqual = true;
-
-                    for (const key of Object.keys(item)) {
-                        const currentValue = existing[key];
-                        const newValue = item[key];
-
-                        // 1. Skip placeholder dates (e.g., "0001-01-01T00:00:00.000Z")
-                        if (key.toLowerCase().includes('date') && newValue === '0001-01-01T00:00:00.000Z') {
-                            continue; // Ignore placeholder dates
-                        }
-
-                        // 2. Normalize booleans and integers
-                        const normalizedCurrent = (typeof currentValue === 'boolean' || typeof currentValue === 'number')
-                            ? Boolean(currentValue)
-                            : currentValue;
-                        const normalizedNew = (typeof newValue === 'boolean' || typeof newValue === 'number')
-                            ? Boolean(newValue)
-                            : newValue;
-
-                        if (typeof normalizedNew === 'object' && normalizedNew !== null) {
-                            // 3. Compare objects (JSON.stringify)
-                            if (JSON.stringify(normalizedCurrent) !== JSON.stringify(normalizedNew)) {
-                                changes[key] = { from: currentValue, to: newValue };
-                                isEqual = false;
-                            }
-                        } else if (normalizedCurrent !== normalizedNew) {
-                            // 4. Compare primitive types
-                            changes[key] = { from: currentValue, to: newValue };
-                            isEqual = false;
-                        }
+            logger.debug(`whereClause: ${JSON.stringify(whereClause)}`);
+        
+            // Fetch existing record for comparison
+            const existing = await model.findOne({ where: whereClause, raw: true });
+        
+            if (existing) {
+                checkedCount++;
+                const changes = {};
+                let hasRealChange = false;
+        
+                for (const key of Object.keys(item)) {
+                    const currentValue = existing[key];
+                    const newValue = item[key];
+        
+                    // Skip placeholder dates or redundant type differences
+                    if (
+                        key.toLowerCase().includes('date') &&
+                        (newValue === '0001-01-01T00:00:00.000Z' || newValue === '2001-01-01T00:01:15.000Z')
+                    ) {
+                        continue;
                     }
-
-                    if (!isEqual) {
-                        // Perform the update if changes are detected
-                        await model.update(item, { where: whereClause });
-                        updatedCount++;
-                        const logEntry = {
-                            model: model.name,
-                            action: 'updated',
-                            uniqueKey: item[uniqueKey],
-                            changes,
-                        };
-                        logDetails.push(logEntry);
-                        await appendLogEntry(logFilePath, logEntry);
+        
+                    // Check for real changes (ignore type differences)
+                    if (
+                        typeof currentValue === typeof newValue &&
+                        JSON.stringify(currentValue) !== JSON.stringify(newValue)
+                    ) {
+                        changes[key] = { from: currentValue, to: newValue };
+                        hasRealChange = true;
                     }
-                } else {
-                    // Create new record if it doesn't exist
-                    await model.create(item);
-                    createdCount++;
+                }
+        
+                // Update only if there are real changes
+                if (hasRealChange) {
+                    await model.update(item, { where: whereClause });
+                    updatedCount++;
                     const logEntry = {
                         model: model.name,
-                        action: 'created',
+                        action: 'updated',
                         uniqueKey: item[uniqueKey],
-                        item,
+                        changes,
                     };
                     logDetails.push(logEntry);
                     await appendLogEntry(logFilePath, logEntry);
                 }
-            } catch (findOrUpdateError) {
-                logger.error(`Error processing ${JSON.stringify(whereClause)}: ${findOrUpdateError.message}`);
+            } else {
+                // Create new entry if it doesn't exist
+                await model.create(item);
+                createdCount++;
+                const logEntry = {
+                    model: model.name,
+                    action: 'created',
+                    uniqueKey: item[uniqueKey],
+                    item,
+                };
+                logDetails.push(logEntry);
+                await appendLogEntry(logFilePath, logEntry);
             }
-        }
+        }        
 
         // Update metadata
         try {
