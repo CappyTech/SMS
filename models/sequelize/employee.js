@@ -64,10 +64,9 @@ module.exports = (sequelize, DataTypes) => {
 
   Employees.associate = (db) => {
     // Employees -> Attendances
-    db.Employees.hasMany(db.Attendances, { foreignKey: 'employeeId', allowNull: false });
-    db.Attendances.belongsTo(db.Employees, { foreignKey: 'employeeId', allowNull: false });
+    Employees.hasMany(db.Attendances, { foreignKey: 'employeeId', allowNull: false });
 
-    // Employees -> managerId (Self-referencing)
+    // Employees -> managerId (self-association)
     Employees.hasMany(db.Employees, { foreignKey: 'managerId', allowNull: true });
   };
 

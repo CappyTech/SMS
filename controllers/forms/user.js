@@ -6,7 +6,7 @@ const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 const { rolePermissions } = require('../../models/sequelize/user');
 
-const renderUserCreateForm = async (req, res) => {
+const renderUserCreateForm = async (req, res, next) => {
     try {
         res.render(path.join('users', 'createUser'), {
             title: 'Create User',
@@ -15,11 +15,11 @@ const renderUserCreateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering user create form: ' + error.message);
         req.flash('error', 'Error rendering user create form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderUserUpdateForm = async (req, res) => {
+const renderUserUpdateForm = async (req, res, next) => {
     try {
         const userId = req.params.user;
         const user = await db.Users.findByPk(userId);
@@ -39,7 +39,7 @@ const renderUserUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering user update form: ' + error.message);
         req.flash('error', 'Error rendering user update form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 

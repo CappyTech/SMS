@@ -82,7 +82,7 @@ const ensureRole = (roles) => {
             if (!role || !roles.includes(role)) {
                 req.flash('error', 'Access denied. You do not have the correct role.');
                 logger.info(`Access denied: User ID ${id || 'N/A'}, Role: ${role || 'N/A'}, Path: ${req.method} ${req.originalUrl}`);
-                return res.redirect('/');
+                next(error); // Pass the error to the error handler
             }
 
             // Role is valid, proceed
@@ -90,7 +90,7 @@ const ensureRole = (roles) => {
         } catch (error) {
             logger.error(`Role validation error: ${error.message}`);
             req.flash('error', 'An error occurred while checking your role. Please try again.');
-            res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
     };
 };
@@ -136,7 +136,7 @@ const ensurePermission = (requiredPermissions) => {
         if (!hasPermission) {
             req.flash('error', 'Access denied. You do not have the correct permissions.');
             logger.info(`Access denied: Insufficient permissions for user ID ${user.id}`);
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
 
         // If permissions are valid, proceed to the next middleware

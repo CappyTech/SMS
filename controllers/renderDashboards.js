@@ -9,7 +9,7 @@ const currencyService = require('../services/currencyService');
 const authService = require('../services/authService');
 const kf = require('../services/kashflowDatabaseService');
 
-const renderStatsDashboard = async (req, res) => {
+const renderStatsDashboard = async (req, res, next) => {
     try {
         // Fetch the specified year and month from the URL parameters
         const specifiedYear = parseInt(req.params.year);
@@ -120,11 +120,11 @@ const renderStatsDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering stats dashboard: ' + error.message);
         req.flash('error', 'Error rendering stats dashboard: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderUserDashboard = async (req, res) => {
+const renderUserDashboard = async (req, res, next) => {
     try {
         const users = await db.Users.findAll({ order: [['createdAt', 'DESC']] });
 
@@ -138,11 +138,11 @@ const renderUserDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering users dashboard: ' + error.message);
         req.flash('error', 'Error rendering users dashboard: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderInvoiceDashboard = async (req, res) => {
+const renderInvoiceDashboard = async (req, res, next) => {
     try {
         const invoices = await db.Invoices.findAll({ order: [['createdAt', 'DESC']] });
 
@@ -156,11 +156,11 @@ const renderInvoiceDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering invoices dashboard:' + error.message);
         req.flash('error', 'Error rendering invoices dashboard: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderSubcontractorDashboard = async (req, res) => {
+const renderSubcontractorDashboard = async (req, res, next) => {
     try {
         const subcontractors = await db.Subcontractors.findAll({ order: [['createdAt', 'DESC']] });
 
@@ -174,11 +174,11 @@ const renderSubcontractorDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering subcontractors dashboard:' + error.message);
         req.flash('error', 'Error rendering subcontractors dashboard: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderQuotesDashboard = async (req, res) => {
+const renderQuotesDashboard = async (req, res, next) => {
     try {
         const quotes = await db.Quotes.findAll({
             order: [['createdAt', 'DESC']],
@@ -200,12 +200,12 @@ const renderQuotesDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering quotes dashboard: ' + error.message);
         req.flash('error', 'Error rendering quotes dashboard: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
 
-const renderClientsDashboard = async (req, res) => {
+const renderClientsDashboard = async (req, res, next) => {
     try {
         const clients = await db.Clients.findAll({ order: [['createdAt', 'DESC']] });
 
@@ -216,11 +216,11 @@ const renderClientsDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering clients dashboard:' + error.message);
         req.flash('error', 'Error rendering clients dashboard: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderContactsDashboard = async (req, res) => {
+const renderContactsDashboard = async (req, res, next) => {
     try {
         const contacts = await db.Contacts.findAll({ order: [['createdAt', 'DESC']], include: [db.Clients] });
 
@@ -231,11 +231,11 @@ const renderContactsDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering contacts dashboard:' + error.message);
         req.flash('error', 'Error rendering contacts dashboard: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderJobsDashboard = async (req, res) => {
+const renderJobsDashboard = async (req, res, next) => {
     try {
         // Fetch jobs with a non-empty job_ref
         const jobs = await db.Jobs.findAll({
@@ -286,12 +286,12 @@ const renderJobsDashboard = async (req, res) => {
         // Log the error
         logger.error('Error rendering jobs dashboard: ' + error.message);
         req.flash('error', 'Error rendering jobs dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
 // Read all locations
-const renderLocationsDashboard = async (req, res) => {
+const renderLocationsDashboard = async (req, res, next) => {
     try {
         const locations = await db.Locations.findAll({ order: [['createdAt', 'DESC']] });
 
@@ -302,11 +302,11 @@ const renderLocationsDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering locations dashboard: ' + error.message);
         req.flash('error', 'Error rendering locations dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderAttendanceDashboard = async (req, res) => {
+const renderAttendanceDashboard = async (req, res, next) => {
     try {
         // Extract query parameters from the request
         const { date, employeeId, subcontractorId } = req.query;
@@ -353,11 +353,11 @@ const renderAttendanceDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering attendance dashboard: ' + error.message);
         req.flash('error', 'Error rendering attendance dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderEmployeeDashboard = async (req, res) => {
+const renderEmployeeDashboard = async (req, res, next) => {
     try {
         // Fetch all employees from the database
         const employees = await db.Employees.findAll();
@@ -374,11 +374,11 @@ const renderEmployeeDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering employee dashboard: ' + error.message);
         req.flash('error', 'Error rendering employee dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderKFInvoicesDashboard = async (req, res) => {
+const renderKFInvoicesDashboard = async (req, res, next) => {
     try {
         const invoices = await kf.KF_Invoices.findAll({
             order: [['InvoiceDBID', 'DESC']]
@@ -397,11 +397,11 @@ const renderKFInvoicesDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering KFInvoices dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFInvoices dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderKFCustomersDashboard = async (req, res) => {
+const renderKFCustomersDashboard = async (req, res, next) => {
     try {
         const customers = await kf.KF_Customers.findAll({
             order: [['Created', 'DESC']],
@@ -428,11 +428,11 @@ const renderKFCustomersDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering KFCustomers dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFCustomers dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderKFProjectsDashboard = async (req, res) => {
+const renderKFProjectsDashboard = async (req, res, next) => {
     try {
         const projects = await kf.KF_Projects.findAll({
             order: [['Number', 'DESC']]
@@ -451,11 +451,11 @@ const renderKFProjectsDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering KFProjects dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFProjects dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderKFQuotesDashboard = async (req, res) => {
+const renderKFQuotesDashboard = async (req, res, next) => {
     try {
         const quotes = await kf.KF_Quotes.findAll({
             order: [['InvoiceDBID', 'DESC']]
@@ -468,11 +468,11 @@ const renderKFQuotesDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering KFQuotes dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFQuotes dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderKFReceiptsDashboard = async (req, res) => {
+const renderKFReceiptsDashboard = async (req, res, next) => {
     try {
         const receipts = await kf.KF_Receipts.findAll({
             order: [['InvoiceDBID', 'DESC']],
@@ -486,11 +486,11 @@ const renderKFReceiptsDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering KFReceipts dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFReceipts dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderKFSuppliersDashboard = async (req, res) => {
+const renderKFSuppliersDashboard = async (req, res, next) => {
     try {
         const suppliers = await kf.KF_Suppliers.findAll({
             order: [['Created', 'DESC']]
@@ -516,11 +516,11 @@ const renderKFSuppliersDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering KFSuppliers dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFSuppliers dashboard: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderKashflowDashboard = async (req, res) => {
+const renderKashflowDashboard = async (req, res, next) => {
     try {
         // Fetch all necessary data
         const totalCustomers = await kf.KF_Customers.count();
@@ -568,7 +568,7 @@ const renderKashflowDashboard = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering KashFlow dashboard: ' + error.message);
         req.flash('error', 'Error rendering dashboard.');
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
@@ -580,7 +580,7 @@ router.get('/dashboard/stats', authService.ensureAuthenticated, authService.ensu
     } catch (error) {
         logger.error('Error rendering stats dashboard:' + error.message);
         req.flash('error', 'Error rendering stats dashboard: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 });
 router.get('/dashboard/stats/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderStatsDashboard);

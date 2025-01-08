@@ -5,7 +5,7 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const selectClient = async (req, res) => {
+const selectClient = async (req, res, next) => {
     try {
         const clients = await db.Clients.findAll({});
         
@@ -25,11 +25,11 @@ const selectClient = async (req, res) => {
     } catch (error) {
         logger.error('Error selecting client:  ', error.message);
         req.flash('error', 'Error selecting client: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderClientCreateForm = async (req, res) => {
+const renderClientCreateForm = async (req, res, next) => {
     try {
         res.render(path.join('clients', 'createClient'), {
             title: 'Create Client',
@@ -41,7 +41,7 @@ const renderClientCreateForm = async (req, res) => {
     }
 };
 
-const renderClientUpdateForm = async (req, res) => {
+const renderClientUpdateForm = async (req, res, next) => {
     try {
         const clients = await db.Clients.findByPk(req.params.client, {
             include: [{ model: db.Contacts }]

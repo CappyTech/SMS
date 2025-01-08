@@ -5,7 +5,7 @@ const db = require('../services/sequelizeDatabaseService');
 const logger = require('../services/loggerService');
 const authService = require('../services/authService');
 
-const renderSupplierVerification = async (req, res) => {
+const renderSupplierVerification = async (req, res, next) => {
     try {
         const suppliers = await db.KF_Suppliers.findAll();
         const subcontractors = await db.Subcontractors.findAll();
@@ -18,11 +18,11 @@ const renderSupplierVerification = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering supplier verification: ' + error.message);
         req.flash('error', 'Failed to load suppliers.');
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderReceiptVerification = async (req, res) => {
+const renderReceiptVerification = async (req, res, next) => {
     try {
         const receipts = await db.KF_Receipts.findAll();
         const invoices = await db.Invoices.findAll();
@@ -35,7 +35,7 @@ const renderReceiptVerification = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering receipt verification: ' + error.message);
         req.flash('error', 'Failed to load receipts.');
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 

@@ -7,7 +7,7 @@ const attendanceService = require('../services/attendanceService');
 const authService = require('../services/authService');
 const taxService = require('../services/taxService');
 
-const getWeeklyAttendance = async (req, res) => {
+const getWeeklyAttendance = async (req, res, next) => {
     try {
         const year = req.params.year ? parseInt(req.params.year) : taxService.getCurrentTaxYear();
         const { start: startOfTaxYear } = taxService.getTaxYearStartEnd(year);
@@ -146,7 +146,7 @@ const getWeeklyAttendance = async (req, res) => {
     } catch (error) {
         logger.error('Error fetching weekly attendance: ' + error.message);
         req.flash('error', 'Error fetching weekly attendance: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
@@ -172,7 +172,7 @@ router.get('/attendance/weekly', authService.ensureAuthenticated, authService.en
     } catch (error) {
         logger.error('Error redirecting to current weekly attendance: ' + error.message);
         req.flash('error', 'Error redirecting to current weekly attendance: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 });
 

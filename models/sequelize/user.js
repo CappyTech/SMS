@@ -126,6 +126,17 @@ module.exports = (sequelize, DataTypes) => {
         collate: 'latin1_bin',
     });
 
+    Users.associate = (db) => {
+        // Users -> Clients
+        Users.belongsTo(db.Clients, { foreignKey: 'clientId', as: 'Client' });
+
+        // Users -> Employees
+        Users.belongsTo(db.Employees, { foreignKey: 'employeeId', as: 'Employee' });
+
+        // Users -> Subcontractor (single subcontractor association)
+        Users.belongsTo(db.Subcontractors, { foreignKey: 'subcontractorId', as: 'Subcontractor' });
+    };
+
     // Hook to hash the password before creating the user
     Users.beforeCreate(async (user) => {
         if (user.password) {

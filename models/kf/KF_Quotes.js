@@ -116,5 +116,12 @@ module.exports = (sequelize, DataTypes) => {
         collate: 'latin1_bin',
     });
 
+    KF_Quotes.associate = (models) => {
+        KF_Quotes.belongsTo(models.KF_Customers, {
+            foreignKey: 'CustomerID',
+            as: 'customer',
+        });
+    };
+
     return KF_Quotes;
 };

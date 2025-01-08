@@ -29,133 +29,6 @@ app.use(require('./services/cronService'));
 const db = require('./services/sequelizeDatabaseService');
 const kf = require('./services/kashflowDatabaseService');
 
-// Association for Users and Subcontractors
-db.Users.hasMany(db.Subcontractors, {
-    foreignKey: 'userId',
-    allowNull: false,
-});
-db.Subcontractors.belongsTo(db.Users, {
-    foreignKey: 'userId',
-    allowNull: false,
-});
-
-// Association for Subcontractors and Invoices
-db.Subcontractors.hasMany(db.Invoices, {
-    foreignKey: 'subcontractorId',
-    allowNull: false,
-    as: 'invoices',
-});
-db.Invoices.belongsTo(db.Subcontractors, {
-    foreignKey: 'subcontractorId',
-    allowNull: false,
-});
-
-// Association for Employees and Attendances
-db.Employees.hasMany(db.Attendances, {
-    foreignKey: 'employeeId',
-    allowNull: false,
-});
-db.Attendances.belongsTo(db.Employees, {
-    foreignKey: 'employeeId',
-    allowNull: false,
-});
-
-// Association for Subcontractors and Attendances
-db.Subcontractors.hasMany(db.Attendances, {
-    foreignKey: 'subcontractorId',
-    allowNull: false,
-});
-db.Attendances.belongsTo(db.Subcontractors, {
-    foreignKey: 'subcontractorId',
-    allowNull: false,
-});
-
-// Association for Clients and Quotes
-db.Clients.hasMany(db.Quotes, {
-    foreignKey: 'clientId',
-    allowNull: false,
-});
-db.Quotes.belongsTo(db.Clients, {
-    foreignKey: 'clientId',
-    allowNull: false,
-});
-
-// Association for Clients and Contacts
-db.Clients.hasMany(db.Contacts, {
-    foreignKey: 'clientId',
-    allowNull: false,
-});
-db.Contacts.belongsTo(db.Clients, {
-    foreignKey: 'clientId',
-    allowNull: false,
-});
-
-// Association for Clients and Jobs
-db.Clients.hasMany(db.Jobs, {
-    foreignKey: 'clientId',
-    allowNull: false,
-});
-db.Jobs.belongsTo(db.Clients, {
-    foreignKey: 'clientId',
-    allowNull: false,
-});
-
-// Association for Quotes and Jobs
-db.Quotes.hasMany(db.Jobs, {
-    foreignKey: 'quoteId',
-    allowNull: false,
-});
-db.Jobs.belongsTo(db.Quotes, {
-    foreignKey: 'quoteId',
-    allowNull: false,
-});
-
-// Association for Jobs and Locations
-db.Locations.hasMany(db.Jobs, {
-    foreignKey: 'locationId',
-    allowNull: false,
-});
-db.Jobs.belongsTo(db.Locations, {
-    foreignKey: 'locationId',
-    allowNull: false,
-});
-
-// Association for Quotes and Locations
-db.Locations.hasMany(db.Quotes, {
-    foreignKey: 'locationId',
-    allowNull: false,
-});
-db.Quotes.belongsTo(db.Locations, {
-    foreignKey: 'locationId',
-    allowNull: false,
-});
-
-// Association for Attendances and Locations
-db.Locations.hasMany(db.Attendances, {
-    foreignKey: 'locationId',
-    allowNull: false,
-});
-db.Attendances.belongsTo(db.Locations, {
-    foreignKey: 'locationId',
-    allowNull: false,
-});
-
-// Association for Employees and managerId
-db.Employees.hasMany(db.Employees, {
-    foreignKey: 'managerId',
-    allowNull: true,
-});
-
-// Association for Users
-db.Users.belongsTo(db.Subcontractors, { foreignKey: 'subcontractorId', as: 'Subcontractor' });
-db.Subcontractors.hasOne(db.Users, { foreignKey: 'subcontractorId' });
-
-db.Users.belongsTo(db.Clients, { foreignKey: 'clientId', as: 'Client' });
-db.Clients.hasOne(db.Users, { foreignKey: 'clientId' });
-
-db.Users.belongsTo(db.Employees, { foreignKey: 'employeeId', as: 'Employee' });
-db.Employees.hasOne(db.Users, { foreignKey: 'employeeId' });
-
 app.use(async (req, res, next) => {
     res.locals.session = req.session;
     res.locals.isAuthenticated = false;
@@ -346,7 +219,14 @@ const weeklyAttendance = require('./controllers/weeklyAttendance');
 
 const kashflowRoutes = require('./kf/routes')
 
-const verificationRoutes  = require('./controllers/renderVerification');
+const verificationRoutes = require('./controllers/renderVerification');
+
+const kashflowCustomer = require('./controllers/CRUD/kashflow/customer');
+const kashflowInvoice = require('./controllers/CRUD/kashflow/invoice');
+const kashflowProject = require('./controllers/CRUD/kashflow/project');
+const kashflowQuote = require('./controllers/CRUD/kashflow/quote');
+const kashflowReceipt = require('./controllers/CRUD/kashflow/receipt');
+const kashflowSupplier = require('./controllers/CRUD/kashflow/supplier');
 
 app.use('/', index);
 
@@ -388,6 +268,13 @@ app.use('/', weeklyAttendance);
 app.use('/', kashflowRoutes);
 
 app.use('/', verificationRoutes);
+
+app.use('/', kashflowCustomer);
+app.use('/', kashflowInvoice);
+app.use('/', kashflowProject);
+app.use('/', kashflowQuote);
+app.use('/', kashflowReceipt);
+app.use('/', kashflowSupplier);
 
 // Catch undefined routes (404 handler)
 app.use((req, res, next) => {

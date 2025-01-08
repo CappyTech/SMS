@@ -5,7 +5,7 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const selectSubcontractor = async (req, res) => {
+const selectSubcontractor = async (req, res, next) => {
     try {
         let subcontractors;
         if (req.session.user.role === 'admin') {
@@ -32,7 +32,7 @@ const selectSubcontractor = async (req, res) => {
     } catch (error) {
         logger.error('Error selecting subcontractor:' + error.message);
         req.flash('error', 'Error selecting subcontractor: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
@@ -45,11 +45,11 @@ const renderSubcontractorCreateForm = (req, res) => {
     } catch (error) {
         logger.error('Error rendering subcontractor create form: ' + error.message);
         req.flash('error', 'Error rendering subcontractor create form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderSubcontractorUpdateForm = async (req, res) => {
+const renderSubcontractorUpdateForm = async (req, res, next) => {
     try {
         const subcontractorId = req.params.subcontractor;
         const subcontractor = await db.Subcontractors.findByPk(subcontractorId);
@@ -67,7 +67,7 @@ const renderSubcontractorUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering subcontractor update form: ' + error.message);
         req.flash('error', 'Error rendering subcontractor update form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 

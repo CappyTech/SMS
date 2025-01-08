@@ -86,5 +86,10 @@ const Invoices = sequelize.define('Invoices', {
     collate: 'latin1_bin',
 });
 
+Invoices.associate = (db) => {
+    // Invoices -> Subcontractors
+    Invoices.belongsTo(db.Subcontractors, { foreignKey: 'subcontractorId', allowNull: false });
+};
+
 return Invoices;
 };

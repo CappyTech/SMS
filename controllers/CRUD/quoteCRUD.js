@@ -5,12 +5,9 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const createQuote = async (req, res) => {
+const createQuote = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const { date, quote_ref, job_ref, locationId, clientId, contactId, value, desc, invoice_no, invoice_date } = req.body;
         logger.info(req.body);
 
@@ -54,12 +51,9 @@ const createQuote = async (req, res) => {
 
 
 
-const readQuote = async (req, res) => {
+const readQuote = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const quote = await db.Quotes.findByPk(req.params.quoteId, {
             include: [
@@ -90,12 +84,9 @@ const readQuote = async (req, res) => {
 };
 
 
-const readQuotes = async (req, res) => {
+const readQuotes = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const quotes = await db.Quotes.findAll({
             where: { clientId: req.params.client },
@@ -114,7 +105,7 @@ const readQuotes = async (req, res) => {
     }
 };
 
-const updateQuote = async (req, res) => {
+const updateQuote = async (req, res, next) => {
     try {
         const quote = await db.Quotes.findByPk(req.params.id);
         if (!quote) {
@@ -132,12 +123,9 @@ const updateQuote = async (req, res) => {
     }
 };
 
-const deleteQuote = async (req, res) => {
+const deleteQuote = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const quote = await db.Quotes.findByPk(req.params.id);
 
@@ -157,12 +145,9 @@ const deleteQuote = async (req, res) => {
     }
 };
 
-router.get('/fetch/quote/:quoteId', async (req, res) => {
+router.get('/fetch/quote/:quoteId', async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const quotes = await db.Quotes.findAll({
             where: { id: req.params.quoteId },
@@ -176,10 +161,10 @@ router.get('/fetch/quote/:quoteId', async (req, res) => {
 });
 
 
-router.post('/quote/create/:client', authService.ensureAuthenticated, createQuote);
-router.get('/quote/read/:quoteId', authService.ensureAuthenticated, readQuote);
-router.get('/quote/read/:client', authService.ensureAuthenticated, readQuotes);
-router.post('/quote/update/:id', authService.ensureAuthenticated, updateQuote);
-router.post('/quote/delete/:id', authService.ensureAuthenticated, deleteQuote);
+router.post('/quote/create/:client', authService.ensureAuthenticated, authService.ensureRole('admin'), createQuote);
+router.get('/quote/read/:quoteId', authService.ensureAuthenticated, authService.ensureRole('admin'), readQuote);
+router.get('/quote/read/:client', authService.ensureAuthenticated, authService.ensureRole('admin'), readQuotes);
+router.post('/quote/update/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), updateQuote);
+router.post('/quote/delete/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteQuote);
 
 module.exports = router;

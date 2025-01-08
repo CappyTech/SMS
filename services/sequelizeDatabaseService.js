@@ -48,12 +48,19 @@ modelFiles.forEach((file) => {
     db[model.name] = model;
 });
 
-// Step 2: Set up associations (after all models are defined)
-modelFiles.forEach((file) => {
-    const modelName = path.basename(file, '.js');
-    if (db[modelName] && db[modelName].associate) {
+// Step 2: Invoke associate methods for models
+Object.keys(db).forEach((modelName) => {
+    if (db[modelName].associate) {
         db[modelName].associate(db);
+        console.log(`Associations defined for ${modelName}`);
     }
+});
+
+// Log model names and associations
+console.log('Models Loaded:', Object.keys(db));
+
+Object.keys(db).forEach((modelName) => {
+    console.log(`Associations for ${modelName}:`, db[modelName].associations);
 });
 
 // Export the database object with Sequelize instance and models

@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         Date2: DataTypes.DATE,
         CustomerID: {
             type: DataTypes.INTEGER,
-            allowNull: true,
+            allowNull: false,
         },
         Status: DataTypes.INTEGER,
         Value: DataTypes.DECIMAL(10, 2),
@@ -30,6 +30,13 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'latin1',
         collate: 'latin1_bin',
     });
+
+    KF_Projects.associate = (models) => {
+        KF_Projects.belongsTo(models.KF_Customers, {
+            foreignKey: 'CustomerID',
+            as: 'customer',
+        });
+    };
 
     return KF_Projects;
 };

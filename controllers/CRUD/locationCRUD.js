@@ -6,12 +6,9 @@ const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
 // Create a new location
-const createLocation = async (req, res) => {
+const createLocation = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const {name, address, city, postalCode, country, latitude, longitude } = req.body;
 
         const newLocation = await db.Locations.create({
@@ -35,12 +32,9 @@ const createLocation = async (req, res) => {
 
 
 // Read a specific location
-const readLocation = async (req, res) => {
+const readLocation = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const location = await db.Locations.findByPk(req.params.id);
 
         if (!location) {
@@ -60,12 +54,9 @@ const readLocation = async (req, res) => {
 };
 
 // Update an existing location
-const updateLocation = async (req, res) => {
+const updateLocation = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const { name, address, city, postalCode, country, latitude, longitude } = req.body;
 
         const location = await db.Locations.findByPk(req.params.id);
@@ -95,12 +86,9 @@ const updateLocation = async (req, res) => {
 
 
 // Delete a location
-const deleteLocation = async (req, res) => {
+const deleteLocation = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const location = await db.Locations.findByPk(req.params.id);
 
         if (!location) {
@@ -119,12 +107,9 @@ const deleteLocation = async (req, res) => {
     }
 };
 
-router.get('/fetch/location/:id', async (req, res) => {
+router.get('/fetch/location/:id', async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const location = await db.Locations.findAll({
             where: { id: req.params.id },
@@ -138,9 +123,9 @@ router.get('/fetch/location/:id', async (req, res) => {
 });
 
 // Define routes
-router.post('/location/create', authService.ensureAuthenticated, createLocation);
-router.get('/location/read/:id', authService.ensureAuthenticated, readLocation);
-router.post('/location/update/:id', authService.ensureAuthenticated, updateLocation);
-router.post('/location/delete/:id', authService.ensureAuthenticated, deleteLocation);
+router.post('/location/create', authService.ensureAuthenticated, authService.ensureRole('admin'), createLocation);
+router.get('/location/read/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), readLocation);
+router.post('/location/update/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), updateLocation);
+router.post('/location/delete/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteLocation);
 
 module.exports = router;

@@ -5,7 +5,7 @@ const HOLIDAY_API_URL = 'https://www.gov.uk/bank-holidays.json';
 
 // Custom user-defined holidays
 const customHolidays = [
-    { startDate: '2024-12-21 08:00:00', endDate: '2025-01-06 18:00:00', title: 'Company Holiday' }
+    { startDate: '2024-12-21 08:00:00', endDate: '2025-01-05 18:00:00', title: 'Company Holiday' }
 ];
 
 const holidayService = {

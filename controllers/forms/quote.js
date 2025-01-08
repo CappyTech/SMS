@@ -5,12 +5,9 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const renderQuoteCreateForm = async (req, res) => {
+const renderQuoteCreateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const clients = await db.Clients.findAll({
             include: [db.Contacts],
@@ -30,16 +27,13 @@ const renderQuoteCreateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering quote create form: ' + error.message);
         req.flash('error', 'Error rendering quotes create form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderQuoteUpdateForm = async (req, res) => {
+const renderQuoteUpdateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const quote = await db.Quote.findByPk(req.params.quote, {
             include: [{
@@ -50,7 +44,7 @@ const renderQuoteUpdateForm = async (req, res) => {
 
         if (!quote) {
             req.flash('error', 'Quote not found.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
 
         // Fetch all locations to populate the dropdown
@@ -68,7 +62,7 @@ const renderQuoteUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering quote update form:  ', error.message);
         req.flash('error', 'Error rendering quote update form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 

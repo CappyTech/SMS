@@ -15,7 +15,7 @@ const renderSigninForm = (req, res) => {
     });
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
     try {
         const { usernameOrEmail, password } = req.body;
 
@@ -89,7 +89,7 @@ const loginUser = async (req, res) => {
             }
 
             req.flash('success', 'Successfully logged in.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         });
 
     } catch (error) {
@@ -104,7 +104,7 @@ const logoutUser = (req, res) => {
         if (err) {
             logger.error('Error logging out: ' + err.message);
             req.flash('error', 'An error occurred while logging out. Please try again.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
         res.clearCookie('connect.sid');
         return res.redirect('/signin');
@@ -123,7 +123,7 @@ const render2FAPage = (req, res) => {
     });
 };
 
-const verify2FA = async (req, res) => {
+const verify2FA = async (req, res, next) => {
     try {
         if (!req.session.userPending2FA) {
             req.flash('error', 'Invalid session. Please sign in again.');
@@ -183,7 +183,7 @@ const verify2FA = async (req, res) => {
             }
 
             req.flash('success', 'Successfully logged in.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         });
 
     } catch (error) {

@@ -16,7 +16,7 @@ const sequelize = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'mysql',
-        logging: false,  // Set to console.log for query debugging
+        logging: false, // Set to console.log for query debugging
     }
 );
 
@@ -47,20 +47,31 @@ modelFiles.forEach((file) => {
     const model = require(path.join(modelsDirectory, file))(sequelize, Sequelize.DataTypes);
     kf[model.name] = model;
 });
-if (process.env.NODE_ENV === "development") {
-// Synchronize database schema
-    (async () => {
-        try {
-            //await sequelize.sync({alter: true,logging: console.log,});
 
-            logger.info('All models were synchronized successfully.');
-        } catch (error) {
-            logger.error('Error synchronizing database:', error);
+// Step 2: Invoke associate methods for models
+Object.keys(kf).forEach((modelName) => {
+    if (kf[modelName].associate) {
+        kf[modelName].associate(kf);
+        console.log(`Associations defined for ${modelName}`);
+    }
+});
+
+// Log model names and associations
+console.log('Models Loaded:', Object.keys(kf));
+
+Object.keys(kf).forEach((modelName) => {
+    console.log(`Associations for ${modelName}:`, kf[modelName].associations);
+});
+
+// Synchronize with logging (only in development)
+if (process.env.NODE_ENV === 'development') {
+    sequelize.sync({ alter: true })
+        .then(() => logger.info('All models were synchronized successfully.'))
+        .catch((error) => {
+            logger.error('Error synchronizing database:' + error.message);
             process.exit(1);
-        }
-    })();
+        });
 }
-
 
 // Export the database object with Sequelize instance and models
 kf.sequelize = sequelize;

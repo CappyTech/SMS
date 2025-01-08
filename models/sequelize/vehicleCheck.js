@@ -9,10 +9,6 @@ module.exports = (sequelize, DataTypes) => {
     vehicleId: {
       type: DataTypes.CHAR(36),
       allowNull: false,
-      references: {
-        model: 'Vehicles',
-        key: 'id',
-      }
     },
     date: {
       type: DataTypes.DATE,
@@ -42,6 +38,14 @@ module.exports = (sequelize, DataTypes) => {
       charset: 'latin1',
       collate: 'latin1_bin',
   });
+
+  VehicleChecks.associate = (db) => {
+    // VehicleChecks -> Vehicles
+    VehicleChecks.belongsTo(db.Vehicles, { foreignKey: 'vehicleId', allowNull: false });
+
+    // VehicleChecks -> Employees
+    VehicleChecks.belongsTo(db.Employees, { foreignKey: 'employeeId', allowNull: false });
+};
 
   return VehicleChecks;
 };

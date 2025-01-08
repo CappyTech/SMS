@@ -5,12 +5,9 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const selectContact = async (req, res) => {
+const selectContact = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const contacts = await db.Contacts.findAll({
             include: [{ model: db.Clients, attributes: ['name'] }]
         });
@@ -36,16 +33,13 @@ const selectContact = async (req, res) => {
     } catch (error) {
         logger.error('Error selecting contact:  ', error.message);
         req.flash('error', 'Error selecting contact: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderContactCreateForm = async (req, res) => {
+const renderContactCreateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         // Find the client by primary key (PK)
         const clients = await db.Clients.findAll();
@@ -69,12 +63,9 @@ const renderContactCreateForm = async (req, res) => {
 };
 
 
-const renderContactUpdateForm = async (req, res) => {
+const renderContactUpdateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const contact = await db.Contacts.findByPk(req.params.contact, {
             include: [{ model: db.Clients }]
         });

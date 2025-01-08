@@ -5,7 +5,7 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const createContact = async (req, res) => {
+const createContact = async (req, res, next) => {
     try {
         const {
             name,
@@ -17,7 +17,7 @@ const createContact = async (req, res) => {
         const clientId = req.params.client;
         if (!clientId) {
             req.flash('erorr', 'Client wasn\'t specificied.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         } else {
             const contact = await db.Contacts.create({
                 clientId:clientId,
@@ -40,7 +40,7 @@ const createContact = async (req, res) => {
     }
 };
 
-const readContact = async (req, res) => {
+const readContact = async (req, res, next) => {
     try {
         const contact = await db.Contacts.findByPk(req.params.contact, {
             include: [
@@ -58,11 +58,11 @@ const readContact = async (req, res) => {
     } catch (error) {
         logger.error('Error viewing contact:'+ error.message);
         req.flash('error', 'Error viewing contact:' + error.message);
-        res.redirect('/error');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const readContacts = async (req, res) => {
+const readContacts = async (req, res, next) => {
     try {
         const clients = await db.Clients.findByPk(req.params.client);
         const contacts = await db.Contacts.findAll({
@@ -80,11 +80,11 @@ const readContacts = async (req, res) => {
     } catch (error) {
         logger.error('Error viewing contacts: ' + error.message);
         req.flash('error', 'Error viewing contacts: ' + error.message);
-        res.redirect('/error');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const updateContact = async (req, res) => {
+const updateContact = async (req, res, next) => {
     try {
         const { name, phone, email, note } = req.body;
         const contact = await db.Contacts.findByPk(req.params.contact);
@@ -107,7 +107,7 @@ const updateContact = async (req, res) => {
     }
 };
 
-const deleteContact = async (req, res) => {
+const deleteContact = async (req, res, next) => {
     try {
         const contact = await db.Contacts.findByPk(req.params.contact);
         if (!contact) {
@@ -125,7 +125,7 @@ const deleteContact = async (req, res) => {
     }
 };
 
-router.get('/fetch/contact/:clientId', async (req, res) => {
+router.get('/fetch/contact/:clientId', async (req, res, next) => {
     try {
         const contacts = await db.Contacts.findAll({
             where: { clientId: req.params.clientId },

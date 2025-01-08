@@ -1,0 +1,61 @@
+<div class="container mt-5">
+    <h1 class="mb-4">Receipt: <%= Receipt.InvoiceNumber %></h1>
+    <p><strong>ID:</strong> <%= Receipt.InvoiceDBID %></p>
+    <p><strong>Date:</strong> <%= slimDateTime(Receipt.InvoiceDate) %></p>
+    <p><strong>Due:</strong> <%= slimDateTime(Receipt.DueDate) %></p>
+
+    <!-- Customer Information -->
+    <% if (Customer) { %>
+        <h3>Customer Information</h3>
+        <p><strong>Name:</strong> <%= Customer.Name %></p>
+        <p><strong>Address:</strong></p>
+        <ul>
+            <li><%= Customer.Address1 %></li>
+            <li><%= Customer.Address2 %></li>
+            <li><%= Customer.Address3 %></li>
+            <li><%= Customer.Postcode %></li>
+        </ul>
+    <% } %>
+
+    <h2 class="mt-4">Receipt Lines:</h2>
+
+    <% if (Array.isArray(Receipt.Lines) && Receipt.Lines.length > 0) { %>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Charge Type</th>
+                    <th>Job ID</th>
+                    <th>Job Name</th>
+                    <th>Quantity</th>
+                    <th>Description</th>
+                    <th>Rate (£)</th>
+                    <th>VAT Rate</th>
+                    <th>VAT Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% Receipt.Lines.forEach(line => { %>
+                    <tr>
+                        <td><%= line.ChargeType %></td>
+                        <td><%= line.ProjID %></td>
+                        <td><%= line.ProjectName %> (<%= line.ProjectNumber %>)</td>
+                        <td><%= line.Quantity %></td>
+                        <td><%= line.Description %></td>
+                        <td><%= line.Rate %></td>
+                        <td><%= line.VatRate %></td>
+                        <td><%= line.VatAmount %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+    <% } else { %>
+    <p class="text-danger">No line items available for this receipt.</p>
+    <% } %>
+
+    <h3 class="mt-4">Summary</h3>
+    <p><strong>Net:</strong> £<%= Receipt.NetAmount %></p>
+    <p><strong>VAT:</strong> £<%= Receipt.VATAmount %></p>
+    <p><strong>Total Paid:</strong> £<%= Receipt.AmountPaid %></p>
+</div>

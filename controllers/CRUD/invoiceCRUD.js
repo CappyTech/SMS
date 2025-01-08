@@ -8,10 +8,19 @@ const validationService = require('../../services/validationService');
 const cisService = require('../../services/cisService');
 const taxService = require('../../services/taxService');
 
-const createInvoice = async (req, res) => {
+const createInvoice = async (req, res, next) => {
     try {
         const validatedData = validationService.validateInvoiceData(req.body);
-        const subcontractor = await db.Subcontractors.findByPk(req.params.selected);
+
+        const subcontractor = await db.Subcontractors.findByPk(req.params.selected, {
+            include: [{ model: db.Invoices, as: 'invoices' }],
+        });
+        if (!subcontractor) {
+            logger.error(`Subcontractor with ID ${req.params.selected} not found.`);
+            req.flash('error', 'Subcontractor not found.');
+            return res.redirect('/invoices');
+        }
+
         const amounts = cisService.calculateInvoiceAmounts(validatedData.labourCost, validatedData.materialCost, subcontractor.deduction, subcontractor.cisNumber, subcontractor.vatNumber);
 
         // If remittanceDate or submissionDate are not provided, set them to null
@@ -21,23 +30,23 @@ const createInvoice = async (req, res) => {
         // Calculate Tax Year and Tax Month
         const { taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(validatedData.remittanceDate);
 
-        // Create invoice record
+        // Create invoice
         const newInvoice = await db.Invoices.create({
             invoiceNumber: validatedData.invoiceNumber,
             kashflowNumber: validatedData.kashflowNumber,
             invoiceDate: validatedData.invoiceDate,
-            remittanceDate: validatedData.remittanceDate,
+            remittanceDate: validatedData.remittanceDate || null,
             grossAmount: amounts.grossAmount,
             labourCost: validatedData.labourCost,
             materialCost: validatedData.materialCost,
             cisAmount: amounts.cisAmount,
             netAmount: amounts.netAmount,
-            submissionDate: validatedData.submissionDate,
+            submissionDate: validatedData.submissionDate || null,
             reverseCharge: amounts.reverseCharge,
             month: taxMonth,
             year: taxYear,
-            subcontractorId: req.params.selected,
-            cisRate: amounts.cisRate
+            subcontractorId: subcontractor.id, // Use valid ID
+            cisRate: amounts.cisRate,
         });
 
         res.redirect(`/invoice/read/${newInvoice.id}`);
@@ -54,11 +63,11 @@ const createInvoice = async (req, res) => {
         }
         logger.error('Error creating invoice: ' + error.message);
         req.flash('error', 'Error: ' + error.message);
-        res.redirect('/error');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const updateInvoice = async (req, res) => {
+const updateInvoice = async (req, res, next) => {
     try {
         const invoice = await db.Invoices.findByPk(req.params.invoice);
         if (!invoice) {
@@ -84,7 +93,7 @@ const updateInvoice = async (req, res) => {
     }
 };
 
-const readInvoice = async (req, res) => {
+const readInvoice = async (req, res, next) => {
     try {
         const invoice = await db.Invoices.findByPk(req.params.invoice, {
             include: [
@@ -103,11 +112,11 @@ const readInvoice = async (req, res) => {
     } catch (error) {
         logger.error('Error viewing invoice: ' + error.message);
         req.flash('error', 'Error viewing invoice: ' + error.message);
-        res.redirect('/error');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const readInvoices = async (req, res) => {
+const readInvoices = async (req, res, next) => {
     try {
         const subcontractor = await db.Subcontractors.findByPk(req.params.subcontractor);
         const invoices = await db.Invoices.findAll({
@@ -132,17 +141,14 @@ const readInvoices = async (req, res) => {
     } catch (error) {
         logger.error('Error viewing invoices:'+ error.message);
         req.flash('error', 'Error viewing invoices:' + error.message);
-        res.redirect('/error');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const deleteInvoice = async (req, res) => {
+const deleteInvoice = async (req, res, next) => {
     try {
         // Check if the user is an admin
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         // TODO: Add subcontractorId to the invoice model and refer back to the /invoices/read/:id route
         const invoice = await db.Invoices.findByPk(req.params.invoice);
 
@@ -158,16 +164,13 @@ const deleteInvoice = async (req, res) => {
     } catch (error) {
         logger.error('Error deleting invoice: ' + error.message);
         req.flash('error', 'Error deleting invoice: ' + error.message);
-        res.redirect('/error');
+        next(error); // Pass the error to the error handler
     }
 };
 
-router.get('/fetch/invoice/:id', async (req, res) => {
+router.get('/fetch/invoice/:id', async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const invoice = await db.Invoices.findAll({
             where: { id: req.params.id },
@@ -180,12 +183,9 @@ router.get('/fetch/invoice/:id', async (req, res) => {
     }
 });
 
-router.get('fetch/unpaidinvoices', async (req, res) => {
+router.get('fetch/unpaidinvoices', async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const unpaidInvoices = await db.Invoices.findAll({
             where: { remittanceDate: null },
@@ -199,12 +199,9 @@ router.get('fetch/unpaidinvoices', async (req, res) => {
     }
 });
 
-router.get('fetch/unsubmittedinvoices', async (req, res) => {
+router.get('fetch/unsubmittedinvoices', async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const unsubmittedInvoices = await db.Invoices.findAll({
             where: { submissionDate: null },

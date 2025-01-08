@@ -5,7 +5,7 @@ const path = require('path');
 const db = require('../services/sequelizeDatabaseService');
 const authService = require('../services/authService');
 
-const renderYearlyReturns = async (req, res) => {
+const renderYearlyReturns = async (req, res, next) => {
     try {
         const { year, id } = req.params;
 
@@ -73,6 +73,6 @@ const renderYearlyReturns = async (req, res) => {
     }
 };
 
-router.get('/yearly/returns/:year/:id', authService.ensureAuthenticated, renderYearlyReturns);
+router.get('/yearly/returns/:year/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), renderYearlyReturns);
 
 module.exports = router;

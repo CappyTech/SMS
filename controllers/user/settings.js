@@ -55,12 +55,12 @@ const getProfilePage = async (req,res) => {
 }
 
 // Display the account page
-const getAccountPage = async (req, res) => {
+const getAccountPage = async (req, res, next) => {
     try {
         const user = await db.Users.findOne({ where: { id: req.session.user.id } });
         if (!user) {
             req.flash('error', 'User not found');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
 
         // Retrieve or generate TOTP secret
@@ -120,12 +120,12 @@ const getAccountPage = async (req, res) => {
     } catch (error) {
         logger.error(`Error setting up TOTP for user ${req.session.user.id}: ${error.message}`);
         req.flash('error', 'An error occurred during TOTP setup.');
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
 // Update the account settings
-const updateAccountSettings = async (req, res) => {
+const updateAccountSettings = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         req.flash('error', errors.array().map(err => err.msg).join('. '));
@@ -157,7 +157,7 @@ const updateAccountSettings = async (req, res) => {
 };
 
 // Logout a specific session
-const logoutSession = async (req, res) => {
+const logoutSession = async (req, res, next) => {
     try {
         const { sessionId } = req.body;
 
@@ -204,7 +204,7 @@ router.post(
         .withMessage('Passwords do not match'),
     ],
     authService.ensureAuthenticated,
-    async (req, res) => {
+    async (req, res, next) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         req.flash('error', errors.array().map(err => err.msg).join('. '));

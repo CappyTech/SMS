@@ -6,7 +6,7 @@ const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 const dateService = require('../../services/dateService');
 
-const renderAttendanceCreateForm = async (req, res) => {
+const renderAttendanceCreateForm = async (req, res, next) => {
     try {
         const { date, employeeId, subcontractorId } = req.query;
         const locations = await db.Locations.findAll();
@@ -26,11 +26,11 @@ const renderAttendanceCreateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering Attendance create form: ' + error.message);
         req.flash('error', 'Error rendering Attendance create form: ' + error.message);
-         return res.redirect('/');
+         next(error); // Pass the error to the error handler
     }
 };
 
-const renderAttendanceUpdateForm = async (req, res) => {
+const renderAttendanceUpdateForm = async (req, res, next) => {
     try {
         const attendance = await db.Attendances.findByPk(req.params.attendance);
 
@@ -53,7 +53,7 @@ const renderAttendanceUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering Attendance update form: ' + error.message);
         req.flash('error', 'Error rendering Attendance update form: ' + error.message);
-         return res.redirect('/');
+         next(error); // Pass the error to the error handler
     }
 };
 

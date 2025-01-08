@@ -5,12 +5,9 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const createJob = async (req, res) => {
+const createJob = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const quote = await db.Quotes.findByPk(req.params.quoteId, {
             include: [Clients]
         });
@@ -42,12 +39,9 @@ const createJob = async (req, res) => {
     }
 };
 
-const readJob = async (req, res) => {
+const readJob = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const job = await db.Jobs.findByPk(req.params.jobId, {
             include: [db.Clients, db.Quotes, db.Locations]
         });
@@ -68,12 +62,9 @@ const readJob = async (req, res) => {
     }
 };
 
-const updateJob = async (req, res) => {
+const updateJob = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const job = await db.Jobs.findByPk(req.params.jobId);
 
         if (!job) {
@@ -92,12 +83,9 @@ const updateJob = async (req, res) => {
     }
 };
 
-const deleteJob = async (req, res) => {
+const deleteJob = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const job = await db.Jobs.findByPk(req.params.jobId);
 
         if (!job) {
@@ -116,12 +104,9 @@ const deleteJob = async (req, res) => {
     }
 };
 
-router.get('/fetch/job/:id', async (req, res) => {
+router.get('/fetch/job/:id', async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const job = await db.Jobs.findAll({
             where: { id: req.params.id },
@@ -134,9 +119,9 @@ router.get('/fetch/job/:id', async (req, res) => {
     }
 });
 
-router.get('/job/create/:quoteId', authService.ensureAuthenticated, createJob);
-router.get('/job/read/:jobId', authService.ensureAuthenticated, readJob);
-router.post('/job/update/:jobId', authService.ensureAuthenticated, updateJob);
-router.post('/job/delete/:jobId', authService.ensureAuthenticated, deleteJob);
+router.get('/job/create/:quoteId', authService.ensureAuthenticated, authService.ensureRole('admin'), createJob);
+router.get('/job/read/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), readJob);
+router.post('/job/update/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), updateJob);
+router.post('/job/delete/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteJob);
 
 module.exports = router;

@@ -17,7 +17,7 @@ const renderCreateEmployeeForm = (req, res) => {
     }
 };
 
-const renderUpdateEmployeeForm = async (req, res) => {
+const renderUpdateEmployeeForm = async (req, res, next) => {
     try {
         const employee = await db.Employees.findByPk(req.params.employee);
         if (!employee) {

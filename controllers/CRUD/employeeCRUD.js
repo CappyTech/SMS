@@ -7,7 +7,7 @@ const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
 // Create Employee
-const createEmployee = async (req, res) => {
+const createEmployee = async (req, res, next) => {
     try {
         const { name, email, phoneNumber, position, type, status, contactName, contactNumber, hourlyRate, hireDate } = req.body;
         await db.Employees.create({ name, email: email || null, phoneNumber: phoneNumber || null, position:position || null, type, status, contactName: contactName || null, contactNumber: contactNumber || null, hourlyRate, hireDate: hireDate || moment().NOW });
@@ -20,7 +20,7 @@ const createEmployee = async (req, res) => {
     }
 };
 
-const readEmployee = async (req, res) => {
+const readEmployee = async (req, res, next) => {
     try {
         const employee = await db.Employees.findByPk(req.params.employee);
 
@@ -35,12 +35,12 @@ const readEmployee = async (req, res) => {
     } catch (error) {
         logger.error('Error viewing employee: ' + error.message);
         req.flash('error', 'Error viewing employee: ' + error.message);
-        res.redirect('/error');
+        next(error); // Pass the error to the error handler
     }
 };
 
 // Update Employee
-const updateEmployee = async (req, res) => {
+const updateEmployee = async (req, res, next) => {
     try {
         const { name, email, phoneNumber, position, type, status, contactName, contactNumber, hourlyRate, hireDate } = req.body;
         await db.Employees.update({ name, email: email || null, phoneNumber: phoneNumber || null, position:position || null, type, status, contactName: contactName || null, contactNumber: contactNumber || null, hourlyRate, hireDate }, { where: { id: req.params.employee } });
@@ -54,7 +54,7 @@ const updateEmployee = async (req, res) => {
 };
 
 // Delete Employee
-const deleteEmployee = async (req, res) => {
+const deleteEmployee = async (req, res, next) => {
     try {
         await db.Employees.destroy({ where: { id: req.params.employee } });
         req.flash('success', 'Employee deleted successfully.');
@@ -66,7 +66,7 @@ const deleteEmployee = async (req, res) => {
     }
 };
 
-router.get('/fetch/employee/:id', async (req, res) => {
+router.get('/fetch/employee/:id', async (req, res, next) => {
     try {
         const employee = await db.Employees.findByPk(req.params.id);
         res.json({ employee });

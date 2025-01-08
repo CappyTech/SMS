@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 
-const e500 = async (req, res) => {
+const e500 = async (req, res, next) => {
     try {
         res.render(path.join('errors', '500'), {
             title: '500',
@@ -13,11 +13,11 @@ const e500 = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering 500 page: ' + error.message);
         req.flash('error', 'Error rendering 500 page: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const e404 = async (req, res) => {
+const e404 = async (req, res, next) => {
     try {
         res.render(path.join('errors', '404'), {
             title: '404',
@@ -28,11 +28,11 @@ const e404 = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering 404 page: ' + error.message);
         req.flash('error', 'Error rendering 404 page: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const e403 = async (req, res) => {
+const e403 = async (req, res, next) => {
     try {
         res.render(path.join('errors', '403'), {
             title: '403',
@@ -43,7 +43,7 @@ const e403 = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering 403 page: ' + error.message);
         req.flash('error', 'Error rendering 403 page: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 

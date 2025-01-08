@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         Customer: DataTypes.STRING,
-        CustomerID: {
+        CustomerID: { // SUPPLIERID
             type: DataTypes.INTEGER,
             allowNull: true,
         },
@@ -96,7 +96,7 @@ module.exports = (sequelize, DataTypes) => {
                     try {
                         this.setDataValue('Lines', JSON.parse(value));
                     } catch (error) {
-                        this.setDataValue('Lines', null); // Fallback to null on parse error
+                        this.setDataValue('Lines', []);
                     }
                 } else {
                     this.setDataValue('Lines', value);
@@ -104,7 +104,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             get() {
                 const value = this.getDataValue('Lines');
-                return value || []; // Default to empty array if null
+                return value || [];
             }
         },
         ReadableString: DataTypes.TEXT,
@@ -115,6 +115,15 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'latin1',
         collate: 'latin1_bin',
     });
+
+    KF_Receipts.associate = (models) => {
+        KF_Receipts.belongsTo(models.KF_Suppliers, {
+            foreignKey: 'CustomerID', // Still references CustomerID in KF_Receipts
+            targetKey: 'SupplierID',  // Correctly maps to SupplierID in KF_Suppliers
+            as: 'supplier',
+        });
+    }
+    
 
     return KF_Receipts;
 };

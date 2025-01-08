@@ -80,10 +80,21 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     KF_Customers.associate = (models) => {
-        KF_Customers.hasMany(models.KF_Invoices, { foreignKey: 'CustomerID', as: 'invoices' });
-        KF_Customers.hasMany(models.KF_Quotes, { foreignKey: 'CustomerID', as: 'quotes' });
-        KF_Customers.hasMany(models.KF_Receipts, { foreignKey: 'CustomerID', as: 'receipts' });
-        KF_Customers.hasMany(models.KF_Projects, { foreignKey: 'CustomerID', as: 'projects' });
+        KF_Customers.hasMany(models.KF_Invoices, {
+            foreignKey: 'CustomerID',  // Column in KF_Invoices
+            sourceKey: 'CustomerID',  // Column in KF_Customers to reference
+            as: 'invoices',
+        });
+        KF_Customers.hasMany(models.KF_Quotes, {
+            foreignKey: 'CustomerID',
+            sourceKey: 'CustomerID',
+            as: 'quotes',
+        });
+        KF_Customers.hasMany(models.KF_Projects, {
+            foreignKey: 'CustomerID',
+            sourceKey: 'CustomerID',
+            as: 'projects',
+        });
     };
 
     for (let i = 1; i <= 20; i++) {

@@ -117,5 +117,19 @@ module.exports = (sequelize, DataTypes) => {
       collate: 'latin1_bin',
   });
 
+  Vehicles.associate = (db) => {
+    // Vehicles -> Employees
+    Vehicles.belongsTo(db.Employees, { foreignKey: 'employeeId', allowNull: false });
+
+    // Vehicles -> Jobs (if applicable)
+    Vehicles.belongsTo(db.Jobs, { foreignKey: 'jobId', allowNull: true });
+
+    // Vehicles -> VehicleChecks
+    Vehicles.hasMany(db.VehicleChecks, { foreignKey: 'vehicleId', allowNull: false });
+
+    // Vehicles -> VehicleChecks
+    Vehicles.hasMany(db.VehicleReceipts, { foreignKey: 'vehicleId', allowNull: false });
+  };
+
   return Vehicles;
 };

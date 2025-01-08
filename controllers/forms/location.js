@@ -5,12 +5,9 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const renderLocationCreateForm = async (req, res) => {
+const renderLocationCreateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         logger.info("Accessing /location/create");
 
@@ -22,16 +19,13 @@ const renderLocationCreateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering location create form: ' + error.message);
         req.flash('error', 'Error rendering location create form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderLocationUpdateForm = async (req, res) => {
+const renderLocationUpdateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const location = await db.Locations.findByPk(req.params.locationId);
 
@@ -48,7 +42,7 @@ const renderLocationUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering location update form: ' + error.message);
         req.flash('error', 'Error rendering location update form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 

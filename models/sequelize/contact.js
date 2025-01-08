@@ -33,5 +33,10 @@ module.exports = (sequelize, DataTypes) => {
         collate: 'latin1_bin',
     });
 
+    Contacts.associate = (db) => {
+        // Contacts -> Clients
+        Contacts.belongsTo(db.Clients, { foreignKey: 'clientId', allowNull: false });
+    };
+
     return Contacts;
 }

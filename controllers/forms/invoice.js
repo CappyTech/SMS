@@ -5,12 +5,9 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const renderInvoiceCreateForm = async (req, res) => {
+const renderInvoiceCreateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         
         const subcontractors = await db.Subcontractors.findAll({
             order: [['company', 'ASC']]
@@ -24,16 +21,13 @@ const renderInvoiceCreateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering invoice create form:' + error.message);
         req.flash('error', 'Error rendering invoice create form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderInvoiceUpdateForm = async (req, res) => {
+const renderInvoiceUpdateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const invoice = await db.Invoices.findByPk(req.params.invoice);
 
@@ -50,7 +44,7 @@ const renderInvoiceUpdateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering invoice update form:  ', error.message);
         req.flash('error', 'Error rendering invoice update form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 

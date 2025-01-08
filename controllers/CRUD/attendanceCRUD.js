@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const moment = require('moment');
-const { Op } = require('sequelize');
 const path = require('path');
 const logger = require('../../services/loggerService');
 const attendanceService = require('../../services/attendanceService');
@@ -10,7 +8,7 @@ const taxService = require('../../services/taxService');
 const db = require('../../services/sequelizeDatabaseService');
 const dateService = require('../../services/dateService');
 
-const createAttendance = async (req, res) => {
+const createAttendance = async (req, res, next) => {
     try {
         const {
             date,
@@ -35,11 +33,11 @@ const createAttendance = async (req, res) => {
     } catch (error) {
         logger.error('Error creating attendance: ' + error.message);
         req.flash('error', 'Failed to create attendance.');
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const readAttendance = async (req, res) => {
+const readAttendance = async (req, res, next) => {
     try {
         const attendance = await db.Attendances.findByPk(req.params.attendance, {
             include: [
@@ -61,11 +59,11 @@ const readAttendance = async (req, res) => {
     } catch (error) {
         logger.error('Error viewing attendance: ' + error.message);
         req.flash('error', 'Error viewing attendance: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const updateAttendance = async (req, res) => {
+const updateAttendance = async (req, res, next) => {
     try {
         const { attendance } = req.params;
         const {
@@ -140,7 +138,7 @@ const updateAttendance = async (req, res) => {
 };
 
 
-const deleteAttendance = async (req, res) => {
+const deleteAttendance = async (req, res, next) => {
     try {
         const attendance = req.params.attendance;
 
@@ -151,11 +149,11 @@ const deleteAttendance = async (req, res) => {
     } catch (error) {
         logger.error('Error deleting attendance: ' + error.message);
         req.flash('error', 'Failed to delete attendance.');
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-router.get('/fetch/attendance/:id', authService.ensureAuthenticated, async (req, res) => {
+router.get('/fetch/attendance/:id', authService.ensureAuthenticated, async (req, res, next) => {
     try {
         const attendance = await db.Attendances.findAll({
             where: { id: req.params.id },

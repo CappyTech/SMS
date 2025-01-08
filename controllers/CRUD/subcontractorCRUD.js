@@ -5,12 +5,12 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const createSubcontractor = async (req, res) => {
+const createSubcontractor = async (req, res, next) => {
     try {
         if (!req.session.user.permissionCreateSubcontractor) {
             logger.error("User does not have permission to create subcontractor.");
             req.flash('error', 'Access denied.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
 
         const {
@@ -68,16 +68,16 @@ const createSubcontractor = async (req, res) => {
         }
         logger.error('Error creating subcontractor: ' + error.message);
         req.flash('error', 'Error creating subcontractor: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const readSubcontractor = async (req, res) => {
+const readSubcontractor = async (req, res, next) => {
     try {
         // Check if the user has permissions
         if (!req.session.user.permissionReadSubcontractor) {
             req.flash('error', 'Access denied.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
 
         const subcontractor = await db.Subcontractors.findByPk(req.params.id);
@@ -93,11 +93,11 @@ const readSubcontractor = async (req, res) => {
     } catch (error) {
         logger.error('Error reading subcontractor:  ', error.message);
         req.flash('error', 'Error reading subcontractor: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const updateSubcontractor = async (req, res) => {
+const updateSubcontractor = async (req, res, next) => {
     try {
         // Check if user has permission
         if (!req.session.user.permissionUpdateSubcontractor) {
@@ -183,7 +183,7 @@ const updateSubcontractor = async (req, res) => {
         if (error.name === 'SequelizeUniqueConstraintError') {
             logger.error('Unique constraint error: ', error);
             req.flash('error', 'A subcontractor with this UTR or VAT number already exists.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
         logger.error('Error updating subcontractor: ' + error.message);
         req.flash('error', 'Error updating subcontractor: ' + error.message);
@@ -194,12 +194,12 @@ const updateSubcontractor = async (req, res) => {
 
 
 
-const deleteSubcontractor = async (req, res) => {
+const deleteSubcontractor = async (req, res, next) => {
     try {
         // Check if the user has permissions
         if (!req.session.user.permissionDeleteSubcontractor) {
             req.flash('error', 'Access denied.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
 
         const subcontractor = await db.Subcontractors.findByPk(req.params.id);
@@ -222,16 +222,12 @@ const deleteSubcontractor = async (req, res) => {
     }
 };
 
-router.get('/fetch/subcontractor/:id', async (req, res) => {
+router.get('/fetch/subcontractor/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
-
         const subcontractor = await db.Subcontractors.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
+            include: [{ model: db.Invoices, as: 'invoices' }],
         });
 
         res.json({ subcontractor });
@@ -240,9 +236,9 @@ router.get('/fetch/subcontractor/:id', async (req, res) => {
     }
 });
 
-router.post('/subcontractor/create/', authService.ensureAuthenticated, createSubcontractor);
-router.get('/subcontractor/read/:id', authService.ensureAuthenticated, readSubcontractor);
-router.post('/subcontractor/update/:id', authService.ensureAuthenticated, updateSubcontractor);
-router.post('/subcontractor/delete/:id', authService.ensureAuthenticated, deleteSubcontractor);
+router.post('/subcontractor/create/', authService.ensureAuthenticated, authService.ensureRole('admin'), createSubcontractor);
+router.get('/subcontractor/read/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), readSubcontractor);
+router.post('/subcontractor/update/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), updateSubcontractor);
+router.post('/subcontractor/delete/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteSubcontractor);
 
 module.exports = router;

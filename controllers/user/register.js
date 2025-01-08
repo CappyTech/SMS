@@ -15,7 +15,7 @@ const renderRegistrationForm = (req, res) => {
     });
 };
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
 
@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
         // Create a new user in the database
         await User.create({ username, email, password });
         logger.info('New User Created.');
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     } catch (error) {
         logger.error('Error registering user: ' + error.message);
         req.flash('error', 'Error registering user: ' + error.message);

@@ -5,12 +5,9 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const renderJobCreateForm = async (req, res) => {
+const renderJobCreateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const clients = await db.Clients.findAll({
             include: [db.Quotes],
@@ -35,16 +32,13 @@ const renderJobCreateForm = async (req, res) => {
     } catch (error) {
         logger.error('Error rendering job create form: ' + error.message);
         req.flash('error', 'Error rendering job create form: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const renderJobUpdateForm = async (req, res) => {
+const renderJobUpdateForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const job = await db.Jobs.findByPk(req.params.jobId, {
             include: [db.Clients, db.Locations, db.Quotes],
         });

@@ -5,12 +5,9 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const createClient = async (req, res) => {
+const createClient = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const {
             name 
@@ -26,16 +23,13 @@ const createClient = async (req, res) => {
     } catch (error) {
         logger.error('Error creating client:' + error.message);
         req.flash('error', 'Error: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const readClient = async (req, res) => {
+const readClient = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const clientId = req.params.clientId;
 
@@ -71,7 +65,7 @@ const readClient = async (req, res) => {
     }
 };
 
-const updateClient = async (req, res) => {
+const updateClient = async (req, res, next) => {
     try {
         const clients = await db.Clients.findByPk(req.params.clientId);
 
@@ -85,11 +79,11 @@ const updateClient = async (req, res) => {
     } catch (error) {
         logger.error('Error updating client:' + error.message);
         req.flash('error', 'Error: ' + error.message);
-        return res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const deleteClient = async (req, res) => {
+const deleteClient = async (req, res, next) => {
     try {
         const clients = await db.Clients.findByPk(req.params.clientId);
 
@@ -107,12 +101,9 @@ const deleteClient = async (req, res) => {
     }
 };
 
-router.get('/fetch/client/:clientId', async (req, res) => {
+router.get('/fetch/client/:clientId', async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         const clients = await db.Clients.findAll({
             where: { id: req.params.clientId },

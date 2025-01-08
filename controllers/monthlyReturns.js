@@ -5,12 +5,9 @@ const path = require('path');
 const db = require('../services/sequelizeDatabaseService');
 const authService = require('../services/authService');
 
-const renderMonthlyReturnsForm = async (req, res) => {
+const renderMonthlyReturnsForm = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
 
         // Define the monthNames array starting with April as month 1
         const monthNames = [
@@ -69,12 +66,9 @@ const renderMonthlyReturnsForm = async (req, res) => {
     }
 };
 
-const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
+const renderMonthlyReturnsForOneSubcontactor = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const { month, year, id } = req.params;
 
         if (!month || !year || !id) {
@@ -120,12 +114,9 @@ const renderMonthlyReturnsForOneSubcontactor = async (req, res) => {
     }
 };
 
-const renderMonthlyReturnsForAll = async (req, res) => {
+const renderMonthlyReturnsForAll = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const { month, year } = req.params;
 
         if (!month || !year) {
@@ -170,12 +161,9 @@ const renderMonthlyReturnsForAll = async (req, res) => {
     }
 };
 
-const renderMonthlyReturnsYear = async (req, res) => {
+const renderMonthlyReturnsYear = async (req, res, next) => {
     try {
-        if (!req.session.user || req.session.user.role !== 'admin') {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+        
         const { year } = req.params;
 
         if (!year) {
@@ -216,9 +204,9 @@ const renderMonthlyReturnsYear = async (req, res) => {
     }
 };
 
-router.get('/monthly/returns/form', authService.ensureAuthenticated, renderMonthlyReturnsForm);
-router.get('/monthly/returns/:month/:year/:id', authService.ensureAuthenticated, renderMonthlyReturnsForOneSubcontactor);
-router.get('/monthly/returns/:year/:month', authService.ensureAuthenticated, renderMonthlyReturnsForAll);
-router.get('/monthly/returns/:year', authService.ensureAuthenticated, renderMonthlyReturnsYear);
+router.get('/monthly/returns/form', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsForm);
+router.get('/monthly/returns/:month/:year/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsForOneSubcontactor);
+router.get('/monthly/returns/:year/:month', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsForAll);
+router.get('/monthly/returns/:year', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsYear);
 
 module.exports = router;

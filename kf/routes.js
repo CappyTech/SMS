@@ -18,7 +18,7 @@ router.get('/kashflow', authService.ensureAuthenticated, authService.ensureRole(
 });
 
 // Controller for initiating the data fetch process
-router.get('/fetch-kashflow-data', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
+router.get('/fetch-kashflow-data', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res, next) => {
     if (isFetching) {
         return res.status(400).json({ message: 'Fetch is already in progress.' });
     }

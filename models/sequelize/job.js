@@ -58,5 +58,16 @@ const Jobs = sequelize.define('Jobs', {
     collate: 'latin1_bin',
 });
 
+Jobs.associate = (db) => {
+    // Jobs -> Clients
+    Jobs.belongsTo(db.Clients, { foreignKey: 'clientId', allowNull: true });
+
+    // Jobs -> Locations
+    Jobs.belongsTo(db.Locations, { foreignKey: 'locationId', allowNull: true });
+
+    // Jobs -> Quotes
+    Jobs.belongsTo(db.Quotes, { foreignKey: 'quoteId', allowNull: true });
+};
+
 return Jobs;
 };

@@ -42,6 +42,14 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'latin1',
         collate: 'latin1_bin',
     });
+    
+    KF_Suppliers.associate = (models) => {
+        KF_Suppliers.hasMany(models.KF_Receipts, {
+            foreignKey: 'CustomerID', // Or 'SupplierID' if you rename it
+            sourceKey: 'SupplierID',  // Correctly points to SupplierID
+            as: 'receipts',
+        });
+    }
 
     return KF_Suppliers;
 };

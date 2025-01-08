@@ -18,12 +18,12 @@ const schema = Joi.object({
         .optional() // Permissions field is optional
 });
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
     try {
         const { errors, value } = schema.validate(req.body);
         if (errors) {
             req.flash('error', 'Invalid input.' + errors);
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
         const { username, email, password, role } = value;
         const existingUser = await db.Users.findOne({
@@ -33,7 +33,7 @@ const createUser = async (req, res) => {
         });
         if (existingUser) {
             req.flash('error', 'Registration failed.');
-            return res.redirect('/');
+            next(error); // Pass the error to the error handler
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         await db.Users.create({
@@ -46,15 +46,15 @@ const createUser = async (req, res) => {
             clientId: null,
         });
         req.flash('success', 'User created successfully.');
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     } catch (error) {
         logger.error('Error creating user: ' + error.message);
         req.flash('error', 'An error occurred.');
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-const readUser = async (req, res) => {
+const readUser = async (req, res, next) => {
     try {
         // Verify if req.params and req.params.id exist
         if (!req.params || !req.params.id) {
@@ -77,7 +77,7 @@ const readUser = async (req, res) => {
     }
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
     try {
         if (!req.params || !req.params.id) {
             return res.status(400).send('Bad Request: Missing user id parameter.');
@@ -138,7 +138,7 @@ const updateUser = async (req, res) => {
 };
 
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
     try {
         if (req.session.user.id === req.params.id) {
             return res.status(403).send('Access denied. You cannot delete your own account.');
@@ -156,11 +156,11 @@ const deleteUser = async (req, res) => {
     } catch (error) {
         logger.error('Error deleting user:  ', error.message);
         req.flash('error', 'Error deleting user: ' + error.message);
-        res.redirect('/');
+        next(error); // Pass the error to the error handler
     }
 };
 
-router.get('/fetch/user/:id', async (req, res) => {
+router.get('/fetch/user/:id', async (req, res, next) => {
     try {
         const user = await db.Users.findAll({
             where: { id: req.params.id },
