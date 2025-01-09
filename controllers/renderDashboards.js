@@ -476,12 +476,19 @@ const renderKFReceiptsDashboard = async (req, res, next) => {
     try {
         const receipts = await kf.KF_Receipts.findAll({
             order: [['InvoiceDBID', 'DESC']],
-            limit: 50
+            limit: 50,
+            include: [{ model: kf.KF_Suppliers, as: 'supplier' }],
         });
 
+        // Add total calculation for each receipt
+        const receiptsWithTotals = receipts.map(receipt => ({
+            ...receipt.toJSON(), // Convert Sequelize instance to plain object
+            calcTotal: parseFloat(receipt.NetAmount) + parseFloat(receipt.VATAmount), // Calculate the total
+        }));
+
         res.render(path.join('kashflow', 'receipt'), {
-            title: 'Receipts Dashboard',
-            receipts,
+            title: 'Purchases Dashboard',
+            receipts: receiptsWithTotals,
         });
     } catch (error) {
         logger.error('Error rendering KFReceipts dashboard: ' + error.message);
@@ -603,5 +610,144 @@ router.get('/dashboard/KFsupplier', authService.ensureAuthenticated, authService
 router.get('/dashboard/KFreceipt', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFReceiptsDashboard);
 router.get('/dashboard/KFproject', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFProjectsDashboard);
 router.get('/dashboard/KashFlow', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKashflowDashboard);
+
+const renderCISSubmissionDashboard = async (req, res, next) => {
+    try {
+        // Fetch the specified year and month from the URL parameters
+        const specifiedYear = parseInt(req.params.year);
+        const specifiedMonth = parseInt(req.params.month);
+
+        // Ensure valid values for year and month
+        if (isNaN(specifiedYear) || isNaN(specifiedMonth) || specifiedMonth < 1 || specifiedMonth > 12) {
+            return res.status(400).send('Invalid year or month.');
+        }
+
+        const suppliers = await kf.KF_Suppliers.findAll({});
+        const receipts = await kf.KF_Receipts.findAll({});
+
+        const taxYear = taxService.getTaxYearStartEnd(specifiedYear);
+        const currentMonthlyReturn = taxService.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
+
+        // Filter receipts based on the CIS period
+        const filteredReceipts = receipts.filter(receipt => {
+            if (!receipt.DueDate) return false;
+            const receiptDate = moment(receipt.DueDate);
+            return receiptDate.isBetween(
+                currentMonthlyReturn.periodStart,
+                currentMonthlyReturn.periodEnd,
+                null,
+                '[]'
+            );
+        });
+
+        // Further filter receipts to include only those with both Labour Costs and CIS Deductions
+        const receiptsWithLabourAndCIS = filteredReceipts.filter(receipt => {
+            const lines = typeof receipt.Lines === 'string' ? JSON.parse(receipt.Lines) : receipt.Lines;
+
+            const hasLabourCost = lines.some(line => line.ChargeType === 18685897); // Labour Costs
+            const hasCISDeductions = lines.some(line => line.ChargeType === 18685964); // CIS Deductions
+
+            return hasLabourCost && hasCISDeductions;
+        });
+
+        // Extract unique supplier IDs from the filtered receipts
+        const SupplierIDs = [...new Set(receiptsWithLabourAndCIS.map(receipt => receipt.CustomerID))];
+
+        // Filter suppliers based on IDs
+        const filteredSuppliers = suppliers.filter(supplier => SupplierIDs.includes(supplier.SupplierID));
+
+        // Calculate totals for the filtered receipts
+        const supplierTotals = {};
+        receiptsWithLabourAndCIS.forEach(receipt => {
+            const customerId = String(receipt.CustomerID);
+
+            if (!supplierTotals[customerId]) {
+                supplierTotals[customerId] = {
+                    grossAmount: 0,
+                    materialsCost: 0,
+                    cisDeductions: 0,
+                    labourCost: 0,
+                    reverseChargeVAT: parseFloat(receipt.CISRCVatAmount) || 0,
+                    reverseChargeNet: parseFloat(receipt.CISRCNetAmount) || 0,
+                };
+            }
+
+            const lines = typeof receipt.Lines === 'string' ? JSON.parse(receipt.Lines) : receipt.Lines;
+
+            lines.forEach(line => {
+                if (line.ChargeType === 18685896) { // Materials
+                    supplierTotals[customerId].materialsCost += parseFloat(line.Rate * line.Quantity || 0);
+                } else if (line.ChargeType === 18685897) { // Labour
+                    supplierTotals[customerId].labourCost += parseFloat(line.Rate * line.Quantity || 0);
+                } else if (line.ChargeType === 18685964) { // CIS Deductions
+                    supplierTotals[customerId].cisDeductions += parseFloat(line.Rate * line.Quantity || 0);
+                }
+            });
+
+            supplierTotals[customerId].grossAmount =
+                supplierTotals[customerId].materialsCost + supplierTotals[customerId].labourCost;
+        });
+
+        const allReceiptsSubmitted = receiptsWithLabourAndCIS.every(
+            receipt => receipt.submissionDate && receipt.submissionDate !== '0000-00-00 00:00:00'
+        );
+        const submissionDate =
+            allReceiptsSubmitted && receiptsWithLabourAndCIS.length > 0
+                ? receiptsWithLabourAndCIS[0].submissionDate
+                : null;
+
+        const previousMonth = specifiedMonth === 1 ? 12 : specifiedMonth - 1;
+        const previousYear = specifiedMonth === 1 ? specifiedYear - 1 : specifiedYear;
+        const nextMonth = specifiedMonth === 12 ? 1 : specifiedMonth + 1;
+        const nextYear = specifiedMonth === 12 ? specifiedYear + 1 : specifiedYear;
+
+        const periodEnd = moment(currentMonthlyReturn.periodEndDisplay, 'Do MMMM YYYY');
+        const submissionStartDate = periodEnd.clone().date(7).format('Do MMMM YYYY');
+        const submissionEndDate = periodEnd.clone().date(11).format('Do MMMM YYYY');
+
+        logger.info('Supplier Totals: ' + JSON.stringify(supplierTotals, null, 2));
+
+        res.render(path.join('kashflow', 'cisDashboard'), {
+            title: 'CIS Submission Dashboard',
+            supplierCount: filteredSuppliers.length,
+            receiptCount: receiptsWithLabourAndCIS.length,
+            suppliers: filteredSuppliers,
+            receipts: receiptsWithLabourAndCIS,
+            taxYear,
+            taxMonth: specifiedMonth,
+            allReceiptsSubmitted,
+            submissionDate,
+            supplierTotals,
+            currentMonthlyReturn,
+            previousYear,
+            previousMonth,
+            nextYear,
+            nextMonth,
+            submissionStartDate,
+            submissionEndDate,
+            specifiedYear,
+            specifiedMonth,
+        });
+    } catch (error) {
+        logger.error('Error rendering CIS submission dashboard: ' + error.message);
+        req.flash('error', 'Error rendering CIS submission dashboard: ' + error.message);
+        next(error);
+    }
+};
+
+
+router.get('/dashboard/CIS', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
+    try {
+        const { taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(moment());
+        logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
+        return res.redirect(`/dashboard/KFCIS/${taxYear}/${taxMonth}`);
+    } catch (error) {
+        logger.error('Error rendering stats dashboard:' + error.message);
+        req.flash('error', 'Error rendering stats dashboard: ' + error.message);
+        next(error); // Pass the error to the error handler
+    }
+});
+
+router.get('/dashboard/KFCIS/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderCISSubmissionDashboard);
 
 module.exports = router;

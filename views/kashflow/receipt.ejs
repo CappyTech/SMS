@@ -1,14 +1,14 @@
 
 <div class="container my-5">
-    <h1 class="mb-4 text-center">Receipts Dashboard</h1>
+    <h1 class="mb-4 text-center">Purchases Dashboard</h1>
     <div class="row">
         <% receipts.forEach(receipt => { %>
         <div class="col-md-4 mb-3">
             <div class="card">
                 <div class="card-body">
-                    <h5>Receipt #<%= receipt.InvoiceNumber %></h5>
-                    <p><strong>Customer:</strong> <%= receipt.customer ? receipt.customer.Name : 'N/A' %></p>
-                    <p><strong>Amount:</strong> £<%= receipt.AmountPaid || 0 %></p>
+                    <h5>Purchase #<%= receipt.InvoiceNumber %></h5>
+                    <p><strong>Supplier:</strong> <%= receipt.supplier ? receipt.supplier.Name : 'N/A' %></p>
+                    <p><strong>Amount:</strong> <%= formatCurrency(receipt.calcTotal) %></p>
                     <p><strong>Date:</strong> <%= new Date(receipt.InvoiceDate).toLocaleDateString() %></p>
                 </div>
                 <div class="card-footer text-center">

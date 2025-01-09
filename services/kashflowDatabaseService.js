@@ -65,7 +65,7 @@ Object.keys(kf).forEach((modelName) => {
 
 // Synchronize with logging (only in development)
 if (process.env.NODE_ENV === 'development') {
-    sequelize.sync({ alter: true })
+    sequelize.sync({ alter: false })
         .then(() => logger.info('All models were synchronized successfully.'))
         .catch((error) => {
             logger.error('Error synchronizing database:' + error.message);

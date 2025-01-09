@@ -14,7 +14,7 @@ function formatCurrency(amount) {
         logger.error(errorMessage);
         throw new Error(errorMessage);
     }
-    return '£' + amount;
+    return '£' + amount.toFixed(2);
 }
 
 /**

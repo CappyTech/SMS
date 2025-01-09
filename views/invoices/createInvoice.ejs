@@ -23,6 +23,17 @@
                     </div>
                 </div>
 
+                <!-- Display Subcontractor Details -->
+                <div id="subcontractorDetails" class="row mb-3 text-start" style="display: none;">
+                    <div class="col-sm-12">
+                        <div class="alert alert-info">
+                            <p><strong>Subcontractor Details:</strong></p>
+                            <p id="subcontractorName">Name: N/A</p>
+                            <p id="mostRecentInvoice">Most Recent Invoice: N/A</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mb-3">
                     <label for="invoiceNumber" class="col-sm-3 col-form-label">Invoice Number</label>
                     <div class="col-sm-9">
@@ -109,6 +120,7 @@
         </div>
     </div>
 </div>
+<!--
 <script>
     // Handle subcontractor selection and update form dynamically
     document.getElementById('subcontractorId').addEventListener('change', function () {
@@ -125,6 +137,50 @@
                     // Additional logic can be added here
                 })
                 .catch(error => console.error('Error fetching subcontractor details:', error));
+        }
+    });
+</script>
+-->
+<script>
+    document.getElementById('subcontractorId').addEventListener('change', function () {
+        const selectedSubcontractorId = this.value;
+
+        if (selectedSubcontractorId) {
+            // Update form action with the selected subcontractor ID
+            const form = document.getElementById('invoiceForm');
+            form.action = `/invoice/create/${selectedSubcontractorId}`;
+
+            // Fetch subcontractor details
+            fetch(`/fetch/subcontractor/${selectedSubcontractorId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch subcontractor details: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle subcontractor details
+                    if (data.subcontractor) {
+                        const mostRecentInvoiceNumber = data.mostRecentInvoiceNumber || 'None';
+                        
+                        // Display subcontractor details (you can customize this)
+                        document.getElementById('subcontractorDetails').innerHTML = `
+                            <p><strong>Subcontractor Name:</strong> ${data.subcontractor.name || 'N/A'}</p>
+                            <p><strong>Most Recent Invoice:</strong> ${mostRecentInvoiceNumber}</p>
+                        `;
+                    } else {
+                        document.getElementById('subcontractorDetails').innerHTML = '<p>No details available for this subcontractor.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching subcontractor details:', error);
+                    document.getElementById('subcontractorDetails').innerHTML =
+                        '<p>Error fetching subcontractor details. Please try again later.</p>';
+                });
+        } else {
+            // Clear form action and subcontractor details if no selection is made
+            document.getElementById('invoiceForm').action = '';
+            document.getElementById('subcontractorDetails').innerHTML = '';
         }
     });
 </script>

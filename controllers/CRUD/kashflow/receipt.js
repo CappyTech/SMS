@@ -50,4 +50,23 @@ const readReceipt = async (req, res, next) => {
 
 router.get('/kf/receipt/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readReceipt);
 
+router.post('/kf/receipt/:uuid/submit', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
+    try {
+        const receipt = await db.KF_Receipts.findOne({ where: { uuid: req.params.uuid } });
+
+        if (!receipt) {
+            return res.status(404).send('Receipt not found');
+        }
+
+        // Update SubmissionDate to today's date
+        const today = moment().format('YYYY-MM-DD');
+        await receipt.update({ SubmissionDate: today });
+
+        res.redirect(`/kf/receipt/read/${receipt.uuid}`);
+    } catch (error) {
+        console.error('Error updating submission date:', error);
+        res.status(500).send('Internal server error');
+    }
+});
+
 module.exports = router;

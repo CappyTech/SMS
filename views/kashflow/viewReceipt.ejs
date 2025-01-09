@@ -1,30 +1,29 @@
 <div class="container mt-5">
-    <h1 class="mb-4">Receipt: <%= Receipt.InvoiceNumber %></h1>
-    <p><strong>ID:</strong> <%= Receipt.InvoiceDBID %></p>
+    <h1 class="mb-4">Purchase: <%= Receipt.InvoiceNumber %></h1>
     <p><strong>Date:</strong> <%= slimDateTime(Receipt.InvoiceDate) %></p>
     <p><strong>Due:</strong> <%= slimDateTime(Receipt.DueDate) %></p>
 
-    <!-- Customer Information -->
-    <% if (Customer) { %>
-        <h3>Customer Information</h3>
-        <p><strong>Name:</strong> <%= Customer.Name %></p>
+    <!-- Supplier Information -->
+    <% if (Supplier) { %>
+        <h3>Supplier Information</h3>
+        <p><strong>Name:</strong> <%= Supplier.Name %></p>
         <p><strong>Address:</strong></p>
         <ul>
-            <li><%= Customer.Address1 %></li>
-            <li><%= Customer.Address2 %></li>
-            <li><%= Customer.Address3 %></li>
-            <li><%= Customer.Postcode %></li>
+            <li><%= Supplier.Address1 %></li>
+            <li><%= Supplier.Address2 %></li>
+            <li><%= Supplier.Address3 %></li>
+            <li><%= Supplier.Postcode %></li>
         </ul>
     <% } %>
 
-    <h2 class="mt-4">Receipt Lines:</h2>
+    <h2 class="mt-4">Purchase Lines:</h2>
 
     <% if (Array.isArray(Receipt.Lines) && Receipt.Lines.length > 0) { %>
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead class="table-dark">
                 <tr>
-                    <th>Charge Type</th>
+                    <th>Purchase Code</th>
                     <th>Job ID</th>
                     <th>Job Name</th>
                     <th>Quantity</th>
@@ -58,4 +57,19 @@
     <p><strong>Net:</strong> £<%= Receipt.NetAmount %></p>
     <p><strong>VAT:</strong> £<%= Receipt.VATAmount %></p>
     <p><strong>Total Paid:</strong> £<%= Receipt.AmountPaid %></p>
+
+    <% if (!Receipt.SubmissionDate) { %>
+    <div>
+        <h3>Receipt Details</h3>
+        <p><strong>Submission Date:</strong> <%= Receipt.SubmissionDate || 'Not Submitted' %></p>
+        <form action="/kf/receipt/<%= Receipt.uuid %>/submit" method="POST">
+            <button type="submit" class="btn btn-primary">Mark as Submitted (Today)</button>
+        </form>
+    </div>
+    <% } else { %>
+        <div>
+            <h3>Receipt Details</h3>
+            <p><strong>Submission Date:</strong> <%= Receipt.SubmissionDate %></p>
+        </div>
+    <% } %>
 </div>

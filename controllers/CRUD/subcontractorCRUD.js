@@ -5,14 +5,8 @@ const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 const authService = require('../../services/authService');
 
-const createSubcontractor = async (req, res, next) => {
+const createSubcontractor = async (req, res, next, error) => {
     try {
-        if (!req.session.user.permissionCreateSubcontractor) {
-            logger.error("User does not have permission to create subcontractor.");
-            req.flash('error', 'Access denied.');
-            next(error); // Pass the error to the error handler
-        }
-
         const {
             name,
             company,
@@ -74,12 +68,6 @@ const createSubcontractor = async (req, res, next) => {
 
 const readSubcontractor = async (req, res, next) => {
     try {
-        // Check if the user has permissions
-        if (!req.session.user.permissionReadSubcontractor) {
-            req.flash('error', 'Access denied.');
-            next(error); // Pass the error to the error handler
-        }
-
         const subcontractor = await db.Subcontractors.findByPk(req.params.id);
 
         if (!subcontractor) {
@@ -91,20 +79,14 @@ const readSubcontractor = async (req, res, next) => {
             subcontractor,
         });
     } catch (error) {
-        logger.error('Error reading subcontractor:  ', error.message);
+        logger.error('Error reading subcontractor: ' + error.message);
         req.flash('error', 'Error reading subcontractor: ' + error.message);
         next(error); // Pass the error to the error handler
     }
 };
 
-const updateSubcontractor = async (req, res, next) => {
+const updateSubcontractor = async (req, res, next, error) => {
     try {
-        // Check if user has permission
-        if (!req.session.user.permissionUpdateSubcontractor) {
-            logger.error("User does not have permission to update subcontractor.");
-            return res.status(403).send('Access denied. Insufficient permissions.');
-        }
-
         // Extract data from the request body
         const {
             name,
@@ -194,13 +176,8 @@ const updateSubcontractor = async (req, res, next) => {
 
 
 
-const deleteSubcontractor = async (req, res, next) => {
+const deleteSubcontractor = async (req, res, next, error) => {
     try {
-        // Check if the user has permissions
-        if (!req.session.user.permissionDeleteSubcontractor) {
-            req.flash('error', 'Access denied.');
-            next(error); // Pass the error to the error handler
-        }
 
         const subcontractor = await db.Subcontractors.findByPk(req.params.id);
 
@@ -227,10 +204,28 @@ router.get('/fetch/subcontractor/:id', authService.ensureAuthenticated, authServ
         const subcontractor = await db.Subcontractors.findAll({
             where: { id: req.params.id },
             order: [['createdAt', 'ASC']],
-            include: [{ model: db.Invoices, as: 'invoices' }],
+            include: [
+                {
+                    model: db.Invoices,
+                    as: 'invoices',
+                    limit: 1,
+                    order: [['createdAt', 'DESC']],
+                },
+            ],
         });
 
-        res.json({ subcontractor });
+        if (!subcontractor) {
+            return res.status(404).json({ error: 'Subcontractor not found' });
+        }
+
+        // Get the most recent invoice number
+        const mostRecentInvoice = subcontractor.invoices.length > 0 ? subcontractor.invoices[0] : null;
+
+
+        res.json({
+            subcontractor: subcontractor,
+            mostRecentInvoiceNumber: mostRecentInvoice ? mostRecentInvoice.invoiceNumber : null,
+        });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch subcontractor' });
     }

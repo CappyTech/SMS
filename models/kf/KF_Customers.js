@@ -68,8 +68,38 @@ module.exports = (sequelize, DataTypes) => {
         DeliveryCountryCode: DataTypes.STRING(6),
         DeliveryPostcode: DataTypes.STRING(8),
         VATNumber: DataTypes.STRING(100),
-        Created: DataTypes.DATE,
-        Updated: DataTypes.DATE,
+        Created: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            set(value) {
+                // Convert placeholder dates to null
+                if (value === '0001-01-01T00:00:00.000Z' || value === '0001-01-01T00:01:15.000Z' || value === "2001-01-01T00:01:15.000Z") {
+                    this.setDataValue('Created', null);
+                } else {
+                    this.setDataValue('Created', value);
+                }
+            },
+            get() {
+                const value = this.getDataValue('Created');
+                return value ? value : null; // Return null for invalid dates
+            }
+        },
+        Updated: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            set(value) {
+                // Convert placeholder dates to null
+                if (value === '0001-01-01T00:00:00.000Z' || value === '0001-01-01T00:01:15.000Z' || value === "2001-01-01T00:01:15.000Z") {
+                    this.setDataValue('Updated', null);
+                } else {
+                    this.setDataValue('Updated', value);
+                }
+            },
+            get() {
+                const value = this.getDataValue('Updated');
+                return value ? value : null; // Return null for invalid dates
+            }
+        },
 
     }, {
         tableName: 'KF_Customers',

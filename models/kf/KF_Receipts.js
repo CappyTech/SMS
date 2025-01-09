@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             set(value) {
                 // Convert placeholder dates to null
-                if (value === '0001-01-01T00:00:00.000Z' || value === '0001-01-01T00:01:15.000Z') {
+                if (value === '0001-01-01T00:00:00.000Z' || value === '0001-01-01T00:01:15.000Z' || value === "2001-01-01T00:01:15.000Z") {
                     this.setDataValue('DueDate', null);
                 } else {
                     this.setDataValue('DueDate', value);
@@ -91,11 +91,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.JSON,
             allowNull: true,
             set(value) {
-                // Normalize Lines to ensure it is stored as JSON
                 if (typeof value === 'string') {
                     try {
                         this.setDataValue('Lines', JSON.parse(value));
                     } catch (error) {
+                        console.error('Failed to parse JSON for Lines:', error);
                         this.setDataValue('Lines', []);
                     }
                 } else {
@@ -108,6 +108,17 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         ReadableString: DataTypes.TEXT,
+        SubmissionDate: {
+            type: DataTypes.DATEONLY, // Store date in YYYY-MM-DD format
+            allowNull: true,
+            get() {
+                const value = this.getDataValue('SubmissionDate');
+                return value ? value : null; // Return null if no date
+            },
+            set(value) {
+                this.setDataValue('SubmissionDate', value);
+            }
+        },
     }, {
         tableName: 'KF_Receipts',
         timestamps: true,
