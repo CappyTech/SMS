@@ -119,6 +119,26 @@ module.exports = (sequelize, DataTypes) => {
                 this.setDataValue('SubmissionDate', value);
             }
         },
+        Payments: {
+            type: DataTypes.JSON,
+            allowNull: true,
+            set(value) {
+                if (typeof value === 'string') {
+                    try {
+                        this.setDataValue('Payments', JSON.parse(value));
+                    } catch (error) {
+                        console.error('Failed to parse JSON for Payments:', error);
+                        this.setDataValue('Payments', []);
+                    }
+                } else {
+                    this.setDataValue('Payments', value);
+                }
+            },
+            get() {
+                const value = this.getDataValue('Payments');
+                return value || [];
+            }
+        }
     }, {
         tableName: 'KF_Receipts',
         timestamps: true,

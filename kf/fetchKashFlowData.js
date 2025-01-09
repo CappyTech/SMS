@@ -8,6 +8,7 @@ const getQuotes = require('./getQuotes');
 const getSuppliers = require('./getSuppliers');
 const getInvoicesByDate = require('./getInvoicesByDate');
 const getReceiptsForSupplier = require('./getReceiptsForSupplier');
+const getReceiptPayment = require('./getReceiptPayment');
 const logger = require('../services/loggerService');
 
 async function logOperationDetails(filename, data) {
@@ -82,6 +83,7 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                         changes,
                     };
                     logDetails.push(logEntry);
+                    logger.debug(JSON.stringify(logEntry, null, 2));
                     await appendLogEntry(logFilePath, logEntry);
                 }
             } else {
@@ -95,6 +97,7 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                     item,
                 };
                 logDetails.push(logEntry);
+                logger.debug(JSON.stringify(logEntry, null, 2));
                 await appendLogEntry(logFilePath, logEntry);
             }
         }        
@@ -140,8 +143,6 @@ exports.fetchKashFlowData = async () => {
     const operationLog = [];
     try {
         isFetching = true;
-        isMaintenanceMode = true;
-        logger.info('Maintenance mode enabled.');
 
         const client = await new Promise((resolve, reject) => {
             authenticate((err, client) => {
@@ -155,7 +156,7 @@ exports.fetchKashFlowData = async () => {
         const KF_Meta = db.KF_Meta;
 
         const modelsToFetch = [
-            { name: 'customers', fetchFn: getCustomers, model: db.KF_Customers, uniqueKey: 'CustomerID' },
+            //{ name: 'customers', fetchFn: getCustomers, model: db.KF_Customers, uniqueKey: 'CustomerID' },
             { name: 'supplier', fetchFn: getSuppliers, model: db.KF_Suppliers, uniqueKey: 'SupplierID' },
         ];
 
@@ -242,6 +243,7 @@ exports.fetchKashFlowData = async () => {
         } else {
             logger.info('No quotes found.');
         }
+        
 
         for (const supplier of await db.KF_Suppliers.findAll({ raw: true })) {
             try {
@@ -252,18 +254,21 @@ exports.fetchKashFlowData = async () => {
                 if (receipts.length > 0) {
                     logger.info(`Fetched ${receipts.length} receipts for supplier: ${supplier.Name} (SupplierID: ${supplier.SupplierID})`);
         
-                    // Log raw receipts data
-                    //receipts.forEach((receipt, index) => {
-                        //logger.debug(`Receipt ${index + 1} for SupplierID ${supplier.SupplierID}: ${JSON.stringify(receipt, null, 2)}`);
-                    //});
+                    // Transform receipts and include payments
+                    const transformedReceipts = [];
+                    for (const receipt of receipts) {
+                        // Fetch payments for the receipt
+                        const payments = await getReceiptPayment(client, receipt.InvoiceNumber);
+                        //logger.debug(`Payments for ReceiptNumber ${receipt.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
         
-                    // Log transformed data
-                    const transformedReceipts = receipts.map((receipt) => ({
-                        ...receipt,
-                        Lines: receipt.Lines?.anyType?.map(mapLine),
-                    }));
-                    //logger.debug(`Transformed receipts for SupplierID ${supplier.SupplierID}: ${JSON.stringify(transformedReceipts, null, 2)}`);
+                        transformedReceipts.push({
+                            ...receipt,
+                            Lines: receipt.Lines?.anyType?.map(mapLine) || [],
+                            Payments: { Payment: payments },
+                        });
+                    }
         
+                    // Upsert receipts with payments
                     await upsertData(
                         db.KF_Receipts,
                         transformedReceipts,
@@ -280,21 +285,14 @@ exports.fetchKashFlowData = async () => {
             } catch (error) {
                 logger.error(`Error processing receipts for supplier: ${supplier.Name} (SupplierID: ${supplier.SupplierID}): ${error.message}`);
             }
-        }
-        
+        }        
 
-        isMaintenanceMode = false;
-        logger.info('Maintenance mode disabled.');
         logger.info('Data fetch and upsert completed.');
 
         const logFilename = `fetch-log-${new Date().toISOString().replace(/[:.]/g, '-')}.txt`;
         await logOperationDetails(logFilename, operationLog);
     } catch (error) {
         logger.error(`An error occurred during fetch: ${error.message}`);
-    } finally {
-        isFetching = false;
-        isMaintenanceMode = false;
-        logger.info('Maintenance mode disabled.');
     }
 };
 
