@@ -5,7 +5,7 @@ const errorHandlerService = (err, req, res, next) => {
     const statusCode = err.statusCode || 500; // Default to 500 if not set
     const title = `${statusCode} - ${err.name || 'Error'}`;
     const message = err.message || 'Something went wrong.';
-    const stack = process.env.NODE_ENV === 'production' ? null : err.stack || 'No stack trace available';
+    const stack = err.stack ;
 
     // Log the error details
     logger.error(`Error Details:

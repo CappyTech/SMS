@@ -31,12 +31,14 @@ const createSubcontractor = async (req, res, next, error) => {
 
         if (existingSubcontractor) {
             req.flash('error', 'User with the same UTR already exists.');
+            logger.error('User with the same UTR already exists.')
             return res.redirect('/subcontractor/create'); // Redirect to the appropriate page
         }
 
         const requiredFields = [company, utrNumber];
         if (requiredFields.some(field => !field)) {
             req.flash('error', 'Incomplete required form data.');
+            logger.error('Incomplete required form data.')
             return res.redirect('/subcontractor/create');
         }
 
@@ -52,11 +54,12 @@ const createSubcontractor = async (req, res, next, error) => {
         await db.Subcontractors.create(sanitizedData);
 
         req.flash('success', 'Subcontractor created.');
+        logger.info('Subcontractor created.')
         const referer = '/dashboard/subcontractor';
         res.redirect(referer);
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
-            logger.error('Unique constraint error: ', error);
+            logger.error('Unique constraint error: '+ error);
             req.flash('error', 'A subcontractor with this UTR, or VAT number already exists.');
             return res.redirect('/subcontractor/create');
         }
