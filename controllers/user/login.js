@@ -10,8 +10,6 @@ const renderSigninForm = (req, res) => {
     
     res.render(path.join('user', 'signin'), {
         title: 'Sign In',
-        errorMessages: req.flash('error'),
-        successMessage: req.flash('success'),
     });
 };
 
@@ -81,15 +79,15 @@ const loginUser = async (req, res, next) => {
             },
         };
         
-        req.session.save((err) => {
-            if (err) {
-                logger.error('Error saving session: ' + err.message);
+        req.session.save((error) => {
+            if (error) {
+                logger.error('Error saving session: ' + error.message);
                 req.flash('error', 'An error occurred while logging in. Please try again.');
                 return res.redirect('/signin');
             }
 
             req.flash('success', 'Successfully logged in.');
-            next(error); // Pass the error to the error handler
+            next(error);
         });
 
     } catch (error) {
@@ -100,9 +98,9 @@ const loginUser = async (req, res, next) => {
 };
 
 const logoutUser = (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            logger.error('Error logging out: ' + err.message);
+    req.session.destroy((error) => {
+        if (error) {
+            logger.error('Error logging out: ' + error.message);
             req.flash('error', 'An error occurred while logging out. Please try again.');
             next(error); // Pass the error to the error handler
         }
@@ -175,9 +173,9 @@ const verify2FA = async (req, res, next) => {
 
         delete req.session.userPending2FA;
 
-        req.session.save((err) => {
-            if (err) {
-                logger.error('Error saving session: ' + err.message);
+        req.session.save((error) => {
+            if (error) {
+                logger.error('Error saving session: ' + error.message);
                 req.flash('error', 'An error occurred while logging in. Please try again.');
                 return res.redirect('/signin');
             }

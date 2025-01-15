@@ -17,12 +17,12 @@ app.use(expressLayouts);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
-app.use(flash());
+app.use('/resources', express.static(path.join(__dirname, 'node_modules')));
 app.use(useragent.express());
 
 app.use(require('./services/securityService'));
 app.use(require('./services/sessionService'));
+app.use(flash());
 app.use(require('./services/logRequestDetailsService'));
 app.use(require('./services/rateLimiterService'));
 app.use(require('./services/cronService'));
@@ -36,7 +36,7 @@ app.use(async (req, res, next) => {
     res.locals.firstName = null;
     res.locals.permissions = {};
     res.locals.role = null;
-
+    logger.debug(JSON.stringify(res.locals.session, null, 2))
     try {
         const user = req.session.user;
         if (user && user.id) {
@@ -120,8 +120,6 @@ app.use((req, res, next) => {
     res.locals.slimDateTime = slimDateTime;
     res.locals.formatCurrency = formatCurrency;
     res.locals.rounding = rounding;
-    res.locals.errorMessages = req.flash('error');
-    res.locals.successMessage = req.flash('success');
     next();
 });
 
@@ -148,7 +146,9 @@ app.use(async (req, res, next) => {
                 title: 'Holiday Notice',
                 reason: holidayDetails.reason,
                 startDate: holidayDetails.startDate,
-                endDate: holidayDetails.endDate
+                endDate: holidayDetails.endDate,
+                errorMessages : req.flash('error'),
+                successMessage : req.flash('success'),
             });
         }
         
@@ -275,6 +275,12 @@ app.use('/', kashflowProject);
 app.use('/', kashflowQuote);
 app.use('/', kashflowReceipt);
 app.use('/', kashflowSupplier);
+
+app.get('/test-flash', (req, res) => {
+    req.flash('error', 'Test error message');
+    req.flash('success', 'Test success message');
+    res.redirect('/');
+});
 
 // Catch undefined routes (404 handler)
 app.use((req, res, next) => {

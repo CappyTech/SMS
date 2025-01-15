@@ -53,10 +53,10 @@ exports.fetchKashFlowData = async () => {
         logger.info('Maintenance mode enabled.');
         logger.info('Authenticating SOAP API...');
         const client = await new Promise((resolve, reject) => {
-            authenticate((err, client) => {
-                if (err) {
-                    logger.error('Failed to authenticate: ' + err.message);
-                    return reject(err);
+            authenticate((error, client) => {
+                if (error) {
+                    logger.error('Failed to authenticate: ' + error.message);
+                    return reject(error);
                 }
                 resolve(client);
             });

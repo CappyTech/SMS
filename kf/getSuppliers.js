@@ -6,10 +6,10 @@ function getSuppliers(client) {
       Password: process.env.KFPASSWORD
     };
 
-    client.GetSuppliers(suppliersParams, async (err, result) => {
-      if (err) {
-        logger.error('Error calling GetSuppliers method:', err);
-        return reject(err);
+    client.GetSuppliers(suppliersParams, async (error, result) => {
+      if (error) {
+        logger.error('Error calling GetSuppliers method:', error);
+        return reject(error);
       }
 
       const suppliers = result.GetSuppliersResult.Supplier;

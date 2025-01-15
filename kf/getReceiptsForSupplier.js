@@ -7,10 +7,10 @@ function getReceiptsForSupplier(client, supplierID) {
       SupplierID: supplierID,
     };
 
-    client.GetReceiptsForSupplier(params, (err, result) => {
-      if (err) {
-        logger.error(`Error calling GetReceiptsForSupplier for SupplierID ${supplierID}:`, err);
-        return reject(err);
+    client.GetReceiptsForSupplier(params, (error, result) => {
+      if (error) {
+        logger.error(`Error calling GetReceiptsForSupplier for SupplierID ${supplierID}:`, error);
+        return reject(error);
       }
 
       const receipts = result?.GetReceiptsForSupplierResult?.Invoice;

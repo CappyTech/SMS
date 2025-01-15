@@ -6,10 +6,10 @@ function getReceipts(client) {
       Password: process.env.KFPASSWORD
     };
 
-    client.GetReceipts(receiptsParams, async (err, result) => {
-      if (err) {
-        logger.error('Error calling GetReceipts method:', err);
-        return reject(err);
+    client.GetReceipts(receiptsParams, async (error, result) => {
+      if (error) {
+        logger.error('Error calling GetReceipts method:', error);
+        return reject(error);
       }
 
       const receipts = result.GetReceiptsResult.Invoice;

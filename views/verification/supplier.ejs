@@ -13,7 +13,7 @@
             </thead>
             <tbody>
                 <% subcontractors.forEach((subcontractor) => { 
-                    const matchingSupplier = suppliers.find(supplier => supplier.SupplierID === subcontractor.SupplierID);
+                    const matchingSupplier = suppliers.find(supplier => supplier.Name === subcontractor.company);
                 %>
                 <tr>
                     <!-- Subcontractor Details -->

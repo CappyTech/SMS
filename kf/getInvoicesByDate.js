@@ -8,10 +8,10 @@ function getInvoicesByDate(client, startDate, endDate) {
       EndDate: endDate.toISOString(),
     };
 
-    client.GetInvoicesByDateRange(invoicesParams, async (err, result) => {
-      if (err) {
-        logger.error('Error calling GetInvoicesByDateRange method:', err);
-        return reject(err);
+    client.GetInvoicesByDateRange(invoicesParams, async (error, result) => {
+      if (error) {
+        logger.error('Error calling GetInvoicesByDateRange method:', error);
+        return reject(error);
       }
 
       const invoices = result.GetInvoicesByDateRangeResult.Invoice;

@@ -145,9 +145,9 @@ exports.fetchKashFlowData = async () => {
         isFetching = true;
 
         const client = await new Promise((resolve, reject) => {
-            authenticate((err, client) => {
-                if (err) {
-                    return reject(err);
+            authenticate((error, client) => {
+                if (error) {
+                    return reject(error);
                 }
                 resolve(client);
             });

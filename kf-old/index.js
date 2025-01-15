@@ -150,10 +150,10 @@ const getReceiptsForSupplier = require('../kf/getReceiptsForSupplier');
 
     // Authenticate with KashFlow API
     const client = await new Promise((resolve, reject) => {
-      authenticate((err, client) => {
-        if (err) {
-          console.error('Failed to authenticate:', err);
-          return reject(err);
+      authenticate((error, client) => {
+        if (error) {
+          console.error('Failed to authenticate:', error);
+          return reject(error);
         }
         resolve(client);
       });

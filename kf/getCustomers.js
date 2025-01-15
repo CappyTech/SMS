@@ -6,10 +6,10 @@ function getCustomers(client) {
       Password: process.env.KFPASSWORD
     };
 
-    client.GetCustomers(customersParams, (err, result) => {
-      if (err) {
-        logger.error('Error calling GetCustomers method:', err);
-        return reject(err);
+    client.GetCustomers(customersParams, (error, result) => {
+      if (error) {
+        logger.error('Error calling GetCustomers method:', error);
+        return reject(error);
       }
 
       const customers = result.GetCustomersResult.Customer;

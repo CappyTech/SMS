@@ -8,8 +8,8 @@
   <title>
     <%= typeof title !=='undefined' ? title : 'Subcontractor Management System' %>
   </title>
-  <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="/resources/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/resources/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link href="/css/styles.css" rel="stylesheet">
   <link rel="manifest" href="/manifest/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -267,8 +267,6 @@
 
   <!-- Main Content -->
   <section class="content bg-body">
-    <%- include('./partials/successAlert.ejs') %>
-    <%- include('./partials/errorAlerts.ejs') %>
     <%- body %>
   </section>
 
@@ -322,8 +320,8 @@
       });
     });
   </script>
-  <script defer src="/node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
-  <script defer src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script defer src="/resources/@popperjs/core/dist/umd/popper.min.js"></script>
+  <script defer src="/resources/bootstrap/dist/js/bootstrap.min.js"></script>
   <script defer>
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
@@ -384,8 +382,8 @@
         navigator.serviceWorker.register('/js/service-worker.js')
           .then(registration => {
             //console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          }, err => {
-            console.log('ServiceWorker registration failed: ', err);
+          }, error => {
+            console.log('ServiceWorker registration failed: ', error);
           });
       });
     }
@@ -396,6 +394,7 @@
       console.log(`Page load time is ${pageLoadTime.toFixed(2)} ms`);
       const pageLoadTimeElement = document.getElementById('pageLoadTime');
       pageLoadTimeElement.innerHTML = `${Math.round(pageLoadTime)} ms`;
+      console.log(<%- JSON.stringify(session, null, 2) %>);
     });
   </script>
 </body>

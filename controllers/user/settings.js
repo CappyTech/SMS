@@ -128,7 +128,7 @@ const getAccountPage = async (req, res, next) => {
 const updateAccountSettings = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        req.flash('error', errors.array().map(err => err.msg).join('. '));
+        req.flash('error', errors.array().map(error => error.msg).join('. '));
         return res.redirect('/account');
     }
 
@@ -167,9 +167,9 @@ const logoutSession = async (req, res, next) => {
         }
 
         // Remove the specific session from the store
-        sessionStore.destroy(sessionId, (err) => {
-            if (err) {
-                logger.error(`Error destroying session: ${err.message}`);
+        sessionStore.destroy(sessionId, (error) => {
+            if (error) {
+                logger.error(`Error destroying session: ${error.message}`);
                 req.flash('error', 'Failed to log out session.');
                 return res.redirect('/account/');
             }
@@ -207,7 +207,7 @@ router.post(
     async (req, res, next) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        req.flash('error', errors.array().map(err => err.msg).join('. '));
+        req.flash('error', errors.array().map(error => error.msg).join('. '));
         return res.redirect('/account/change-password');
       }
   

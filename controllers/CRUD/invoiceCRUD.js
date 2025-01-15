@@ -53,7 +53,7 @@ const createInvoice = async (req, res, next) => {
 
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
-            const errorMessages = error.errors.map((err) => err.message);
+            const errorMessages = error.errors.map((error) => error.message);
             logger.error(`Validation errors: ${errorMessages.join(', ')}`);
             return res.render('createInvoice', {
                 title: 'Create Invoice',

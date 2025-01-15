@@ -7,10 +7,10 @@ function getProjects(client,ProjStatus) {
       ProjStatus: ProjStatus
     };
 
-    client.GetProjects_Full(projectFullParams, (err, result) => {
-      if (err) {
-        logger.error('Error calling GetProjects_Full method:', err);
-        return reject(err); 
+    client.GetProjects_Full(projectFullParams, (error, result) => {
+      if (error) {
+        logger.error('Error calling GetProjects_Full method:', error);
+        return reject(error); 
       }
 
       const projects = result.GetProjects_FullResult.Project;

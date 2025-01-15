@@ -1,10 +1,10 @@
 const soap = require('soap');
 require('dotenv').config({ path: '../.env' });
 function authenticate(callback) {
-  soap.createClient('https://securedwebapp.com/api/service.asmx?WSDL', (err, client) => {
-    if (err) {
-      console.error('Error creating SOAP client: ' + err);
-      return callback(err);
+  soap.createClient('https://securedwebapp.com/api/service.asmx?WSDL', (error, client) => {
+    if (error) {
+      console.error('Error creating SOAP client: ' + error);
+      return callback(error);
     }
 
     console.log('SOAP client created successfully.');
@@ -16,10 +16,10 @@ function authenticate(callback) {
       AutoAuthKey: process.env.autoAuthKey
     };
 
-    client.AutoAuthIP(authParams, (err, authResult) => {
-      if (err) {
-        console.error('Error calling AutoAuthIP method: ' + err);
-        return callback(err);
+    client.AutoAuthIP(authParams, (error, authResult) => {
+      if (error) {
+        console.error('Error calling AutoAuthIP method: ' + error);
+        return callback(error);
       }
 
       if (authResult.Status === 'OK') {

@@ -47,10 +47,10 @@ async function upsertData(model, data, uniqueKey, metaModel) {
 
     // Authenticate with KashFlow API
     const client = await new Promise((resolve, reject) => {
-      authenticate((err, client) => {
-        if (err) {
-          logger.error('Failed to authenticate:' + err);
-          return reject(err);
+      authenticate((error, client) => {
+        if (error) {
+          logger.error('Failed to authenticate:' + error);
+          return reject(error);
         }
         resolve(client);
       });

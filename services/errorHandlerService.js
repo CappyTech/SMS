@@ -1,11 +1,11 @@
 const logger = require('./loggerService');
 
-const errorHandlerService = (err, req, res, next) => {
+const errorHandlerService = (error, req, res, next) => {
     // Determine the status code, title, and message
-    const statusCode = err.statusCode || 500; // Default to 500 if not set
-    const title = `${statusCode} - ${err.name || 'Error'}`;
-    const message = err.message || 'Something went wrong.';
-    const stack = err.stack ;
+    const statusCode = error.statusCode || 500; // Default to 500 if not set
+    const title = `${statusCode} - ${error.name || 'Error'}`;
+    const message = error.message || 'Something went wrong.';
+    const stack = error.stack ;
 
     // Log the error details
     logger.error(`Error Details:

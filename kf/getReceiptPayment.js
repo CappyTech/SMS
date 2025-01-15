@@ -8,10 +8,10 @@ function getReceiptPayment(client, receiptNumber) {
       ReceiptNumber: receiptNumber,
     };
 
-    client.GetReceiptPayment(receiptPaymentParams, (err, result) => {
-      if (err) {
-        logger.error('Error calling GetReceiptPayment method:', err);
-        return reject(err);
+    client.GetReceiptPayment(receiptPaymentParams, (error, result) => {
+      if (error) {
+        logger.error('Error calling GetReceiptPayment method:', error);
+        return reject(error);
       }
 
       // Safely handle the response structure
