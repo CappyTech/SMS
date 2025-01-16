@@ -397,5 +397,19 @@
       console.log(<%- JSON.stringify(session, null, 2) %>);
     });
   </script>
+  <script>
+    // Count and log flash messages
+    const successMessages = <%= JSON.stringify(successMessage, null, 2) %>;
+    const errorMessages = <%= JSON.stringify(errorMessages, null, 2) %>;
+
+    console.log('Success Messages:', successMessages);
+    console.log('Error Messages:', errorMessages);
+
+    const successCount = successMessages ? successMessages.length : 0;
+    const errorCount = errorMessages ? errorMessages.length : 0;
+
+    console.log('Number of Success Messages:', successCount);
+    console.log('Number of Error Messages:', errorCount);
+  </script>
 </body>
 </html>
