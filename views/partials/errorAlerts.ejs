@@ -1,7 +1,7 @@
 <% if (errorMessages && errorMessages.length > 0) { %>
-    <% errorMessages.forEach(function(message) { %>
+    <% errorMessages.forEach(function(message, index) { %>
         <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 11">
-            <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
+            <div id="errorToast<%= index %>" class="toast align-items-center text-bg-danger border-0" role="alert"
                 aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
                     <div class="toast-body">
