@@ -276,12 +276,6 @@ app.use('/', kashflowQuote);
 app.use('/', kashflowReceipt);
 app.use('/', kashflowSupplier);
 
-app.get('/test-flash', (req, res) => {
-    req.flash('error', 'Test error message');
-    req.flash('success', 'Test success message');
-    res.redirect('/');
-});
-
 // Catch undefined routes (404 handler)
 app.use((req, res, next) => {
     const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
