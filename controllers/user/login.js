@@ -13,7 +13,7 @@ const renderSigninForm = (req, res) => {
     });
 };
 
-const loginUser = async (req, res, next) => {
+const loginUser = async (req, res) => {
     try {
         const { usernameOrEmail, password } = req.body;
 
@@ -87,7 +87,7 @@ const loginUser = async (req, res, next) => {
             }
 
             req.flash('success', 'Successfully logged in.');
-            next(error);
+            return res.redirect('/');
         });
 
     } catch (error) {
