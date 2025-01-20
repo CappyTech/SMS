@@ -58,7 +58,9 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                     }
 
                     // Skip placeholder dates or redundant type differences
-                    if (key.toLowerCase().includes('date') && (newValue === '0001-01-01T00:00:00.000Z' || newValue === '2001-01-01T00:01:15.000Z')) {
+                    if (key.toLowerCase().includes('date') && 
+                    (newValue === '0001-01-01T00:00:00.000Z' || newValue === '2001-01-01T00:01:15.000Z' || 
+                    currentValue === '0001-01-01T00:00:00.000Z' || currentValue === '2001-01-01T00:01:15.000Z')) {
                         continue;
                     }
         
