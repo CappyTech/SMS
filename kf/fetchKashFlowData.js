@@ -21,6 +21,12 @@ async function logOperationDetails(filename, data) {
     }
 }
 
+const PLACEHOLDER_DATES = ['0001-01-01T00:00:00.000Z', '2001-01-01T00:01:15.000Z'];
+
+function isPlaceholderDate(value) {
+    return PLACEHOLDER_DATES.includes(value);
+}
+
 async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFilePath) {
     try {
         logger.info(`Upserting data into ${model.name}...`);
@@ -34,6 +40,7 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
         
             // Fetch existing record for comparison
             const existing = await model.findOne({ where: whereClause, raw: true });
+            //logger.debug(`Existing record: ${JSON.stringify(existing)}`);
         
             if (existing) {
                 checkedCount++;
@@ -43,25 +50,35 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                 for (const key of Object.keys(item)) {
                     const currentValue = existing[key];
                     const newValue = item[key];
-        
+                    const debug = key === 'DueDate';
+
+                    if (debug) {
+                        logger.debug(`Key: ${key}\n Current Value: ${currentValue}\n New Value: ${newValue}`);
+                        logger.debug(`Type of Current Value: ${typeof currentValue}\n Type of New Value: ${typeof newValue}`);
+                    }
                     // Skip placeholder dates or redundant type differences
-                    if (key.toLowerCase().includes('date') || key.toLowerCase().includes('updated')) {
-                        if (newValue === '0001-01-01T00:00:00.000Z' || newValue === '2001-01-01T00:01:15.000Z' || 
-                            currentValue === '0001-01-01T00:00:00.000Z' || currentValue === '2001-01-01T00:01:15.000Z') {
-                            continue;
+                    if (isPlaceholderDate(currentValue) || isPlaceholderDate(newValue)) {
+                        if (debug) {
+                            logger.debug(`Skipping placeholder date for key: ${key}`);
                         }
+                        continue;
                     }
 
                     // Normalize and compare timestamps to the second (ignore microseconds/milliseconds)
                     if (key.toLowerCase().includes('created') || key.toLowerCase().includes('updated')) {
                         const normalizedCurrent = currentValue ? new Date(currentValue).toISOString().split('.')[0] : null;
                         const normalizedNew = newValue ? new Date(newValue).toISOString().split('.')[0] : null;
+                        if (debug) {
+                            logger.debug(`Normalized Current: ${normalizedCurrent}, Normalized New: ${normalizedNew}`);
+                        }
 
                         if (normalizedCurrent !== normalizedNew) {
                             // If the timestamps differ significantly, log the change
                             changes[key] = { from: currentValue, to: newValue };
                             hasRealChange = true; // Only set this if the difference is beyond normalization
                         }
+                        logger.debug(`Continuing after timestamp normalization check for key: ${key}`);
+                        
                         continue; // Skip further checks for timestamps
                     }
         
@@ -77,6 +94,7 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
         
                 // Update only if there are real changes
                 if (hasRealChange) {
+                    logger.debug(`Updating record with changes: ${JSON.stringify(changes)}`);
                     await model.update(item, { where: whereClause });
                     updatedCount++;
                     const logEntry = {
@@ -91,6 +109,7 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                 }
             } else {
                 // Create new entry if it doesn't exist
+                logger.debug(`Creating new record: ${JSON.stringify(item)}`);
                 await model.create(item);
                 createdCount++;
                 const logEntry = {
@@ -107,6 +126,7 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
 
         // Update metadata
         try {
+            logger.debug(`Updating metadata for model: ${model.name}`);
             await metaModel.upsert({
                 model: model.name,
                 createdCount,
