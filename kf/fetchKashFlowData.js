@@ -44,6 +44,14 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                     const currentValue = existing[key];
                     const newValue = item[key];
         
+                    // Skip placeholder dates or redundant type differences
+                    if (key.toLowerCase().includes('date') || key.toLowerCase().includes('updated')) {
+                        if (newValue === '0001-01-01T00:00:00.000Z' || newValue === '2001-01-01T00:01:15.000Z' || 
+                            currentValue === '0001-01-01T00:00:00.000Z' || currentValue === '2001-01-01T00:01:15.000Z') {
+                            continue;
+                        }
+                    }
+
                     // Normalize and compare timestamps to the second (ignore microseconds/milliseconds)
                     if (key.toLowerCase().includes('created') || key.toLowerCase().includes('updated')) {
                         const normalizedCurrent = currentValue ? new Date(currentValue).toISOString().split('.')[0] : null;
@@ -55,13 +63,6 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                             hasRealChange = true; // Only set this if the difference is beyond normalization
                         }
                         continue; // Skip further checks for timestamps
-                    }
-
-                    // Skip placeholder dates or redundant type differences
-                    if (key.toLowerCase().includes('date') && 
-                    (newValue === '0001-01-01T00:00:00.000Z' || newValue === '2001-01-01T00:01:15.000Z' || 
-                    currentValue === '0001-01-01T00:00:00.000Z' || currentValue === '2001-01-01T00:01:15.000Z')) {
-                        continue;
                     }
         
                     // Check for real changes (ignore type differences)
