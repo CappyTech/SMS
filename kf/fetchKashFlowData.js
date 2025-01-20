@@ -156,7 +156,7 @@ exports.fetchKashFlowData = async () => {
         const KF_Meta = db.KF_Meta;
 
         const modelsToFetch = [
-            //{ name: 'customers', fetchFn: getCustomers, model: db.KF_Customers, uniqueKey: 'CustomerID' },
+            { name: 'customers', fetchFn: getCustomers, model: db.KF_Customers, uniqueKey: 'CustomerID' },
             { name: 'supplier', fetchFn: getSuppliers, model: db.KF_Suppliers, uniqueKey: 'SupplierID' },
         ];
 
