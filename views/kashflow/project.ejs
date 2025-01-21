@@ -34,7 +34,7 @@
                 <ul class="list-group">
                     <% activeProjects.forEach(project => { %>
                     <li class="list-group-item">
-                        <strong><a href="https://app.kashflow.com/editProject.asp?id=<%= project.ID %>" target="_blank"><%= project.Number %> | <%= project.Name %> | <%= project.Reference %></a></strong>
+                        <strong><a href="/kf/project/read/<%= project.Number %>" target="_blank"><%= project.Number %> | <%= project.Name %></a></strong>
                         <p><%= project.Description %></p>
                     </li>
                     <% }) %>
@@ -48,7 +48,7 @@
                 <ul class="list-group">
                     <% completedProjects.forEach(project => { %>
                     <li class="list-group-item">
-                        <strong><a href="https://app.kashflow.com/editProject.asp?id=<%= project.ID %>" target="_blank"><%= project.Number %> | <%= project.Name %> | <%= project.Reference %></a></strong>
+                        <strong><a href="/kf/project/read/<%= project.uuid %>" target="_blank"><%= project.Number %> | <%= project.Name %></a></strong>
                         <p><%= project.Description %></p>
                     </li>
                     <% }) %>
@@ -62,7 +62,7 @@
                 <ul class="list-group">
                     <% archivedProjects.forEach(project => { %>
                     <li class="list-group-item">
-                        <strong><a href="https://app.kashflow.com/editProject.asp?id=<%= project.ID %>" target="_blank"><%= project.Number %> | <%= project.Name %> | <%= project.Reference %></a></strong>
+                        <strong><a href="/kf/project/read/<%= project.Number %>" target="_blank"><%= project.Number %> | <%= project.Name %></a></strong>
                         <p><%= project.Description %></p>
                     </li>
                     <% }) %>
