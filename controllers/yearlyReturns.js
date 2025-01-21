@@ -73,6 +73,6 @@ const renderYearlyReturns = async (req, res, next) => {
     }
 };
 
-router.get('/yearly/returns/:year/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), renderYearlyReturns);
+router.get('/returns/:year/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), renderYearlyReturns);
 
 module.exports = router;
