@@ -27,6 +27,6 @@ const getDailyAttendance = async (req, res, next) => {
     }
 };
 
-router.get('/attendance/daily/:date?', authService.ensureAuthenticated, authService.ensureRole('admin'), getDailyAttendance);
+router.get('/daily/:date?', authService.ensureAuthenticated, authService.ensureRole('admin'), getDailyAttendance);
 
 module.exports = router;
