@@ -150,7 +150,7 @@ const getWeeklyAttendance = async (req, res, next) => {
     }
 };
 
-router.get('/attendance/weekly', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
+router.get('/weekly', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
     try {
         // Calculate the current tax year
         const currentTaxYear = taxService.getCurrentTaxYear();
@@ -176,6 +176,6 @@ router.get('/attendance/weekly', authService.ensureAuthenticated, authService.en
     }
 });
 
-router.get('/attendance/weekly/:year?/:week?', authService.ensureAuthenticated, authService.ensureRole('admin'), getWeeklyAttendance);
+router.get('/weekly/:year?/:week?', authService.ensureAuthenticated, authService.ensureRole('admin'), getWeeklyAttendance);
 
 module.exports = router;
