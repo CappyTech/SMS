@@ -204,9 +204,9 @@ const renderMonthlyReturnsYear = async (req, res, next) => {
     }
 };
 
-router.get('/monthly/returns/form', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsForm);
-router.get('/monthly/returns/:month/:year/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsForOneSubcontactor);
-router.get('/monthly/returns/:year/:month', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsForAll);
-router.get('/monthly/returns/:year', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsYear);
+router.get('/returns/form', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsForm);
+router.get('/returns/:month/:year/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsForOneSubcontactor);
+router.get('/returns/:year/:month', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsForAll);
+router.get('/returns/:year', authService.ensureAuthenticated, authService.ensureRole('admin'), renderMonthlyReturnsYear);
 
 module.exports = router;
