@@ -579,7 +579,7 @@ const renderKashflowDashboard = async (req, res, next) => {
     }
 };
 
-router.get('/dashboard/stats', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
+router.get('/stats', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
     try {
         const { taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(moment());
         logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
@@ -590,26 +590,26 @@ router.get('/dashboard/stats', authService.ensureAuthenticated, authService.ensu
         next(error); // Pass the error to the error handler
     }
 });
-router.get('/dashboard/stats/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderStatsDashboard);
-router.get('/dashboard/user', authService.ensureAuthenticated, authService.ensureRole('admin'), renderUserDashboard);
-router.get('/dashboard/subcontractor', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorDashboard);
-router.get('/dashboard/invoice', authService.ensureAuthenticated, authService.ensureRole('admin'), renderInvoiceDashboard);
-router.get('/dashboard/quote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuotesDashboard);
-router.get('/dashboard/client', authService.ensureAuthenticated, authService.ensureRole('admin'), renderClientsDashboard);
-router.get('/dashboard/contact', authService.ensureAuthenticated, authService.ensureRole('admin'), renderContactsDashboard);
-router.get('/dashboard/job', authService.ensureAuthenticated, authService.ensureRole('admin'), renderJobsDashboard);
-//router.get('/dashboard/archive', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteArchiveDashboard);
-router.get('/dashboard/location', authService.ensureAuthenticated, authService.ensureRole('admin'), renderLocationsDashboard);
-router.get('/dashboard/attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceDashboard);
-router.get('/dashboard/employee', authService.ensureAuthenticated, authService.ensureRole('admin'), renderEmployeeDashboard);
+router.get('/stats/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderStatsDashboard);
+router.get('/user', authService.ensureAuthenticated, authService.ensureRole('admin'), renderUserDashboard);
+router.get('/subcontractor', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorDashboard);
+router.get('/invoice', authService.ensureAuthenticated, authService.ensureRole('admin'), renderInvoiceDashboard);
+router.get('/quote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuotesDashboard);
+router.get('/client', authService.ensureAuthenticated, authService.ensureRole('admin'), renderClientsDashboard);
+router.get('/contact', authService.ensureAuthenticated, authService.ensureRole('admin'), renderContactsDashboard);
+router.get('/job', authService.ensureAuthenticated, authService.ensureRole('admin'), renderJobsDashboard);
+//router.get('/archive', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteArchiveDashboard);
+router.get('/location', authService.ensureAuthenticated, authService.ensureRole('admin'), renderLocationsDashboard);
+router.get('/attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceDashboard);
+router.get('/employee', authService.ensureAuthenticated, authService.ensureRole('admin'), renderEmployeeDashboard);
 
-router.get('/dashboard/KFcustomer', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFCustomersDashboard);
-router.get('/dashboard/KFinvoice', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFInvoicesDashboard);
-router.get('/dashboard/KFquote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFQuotesDashboard);
-router.get('/dashboard/KFsupplier', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFSuppliersDashboard);
-router.get('/dashboard/KFreceipt', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFReceiptsDashboard);
-router.get('/dashboard/KFproject', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFProjectsDashboard);
-router.get('/dashboard/KashFlow', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKashflowDashboard);
+router.get('/KFcustomer', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFCustomersDashboard);
+router.get('/KFinvoice', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFInvoicesDashboard);
+router.get('/KFquote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFQuotesDashboard);
+router.get('/KFsupplier', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFSuppliersDashboard);
+router.get('/KFreceipt', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFReceiptsDashboard);
+router.get('/KFproject', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFProjectsDashboard);
+router.get('/KashFlow', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKashflowDashboard);
 
 const renderCISSubmissionDashboard = async (req, res, next) => {
     try {
@@ -736,11 +736,11 @@ const renderCISSubmissionDashboard = async (req, res, next) => {
 };
 
 
-router.get('/dashboard/CIS', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
+router.get('/CIS', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
     try {
         const { taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(moment());
         logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
-        return res.redirect(`/dashboard/KFCIS/${taxYear}/${taxMonth}`);
+        return res.redirect(`/dashboard/CIS/${taxYear}/${taxMonth}`);
     } catch (error) {
         logger.error('Error rendering stats dashboard:' + error.message);
         req.flash('error', 'Error rendering stats dashboard: ' + error.message);
@@ -748,6 +748,6 @@ router.get('/dashboard/CIS', authService.ensureAuthenticated, authService.ensure
     }
 });
 
-router.get('/dashboard/KFCIS/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderCISSubmissionDashboard);
+router.get('/CIS/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderCISSubmissionDashboard);
 
 module.exports = router;
