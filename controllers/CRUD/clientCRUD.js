@@ -101,7 +101,7 @@ const deleteClient = async (req, res, next) => {
     }
 };
 
-router.get('/fetch/client/:clientId', async (req, res, next) => {
+router.get('/fetch/:clientId', async (req, res, next) => {
     try {
         
 
@@ -116,9 +116,9 @@ router.get('/fetch/client/:clientId', async (req, res, next) => {
     }
 });
 
-router.post('/client/create/', authService.ensureAuthenticated, createClient);
-router.get('/client/read/:clientId', authService.ensureAuthenticated, readClient);
-router.post('/client/update/:clientId', authService.ensureAuthenticated, updateClient);
-router.post('/client/delete/:clientId', authService.ensureAuthenticated, deleteClient);
+router.post('/create/', authService.ensureAuthenticated, createClient);
+router.get('/read/:clientId', authService.ensureAuthenticated, readClient);
+router.post('/update/:clientId', authService.ensureAuthenticated, updateClient);
+router.post('/delete/:clientId', authService.ensureAuthenticated, deleteClient);
 
 module.exports = router;
