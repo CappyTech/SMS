@@ -40,7 +40,7 @@ const renderReceiptVerification = async (req, res, next) => {
     }
 };
 
-router.get('/supplier/verification', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSupplierVerification);
-router.get('/receipt/verification', authService.ensureAuthenticated, authService.ensureRole('admin'), renderReceiptVerification);
+router.get('/supplier/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSupplierVerification);
+router.get('/receipt/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderReceiptVerification);
 
 module.exports = router;
