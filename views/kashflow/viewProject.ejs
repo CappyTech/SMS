@@ -1,0 +1,81 @@
+<div class="container my-5">
+    <h1><%= title %></h1>
+    <div class="list-group">
+        <div class="list-group-item">
+            <h5 class="mb-1">Project Number: <%= Project.Number %></h5>
+            <p class="mb-1">Name: <%= Project.Name %></p>
+            <p class="mb-1">Reference: <%= Project.Reference %></p>
+            <p class="mb-1">Description: <%= Project.Description %></p>
+            <p class="mb-1">Customer: <%= Project.customer ? Project.customer.Name : 'N/A' %></p>
+            <p class="mb-1">Status: <%= Project.Status %></p>
+            <p class="mb-1">Value: <%= Project.Value %></p>
+            <p class="mb-1">Date1: <%= Project.Date1 %></p>
+            <p class="mb-1">Date2: <%= Project.Date2 %></p>
+        </div>
+        <div class="list-group-item">
+            <a href="/kf/project/view/<%= Project.uuid %>" class="btn btn-primary">View</a>
+            <a href="/kf/project/delete/<%= Project.uuid %>" class="btn btn-danger">Delete</a>
+            <a href="/kf/project/print/<%= Project.uuid %>" class="btn btn-secondary">Print</a>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <h1>Files for Project <%= number %></h1>
+    <ul class="list-group">
+        <% files.forEach(file => { %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="/projects/<%= Project.uuid %>/download/<%= file %>"><%= file %></a>
+                    <% if (file.match(/\.(jpg|jpeg|png)$/)) { %>
+                        <img src="/projects/<%= Project.uuid %>/download/<%= file %>" alt="<%= file %>" style="max-width: 200px;">
+                    <% } %>
+                </div>
+                <div>
+                    <a href="/project/<%= Project.uuid %>/view/<%= file %>" class="btn btn-primary btn-sm">View</a>
+                    <a href="/project/<%= Project.uuid %>/delete/<%= file %>" class="btn btn-danger btn-sm">Delete</a>
+                    <a href="/project/<%= Project.uuid %>/download/<%= file %>" class="btn btn-secondary btn-sm">Download</a>
+                    <a href="/project/<%= Project.uuid %>/print/<%= file %>" class="btn btn-info btn-sm">Print</a>
+                </div>
+            </li>
+        <% }) %>
+    </ul>
+
+    <!-- Drag and Drop Upload Area -->
+    <div class="drag-drop-area border border-primary p-4 text-center mt-4" id="drag-drop-area">
+        <p>Drag & Drop files here or click to upload</p>
+        <form id="upload-form" action="/projects/<%= number %>/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="files" id="file-input" class="d-none" multiple>
+            <button type="submit" class="btn btn-primary mt-2">Upload</button>
+        </form>
+    </div>
+</div>
+<script>
+    const dragDropArea = document.getElementById('drag-drop-area');
+    const fileInput = document.getElementById('file-input');
+    const uploadForm = document.getElementById('upload-form');
+
+    dragDropArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    dragDropArea.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dragDropArea.classList.add('bg-light');
+    });
+
+    dragDropArea.addEventListener('dragleave', () => {
+        dragDropArea.classList.remove('bg-light');
+    });
+
+    dragDropArea.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dragDropArea.classList.remove('bg-light');
+        fileInput.files = event.dataTransfer.files;
+        uploadForm.submit();
+    });
+
+    fileInput.addEventListener('change', () => {
+        uploadForm.submit();
+    });
+</script>
