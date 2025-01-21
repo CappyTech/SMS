@@ -191,7 +191,6 @@ const index = require('./controllers/renderIndex');
 const formsUser = require('./controllers/forms/user');
 const formsSubcontractor = require('./controllers/forms/subcontractor');
 const formsInvoice = require('./controllers/forms/invoice');
-const formsError = require('./controllers/forms/error');
 const formsQuote = require('./controllers/forms/quote');
 const formsClient = require('./controllers/forms/client');
 const formsContact = require('./controllers/forms/contact');
@@ -223,7 +222,7 @@ const yearlyReturns = require('./controllers/yearlyReturns');
 const dailyAttendance = require('./controllers/dailyAttendance');
 const weeklyAttendance = require('./controllers/weeklyAttendance');
 
-const kashflowRoutes = require('./kf/routes')
+//const kashflowRoutes = require('./kf/routes')
 
 const verificationRoutes = require('./controllers/renderVerification');
 
@@ -234,53 +233,56 @@ const kashflowQuote = require('./controllers/CRUD/kashflow/quote');
 const kashflowReceipt = require('./controllers/CRUD/kashflow/receipt');
 const kashflowSupplier = require('./controllers/CRUD/kashflow/supplier');
 
+const fileSystemProjects = require('./controllers/fileSystemProjects');
+
 app.use('/', index);
 
-app.use('/', formsClient);
-app.use('/', formsContact);
-app.use('/', formsError);
-app.use('/', formsInvoice);
-app.use('/', formsQuote);
-app.use('/', formsSubcontractor);
-app.use('/', formsUser);
-app.use('/', formsJob);
-app.use('/', formsLocation);
-app.use('/', formsAttendance);
-app.use('/', formsEmployee);
+app.use('/client', formsClient);
+app.use('/contact', formsContact);
+app.use('/invoice', formsInvoice);
+app.use('/quote', formsQuote);
+app.use('/subcontractor', formsSubcontractor);
+app.use('/user', formsUser);
+app.use('/job', formsJob);
+app.use('/location', formsLocation);
+app.use('/attendance', formsAttendance);
+app.use('/employee', formsEmployee);
 
-app.use('/', renderDashboard);
+app.use('/dashboard', renderDashboard);
 
-app.use('/', userLogin);
-app.use('/', userRegister);
-app.use('/', userSettings);
+app.use('/user', userLogin);
+app.use('/user', userRegister);
+app.use('/user', userSettings);
 
-app.use('/', userCRUD);
-app.use('/', subcontractorCRUD);
-app.use('/', invoiceCRUD);
-app.use('/', quoteCRUD);
-app.use('/', clientCRUD);
-app.use('/', contactCRUD);
-app.use('/', attendanceCRUD);
-app.use('/', employeeCRUD);
-app.use('/', jobCRUD);
-app.use('/', locationCRUD);
+app.use('/user', userCRUD);
+app.use('/subcontractor', subcontractorCRUD);
+app.use('/invoice', invoiceCRUD);
+app.use('/quote', quoteCRUD);
+app.use('/client', clientCRUD);
+app.use('/contact', contactCRUD);
+app.use('/attendance', attendanceCRUD);
+app.use('/employee', employeeCRUD);
+app.use('/job', jobCRUD);
+app.use('/location', locationCRUD);
 
-app.use('/', monthlyReturns);
-app.use('/', yearlyReturns);
+app.use('/monthly', monthlyReturns);
+app.use('/yearly', yearlyReturns);
 
-app.use('/', dailyAttendance);
-app.use('/', weeklyAttendance);
+app.use('/daily', dailyAttendance);
+app.use('/weekly', weeklyAttendance);
 
-app.use('/', kashflowRoutes);
+//app.use('/', kashflowRoutes);
 
-app.use('/', verificationRoutes);
+app.use('/verify', verificationRoutes);
 
-app.use('/', kashflowCustomer);
-app.use('/', kashflowInvoice);
-app.use('/', kashflowProject);
-app.use('/', kashflowQuote);
-app.use('/', kashflowReceipt);
-app.use('/', kashflowSupplier);
+app.use('/kashflow', kashflowCustomer);
+app.use('/kashflow', kashflowInvoice);
+app.use('/kashflow', kashflowProject);
+app.use('/kashflow', kashflowQuote);
+app.use('/kashflow', kashflowReceipt);
+app.use('/kashflow', kashflowSupplier);
+
+app.use('/', fileSystemProjects);
 
 // Catch undefined routes (404 handler)
 app.use((req, res, next) => {
@@ -301,3 +303,5 @@ if (process.env.NODE_ENV === 'development') {
         logger.info(`Server is running production`);
     });
 }
+
+module.exports = app;
