@@ -215,10 +215,10 @@ router.get('fetch/unsubmittedinvoices', async (req, res, next) => {
     }
 });
 
-router.post('/invoice/create/:selected', authService.ensureAuthenticated, createInvoice);
-router.get('/invoice/read/:invoice', authService.ensureAuthenticated, readInvoice);
-router.get('/invoices/read/:subcontractor', authService.ensureAuthenticated, readInvoices);
-router.post('/invoice/update/:invoice', authService.ensureAuthenticated, updateInvoice);
-router.post('/invoice/delete/:invoice', authService.ensureAuthenticated, deleteInvoice);
+router.post('/create/:selected', authService.ensureAuthenticated, createInvoice);
+router.get('/read/:invoice', authService.ensureAuthenticated, readInvoice);
+router.get('/read/:subcontractor', authService.ensureAuthenticated, readInvoices);
+router.post('/update/:invoice', authService.ensureAuthenticated, updateInvoice);
+router.post('/delete/:invoice', authService.ensureAuthenticated, deleteInvoice);
 
 module.exports = router;
