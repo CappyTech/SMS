@@ -166,9 +166,9 @@ router.get('/fetch/attendance/:id', authService.ensureAuthenticated, async (req,
     }
 });
 
-router.post('/attendance/create', authService.ensureAuthenticated, createAttendance);
-router.get('/attendance/read/:attendance', authService.ensureAuthenticated, readAttendance);
-router.post('/attendance/update/:attendance', authService.ensureAuthenticated, updateAttendance);
-router.post('/attendance/delete/:attendance', authService.ensureAuthenticated, deleteAttendance);
+router.post('/create', authService.ensureAuthenticated, createAttendance);
+router.get('/read/:attendance', authService.ensureAuthenticated, readAttendance);
+router.post('/update/:attendance', authService.ensureAuthenticated, updateAttendance);
+router.post('/delete/:attendance', authService.ensureAuthenticated, deleteAttendance);
 
 module.exports = router;
