@@ -66,7 +66,7 @@ const renderQuoteUpdateForm = async (req, res, next) => {
     }
 };
 
-router.get('/quote/create/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteCreateForm);
-router.get('/quote/update/:quote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteUpdateForm);
+router.get('/create/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteCreateForm);
+router.get('/update/:quote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteUpdateForm);
 
 module.exports = router;

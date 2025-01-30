@@ -30,7 +30,7 @@ const ensureAuthenticated = async (req, res, next) => {
         if (!id || !username || !email || !role) {
             req.flash('error', 'Invalid session. Please sign in.');
             logger.info(`Access denied: Missing required session properties for ${req.method} ${req.originalUrl}`);
-            return res.redirect('/signin');
+            return res.redirect('/user/signin');
         }
 
         // Optional: Verify against the database
@@ -41,7 +41,7 @@ const ensureAuthenticated = async (req, res, next) => {
         if (!dbUser) {
             req.flash('error', 'Session data mismatch. Please sign in again.');
             logger.info(`Access denied: Session mismatch for user ID ${id || 'N/A'} on ${req.method} ${req.originalUrl}`);
-            return res.redirect('/signin');
+            return res.redirect('/user/signin');
         }
 
         // User is authenticated, proceed
@@ -50,7 +50,7 @@ const ensureAuthenticated = async (req, res, next) => {
     } catch (error) {
         logger.error(`Authentication error: ${error.message}`);
         req.flash('error', 'An error occurred during authentication. Please try again.');
-        res.redirect('/signin');
+        res.redirect('/user/signin');
     }
 };
 
@@ -126,7 +126,7 @@ const ensurePermission = (requiredPermissions) => {
         if (!user) {
             req.flash('error', 'Please sign in.');
             logger.info(`Access denied: User not signed in for ${req.method} ${req.originalUrl}`);
-            return res.redirect('/signin');
+            return res.redirect('/user/signin');
         }
 
         // Ensure required permissions exist in the user object

@@ -25,6 +25,6 @@ const readQuote = async (req, res, next) => {
     }
 }
 
-router.get('/kf/quote/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readQuote);
+router.get('/quote/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readQuote);
 
 module.exports = router;

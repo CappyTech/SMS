@@ -6,13 +6,13 @@ const kf = require('../services/kashflowDatabaseService');
 const logger = require('../services/loggerService');
 const authService = require('../services/authService');
 
-const renderSupplierVerification = async (req, res, next) => {
+const renderSubcontractorVerification = async (req, res, next) => {
     try {
         const suppliers = await kf.KF_Suppliers.findAll();
         const subcontractors = await db.Subcontractors.findAll();
 
-        res.render(path.join('verification', 'supplier'), {
-            title: 'Supplier Verification',
+        res.render(path.join('verification', 'subcontractor'), {
+            title: 'Subcontractor Verification',
             suppliers,
             subcontractors,
         });
@@ -23,13 +23,13 @@ const renderSupplierVerification = async (req, res, next) => {
     }
 };
 
-const renderReceiptVerification = async (req, res, next) => {
+const renderInvoiceVerification = async (req, res, next) => {
     try {
         const receipts = await kf.KF_Receipts.findAll();
         const invoices = await db.Invoices.findAll();
 
-        res.render(path.join('verification', 'receipt'), {
-            title: 'Receipt Verification',
+        res.render(path.join('verification', 'invoice'), {
+            title: 'Invoice Verification',
             receipts,
             invoices,
         });
@@ -40,7 +40,25 @@ const renderReceiptVerification = async (req, res, next) => {
     }
 };
 
-router.get('/supplier/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSupplierVerification);
-router.get('/receipt/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderReceiptVerification);
+const renderClientVerification = async (req, res, next) => {
+    try {
+        const customers = await kf.KF_Customer.findAll();
+        const clients = await db.Clients.findAll();
+
+        res.render(path.join('verification', 'client'), {
+            title: 'Client Verification',
+            customers,
+            clients,
+        });
+    } catch (error) {
+        logger.error('Error rendering supplier verification: ' + error.message);
+        req.flash('error', 'Failed to load suppliers.');
+        next(error); // Pass the error to the error handler
+    }
+};
+
+router.get('/subcontractor/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorVerification);
+router.get('/invoice/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderInvoiceVerification);
+router.get('/client/', authService.ensureAuthenticated, authService.ensureRole('admin'), renderClientVerification);
 
 module.exports = router;

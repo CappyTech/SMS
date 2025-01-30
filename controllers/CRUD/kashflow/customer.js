@@ -25,6 +25,6 @@ const readCustomer = async (req, res, next) => {
     }
 }
 
-router.get('/kf/customer/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readCustomer);
+router.get('/customer/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readCustomer);
 
 module.exports = router;

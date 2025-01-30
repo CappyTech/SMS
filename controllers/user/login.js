@@ -19,7 +19,7 @@ const loginUser = async (req, res) => {
 
         if (!usernameOrEmail || !password) {
             req.flash('error', 'Username and password are required.');
-            return res.redirect('/signin');
+            return res.redirect('/user/signin');
         }
 
         const user = await db.Users.findOne({
@@ -30,14 +30,14 @@ const loginUser = async (req, res) => {
 
         if (!user) {
             req.flash('error', 'Invalid username.');
-            return res.redirect('/signin');
+            return res.redirect('/user/signin');
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
             req.flash('error', 'Invalid password.');
-            return res.redirect('/signin');
+            return res.redirect('/user/signin');
         }
 
         const agent = req.useragent || {};
@@ -60,7 +60,7 @@ const loginUser = async (req, res) => {
                 },
             };
 
-            return res.redirect('/2fa');
+            return res.redirect('/user/2fa');
         }
 
         req.session.user = {
@@ -83,7 +83,7 @@ const loginUser = async (req, res) => {
             if (error) {
                 logger.error('Error saving session: ' + error.message);
                 req.flash('error', 'An error occurred while logging in. Please try again.');
-                return res.redirect('/signin');
+                return res.redirect('/user/signin');
             }
 
             req.flash('success', 'Successfully logged in.');
@@ -93,7 +93,7 @@ const loginUser = async (req, res) => {
     } catch (error) {
         logger.error('Error during login: ' + error.message);
         req.flash('error', 'An error occurred during login. Please try again.');
-        return res.redirect('/signin');
+        return res.redirect('/user/signin');
     }
 };
 
@@ -105,13 +105,13 @@ const logoutUser = (req, res) => {
             next(error); // Pass the error to the error handler
         }
         res.clearCookie('connect.sid');
-        return res.redirect('/signin');
+        return res.redirect('/user/signin');
     });
 };
 
 const render2FAPage = (req, res) => {
     if (!req.session.userPending2FA) {
-        return res.redirect('/signin');
+        return res.redirect('/user/signin');
     }
 
     res.render(path.join('user', '2fa'), {
@@ -125,7 +125,7 @@ const verify2FA = async (req, res, next) => {
     try {
         if (!req.session.userPending2FA) {
             req.flash('error', 'Invalid session. Please sign in again.');
-            return res.redirect('/signin');
+            return res.redirect('/user/signin');
         }
 
         const { totpToken } = req.body;
@@ -136,7 +136,7 @@ const verify2FA = async (req, res, next) => {
 
         if (!user) {
             req.flash('error', 'User not found. Please sign in again.');
-            return res.redirect('/signin');
+            return res.redirect('/user/signin');
         }
 
         const agent = req.useragent || {};
@@ -152,7 +152,7 @@ const verify2FA = async (req, res, next) => {
 
         if (!tokenValidates) {
             req.flash('error', 'Invalid 2FA code. Please try again.');
-            return res.redirect('/2fa');
+            return res.redirect('/user/2fa');
         }
 
         req.session.user = {
@@ -177,7 +177,7 @@ const verify2FA = async (req, res, next) => {
             if (error) {
                 logger.error('Error saving session: ' + error.message);
                 req.flash('error', 'An error occurred while logging in. Please try again.');
-                return res.redirect('/signin');
+                return res.redirect('/user/signin');
             }
 
             req.flash('success', 'Successfully logged in.');
@@ -187,7 +187,7 @@ const verify2FA = async (req, res, next) => {
     } catch (error) {
         logger.error('Error during 2FA verification: ' + error.message);
         req.flash('error', 'An error occurred during 2FA verification. Please try again.');
-        return res.redirect('/2fa');
+        return res.redirect('/user/2fa');
     }
 };
 

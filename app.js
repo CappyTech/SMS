@@ -268,8 +268,8 @@ app.use('/location', locationCRUD);
 app.use('/monthly', monthlyReturns);
 app.use('/yearly', yearlyReturns);
 
-app.use('/daily', dailyAttendance);
-app.use('/weekly', weeklyAttendance);
+app.use('/attendance', dailyAttendance);
+app.use('/attendance', weeklyAttendance);
 
 //app.use('/', kashflowRoutes);
 

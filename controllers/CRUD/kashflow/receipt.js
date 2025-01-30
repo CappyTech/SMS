@@ -48,9 +48,9 @@ const readReceipt = async (req, res, next) => {
     }
 };
 
-router.get('/kf/receipt/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readReceipt);
+router.get('/receipt/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readReceipt);
 
-router.post('/kf/receipt/:uuid/submit', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
+router.post('/receipt/:uuid/submit', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
     try {
         const receipt = await db.KF_Receipts.findOne({ where: { uuid: req.params.uuid } });
 

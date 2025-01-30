@@ -57,7 +57,7 @@ const renderAttendanceUpdateForm = async (req, res, next) => {
     }
 };
 
-router.get('/attendance/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceCreateForm);
-router.get('/attendance/update/:attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceUpdateForm);
+router.get('/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceCreateForm);
+router.get('/update/:attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceUpdateForm);
 
 module.exports = router;

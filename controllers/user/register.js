@@ -32,7 +32,7 @@ const registerUser = async (req, res, next) => {
         if (existingUser) {
             logger.error('Username or email already exists');
             req.flash('error', 'Username or email already exists');
-            return res.redirect('/register');
+            return res.redirect('/user/register');
         }
 
         // Create a new user in the database
@@ -42,7 +42,7 @@ const registerUser = async (req, res, next) => {
     } catch (error) {
         logger.error('Error registering user: ' + error.message);
         req.flash('error', 'Error registering user: ' + error.message);
-        return res.redirect('/register');
+        return res.redirect('/user/register');
     }
 };
 

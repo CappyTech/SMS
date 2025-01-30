@@ -1,4 +1,3 @@
-
 <div class="container my-5">
     <h1 class="mb-4 text-center">Customers Overview</h1>
     <div class="row">
@@ -36,3 +35,65 @@
         <% }) %>
     </ul>
 </div>
+
+<div class="container my-5">
+    <h3 class="text-center fw-bold text-light">Customer Details</h3>
+    <div class="row mt-4">
+        <!-- Side Tabs -->
+        <div class="col-lg-3 mb-3 mb-lg-0">
+            <div class="nav flex-column nav-pills" id="customer-tabs" role="tablist" aria-orientation="vertical">
+                <% customers.forEach((customer, index) => { %>
+                    <button 
+                        class="nav-link <% if (index === 0) { %>active<% } %>" 
+                        id="customer-tab-<%= index %>" 
+                        data-bs-toggle="pill" 
+                        data-bs-target="#customer-content-<%= index %>" 
+                        type="button" 
+                        role="tab" 
+                        aria-controls="customer-content-<%= index %>" 
+                        aria-selected="<% if (index === 0) { %>true<% } else { %>false<% } %>">
+                        <%= customer.Name %>
+                    </button>
+                <% }); %>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="col-lg-9">
+            <div class="tab-content" id="customer-tab-content">
+                <% customers.forEach((customer, index) => { %>
+                    <div 
+                        class="tab-pane fade <% if (index === 0) { %>show active<% } %>" 
+                        id="customer-content-<%= index %>" 
+                        role="tabpanel" 
+                        aria-labelledby="customer-tab-<%= index %>">
+                        <div class="card border-light shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary fw-bold"><%= customer.Name %> - Details</h5>
+                                <% if (customer.Code) { %>
+                                    <p><strong>Code:</strong> <%= customer.Code %></p>
+                                <% } %>
+                                <% if (customer.CountryName) { %>
+                                    <p><strong>Country:</strong> <%= customer.CountryName %></p>
+                                <% } %>
+                                <% if (customer.Postcode) { %>
+                                    <p><strong>Postcode:</strong> <%= customer.Postcode %></p>
+                                <% } %>
+                                <% if (customer.Address1 || customer.Address2 || customer.Address3 || customer.Address4) { %>
+                                    <p>
+                                        <strong>Address:</strong> 
+                                        <%= customer.Address1 %> 
+                                        <% if (customer.Address2) { %>, <%= customer.Address2 %> <% } %>
+                                        <% if (customer.Address3) { %>, <%= customer.Address3 %> <% } %>
+                                        <% if (customer.Address4) { %>, <%= customer.Address4 %> <% } %>
+                                    </p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+</div>
+

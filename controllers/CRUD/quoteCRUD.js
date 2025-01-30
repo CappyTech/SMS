@@ -161,10 +161,10 @@ router.get('/fetch/quote/:quoteId', async (req, res, next) => {
 });
 
 
-router.post('/quote/create/:client', authService.ensureAuthenticated, authService.ensureRole('admin'), createQuote);
-router.get('/quote/read/:quoteId', authService.ensureAuthenticated, authService.ensureRole('admin'), readQuote);
-router.get('/quote/read/:client', authService.ensureAuthenticated, authService.ensureRole('admin'), readQuotes);
-router.post('/quote/update/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), updateQuote);
-router.post('/quote/delete/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteQuote);
+router.post('/create/:client', authService.ensureAuthenticated, authService.ensureRole('admin'), createQuote);
+router.get('/read/:quoteId', authService.ensureAuthenticated, authService.ensureRole('admin'), readQuote);
+router.get('/read/:client', authService.ensureAuthenticated, authService.ensureRole('admin'), readQuotes);
+router.post('/update/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), updateQuote);
+router.post('/delete/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteQuote);
 
 module.exports = router;

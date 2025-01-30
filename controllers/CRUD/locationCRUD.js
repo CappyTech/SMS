@@ -123,9 +123,9 @@ router.get('/fetch/location/:id', async (req, res, next) => {
 });
 
 // Define routes
-router.post('/location/create', authService.ensureAuthenticated, authService.ensureRole('admin'), createLocation);
-router.get('/location/read/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), readLocation);
-router.post('/location/update/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), updateLocation);
-router.post('/location/delete/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteLocation);
+router.post('/create', authService.ensureAuthenticated, authService.ensureRole('admin'), createLocation);
+router.get('/read/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), readLocation);
+router.post('/update/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), updateLocation);
+router.post('/delete/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteLocation);
 
 module.exports = router;

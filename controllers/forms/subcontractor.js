@@ -71,8 +71,8 @@ const renderSubcontractorUpdateForm = async (req, res, next) => {
     }
 };
 
-//router.get('/subcontractor/select', selectSubcontractor);
-router.get('/subcontractor/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorCreateForm);
-router.get('/subcontractor/update/:subcontractor', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorUpdateForm);
+//router.get('/select', selectSubcontractor);
+router.get('/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorCreateForm);
+router.get('/update/:subcontractor', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorUpdateForm);
 
 module.exports = router;

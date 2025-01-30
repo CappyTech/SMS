@@ -46,7 +46,7 @@ const renderLocationUpdateForm = async (req, res, next) => {
     }
 };
 
-router.get('/location/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderLocationCreateForm);
-router.get('/location/update/:locationId', authService.ensureAuthenticated, authService.ensureRole('admin'), renderLocationUpdateForm);
+router.get('/create', authService.ensureAuthenticated, authService.ensureRole('admin'), renderLocationCreateForm);
+router.get('/update/:locationId', authService.ensureAuthenticated, authService.ensureRole('admin'), renderLocationUpdateForm);
 
 module.exports = router;

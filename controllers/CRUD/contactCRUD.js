@@ -138,10 +138,10 @@ router.get('/fetch/contact/:clientId', async (req, res, next) => {
     }
 });
 
-router.post('/contact/create/:client', authService.ensureAuthenticated, createContact);
-router.get('/contact/read/:contact', authService.ensureAuthenticated, readContact);
-router.get('/contacts/read/:client', authService.ensureAuthenticated, readContacts);
-router.post('/contact/update/:contact', authService.ensureAuthenticated, updateContact);
-router.post('/contact/delete/:contact', authService.ensureAuthenticated, deleteContact);
+router.post('/create/:client', authService.ensureAuthenticated, createContact);
+router.get('/read/:contact', authService.ensureAuthenticated, readContact);
+router.get('/read/:client', authService.ensureAuthenticated, readContacts);
+router.post('/update/:contact', authService.ensureAuthenticated, updateContact);
+router.post('/delete/:contact', authService.ensureAuthenticated, deleteContact);
 
 module.exports = router;

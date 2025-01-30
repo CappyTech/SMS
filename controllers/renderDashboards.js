@@ -540,7 +540,6 @@ const renderKashflowDashboard = async (req, res, next) => {
 
         const incomeExpenseData = await currencyService.getIncomeExpenseData(kf);
 
-        console.log(incomeExpenseData);
         // Calculate paid/unpaid invoices
         const paidInvoices = await kf.KF_Invoices.count({ where: { Paid: { [kf.Sequelize.Op.gt]: 0 } } });
         const unpaidInvoices = totalInvoices - paidInvoices;
@@ -609,7 +608,7 @@ router.get('/KFquote', authService.ensureAuthenticated, authService.ensureRole('
 router.get('/KFsupplier', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFSuppliersDashboard);
 router.get('/KFreceipt', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFReceiptsDashboard);
 router.get('/KFproject', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFProjectsDashboard);
-router.get('/KashFlow', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKashflowDashboard);
+router.get('/KF', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKashflowDashboard);
 
 const renderCISSubmissionDashboard = async (req, res, next) => {
     try {

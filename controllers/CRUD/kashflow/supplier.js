@@ -25,6 +25,6 @@ const readSupplier = async (req, res, next) => {
     }
 }
 
-router.get('/kf/supplier/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readSupplier);
+router.get('/supplier/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readSupplier);
 
 module.exports = router;

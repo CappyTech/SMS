@@ -119,9 +119,9 @@ router.get('/fetch/job/:id', async (req, res, next) => {
     }
 });
 
-router.get('/job/create/:quoteId', authService.ensureAuthenticated, authService.ensureRole('admin'), createJob);
-router.get('/job/read/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), readJob);
-router.post('/job/update/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), updateJob);
-router.post('/job/delete/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteJob);
+router.get('/create/:quoteId', authService.ensureAuthenticated, authService.ensureRole('admin'), createJob);
+router.get('/read/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), readJob);
+router.post('/update/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), updateJob);
+router.post('/delete/:jobId', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteJob);
 
 module.exports = router;
