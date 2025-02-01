@@ -30,20 +30,6 @@
         </div>
     </div>
 
-    <!-- Visual Graph for Supplier Distribution -->
-    <div class="row mb-5">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    Supplier Distribution by Contact Availability
-                </div>
-                <div class="card-body">
-                    <canvas id="supplierChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Recent Suppliers -->
     <div class="card">
         <div class="card-header">
@@ -54,7 +40,7 @@
                 <% suppliers.slice(0, 5).forEach((supplier) => { %>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <strong><%= supplier.Name %></strong>
+                            <strong><a href="/kashflow/supplier/read/<%= supplier.uuid %>"><%= supplier.Name %></a></strong>
                             <p class="mb-0 text-muted">Added on: <%= new Date(supplier.Created).toLocaleDateString() %></p>
                         </div>
                         <span><%= supplier.Email || 'No Email' %></span>
@@ -63,34 +49,111 @@
             </ul>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Chart.js for supplier contact distribution
-    document.addEventListener('DOMContentLoaded', () => {
-        const ctx = document.getElementById('supplierChart').getContext('2d');
-        const supplierChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['With Contact Info', 'Without Contact Info'],
-                datasets: [{
-                    data: [<%= suppliersWithContact %>, <%= totalSuppliers - suppliersWithContact %>],
-                    backgroundColor: ['#28a745', '#dc3545']
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Supplier Contact Information Distribution'
-                    }
-                }
-            }
-        });
-    });
-</script>
+    <div class="container my-5">
+        <h3 class="text-center fw-bold text-light">Supplier Details</h3>
+        <div class="row mt-4">
+            <!-- Side Tabs -->
+            <div class="col-lg-3 mb-3 mb-lg-0">
+                <div class="nav nav-pills overflow" id="supplier-tabs" role="tablist" aria-orientation="vertical" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column;">
+                    <% suppliers.forEach((supplier, index) => { %>
+                        <button 
+                            class="nav-link <% if (index === 0) { %>active<% } %>" 
+                            id="supplier-tab-<%= index %>" 
+                            data-bs-toggle="pill" 
+                            data-bs-target="#supplier-content-<%= index %>" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="supplier-content-<%= index %>" 
+                            aria-selected="<% if (index === 0) { %>true<% } else { %>false<% } %>">
+                            <%= supplier.Name %>
+                        </button>
+                    <% }); %>
+                </div>
+            </div>
+    
+            <!-- Content Area -->
+            <div class="col-lg-9">
+                <div class="tab-content" id="supplier-tab-content">
+                    <% suppliers.forEach((supplier, index) => { %>
+                        <div 
+                            class="tab-pane fade <% if (index === 0) { %>show active<% } %>" 
+                            id="supplier-content-<%= index %>" 
+                            role="tabpanel" 
+                            aria-labelledby="supplier-tab-<%= index %>">
+                            <div class="card border-light shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold"><a href="/kashflow/supplier/read/<%= supplier.uuid %>"><%= supplier.Name %></a></h5>
+                                    <p><strong>Supplier ID:</strong> <%= supplier.SupplierID %></p>
+                                    <% if (supplier.Code) { %>
+                                        <p><strong>Code:</strong> <%= supplier.Code %></p>
+                                    <% } %>
+                                    <% if (supplier.Contact) { %>
+                                        <p><strong>Contact:</strong> <%= supplier.Contact %></p>
+                                    <% } %>
+                                    <% if (supplier.Email) { %>
+                                        <p><strong>Email:</strong> <%= supplier.Email %></p>
+                                    <% } %>
+                                    <% if (supplier.Telephone) { %>
+                                        <p><strong>Telephone:</strong> <%= supplier.Telephone %></p>
+                                    <% } %>
+                                    <% if (supplier.Mobile) { %>
+                                        <p><strong>Mobile:</strong> <%= supplier.Mobile %></p>
+                                    <% } %>
+                                    <% if (supplier.Fax) { %>
+                                        <p><strong>Fax:</strong> <%= supplier.Fax %></p>
+                                    <% } %>
+                                    <% if (supplier.Website) { %>
+                                        <p><strong>Website:</strong> <a href="<%= supplier.Website %>" target="_blank"><%= supplier.Website %></a></p>
+                                    <% } %>
+                                    <% if (supplier.Address1 || supplier.Address2 || supplier.Address3 || supplier.Address4) { %>
+                                        <p>
+                                            <strong>Address:</strong> 
+                                            <%= supplier.Address1 %>
+                                            <% if (supplier.Address2) { %>, <%= supplier.Address2 %> <% } %>
+                                            <% if (supplier.Address3) { %>, <%= supplier.Address3 %> <% } %>
+                                            <% if (supplier.Address4) { %>, <%= supplier.Address4 %> <% } %>
+                                        </p>
+                                    <% } %>
+                                    <% if (supplier.PostCode) { %>
+                                        <p><strong>Postcode:</strong> <%= supplier.PostCode %></p>
+                                    <% } %>
+                                    <% if (supplier.Created) { %>
+                                        <p><strong>Created:</strong> <%= new Date(supplier.Created).toLocaleDateString() %></p>
+                                    <% } %>
+                                    <% if (supplier.EC) { %>
+                                        <p><strong>EC:</strong> <%= supplier.EC %></p>
+                                    <% } %>
+                                    <% if (supplier.VATNumber) { %>
+                                        <p><strong>VAT Number:</strong> <%= supplier.VATNumber %></p>
+                                    <% } %>
+                                    <% if (supplier.Notes) { %>
+                                        <p><strong>Notes:</strong> <%= supplier.Notes %></p>
+                                    <% } %>
+                                    <% if (supplier.CurrencyID) { %>
+                                        <p><strong>Currency ID:</strong> <%= supplier.CurrencyID %></p>
+                                    <% } %>
+                                    <% if (supplier.PaymentTerms) { %>
+                                        <p><strong>Payment Terms:</strong> <%= supplier.PaymentTerms %></p>
+                                    <% } %>
+                                    <% if (supplier.ContactTitle) { %>
+                                        <p><strong>Contact Title:</strong> <%= supplier.ContactTitle %></p>
+                                    <% } %>
+                                    <% if (supplier.ContactFirstName) { %>
+                                        <p><strong>Contact First Name:</strong> <%= supplier.ContactFirstName %></p>
+                                    <% } %>
+                                    <% if (supplier.ContactLastName) { %>
+                                        <p><strong>Contact Last Name:</strong> <%= supplier.ContactLastName %></p>
+                                    <% } %>
+                                    <% if (supplier.TradeBorderType) { %>
+                                        <p><strong>Trade Border Type:</strong> <%= supplier.TradeBorderType %></p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

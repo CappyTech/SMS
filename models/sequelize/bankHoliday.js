@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
     }, {
+        tableName: 'BankHoliday',
         timestamps: true,
         paranoid: false,
         charset: 'latin1',

@@ -1,5 +1,6 @@
 const axios = require('axios');
 const moment = require('moment');
+const db = require('./sequelizeDatabaseService');
 
 const HOLIDAY_API_URL = 'https://www.gov.uk/bank-holidays.json';
 
@@ -155,7 +156,46 @@ const holidayService = {
      */
     getCustomHolidays: () => {
         return customHolidays;
-    }
+    },
+
+    getBankHoliday: async () => {
+        try {
+            const response = await axios.get(HOLIDAY_API_URL);
+            const data = response.data;
+
+            const events = [];
+            for (const division in data) {
+                data[division].events.forEach(event => {
+                    events.push({
+                        title: event.title,
+                        date: event.date,
+                        notes: event.notes,
+                        bunting: event.bunting,
+                        division: division
+                    });
+                });
+            }
+
+            const existingData = await db.BankHoliday.findAll();
+
+            const hasChanged = events.some(event => {
+                return !existingData.some(existingEvent => 
+                    existingEvent.title === event.title &&
+                    existingEvent.date === event.date &&
+                    existingEvent.notes === event.notes &&
+                    existingEvent.bunting === event.bunting &&
+                    existingEvent.division === event.division
+                );
+            });
+
+            if (hasChanged) {
+                await db.BankHoliday.destroy({ where: {}, truncate: true });
+                await db.BankHoliday.bulkCreate(events);
+            }
+        } catch (error) {
+            console.error('Error fetching or updating bank holidays:', error);
+        }
+    },
 };
 
 module.exports = holidayService;

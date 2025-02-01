@@ -106,6 +106,13 @@ const updateUser = async (req, res, next) => {
             permissions: updatedPermissions
         };
 
+        // If password is provided, hash it and add to updateFields
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            updateFields.password = hashedPassword;
+        }
+
         // Update the user in the database
         const [affectedRows, updatedUsers] = await db.Users.update(updateFields, {
             where: { id: req.params.id },

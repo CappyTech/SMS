@@ -6,7 +6,7 @@
     <!-- Supplier Information -->
     <% if (Supplier) { %>
         <h3>Supplier Information</h3>
-        <p><strong>Name:</strong> <%= Supplier.Name %></p>
+        <p><strong>Name:</strong> <a href="/kashflow/supplier/read/<%= Supplier.uuid %>"><%= Supplier.Name %></a></p>
         <p><strong>Address:</strong></p>
         <ul>
             <li><%= Supplier.Address1 %></li>

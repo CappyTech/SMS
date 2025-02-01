@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 require('dotenv').config();
 const fetchKF = require('../kf/fetchKashFlowData');
-const taxService = require('../services/taxService');
+const holidayService = require('../services/holidayService');
 const logger = require('./loggerService');
 
 let scheduleKashFlowData;
@@ -34,7 +34,7 @@ module.exports = (req, res, next) => {
     cron.schedule(scheduleBankHoliday, async () => {
         try {
             logger.info('Cron job started: Fetching Bank Holiday data...');
-            await taxService.getBankHoliday();
+            await holidayService.getBankHoliday();
             logger.info('Cron job completed: Bank Holiday fetched successfully.');
         } catch (error) {
             logger.error('Cron job (getBankHoliday) failed: ' + error.message);

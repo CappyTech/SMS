@@ -166,7 +166,6 @@ app.use(async (req, res, next) => {
     }
 });
 
-
 const crypto = require('crypto');
 if (process.env.NODE_ENV === 'development') {
     if (process.env.ENCRYPTION_KEY === '') {
