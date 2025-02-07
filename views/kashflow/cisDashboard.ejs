@@ -4,13 +4,13 @@
             <div class="d-flex justify-content-between mb-2">
 
                 <button class="btn btn-hcs-green" style="transform: rotate(0);">
-                    <a class="text-white stretched-link text-decoration-none" href="/dashboard/KFCIS/<%= previousYear %>/<%= previousMonth %>">&laquo; Previous</a>
+                    <a class="text-white stretched-link text-decoration-none" href="/dashboard/CIS/<%= previousYear %>/<%= previousMonth %>">&laquo; Previous</a>
                 </button>
 
                 <h1 class="display-6">Month <%= specifiedMonth %> | <%= currentMonthlyReturn.periodStartDisplay %> - <%= currentMonthlyReturn.periodEndDisplay %></h1>
 
                 <button class="btn btn-hcs-green" style="transform: rotate(0);">
-                    <a class="text-white stretched-link text-decoration-none" href="/dashboard/KFCIS/<%= nextYear %>/<%= nextMonth %>">Next &raquo;</a>
+                    <a class="text-white stretched-link text-decoration-none" href="/dashboard/CIS/<%= nextYear %>/<%= nextMonth %>">Next &raquo;</a>
                 </button>
             </div>
             <div class="row mb-4">
@@ -84,12 +84,10 @@
                             <thead>
                                 <tr>
                                     <th>Supplier</th>
-                                    <th>Gross Amount</th>
-                                    <th>Materials Cost</th>
-                                    <th>Labour Cost</th>
-                                    <th>CIS Deductions</th>
-                                    <th>Reverse ChargeVAT</th>
-                                    <th>Reverse ChargeNet</th>
+                                    <th>Gross Total</th>
+                                    <th>Materials Total</th>
+                                    <th>CIS Total</th>
+                                    <th>Reverse Charge Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -101,14 +99,12 @@
                                 <% } else { %>
                                     <% suppliers.forEach(supplier => { %>
                                     <tr>
-                                        <td><a href="/kf/supplier/read/<%= supplier.Code %>"><%= supplier.Name %></a></td>
+                                        <td><a href="/kashflow/supplier/read/<%= supplier.Code %>"><%= supplier.Name %></a></td>
                                         <% if (supplierTotals[supplier.SupplierID]) { %>
                                             <td><%= formatCurrency(supplierTotals[supplier.SupplierID].grossAmount) %></td>
                                             <td><%= formatCurrency(supplierTotals[supplier.SupplierID].materialsCost) %></td>
-                                            <td><%= formatCurrency(supplierTotals[supplier.SupplierID].labourCost) %></td>
                                             <td><%= formatCurrency(supplierTotals[supplier.SupplierID].cisDeductions) %></td>
                                             <td><%= formatCurrency(supplierTotals[supplier.SupplierID].reverseChargeVAT) %></td>
-                                            <td><%= formatCurrency(supplierTotals[supplier.SupplierID].reverseChargeNet) %></td>
                                         <% } else { %>
                                             <td colspan="5" class="text-center">No Data</td>
                                         <% } %>
@@ -128,8 +124,8 @@
                 <div class="col-6">
                     <ul class="list-group">
                         <% receipts.slice(0, midIndex).forEach(receipt => { %>
-                        <a href="/kf/receipt/read/<%= receipt.uuid %>" class="list-group-item list-group-item-action">
-                            <%= receipt.InvoiceNumber %> | <%= receipt.CustomerName %>
+                        <a href="/kashflow/receipt/read/<%= receipt.uuid %>" class="list-group-item list-group-item-action">
+                            <%= receipt.InvoiceNumber %> | <%= receipt.CustomerName %> | <%= receipt.CustomerReference %>
                             <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
                             <% if (receipt.submissionDate === null || receipt.submissionDate === "0000-00-00 00:00:00") { %>
                                 <i class="bi bi-x hcs-red-text"></i>
@@ -145,8 +141,8 @@
                 <div class="col-6">
                     <ul class="list-group">
                         <% receipts.slice(midIndex).forEach(receipt => { %>
-                        <a href="/receipt/read/<%= receipt.uuid %>" class="list-group-item list-group-item-action">
-                            <%= receipt.InvoiceNumber %> | <%= receipt.CustomerName %>
+                        <a href="/kashflow/receipt/read/<%= receipt.uuid %>" class="list-group-item list-group-item-action">
+                            <%= receipt.InvoiceNumber %> | <%= receipt.CustomerName %> | <%= receipt.CustomerReference %>
                             <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
                             <% if (receipt.submissionDate !== null) { %>
                                 <i class="bi bi-check hcs-green-text"></i>

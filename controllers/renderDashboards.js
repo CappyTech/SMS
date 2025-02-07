@@ -21,8 +21,8 @@ const renderStatsDashboard = async (req, res, next) => {
         }
 
         // Fetch all subcontractors and invoices
-        const subcontractors = await db.Subcontractors.findAll();
-        const invoices = await db.Invoices.findAll({ order: [['updatedAt', 'ASC']] });
+        const subcontractors = await db.Subcontractors.findAll({ order: [['company', 'ASC']] });
+        const invoices = await db.Invoices.findAll({ order: [['kashflowNumber', 'ASC']] });
 
         // Determine the tax year start and end dates and the current monthly return period
         const taxYear = taxService.getTaxYearStartEnd(specifiedYear);
@@ -621,17 +621,35 @@ const renderCISSubmissionDashboard = async (req, res, next) => {
             return res.status(400).send('Invalid year or month.');
         }
 
-        const suppliers = await kf.KF_Suppliers.findAll({});
-        const receipts = await kf.KF_Receipts.findAll({});
+        const suppliers = await kf.KF_Suppliers.findAll({
+            order: [['Name', 'ASC']]
+        });
+        const receipts = await kf.KF_Receipts.findAll({
+            order: [['InvoiceNumber', 'ASC']]
+        });
 
         const taxYear = taxService.getTaxYearStartEnd(specifiedYear);
         const currentMonthlyReturn = taxService.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
-
-        // Filter receipts based on the CIS period
+        // Log one of the receipts in full, JSON Parse
+        if (receipts.length > 0) {
+            const receiptToLog = receipts[0];
+            const parsedReceipt = typeof receiptToLog.Lines === 'string' ? JSON.parse(receiptToLog.Lines) : receiptToLog.Lines;
+            const parsedPayments = typeof receiptToLog.Payments === 'string' ? JSON.parse(receiptToLog.Payments) : receiptToLog.Payments;
+            logger.info('Receipt:'+ JSON.stringify({ ...receiptToLog.toJSON(), Lines: parsedReceipt, Payments: parsedPayments }, null, 2));
+        }
+        // Filter receipts based on the CIS period using PayDate
         const filteredReceipts = receipts.filter(receipt => {
-            if (!receipt.DueDate) return false;
-            const receiptDate = moment(receipt.DueDate);
-            return receiptDate.isBetween(
+            if (!receipt.Payments) return false;
+
+            // Parse Payments if it's a string
+            const parsedPayments = typeof receipt.Payments === 'string' ? JSON.parse(receipt.Payments) : receipt.Payments;
+
+            // Extract the PayDate from the Payments
+            const payment = parsedPayments.Payment?.Payment?.[0];
+            if (!payment || !payment.PayDate) return false;
+
+            const payDate = moment(payment.PayDate);
+            return payDate.isBetween(
                 currentMonthlyReturn.periodStart,
                 currentMonthlyReturn.periodEnd,
                 null,
@@ -666,8 +684,8 @@ const renderCISSubmissionDashboard = async (req, res, next) => {
                     materialsCost: 0,
                     cisDeductions: 0,
                     labourCost: 0,
-                    reverseChargeVAT: parseFloat(receipt.CISRCVatAmount) || 0,
-                    reverseChargeNet: parseFloat(receipt.CISRCNetAmount) || 0,
+                    reverseChargeVAT: 0,
+                    reverseChargeNet: 0,
                 };
             }
 
@@ -682,6 +700,9 @@ const renderCISSubmissionDashboard = async (req, res, next) => {
                     supplierTotals[customerId].cisDeductions += parseFloat(line.Rate * line.Quantity || 0);
                 }
             });
+
+            supplierTotals[customerId].reverseChargeVAT += parseFloat(receipt.CISRCVatAmount || 0);
+            supplierTotals[customerId].reverseChargeNet += parseFloat(receipt.CISRCNetAmount || 0);
 
             supplierTotals[customerId].grossAmount =
                 supplierTotals[customerId].materialsCost + supplierTotals[customerId].labourCost;

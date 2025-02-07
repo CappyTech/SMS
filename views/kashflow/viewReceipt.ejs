@@ -53,6 +53,55 @@
     <p class="text-danger">No line items available for this receipt.</p>
     <% } %>
 
+    <h2 class="mt-4">Payment Lines:</h2>
+
+    <pre><%= JSON.stringify(Receipt.Payments, null, 2) %></pre>
+
+    <% if (Receipt.Payments) { %>
+        <% if (Receipt.Payments.Payment) { %>
+            <% if (Array.isArray(Receipt.Payments.Payment.Payment)) { %>
+                <% if (Receipt.Payments.Payment.Payment.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Pay ID</th>
+                                    <th>Pay Invoice</th>
+                                    <th>Pay Date</th>
+                                    <th>Pay Note</th>
+                                    <th>Pay Method</th>
+                                    <th>Pay Account</th>
+                                    <th>Pay Amount (£)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% Receipt.Payments.Payment.Payment.forEach(payment => { %>
+                                    <tr>
+                                        <td><%= payment.PayID %></td>
+                                        <td><%= payment.PayInvoice %></td>
+                                        <td><%= new Date(payment.PayDate).toLocaleDateString() %></td>
+                                        <td><%= payment.PayNote %></td>
+                                        <td><%= payment.PayMethod %></td>
+                                        <td><%= payment.PayAccount %></td>
+                                        <td><%= payment.PayAmount %></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <p class="text-danger">Payments.Payment.Payment array is empty.</p>
+                <% } %>
+            <% } else { %>
+                <p class="text-danger">Payments.Payment.Payment is not an array.</p>
+            <% } %>
+        <% } else { %>
+            <p class="text-danger">Payments.Payment object does not exist.</p>
+        <% } %>
+    <% } else { %>
+        <p class="text-danger">No payment items available for this receipt.</p>
+    <% } %>
+
     <h3 class="mt-4">Summary</h3>
     <p><strong>Net:</strong> £<%= Receipt.NetAmount %></p>
     <p><strong>VAT:</strong> £<%= Receipt.VATAmount %></p>
@@ -62,7 +111,7 @@
     <div>
         <h3>Receipt Details</h3>
         <p><strong>Submission Date:</strong> <%= Receipt.SubmissionDate || 'Not Submitted' %></p>
-        <form action="/kf/receipt/<%= Receipt.uuid %>/submit" method="POST">
+        <form action="/kashflow/receipt/<%= Receipt.uuid %>/submit" method="POST">
             <button type="submit" class="btn btn-primary">Mark as Submitted (Today)</button>
         </form>
     </div>

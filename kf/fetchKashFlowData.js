@@ -9,7 +9,14 @@ const getSuppliers = require('./getSuppliers');
 const getInvoicesByDate = require('./getInvoicesByDate');
 const getReceiptsForSupplier = require('./getReceiptsForSupplier');
 const getReceiptPayment = require('./getReceiptPayment');
+const getInvoicePayment = require('./getInvoicePayment');
 const logger = require('../services/loggerService');
+
+const ChargeTypes = {
+    18685896: 'Materials',
+    18685897: 'Labour',
+    18685964: 'CIS Deductions',
+};
 
 async function logOperationDetails(filename, data) {
     try {
@@ -50,17 +57,17 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                 for (const key of Object.keys(item)) {
                     const currentValue = existing[key];
                     const newValue = item[key];
-                    const debug = key === 'DueDate';
+                    //const debug = key === 'DueDate';
 
-                    if (debug) {
-                        logger.debug(`Key: ${key}\n Current Value: ${currentValue}\n New Value: ${newValue}`);
-                        logger.debug(`Type of Current Value: ${typeof currentValue}\n Type of New Value: ${typeof newValue}`);
-                    }
+                    //if (debug) {
+                        //logger.debug(`Key: ${key}\n Current Value: ${currentValue}\n New Value: ${newValue}`);
+                        //logger.debug(`Type of Current Value: ${typeof currentValue}\n Type of New Value: ${typeof newValue}`);
+                    //}
                     // Skip placeholder dates or redundant type differences
                     if (isPlaceholderDate(currentValue) || isPlaceholderDate(newValue)) {
-                        if (debug) {
-                            logger.debug(`Skipping placeholder date for key: ${key}`);
-                        }
+                        //if (debug) {
+                            //logger.debug(`Skipping placeholder date for key: ${key}`);
+                        //}
                         continue;
                     }
 
@@ -68,16 +75,16 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                     if (key.toLowerCase().includes('created') || key.toLowerCase().includes('updated')) {
                         const normalizedCurrent = currentValue ? new Date(currentValue).toISOString().split('.')[0] : null;
                         const normalizedNew = newValue ? new Date(newValue).toISOString().split('.')[0] : null;
-                        if (debug) {
-                            logger.debug(`Normalized Current: ${normalizedCurrent}, Normalized New: ${normalizedNew}`);
-                        }
+                        //if (debug) {
+                            //logger.debug(`Normalized Current: ${normalizedCurrent}, Normalized New: ${normalizedNew}`);
+                        //}
 
                         if (normalizedCurrent !== normalizedNew) {
                             // If the timestamps differ significantly, log the change
                             changes[key] = { from: currentValue, to: newValue };
                             hasRealChange = true; // Only set this if the difference is beyond normalization
                         }
-                        logger.debug(`Continuing after timestamp normalization check for key: ${key}`);
+                        //logger.debug(`Continuing after timestamp normalization check for key: ${key}`);
                         
                         continue; // Skip further checks for timestamps
                     }
@@ -94,7 +101,7 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
         
                 // Update only if there are real changes
                 if (hasRealChange) {
-                    logger.debug(`Updating record with changes: ${JSON.stringify(changes)}`);
+                    logger.info(`Updating record with changes: ${JSON.stringify(changes)}`);
                     await model.update(item, { where: whereClause });
                     updatedCount++;
                     const logEntry = {
@@ -104,12 +111,12 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                         changes,
                     };
                     logDetails.push(logEntry);
-                    logger.debug(JSON.stringify(logEntry, null, 2));
+                    //logger.debug(JSON.stringify(logEntry, null, 2));
                     await appendLogEntry(logFilePath, logEntry);
                 }
             } else {
                 // Create new entry if it doesn't exist
-                logger.debug(`Creating new record: ${JSON.stringify(item)}`);
+                logger.info(`Creating new record: ${JSON.stringify(item)}`);
                 await model.create(item);
                 createdCount++;
                 const logEntry = {
@@ -119,14 +126,14 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
                     item,
                 };
                 logDetails.push(logEntry);
-                logger.debug(JSON.stringify(logEntry, null, 2));
+                //logger.debug(JSON.stringify(logEntry, null, 2));
                 await appendLogEntry(logFilePath, logEntry);
             }
         }        
 
         // Update metadata
         try {
-            logger.debug(`Updating metadata for model: ${model.name}`);
+            logger.info(`Updating metadata for model: ${model.name}`);
             await metaModel.upsert({
                 model: model.name,
                 createdCount,
@@ -232,7 +239,22 @@ exports.fetchKashFlowData = async () => {
         logger.info('Fetching invoices...');
         const invoices = await getInvoicesByDate(client, startDate, endDate);
         if (invoices.length > 0) {
+
             logger.info(`Fetched ${invoices.length} invoices.`);
+
+            //transform quotes and include lines
+            const transformedInvoices = await Promise.all(invoices.map(async (invoice) => {
+                // Fetch payments for the quote
+                const payments = await getInvoicePayment(client, invoice.InvoiceNumber);
+                //logger.debug(`Payments for InvoiceNumber ${quote.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
+                return {
+                    ...quote,
+                    Lines: quote.Lines?.anyType?.map(mapLine),
+                    ChargeTypeName: quote.ChargeType ? ChargeTypes[quote.ChargeType] : null,
+                    Payments: { Payment: payments },
+                };
+            }));
+
             await upsertData(
                 db.KF_Invoices,
                 invoices.map((invoice) => ({
@@ -251,13 +273,25 @@ exports.fetchKashFlowData = async () => {
         logger.info('Fetching quotes...');
         const quotes = await getQuotes(client);
         if (quotes.length > 0) {
+
             logger.info(`Fetched ${quotes.length} quotes.`);
-            await upsertData(
-                db.KF_Quotes,
-                quotes.map((quote) => ({
+
+            //transform quotes and include lines
+            const transformedQuotes = await Promise.all(quotes.map(async (quote) => {
+                // Fetch payments for the quote
+                //const payments = await getInvoicePayment(client, quote.InvoiceNumber);
+                //logger.debug(`Payments for InvoiceNumber ${quote.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
+                return {
                     ...quote,
                     Lines: quote.Lines?.anyType?.map(mapLine),
-                })),
+                    ChargeTypeName: quote.ChargeType ? ChargeTypes[quote.ChargeType] : null,
+                    //Payments: { Payment: payments },
+                };
+            }));
+
+            await upsertData(
+                db.KF_Quotes,
+                transformedQuotes,
                 'InvoiceDBID',
                 KF_Meta,
                 operationLog,
@@ -278,18 +312,19 @@ exports.fetchKashFlowData = async () => {
                     logger.info(`Fetched ${receipts.length} receipts for supplier: ${supplier.Name} (SupplierID: ${supplier.SupplierID})`);
         
                     // Transform receipts and include payments
-                    const transformedReceipts = [];
-                    for (const receipt of receipts) {
+                    const transformedReceipts = await Promise.all(receipts.map(async (receipt) => {
                         // Fetch payments for the receipt
                         const payments = await getReceiptPayment(client, receipt.InvoiceNumber);
                         //logger.debug(`Payments for ReceiptNumber ${receipt.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
-        
-                        transformedReceipts.push({
+                        return {
                             ...receipt,
+                            // map line items to the expected format for upsert (e.g. Quantity, Description, Rate, etc.)
                             Lines: receipt.Lines?.anyType?.map(mapLine) || [],
+                            // if ChargeType equal known number:value key pair, push ChargeTypeName to the object
+                            ChargeTypeName: receipt.ChargeType ? ChargeTypes[receipt.ChargeType] : null,
                             Payments: { Payment: payments },
-                        });
-                    }
+                        };
+                    }));
         
                     // Upsert receipts with payments
                     await upsertData(
@@ -326,6 +361,8 @@ function mapLine(line) {
         Description: line.Description || 'N/A',
         Rate: line.Rate || null,
         ChargeType: line.ChargeType || null,
+        // Add ChargeTypeName here to be able to display it in the view (e.g. Materials, Labour, CIS Deductions)
+        ChargeTypeName: line.ChargeTypeName || null,
         VatRate: line.VatRate || null,
         VatAmount: line.VatAmount || null,
         ProductID: line.ProductID || null,

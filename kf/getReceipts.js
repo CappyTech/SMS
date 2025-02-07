@@ -16,7 +16,6 @@ function getReceipts(client) {
 
       if (receipts && receipts.length) {
         logger.info('Total number of receipts: '+ receipts.length);
-
         resolve(receipts);
       } else {
         logger.info('No receipts found.');
