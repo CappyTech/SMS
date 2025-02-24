@@ -47,7 +47,7 @@
                 <td><%= invoice.InvoiceNumber %></td>
                 <td>£<%= invoice.NetAmount %></td>
                 <td>
-                    <% if (invoice.AmountPaid >= invoice.NetAmount) { %>
+                    <% if (invoice.Paid) { %>
                     <span class="badge bg-success">Paid</span>
                     <% } else { %>
                     <span class="badge bg-warning">Unpaid</span>
@@ -61,7 +61,7 @@
 
 <script>
     function filterInvoices() {
-        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const searchInput = document.getElementById('searchInput').value;
         const statusFilter = document.getElementById('statusFilter').value;
         const tableBody = document.getElementById('invoiceTableBody');
         const invoices = <%- JSON.stringify(invoices) %>;
