@@ -37,6 +37,7 @@
         <thead>
             <tr>
                 <th>Invoice Number</th>
+                <th>Customer</th>
                 <th>Net Amount</th>
                 <th>Status</th>
             </tr>
@@ -45,6 +46,7 @@
             <% invoices.forEach(invoice => { %>
             <tr>
                 <td><%= invoice.InvoiceNumber %></td>
+                <td><%= invoice.Customer %></td>
                 <td>£<%= invoice.NetAmount %></td>
                 <td>
                     <% if (invoice.Paid) { %>
