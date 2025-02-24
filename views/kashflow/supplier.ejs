@@ -109,7 +109,7 @@
                                     <% if (supplier.Address1 || supplier.Address2 || supplier.Address3 || supplier.Address4) { %>
                                         <p>
                                             <strong>Address:</strong> 
-                                            <%= supplier.Address1 %>
+                                            <% if (supplier.Address1) { %> <%= supplier.Address1 %> <% } %>
                                             <% if (supplier.Address2) { %>, <%= supplier.Address2 %> <% } %>
                                             <% if (supplier.Address3) { %>, <%= supplier.Address3 %> <% } %>
                                             <% if (supplier.Address4) { %>, <%= supplier.Address4 %> <% } %>
