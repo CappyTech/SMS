@@ -1,5 +1,15 @@
 <div class="container mt-5">
     <p class="display-5 text-center">Supplier<br> <span class="fw-bold"><%= supplier.Name %></span></p>
+    <div class="card">
+        <div class="card-body">
+            <p>
+                <strong>Contact:</strong> <%= supplier.Contact %>
+                <strong>Email:</strong> <%= supplier.Email %>
+                <strong>Phone:</strong> <%= supplier.Telephone %>
+                <strong>Address:</strong> <%= supplier.Address1 %>, <%= supplier.Address2 %>, <%= supplier.Address3 %>, <%= supplier.Address4 %>, <%= supplier.PostCode %>
+            </p>
+        </div>
+    </div>
     <p><strong>Contact:</strong> <%= supplier.Contact %></p>
     <p><strong>Email:</strong> <%= supplier.Email %></p>
     <p><strong>Phone:</strong> <%= supplier.Telephone %></p>
