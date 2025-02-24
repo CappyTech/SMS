@@ -242,15 +242,15 @@ exports.fetchKashFlowData = async () => {
 
             logger.info(`Fetched ${invoices.length} invoices.`);
 
-            //transform quotes and include lines
+            //transform invoices and include lines
             const transformedInvoices = await Promise.all(invoices.map(async (invoice) => {
-                // Fetch payments for the quote
+                // Fetch payments for the invoice
                 const payments = await getInvoicePayment(client, invoice.InvoiceNumber);
                 //logger.debug(`Payments for InvoiceNumber ${quote.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
                 return {
-                    ...quote,
-                    Lines: quote.Lines?.anyType?.map(mapLine),
-                    ChargeTypeName: quote.ChargeType ? ChargeTypes[quote.ChargeType] : null,
+                    ...invoice,
+                    Lines: invoice.Lines?.anyType?.map(mapLine),
+                    ChargeTypeName: invoice.ChargeType ? ChargeTypes[invoice.ChargeType] : null,
                     Payments: { Payment: payments },
                 };
             }));
@@ -285,7 +285,7 @@ exports.fetchKashFlowData = async () => {
                     ...quote,
                     Lines: quote.Lines?.anyType?.map(mapLine),
                     ChargeTypeName: quote.ChargeType ? ChargeTypes[quote.ChargeType] : null,
-                    //Payments: { Payment: payments },
+                    Payments: { Payment: payments },
                 };
             }));
 
