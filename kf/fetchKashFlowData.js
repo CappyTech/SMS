@@ -279,7 +279,7 @@ exports.fetchKashFlowData = async () => {
             //transform quotes and include lines
             const transformedQuotes = await Promise.all(quotes.map(async (quote) => {
                 // Fetch payments for the quote
-                //const payments = await getInvoicePayment(client, quote.InvoiceNumber);
+                const payments = await getInvoicePayment(client, quote.InvoiceNumber);
                 //logger.debug(`Payments for InvoiceNumber ${quote.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
                 return {
                     ...quote,
