@@ -42,7 +42,7 @@
             </tr>
         </thead>
         <tbody id="invoiceTableBody">
-            <% invoices.slice(0, 5).forEach(invoice => { %>
+            <% invoices.forEach(invoice => { %>
             <tr>
                 <td><%= invoice.InvoiceNumber %></td>
                 <td>£<%= invoice.NetAmount %></td>
