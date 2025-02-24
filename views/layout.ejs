@@ -110,6 +110,11 @@
               </button>
               <div class="dropdown-menu p-3 bg-body">
                 <ul class="nav flex-column" aria-labelledby="kashflowDropdown" id="nestedDropdownMenu">
+                  <li class="nav-item">
+                    <a href="/dashboard/KF" class="nav-link">
+                      <i class="bi bi-binoculars me-2"></i> Overview
+                    </a>
+                  </li>
                   <!-- Customers -->
                   <li class="nav-item">
                     <a href="/dashboard/KFcustomer" class="nav-link">
@@ -259,6 +264,29 @@
               </div>
             </li>
             <% } %>
+
+            <!-- Dropdown: HR (Administration) -->
+            <% if (isAuthenticated && isAdmin) { %>
+              <li class="nav-item dropdown">
+                <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-person"></i> Internal
+                </button>
+                <div class="dropdown-menu p-3 bg-body">
+                  <ul class="nav flex-column">
+                    <li class="nav-item">
+                      <a href="/user/create" class="nav-link">
+                        <i class="bi bi-person me-2"></i> Create User
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="/dashboard/user" class="nav-link">
+                        <i class="bi bi-people me-2"></i> Manage Users
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <% } %>
           </ul>
         </div>
     </nav>
