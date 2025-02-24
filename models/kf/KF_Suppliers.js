@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         ContactFirstName: DataTypes.STRING,
         ContactLastName: DataTypes.STRING,
         TradeBorderType: DataTypes.INTEGER,
+        Subcontractor: DataTypes.BOOLEAN,
     }, {
         tableName: 'KF_Suppliers',
         timestamps: true,
