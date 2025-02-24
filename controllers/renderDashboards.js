@@ -725,7 +725,7 @@ const renderCISSubmissionDashboard = async (req, res, next) => {
         const submissionStartDate = periodEnd.clone().date(7).format('Do MMMM YYYY');
         const submissionEndDate = periodEnd.clone().date(11).format('Do MMMM YYYY');
 
-        logger.info('Supplier Totals: ' + JSON.stringify(supplierTotals, null, 2));
+        //logger.info('Supplier Totals: ' + JSON.stringify(supplierTotals, null, 2));
 
         res.render(path.join('kashflow', 'cisDashboard'), {
             title: 'CIS Submission Dashboard',
