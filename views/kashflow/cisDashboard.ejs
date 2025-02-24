@@ -99,7 +99,7 @@
                                 <% } else { %>
                                     <% suppliers.forEach(supplier => { %>
                                     <tr>
-                                        <td><a href="/kashflow/supplier/read/<%= supplier.Code %>"><%= supplier.Name %></a></td>
+                                        <td><a href="/kashflow/supplier/read/<%= supplier.uuid %>"><%= supplier.Name %></a></td>
                                         <% if (supplierTotals[supplier.SupplierID]) { %>
                                             <td><%= formatCurrency(supplierTotals[supplier.SupplierID].grossAmount) %></td>
                                             <td><%= formatCurrency(supplierTotals[supplier.SupplierID].materialsCost) %></td>
