@@ -69,8 +69,8 @@
         const filteredInvoices = invoices.filter(invoice => {
             const matchesSearch = invoice.InvoiceNumber.toString().toLowerCase().includes(searchInput);
             const matchesStatus = statusFilter === '' || 
-                                  (statusFilter === 'paid' && invoice.AmountPaid >= invoice.NetAmount) || 
-                                  (statusFilter === 'unpaid' && invoice.AmountPaid < invoice.NetAmount);
+                                  (statusFilter === 'paid' && invoice.Paid) || 
+                                  (statusFilter === 'unpaid' && !invoice.Paid);
             return matchesSearch && matchesStatus;
         });
 
