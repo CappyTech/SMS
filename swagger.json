@@ -3,137 +3,14 @@
     "info": {
       "title": "SMS API",
       "version": "4.5.6",
-      "description": "API for managing subcontractor attendance records in the SMS system."
+      "description": ""
     },
     "servers": [
       {
-        "url": "http://localhost:3000",
-        "description": "Local development server"
+        "url": "http://app.heroncs.co.uk",
+        "description": "Production Server"
       }
     ],
-    "paths": {
-      "/attendance": {
-        "get": {
-          "summary": "Get all attendance records",
-          "tags": ["Attendance"],
-          "responses": {
-            "200": {
-              "description": "List of attendance records",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": { "$ref": "#/components/schemas/Attendance" }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "post": {
-          "summary": "Create a new attendance record",
-          "tags": ["Attendance"],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Attendance" }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Attendance record created successfully",
-              "content": {
-                "application/json": {
-                  "schema": { "$ref": "#/components/schemas/Attendance" }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/attendance/{id}": {
-        "get": {
-          "summary": "Get attendance by ID",
-          "tags": ["Attendance"],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": { "type": "string", "format": "uuid" }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Attendance record found",
-              "content": {
-                "application/json": {
-                  "schema": { "$ref": "#/components/schemas/Attendance" }
-                }
-              }
-            },
-            "404": {
-              "description": "Attendance record not found"
-            }
-          }
-        },
-        "put": {
-          "summary": "Update an attendance record",
-          "tags": ["Attendance"],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": { "type": "string", "format": "uuid" }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Attendance" }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Attendance updated successfully",
-              "content": {
-                "application/json": {
-                  "schema": { "$ref": "#/components/schemas/Attendance" }
-                }
-              }
-            },
-            "404": {
-              "description": "Attendance record not found"
-            }
-          }
-        },
-        "delete": {
-          "summary": "Delete an attendance record",
-          "tags": ["Attendance"],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": { "type": "string", "format": "uuid" }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Attendance deleted successfully"
-            },
-            "404": {
-              "description": "Attendance record not found"
-            }
-          }
-        }
-      }
-    },
     "components": {
       "schemas": {
         "Attendance": {
