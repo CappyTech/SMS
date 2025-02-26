@@ -144,7 +144,7 @@
                         <a href="/kashflow/receipt/read/<%= receipt.uuid %>" class="list-group-item list-group-item-action">
                             <%= receipt.InvoiceNumber %> | <%= receipt.CustomerName %> | <%= receipt.CustomerReference %>
                             <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
-                            <% if (receipt.submissionDate !== null) { %>
+                            <% if (receipt.submissionDate) { %>
                                 <i class="bi bi-check hcs-green-text"></i>
                             <% } else { %>
                                 <i class="bi bi-x hcs-red-text"></i>
