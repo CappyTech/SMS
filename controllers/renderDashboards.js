@@ -9,32 +9,6 @@ const currencyService = require('../services/currencyService');
 const authService = require('../services/authService');
 const kf = require('../services/kashflowDatabaseService');
 
-/**
- * @swagger
- * /dashboard/stats/{year}/{month}:
- *   get:
- *     summary: Render the stats dashboard
- *     parameters:
- *       - in: path
- *         name: year
- *         required: true
- *         schema:
- *           type: integer
- *         description: The specified year
- *       - in: path
- *         name: month
- *         required: true
- *         schema:
- *           type: integer
- *         description: The specified month
- *     responses:
- *       200:
- *         description: Stats dashboard rendered successfully
- *       400:
- *         description: Invalid year or month
- *       500:
- *         description: Error rendering stats dashboard
- */
 const renderStatsDashboard = async (req, res, next) => {
     try {
         // Fetch the specified year and month from the URL parameters
@@ -150,17 +124,6 @@ const renderStatsDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/user:
- *   get:
- *     summary: Render the user dashboard
- *     responses:
- *       200:
- *         description: User dashboard rendered successfully
- *       500:
- *         description: Error rendering user dashboard
- */
 const renderUserDashboard = async (req, res, next) => {
     try {
         const users = await db.Users.findAll({ order: [['createdAt', 'DESC']] });
@@ -179,17 +142,6 @@ const renderUserDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/invoice:
- *   get:
- *     summary: Render the invoice dashboard
- *     responses:
- *       200:
- *         description: Invoice dashboard rendered successfully
- *       500:
- *         description: Error rendering invoice dashboard
- */
 const renderInvoiceDashboard = async (req, res, next) => {
     try {
         const invoices = await db.Invoices.findAll({ order: [['createdAt', 'DESC']] });
@@ -208,17 +160,6 @@ const renderInvoiceDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/subcontractor:
- *   get:
- *     summary: Render the subcontractor dashboard
- *     responses:
- *       200:
- *         description: Subcontractor dashboard rendered successfully
- *       500:
- *         description: Error rendering subcontractor dashboard
- */
 const renderSubcontractorDashboard = async (req, res, next) => {
     try {
         const subcontractors = await db.Subcontractors.findAll({ order: [['createdAt', 'DESC']] });
@@ -237,17 +178,6 @@ const renderSubcontractorDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/quote:
- *   get:
- *     summary: Render the quotes dashboard
- *     responses:
- *       200:
- *         description: Quotes dashboard rendered successfully
- *       500:
- *         description: Error rendering quotes dashboard
- */
 const renderQuotesDashboard = async (req, res, next) => {
     try {
         const quotes = await db.Quotes.findAll({
@@ -275,17 +205,6 @@ const renderQuotesDashboard = async (req, res, next) => {
 };
 
 
-/**
- * @swagger
- * /dashboard/client:
- *   get:
- *     summary: Render the clients dashboard
- *     responses:
- *       200:
- *         description: Clients dashboard rendered successfully
- *       500:
- *         description: Error rendering clients dashboard
- */
 const renderClientsDashboard = async (req, res, next) => {
     try {
         const clients = await db.Clients.findAll({ order: [['createdAt', 'DESC']] });
@@ -301,17 +220,6 @@ const renderClientsDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/contact:
- *   get:
- *     summary: Render the contacts dashboard
- *     responses:
- *       200:
- *         description: Contacts dashboard rendered successfully
- *       500:
- *         description: Error rendering contacts dashboard
- */
 const renderContactsDashboard = async (req, res, next) => {
     try {
         const contacts = await db.Contacts.findAll({ order: [['createdAt', 'DESC']], include: [db.Clients] });
@@ -327,17 +235,6 @@ const renderContactsDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/job:
- *   get:
- *     summary: Render the jobs dashboard
- *     responses:
- *       200:
- *         description: Jobs dashboard rendered successfully
- *       500:
- *         description: Error rendering jobs dashboard
- */
 const renderJobsDashboard = async (req, res, next) => {
     try {
         // Fetch jobs with a non-empty job_ref
@@ -394,17 +291,6 @@ const renderJobsDashboard = async (req, res, next) => {
 };
 
 // Read all locations
-/**
- * @swagger
- * /dashboard/location:
- *   get:
- *     summary: Render the locations dashboard
- *     responses:
- *       200:
- *         description: Locations dashboard rendered successfully
- *       500:
- *         description: Error rendering locations dashboard
- */
 const renderLocationsDashboard = async (req, res, next) => {
     try {
         const locations = await db.Locations.findAll({ order: [['createdAt', 'DESC']] });
@@ -420,33 +306,6 @@ const renderLocationsDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/attendance:
- *   get:
- *     summary: Render the attendance dashboard
- *     parameters:
- *       - in: query
- *         name: date
- *         schema:
- *           type: string
- *         description: The date of attendance
- *       - in: query
- *         name: employeeId
- *         schema:
- *           type: integer
- *         description: The ID of the employee
- *       - in: query
- *         name: subcontractorId
- *         schema:
- *           type: integer
- *         description: The ID of the subcontractor
- *     responses:
- *       200:
- *         description: Attendance dashboard rendered successfully
- *       500:
- *         description: Error rendering attendance dashboard
- */
 const renderAttendanceDashboard = async (req, res, next) => {
     try {
         // Extract query parameters from the request
@@ -498,17 +357,6 @@ const renderAttendanceDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/employee:
- *   get:
- *     summary: Render the employee dashboard
- *     responses:
- *       200:
- *         description: Employee dashboard rendered successfully
- *       500:
- *         description: Error rendering employee dashboard
- */
 const renderEmployeeDashboard = async (req, res, next) => {
     try {
         // Fetch all employees from the database
@@ -530,17 +378,6 @@ const renderEmployeeDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/KFinvoice:
- *   get:
- *     summary: Render the KashFlow invoices dashboard
- *     responses:
- *       200:
- *         description: KashFlow invoices dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow invoices dashboard
- */
 const renderKFInvoicesDashboard = async (req, res, next) => {
     try {
         const invoices = await kf.KF_Invoices.findAll({
@@ -564,17 +401,6 @@ const renderKFInvoicesDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/KFcustomer:
- *   get:
- *     summary: Render the KashFlow customers dashboard
- *     responses:
- *       200:
- *         description: KashFlow customers dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow customers dashboard
- */
 const renderKFCustomersDashboard = async (req, res, next) => {
     try {
         const customers = await kf.KF_Customers.findAll({
@@ -606,17 +432,6 @@ const renderKFCustomersDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/KFproject:
- *   get:
- *     summary: Render the KashFlow projects dashboard
- *     responses:
- *       200:
- *         description: KashFlow projects dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow projects dashboard
- */
 const renderKFProjectsDashboard = async (req, res, next) => {
     try {
         const projects = await kf.KF_Projects.findAll({
@@ -640,17 +455,6 @@ const renderKFProjectsDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/KFquote:
- *   get:
- *     summary: Render the KashFlow quotes dashboard
- *     responses:
- *       200:
- *         description: KashFlow quotes dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow quotes dashboard
- */
 const renderKFQuotesDashboard = async (req, res, next) => {
     try {
         const quotes = await kf.KF_Quotes.findAll({
@@ -668,17 +472,6 @@ const renderKFQuotesDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/KFreceipt:
- *   get:
- *     summary: Render the KashFlow receipts dashboard
- *     responses:
- *       200:
- *         description: KashFlow receipts dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow receipts dashboard
- */
 const renderKFReceiptsDashboard = async (req, res, next) => {
     try {
         const receipts = await kf.KF_Receipts.findAll({
@@ -704,17 +497,6 @@ const renderKFReceiptsDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/KFsupplier:
- *   get:
- *     summary: Render the KashFlow suppliers dashboard
- *     responses:
- *       200:
- *         description: KashFlow suppliers dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow suppliers dashboard
- */
 const renderKFSuppliersDashboard = async (req, res, next) => {
     try {
         const suppliers = await kf.KF_Suppliers.findAll({
@@ -745,17 +527,6 @@ const renderKFSuppliersDashboard = async (req, res, next) => {
     }
 };
 
-/**
- * @swagger
- * /dashboard/KF:
- *   get:
- *     summary: Render the KashFlow dashboard
- *     responses:
- *       200:
- *         description: KashFlow dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow dashboard
- */
 const renderKashflowDashboard = async (req, res, next) => {
     try {
         // Fetch all necessary data
@@ -818,282 +589,173 @@ router.get('/stats', authService.ensureAuthenticated, authService.ensureRole('ad
         next(error); // Pass the error to the error handler
     }
 });
-/**
- * @swagger
- * /dashboard/stats/{year}/{month}:
- *   get:
- *     summary: Render the stats dashboard
- *     parameters:
- *       - in: path
- *         name: year
- *         required: true
- *         schema:
- *           type: integer
- *         description: The specified year
- *       - in: path
- *         name: month
- *         required: true
- *         schema:
- *           type: integer
- *         description: The specified month
- *     responses:
- *       200:
- *         description: Stats dashboard rendered successfully
- *       400:
- *         description: Invalid year or month
- *       500:
- *         description: Error rendering stats dashboard
- */
 router.get('/stats/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderStatsDashboard);
-
-/**
- * @swagger
- * /dashboard/user:
- *   get:
- *     summary: Render the user dashboard
- *     responses:
- *       200:
- *         description: User dashboard rendered successfully
- *       500:
- *         description: Error rendering user dashboard
- */
 router.get('/user', authService.ensureAuthenticated, authService.ensureRole('admin'), renderUserDashboard);
-
-/**
- * @swagger
- * /dashboard/subcontractor:
- *   get:
- *     summary: Render the subcontractor dashboard
- *     responses:
- *       200:
- *         description: Subcontractor dashboard rendered successfully
- *       500:
- *         description: Error rendering subcontractor dashboard
- */
 router.get('/subcontractor', authService.ensureAuthenticated, authService.ensureRole('admin'), renderSubcontractorDashboard);
-
-/**
- * @swagger
- * /dashboard/invoice:
- *   get:
- *     summary: Render the invoice dashboard
- *     responses:
- *       200:
- *         description: Invoice dashboard rendered successfully
- *       500:
- *         description: Error rendering invoice dashboard
- */
 router.get('/invoice', authService.ensureAuthenticated, authService.ensureRole('admin'), renderInvoiceDashboard);
-
-/**
- * @swagger
- * /dashboard/quote:
- *   get:
- *     summary: Render the quotes dashboard
- *     responses:
- *       200:
- *         description: Quotes dashboard rendered successfully
- *       500:
- *         description: Error rendering quotes dashboard
- */
 router.get('/quote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuotesDashboard);
-
-/**
- * @swagger
- * /dashboard/client:
- *   get:
- *     summary: Render the clients dashboard
- *     responses:
- *       200:
- *         description: Clients dashboard rendered successfully
- *       500:
- *         description: Error rendering clients dashboard
- */
 router.get('/client', authService.ensureAuthenticated, authService.ensureRole('admin'), renderClientsDashboard);
-
-/**
- * @swagger
- * /dashboard/contact:
- *   get:
- *     summary: Render the contacts dashboard
- *     responses:
- *       200:
- *         description: Contacts dashboard rendered successfully
- *       500:
- *         description: Error rendering contacts dashboard
- */
 router.get('/contact', authService.ensureAuthenticated, authService.ensureRole('admin'), renderContactsDashboard);
-
-/**
- * @swagger
- * /dashboard/job:
- *   get:
- *     summary: Render the jobs dashboard
- *     responses:
- *       200:
- *         description: Jobs dashboard rendered successfully
- *       500:
- *         description: Error rendering jobs dashboard
- */
 router.get('/job', authService.ensureAuthenticated, authService.ensureRole('admin'), renderJobsDashboard);
 //router.get('/archive', authService.ensureAuthenticated, authService.ensureRole('admin'), renderQuoteArchiveDashboard);
-/**
- * @swagger
- * /dashboard/location:
- *   get:
- *     summary: Render the locations dashboard
- *     responses:
- *       200:
- *         description: Locations dashboard rendered successfully
- *       500:
- *         description: Error rendering locations dashboard
- */
 router.get('/location', authService.ensureAuthenticated, authService.ensureRole('admin'), renderLocationsDashboard);
-
-/**
- * @swagger
- * /dashboard/attendance:
- *   get:
- *     summary: Render the attendance dashboard
- *     parameters:
- *       - in: query
- *         name: date
- *         schema:
- *           type: string
- *         description: The date of attendance
- *       - in: query
- *         name: employeeId
- *         schema:
- *           type: integer
- *         description: The ID of the employee
- *       - in: query
- *         name: subcontractorId
- *         schema:
- *           type: integer
- *         description: The ID of the subcontractor
- *     responses:
- *       200:
- *         description: Attendance dashboard rendered successfully
- *       500:
- *         description: Error rendering attendance dashboard
- */
 router.get('/attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), renderAttendanceDashboard);
-
-/**
- * @swagger
- * /dashboard/employee:
- *   get:
- *     summary: Render the employee dashboard
- *     responses:
- *       200:
- *         description: Employee dashboard rendered successfully
- *       500:
- *         description: Error rendering employee dashboard
- */
 router.get('/employee', authService.ensureAuthenticated, authService.ensureRole('admin'), renderEmployeeDashboard);
 
-/**
- * @swagger
- * /dashboard/KFcustomer:
- *   get:
- *     summary: Render the KashFlow customers dashboard
- *     responses:
- *       200:
- *         description: KashFlow customers dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow customers dashboard
- */
 router.get('/KFcustomer', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFCustomersDashboard);
-
-/**
- * @swagger
- * /dashboard/KFinvoice:
- *   get:
- *     summary: Render the KashFlow invoices dashboard
- *     responses:
- *       200:
- *         description: KashFlow invoices dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow invoices dashboard
- */
 router.get('/KFinvoice', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFInvoicesDashboard);
-
-/**
- * @swagger
- * /dashboard/KFquote:
- *   get:
- *     summary: Render the KashFlow quotes dashboard
- *     responses:
- *       200:
- *         description: KashFlow quotes dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow quotes dashboard
- */
 router.get('/KFquote', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFQuotesDashboard);
-
-/**
- * @swagger
- * /dashboard/KFsupplier:
- *   get:
- *     summary: Render the KashFlow suppliers dashboard
- *     responses:
- *       200:
- *         description: KashFlow suppliers dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow suppliers dashboard
- */
 router.get('/KFsupplier', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFSuppliersDashboard);
-
-/**
- * @swagger
- * /dashboard/KFreceipt:
- *   get:
- *     summary: Render the KashFlow receipts dashboard
- *     responses:
- *       200:
- *         description: KashFlow receipts dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow receipts dashboard
- */
 router.get('/KFreceipt', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFReceiptsDashboard);
-
-/**
- * @swagger
- * /dashboard/KFproject:
- *   get:
- *     summary: Render the KashFlow projects dashboard
- *     responses:
- *       200:
- *         description: KashFlow projects dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow projects dashboard
- */
 router.get('/KFproject', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFProjectsDashboard);
-
-/**
- * @swagger
- * /dashboard/KF:
- *   get:
- *     summary: Render the KashFlow dashboard
- *     responses:
- *       200:
- *         description: KashFlow dashboard rendered successfully
- *       500:
- *         description: Error rendering KashFlow dashboard
- */
 router.get('/KF', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKashflowDashboard);
 
-/**
- * @swagger
- * /dashboard/CIS:
- *   get:
- *     summary: Redirect to the current CIS submission dashboard
- *     responses:
- *       302:
- *         description: Redirect to the current CIS submission dashboard
- *       500:
- *         description: Error rendering CIS submission dashboard
- */
+const renderCISSubmissionDashboard = async (req, res, next) => {
+    try {
+        // Fetch the specified year and month from the URL parameters
+        const specifiedYear = parseInt(req.params.year);
+        const specifiedMonth = parseInt(req.params.month);
+
+        // Ensure valid values for year and month
+        if (isNaN(specifiedYear) || isNaN(specifiedMonth) || specifiedMonth < 1 || specifiedMonth > 12) {
+            return res.status(400).send('Invalid year or month.');
+        }
+
+        const suppliers = await kf.KF_Suppliers.findAll({
+            order: [['Name', 'ASC']]
+        });
+        const receipts = await kf.KF_Receipts.findAll({
+            order: [['InvoiceNumber', 'ASC']]
+        });
+
+        const taxYear = taxService.getTaxYearStartEnd(specifiedYear);
+        const currentMonthlyReturn = taxService.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
+        // Log one of the receipts in full, JSON Parse
+        if (receipts.length > 0) {
+            const receiptToLog = receipts[0];
+            const parsedReceipt = typeof receiptToLog.Lines === 'string' ? JSON.parse(receiptToLog.Lines) : receiptToLog.Lines;
+            const parsedPayments = typeof receiptToLog.Payments === 'string' ? JSON.parse(receiptToLog.Payments) : receiptToLog.Payments;
+            logger.info('Receipt:'+ JSON.stringify({ ...receiptToLog.toJSON(), Lines: parsedReceipt, Payments: parsedPayments }, null, 2));
+        }
+        // Filter receipts based on the CIS period using PayDate
+        const filteredReceipts = receipts.filter(receipt => {
+            if (!receipt.Payments) return false;
+
+            // Parse Payments if it's a string
+            const parsedPayments = typeof receipt.Payments === 'string' ? JSON.parse(receipt.Payments) : receipt.Payments;
+
+            // Extract the PayDate from the Payments
+            const payment = parsedPayments.Payment?.Payment?.[0];
+            if (!payment || !payment.PayDate) return false;
+
+            const payDate = moment(payment.PayDate);
+            return payDate.isBetween(
+                currentMonthlyReturn.periodStart,
+                currentMonthlyReturn.periodEnd,
+                null,
+                '[]'
+            );
+        });
+
+        // Further filter receipts to include only those with both Labour Costs and CIS Deductions
+        const receiptsWithLabourAndCIS = filteredReceipts.filter(receipt => {
+            const lines = typeof receipt.Lines === 'string' ? JSON.parse(receipt.Lines) : receipt.Lines;
+
+            const hasLabourCost = lines.some(line => line.ChargeType === 18685897); // Labour Costs
+            const hasCISDeductions = lines.some(line => line.ChargeType === 18685964); // CIS Deductions
+
+            return hasLabourCost && hasCISDeductions;
+        });
+
+        // Extract unique supplier IDs from the filtered receipts
+        const SupplierIDs = [...new Set(receiptsWithLabourAndCIS.map(receipt => receipt.CustomerID))];
+
+        // Filter suppliers based on IDs
+        const filteredSuppliers = suppliers.filter(supplier => SupplierIDs.includes(supplier.SupplierID));
+
+        // Calculate totals for the filtered receipts
+        const supplierTotals = {};
+        receiptsWithLabourAndCIS.forEach(receipt => {
+            const customerId = String(receipt.CustomerID);
+
+            if (!supplierTotals[customerId]) {
+                supplierTotals[customerId] = {
+                    grossAmount: 0,
+                    materialsCost: 0,
+                    cisDeductions: 0,
+                    labourCost: 0,
+                    reverseChargeVAT: 0,
+                    reverseChargeNet: 0,
+                };
+            }
+
+            const lines = typeof receipt.Lines === 'string' ? JSON.parse(receipt.Lines) : receipt.Lines;
+
+            lines.forEach(line => {
+                if (line.ChargeType === 18685896) { // Materials
+                    supplierTotals[customerId].materialsCost += parseFloat(line.Rate * line.Quantity || 0);
+                } else if (line.ChargeType === 18685897) { // Labour
+                    supplierTotals[customerId].labourCost += parseFloat(line.Rate * line.Quantity || 0);
+                } else if (line.ChargeType === 18685964) { // CIS Deductions
+                    supplierTotals[customerId].cisDeductions += parseFloat(line.Rate * line.Quantity || 0);
+                }
+            });
+
+            supplierTotals[customerId].reverseChargeVAT += parseFloat(receipt.CISRCVatAmount || 0);
+            supplierTotals[customerId].reverseChargeNet += parseFloat(receipt.CISRCNetAmount || 0);
+
+            supplierTotals[customerId].grossAmount =
+                supplierTotals[customerId].materialsCost + supplierTotals[customerId].labourCost;
+        });
+
+        const allReceiptsSubmitted = receiptsWithLabourAndCIS.every(
+            receipt => receipt.submissionDate && receipt.submissionDate !== '0000-00-00 00:00:00'
+        );
+        const submissionDate =
+            allReceiptsSubmitted && receiptsWithLabourAndCIS.length > 0
+                ? receiptsWithLabourAndCIS[0].submissionDate
+                : null;
+
+        const previousMonth = specifiedMonth === 1 ? 12 : specifiedMonth - 1;
+        const previousYear = specifiedMonth === 1 ? specifiedYear - 1 : specifiedYear;
+        const nextMonth = specifiedMonth === 12 ? 1 : specifiedMonth + 1;
+        const nextYear = specifiedMonth === 12 ? specifiedYear + 1 : specifiedYear;
+
+        const periodEnd = moment(currentMonthlyReturn.periodEndDisplay, 'Do MMMM YYYY');
+        const submissionStartDate = periodEnd.clone().date(7).format('Do MMMM YYYY');
+        const submissionEndDate = periodEnd.clone().date(11).format('Do MMMM YYYY');
+
+        //logger.info('Supplier Totals: ' + JSON.stringify(supplierTotals, null, 2));
+
+        res.render(path.join('kashflow', 'cisDashboard'), {
+            title: 'CIS Submission Dashboard',
+            supplierCount: filteredSuppliers.length,
+            receiptCount: receiptsWithLabourAndCIS.length,
+            suppliers: filteredSuppliers,
+            receipts: receiptsWithLabourAndCIS,
+            taxYear,
+            taxMonth: specifiedMonth,
+            allReceiptsSubmitted,
+            submissionDate,
+            supplierTotals,
+            currentMonthlyReturn,
+            previousYear,
+            previousMonth,
+            nextYear,
+            nextMonth,
+            submissionStartDate,
+            submissionEndDate,
+            specifiedYear,
+            specifiedMonth,
+        });
+    } catch (error) {
+        logger.error('Error rendering CIS submission dashboard: ' + error.message);
+        req.flash('error', 'Error rendering CIS submission dashboard: ' + error.message);
+        next(error);
+    }
+};
+
+
 router.get('/CIS', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
     try {
         const { taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(moment());
@@ -1106,32 +768,6 @@ router.get('/CIS', authService.ensureAuthenticated, authService.ensureRole('admi
     }
 });
 
-/**
- * @swagger
- * /dashboard/CIS/{year}/{month}:
- *   get:
- *     summary: Render the CIS submission dashboard
- *     parameters:
- *       - in: path
- *         name: year
- *         required: true
- *         schema:
- *           type: integer
- *         description: The specified year
- *       - in: path
- *         name: month
- *         required: true
- *         schema:
- *           type: integer
- *         description: The specified month
- *     responses:
- *       200:
- *         description: CIS submission dashboard rendered successfully
- *       400:
- *         description: Invalid year or month
- *       500:
- *         description: Error rendering CIS submission dashboard
- */
 router.get('/CIS/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderCISSubmissionDashboard);
 
 module.exports = router;
