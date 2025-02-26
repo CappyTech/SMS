@@ -8,8 +8,11 @@ require('dotenv').config();
 const packageJson = require('./package.json');
 const moment = require('moment');
 const app = express();
-app.set('trust proxy', true);
+const authService = require('./services/authService');
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
 
+app.set('trust proxy', true);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set('layout', 'layout');
@@ -28,8 +31,6 @@ app.use(require('./services/rateLimiterService'));
 app.use(require('./services/cronService'));
 const db = require('./services/sequelizeDatabaseService');
 const kf = require('./services/kashflowDatabaseService');
-
-require('./swagger')(app);
 
 app.use(async (req, res, next) => {
     res.locals.session = req.session;
@@ -236,412 +237,61 @@ const kashflowSupplier = require('./controllers/CRUD/kashflow/supplier');
 
 const fileSystemProjects = require('./controllers/fileSystemProjects');
 
-/**
- * @swagger
- * /:
- *   get:
- *     summary: Render the index page
- *     responses:
- *       200:
- *         description: Index page rendered
- */
 app.use('/', index);
 
-/**
- * @swagger
- * /client:
- *   get:
- *     summary: Handle client forms
- *     responses:
- *       200:
- *         description: Client forms handled
- */
 app.use('/client', formsClient);
-
-/**
- * @swagger
- * /contact:
- *   get:
- *     summary: Handle contact forms
- *     responses:
- *       200:
- *         description: Contact forms handled
- */
 app.use('/contact', formsContact);
-
-/**
- * @swagger
- * /invoice:
- *   get:
- *     summary: Handle invoice forms
- *     responses:
- *       200:
- *         description: Invoice forms handled
- */
 app.use('/invoice', formsInvoice);
-
-/**
- * @swagger
- * /quote:
- *   get:
- *     summary: Handle quote forms
- *     responses:
- *       200:
- *         description: Quote forms handled
- */
 app.use('/quote', formsQuote);
-
-/**
- * @swagger
- * /subcontractor:
- *   get:
- *     summary: Handle subcontractor forms
- *     responses:
- *       200:
- *         description: Subcontractor forms handled
- */
 app.use('/subcontractor', formsSubcontractor);
-
-/**
- * @swagger
- * /user:
- *   get:
- *     summary: Handle user forms
- *     responses:
- *       200:
- *         description: User forms handled
- */
 app.use('/user', formsUser);
-
-/**
- * @swagger
- * /job:
- *   get:
- *     summary: Handle job forms
- *     responses:
- *       200:
- *         description: Job forms handled
- */
 app.use('/job', formsJob);
-
-/**
- * @swagger
- * /location:
- *   get:
- *     summary: Handle location forms
- *     responses:
- *       200:
- *         description: Location forms handled
- */
 app.use('/location', formsLocation);
-
-/**
- * @swagger
- * /attendance:
- *   get:
- *     summary: Handle attendance forms
- *     responses:
- *       200:
- *         description: Attendance forms handled
- */
 app.use('/attendance', formsAttendance);
-
-/**
- * @swagger
- * /employee:
- *   get:
- *     summary: Handle employee forms
- *     responses:
- *       200:
- *         description: Employee forms handled
- */
 app.use('/employee', formsEmployee);
 
-/**
- * @swagger
- * /dashboard:
- *   get:
- *     summary: Render the dashboard
- *     responses:
- *       200:
- *         description: Dashboard rendered
- */
 app.use('/dashboard', renderDashboard);
 
-/**
- * @swagger
- * /user/login:
- *   get:
- *     summary: Handle user login
- *     responses:
- *       200:
- *         description: User login handled
- */
 app.use('/user', userLogin);
-
-/**
- * @swagger
- * /user/register:
- *   get:
- *     summary: Handle user registration
- *     responses:
- *       200:
- *         description: User registration handled
- */
 app.use('/user', userRegister);
-
-/**
- * @swagger
- * /user/settings:
- *   get:
- *     summary: Handle user settings
- *     responses:
- *       200:
- *         description: User settings handled
- */
 app.use('/user', userSettings);
 
-/**
- * @swagger
- * /user:
- *   get:
- *     summary: Handle user CRUD operations
- *     responses:
- *       200:
- *         description: User CRUD operations handled
- */
 app.use('/user', userCRUD);
-
-/**
- * @swagger
- * /subcontractor:
- *   get:
- *     summary: Handle subcontractor CRUD operations
- *     responses:
- *       200:
- *         description: Subcontractor CRUD operations handled
- */
 app.use('/subcontractor', subcontractorCRUD);
-
-/**
- * @swagger
- * /invoice:
- *   get:
- *     summary: Handle invoice CRUD operations
- *     responses:
- *       200:
- *         description: Invoice CRUD operations handled
- */
 app.use('/invoice', invoiceCRUD);
-
-/**
- * @swagger
- * /quote:
- *   get:
- *     summary: Handle quote CRUD operations
- *     responses:
- *       200:
- *         description: Quote CRUD operations handled
- */
 app.use('/quote', quoteCRUD);
-
-/**
- * @swagger
- * /client:
- *   get:
- *     summary: Handle client CRUD operations
- *     responses:
- *       200:
- *         description: Client CRUD operations handled
- */
 app.use('/client', clientCRUD);
-
-/**
- * @swagger
- * /contact:
- *   get:
- *     summary: Handle contact CRUD operations
- *     responses:
- *       200:
- *         description: Contact CRUD operations handled
- */
 app.use('/contact', contactCRUD);
-
-/**
- * @swagger
- * /attendance:
- *   get:
- *     summary: Handle attendance CRUD operations
- *     responses:
- *       200:
- *         description: Attendance CRUD operations handled
- */
 app.use('/attendance', attendanceCRUD);
-
-/**
- * @swagger
- * /employee:
- *   get:
- *     summary: Handle employee CRUD operations
- *     responses:
- *       200:
- *         description: Employee CRUD operations handled
- */
 app.use('/employee', employeeCRUD);
-
-/**
- * @swagger
- * /job:
- *   get:
- *     summary: Handle job CRUD operations
- *     responses:
- *       200:
- *         description: Job CRUD operations handled
- */
 app.use('/job', jobCRUD);
-
-/**
- * @swagger
- * /location:
- *   get:
- *     summary: Handle location CRUD operations
- *     responses:
- *       200:
- *         description: Location CRUD operations handled
- */
 app.use('/location', locationCRUD);
 
-/**
- * @swagger
- * /monthly:
- *   get:
- *     summary: Handle monthly returns
- *     responses:
- *       200:
- *         description: Monthly returns handled
- */
 app.use('/monthly', monthlyReturns);
-
-/**
- * @swagger
- * /yearly:
- *   get:
- *     summary: Handle yearly returns
- *     responses:
- *       200:
- *         description: Yearly returns handled
- */
 app.use('/yearly', yearlyReturns);
 
-/**
- * @swagger
- * /attendance/daily:
- *   get:
- *     summary: Handle daily attendance
- *     responses:
- *       200:
- *         description: Daily attendance handled
- */
 app.use('/attendance', dailyAttendance);
-
-/**
- * @swagger
- * /attendance/weekly:
- *   get:
- *     summary: Handle weekly attendance
- *     responses:
- *       200:
- *         description: Weekly attendance handled
- */
 app.use('/attendance', weeklyAttendance);
 
-/**
- * @swagger
- * /verify:
- *   get:
- *     summary: Handle verification
- *     responses:
- *       200:
- *         description: Verification handled
- */
+//app.use('/', kashflowRoutes);
+
 app.use('/verify', verificationRoutes);
 
-/**
- * @swagger
- * /kashflow/customer:
- *   get:
- *     summary: Handle Kashflow customer operations
- *     responses:
- *       200:
- *         description: Kashflow customer operations handled
- */
 app.use('/kashflow', kashflowCustomer);
-
-/**
- * @swagger
- * /kashflow/invoice:
- *   get:
- *     summary: Handle Kashflow invoice operations
- *     responses:
- *       200:
- *         description: Kashflow invoice operations handled
- */
 app.use('/kashflow', kashflowInvoice);
-
-/**
- * @swagger
- * /kashflow/project:
- *   get:
- *     summary: Handle Kashflow project operations
- *     responses:
- *       200:
- *         description: Kashflow project operations handled
- */
 app.use('/kashflow', kashflowProject);
-
-/**
- * @swagger
- * /kashflow/quote:
- *   get:
- *     summary: Handle Kashflow quote operations
- *     responses:
- *       200:
- *         description: Kashflow quote operations handled
- */
 app.use('/kashflow', kashflowQuote);
-
-/**
- * @swagger
- * /kashflow/receipt:
- *   get:
- *     summary: Handle Kashflow receipt operations
- *     responses:
- *       200:
- *         description: Kashflow receipt operations handled
- */
 app.use('/kashflow', kashflowReceipt);
-
-/**
- * @swagger
- * /kashflow/supplier:
- *   get:
- *     summary: Handle Kashflow supplier operations
- *     responses:
- *       200:
- *         description: Kashflow supplier operations handled
- */
 app.use('/kashflow', kashflowSupplier);
 
-/**
- * @swagger
- * /:
- *   get:
- *     summary: Handle file system projects
- *     responses:
- *       200:
- *         description: File system projects handled
- */
 app.use('/', fileSystemProjects);
+
+app.use("/api-docs", authService.ensureAuthenticated, authService.ensureRole('admin'), swaggerUi.serve, (req, res, next) => {
+    const swaggerDocument = JSON.parse(
+      fs.readFileSync(path.join(__dirname, "swagger.json"), "utf8")
+    );
+    swaggerUi.setup(swaggerDocument)(req, res, next);
+  });
 
 // Catch undefined routes (404 handler)
 app.use((req, res, next) => {
