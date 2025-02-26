@@ -81,7 +81,7 @@ router.post('/receipt/:uuid/submit', authService.ensureAuthenticated, authServic
         const today = moment().format('YYYY-MM-DD');
         await receipt.update({ SubmissionDate: today });
 
-        res.redirect(`/kf/receipt/read/${receipt.uuid}`);
+        res.redirect(`/kashflow/receipt/read/${receipt.uuid}`);
     } catch (error) {
         logger.error('Error updating submission date: '+ error.message);
         req.flash('error', 'Error: ' + error.message);
@@ -99,7 +99,7 @@ router.post('/receipt/:uuid/cancel', authService.ensureAuthenticated, authServic
 
         await receipt.update({ SubmissionDate: null });
 
-        res.redirect(`/kf/receipt/read/${receipt.uuid}`);
+        res.redirect(`/kashflow/receipt/read/${receipt.uuid}`);
     } catch (error) {
         logger.error('Error updating submission date: '+ error.message);
         req.flash('error', 'Error: ' + error.message);
