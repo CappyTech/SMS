@@ -283,16 +283,6 @@ app.use('/kashflow', kashflowReceipt);
 app.use('/kashflow', kashflowSupplier);
 
 app.use('/', fileSystemProjects);
-const logFilePath = path.join(__dirname, 'app.log');
-
-// Restrict access to the log file
-fs.chmod(logFilePath, 0o600, (err) => {
-    if (err) {
-        logger.error(`Failed to set permissions on log file: ${err.message}`);
-    } else {
-        logger.info('Log file permissions set to 600');
-    }
-});
 
 // Middleware to prevent access to the log file
 app.use('/app.log', (req, res, next) => {
