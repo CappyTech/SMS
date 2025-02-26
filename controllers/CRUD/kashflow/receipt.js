@@ -82,8 +82,9 @@ router.post('/receipt/:uuid/submit', authService.ensureAuthenticated, authServic
 
         res.redirect(`/kf/receipt/read/${receipt.uuid}`);
     } catch (error) {
-        console.error('Error updating submission date:', error);
-        res.status(500).send('Internal server error');
+        logger.error('Error updating submission date: '+ error.message);
+        req.flash('error', 'Error: ' + error.message);
+        next(error); // Pass the error to the error handler middleware in app.js for logging and debugging purposes (if needed)
     }
 });
 
@@ -99,8 +100,9 @@ router.post('/receipt/:uuid/cancel', authService.ensureAuthenticated, authServic
 
         res.redirect(`/kf/receipt/read/${receipt.uuid}`);
     } catch (error) {
-        console.error('Error updating submission date:', error);
-        res.status(500).send('Internal server error');
+        logger.error('Error updating submission date: '+ error.message);
+        req.flash('error', 'Error: ' + error.message);
+        next(error); // Pass the error to the error handler middleware in app.js for logging and debugging purposes (if needed)
     }
 });
 
