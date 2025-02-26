@@ -87,4 +87,21 @@ router.post('/receipt/:uuid/submit', authService.ensureAuthenticated, authServic
     }
 });
 
+router.post('/receipt/:uuid/cancel', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
+    try {
+        const receipt = await db.KF_Receipts.findOne({ where: { uuid: req.params.uuid } });
+
+        if (!receipt) {
+            return res.status(404).send('Receipt not found');
+        }
+
+        await receipt.update({ SubmissionDate: null });
+
+        res.redirect(`/kf/receipt/read/${receipt.uuid}`);
+    } catch (error) {
+        console.error('Error updating submission date:', error);
+        res.status(500).send('Internal server error');
+    }
+});
+
 module.exports = router;
