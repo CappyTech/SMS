@@ -233,6 +233,7 @@ const kashflowReceipt = require('./controllers/CRUD/kashflow/receipt');
 const kashflowSupplier = require('./controllers/CRUD/kashflow/supplier');
 
 const fileSystemProjects = require('./controllers/fileSystemProjects');
+const fs = require('fs');
 
 app.use('/', index);
 
@@ -282,7 +283,21 @@ app.use('/kashflow', kashflowReceipt);
 app.use('/kashflow', kashflowSupplier);
 
 app.use('/', fileSystemProjects);
+const logFilePath = path.join(__dirname, 'app.log');
 
+// Restrict access to the log file
+fs.chmod(logFilePath, 0o600, (err) => {
+    if (err) {
+        logger.error(`Failed to set permissions on log file: ${err.message}`);
+    } else {
+        logger.info('Log file permissions set to 600');
+    }
+});
+
+// Middleware to prevent access to the log file
+app.use('/app.log', (req, res, next) => {
+    res.status(403).send('Access to this file is restricted');
+});
 // Catch undefined routes (404 handler)
 app.use((req, res, next) => {
     const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
