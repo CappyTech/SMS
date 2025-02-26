@@ -233,7 +233,6 @@ const kashflowReceipt = require('./controllers/CRUD/kashflow/receipt');
 const kashflowSupplier = require('./controllers/CRUD/kashflow/supplier');
 
 const fileSystemProjects = require('./controllers/fileSystemProjects');
-const fs = require('fs');
 
 app.use('/', index);
 
@@ -284,15 +283,48 @@ app.use('/kashflow', kashflowSupplier);
 
 app.use('/', fileSystemProjects);
 
-// Middleware to prevent access to the log file
-app.use('/app.log', (req, res, next) => {
-    res.status(403).send('Access to this file is restricted');
-});
 // Catch undefined routes (404 handler)
 app.use((req, res, next) => {
     const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
     error.statusCode = 404;
     next(error);
+});
+
+function getRoutes(app) {
+    const routes = [];
+    if (app._router && app._router.stack) {
+        app._router.stack.forEach((middleware) => {
+            if (middleware.route) { // routes registered directly on the app
+                routes.push({
+                    path: middleware.route.path,
+                    methods: middleware.route.methods,
+                    controller: middleware.handle.name || 'anonymous',
+                    file: getFilePath(middleware.handle)
+                });
+            } else if (middleware.name === 'router' && middleware.handle.stack) { // router middleware
+                middleware.handle.stack.forEach((handler) => {
+                    const route = handler.route;
+                    route && routes.push({
+                        path: route.path,
+                        methods: route.methods,
+                        controller: handler.handle.name || 'anonymous',
+                        file: getFilePath(handler.handle)
+                    });
+                });
+            }
+        });
+    }
+    return routes;
+}
+
+function getFilePath(fn) {
+    const match = fn.toString().match(/at (.+):\d+:\d+/);
+    return match ? match[1] : 'unknown';
+}
+
+const routes = getRoutes(app);
+routes.forEach(route => {
+    logger.info(`Path: ${route.path}, Methods: ${Object.keys(route.methods).join(', ')}, Controller: ${route.controller}, File: ${route.file}`);
 });
 
 // Register the error handler
