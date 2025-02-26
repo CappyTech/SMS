@@ -116,9 +116,12 @@
         </form>
     </div>
     <% } else { %>
-        <div>
-            <h3>Receipt Details</h3>
-            <p><strong>Submission Date:</strong> <%= Receipt.SubmissionDate %></p>
-        </div>
+    <div>
+        <h3>Receipt Details</h3>
+        <p><strong>Submission Date:</strong> <%= Receipt.SubmissionDate %></p>
+        <form action="/kashflow/receipt/<%= Receipt.uuid %>/cancel" method="POST">
+            <button type="submit" class="btn btn-danger">Cancel Submission</button>
+        </form>
+    </div>
     <% } %>
 </div>
