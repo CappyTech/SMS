@@ -1,0 +1,159 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "SMS API",
+      "version": "4.5.6",
+      "description": "API for managing subcontractor attendance records in the SMS system."
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Local development server"
+      }
+    ],
+    "paths": {
+      "/attendance": {
+        "get": {
+          "summary": "Get all attendance records",
+          "tags": ["Attendance"],
+          "responses": {
+            "200": {
+              "description": "List of attendance records",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Attendance" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Create a new attendance record",
+          "tags": ["Attendance"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Attendance" }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Attendance record created successfully",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/Attendance" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/attendance/{id}": {
+        "get": {
+          "summary": "Get attendance by ID",
+          "tags": ["Attendance"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string", "format": "uuid" }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Attendance record found",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/Attendance" }
+                }
+              }
+            },
+            "404": {
+              "description": "Attendance record not found"
+            }
+          }
+        },
+        "put": {
+          "summary": "Update an attendance record",
+          "tags": ["Attendance"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string", "format": "uuid" }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Attendance" }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Attendance updated successfully",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/Attendance" }
+                }
+              }
+            },
+            "404": {
+              "description": "Attendance record not found"
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete an attendance record",
+          "tags": ["Attendance"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string", "format": "uuid" }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Attendance deleted successfully"
+            },
+            "404": {
+              "description": "Attendance record not found"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Attendance": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid" },
+            "date": { "type": "string", "format": "date" },
+            "type": { 
+              "type": "string", 
+              "enum": ["off", "holiday", "sick", "work"] 
+            },
+            "locationId": { "type": "string", "format": "uuid", "nullable": true },
+            "employeeId": { "type": "string", "format": "uuid", "nullable": true },
+            "subcontractorId": { "type": "string", "format": "uuid", "nullable": true },
+            "hoursWorked": { "type": "number", "format": "decimal", "nullable": true },
+            "createdAt": { "type": "string", "format": "date-time" },
+            "updatedAt": { "type": "string", "format": "date-time" }
+          }
+        }
+      }
+    }
+  }
+  
