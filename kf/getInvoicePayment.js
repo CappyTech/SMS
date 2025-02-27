@@ -8,14 +8,14 @@ function getinvoicePayment(client, invoiceNumber) {
       invoiceNumber: invoiceNumber,
     };
 
-    client.GetinvoicePayment(invoicePaymentParams, (error, result) => {
+    client.getInvoicePayment(invoicePaymentParams, (error, result) => {
       if (error) {
-        logger.error('Error calling GetinvoicePayment method:', error);
+        logger.error('Error calling getInvoicePayment method:', error);
         return reject(error);
       }
 
       // Safely handle the response structure
-      const invoicePaymentResult = result?.GetInvoicePaymentResult;
+      const invoicePaymentResult = result?.getInvoicePaymentResult;
 
       if (invoicePaymentResult) {
         resolve(invoicePaymentResult);
