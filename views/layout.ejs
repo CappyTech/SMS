@@ -66,7 +66,7 @@
     <nav class="navbar navbar-expand-lg bg-body-secondary d-print-none">
         <div class="container">
           <ul class="navbar-nav">
-            <!-- Dropdown: New -->
+            <!-- Dropdown: New 
             <li class="nav-item dropdown">
               <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-plus-circle"></i> Create New
@@ -103,6 +103,7 @@
                 </ul>
               </div>
             </li>
+            -->
             
             <li class="nav-item dropdown">
               <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -115,12 +116,20 @@
                       <i class="bi bi-binoculars me-2"></i> Overview
                     </a>
                   </li>
+                  <li><hr class="dropdown-divider"></li>
                   <!-- Customers -->
                   <li class="nav-item">
                     <a href="/dashboard/KFcustomer" class="nav-link">
                       <i class="bi bi-people me-2"></i> Customers
                     </a>
                   </li>
+                  <!-- Suppliers -->
+                  <li class="nav-item">
+                    <a href="/dashboard/KFsupplier" class="nav-link">
+                      <i class="bi bi-truck me-2"></i> Suppliers
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
                   <!-- Invoices -->
                   <li class="nav-item">
                     <a href="/dashboard/KFinvoice" class="nav-link">
@@ -133,29 +142,26 @@
                       <i class="bi bi-card-text me-2"></i> Quotes
                     </a>
                   </li>
-                  <!-- Suppliers -->
-                  <li class="nav-item">
-                    <a href="/dashboard/KFsupplier" class="nav-link">
-                      <i class="bi bi-truck me-2"></i> Suppliers
-                    </a>
-                  </li>
                   <!-- Receipts -->
                   <li class="nav-item">
                     <a href="/dashboard/KFreceipt" class="nav-link">
                       <i class="bi bi-cash-stack me-2"></i> Purchases
                     </a>
                   </li>
+                  <li><hr class="dropdown-divider"></li>
                   <!-- Projects -->
                   <li class="nav-item">
                     <a href="/dashboard/KFproject" class="nav-link">
                       <i class="bi bi-kanban me-2"></i> Jobs
                     </a>
                   </li>
+                  <li><hr class="dropdown-divider"></li>
                   <li class="nav-item">
                     <a href="/dashboard/CIS" class="nav-link">
                       <i class="bi bi-binoculars me-2"></i> CIS
                     </a>
                   </li>
+                  <li><hr class="dropdown-divider"></li>
                   <li class="nav-item">
                     <a href="/kashflow/monthly/returns/form" class="nav-link">
                       <i class="bi bi-file-spreadsheet-fill me-2"></i> Monthly Returns
@@ -275,28 +281,6 @@
             </li>
             <% } %>
 
-            <!-- Dropdown: HR (Administration) -->
-            <% if (isAuthenticated && isAdmin) { %>
-              <li class="nav-item dropdown">
-                <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-person"></i> Internal
-                </button>
-                <div class="dropdown-menu p-3 bg-body">
-                  <ul class="nav flex-column">
-                    <li class="nav-item">
-                      <a href="/user/create" class="nav-link">
-                        <i class="bi bi-person me-2"></i> Create User
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="/dashboard/user" class="nav-link">
-                        <i class="bi bi-people me-2"></i> Manage Users
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <% } %>
           </ul>
         </div>
     </nav>

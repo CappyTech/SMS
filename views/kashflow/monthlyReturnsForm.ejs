@@ -1,5 +1,5 @@
 <div class="container py-4">
-    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+    <div class="p-5 mb-4 rounded-3">
         <h1 class="display-5">Monthly Returns</h1>
         <div class="accordion" id="subcontractorsAccordion">
             <% suppliersWithMonths.forEach((data, index) => { %>
@@ -9,7 +9,7 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="heading-<%= supplier.uuid %>">
                         <button class="accordion-button <%= index === 0 ? '' : 'collapsed' %>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<%= supplier.uuid %>" aria-expanded="<%= index === 0 %>" aria-controls="collapse-<%= supplier.uuid %>">
-                            <%= supplier.Name %> <span class="badge bg-body-secondary ms-2"><%= years.length %> <%= years.length === 1 ? 'Year' : 'Years' %></span>
+                            <%= supplier.Name %> <span class="badge text-bg-primary ms-2"><%= years.length %> <%= years.length === 1 ? 'Year' : 'Years' %></span>
                         </button>
                     </h2>
                     <div id="collapse-<%= supplier.uuid %>" class="accordion-collapse collapse <%= index === 0 ? 'show' : '' %>" aria-labelledby="heading-<%= supplier.uuid %>" data-bs-parent="#suppliersAccordion">
