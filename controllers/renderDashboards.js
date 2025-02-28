@@ -380,27 +380,43 @@ const renderEmployeeDashboard = async (req, res, next) => {
 
 const renderKFInvoicesDashboard = async (req, res, next) => {
     try {
-        const invoices = await kf.KF_Invoices.findAll();
+        const invoices = await kf.KF_Invoices.findAll({
+            include: [
+                {
+                    model: kf.KF_Customers,
+                    as: 'customer' // Ensure this matches the Sequelize association
+                }
+            ],
+            order: [['InvoiceDate', 'DESC']]
+        });
+
         const totalInvoices = invoices.length;
         const paidInvoices = invoices.filter(inv => inv.Paid > 0).length;
+
+        // Filter invoices from the last 30 days
+        const recentInvoices = invoices.filter(inv =>
+            new Date(inv.InvoiceDate) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        );
 
         res.render(path.join('kashflow', 'invoice'), {
             title: 'Invoices Dashboard',
             invoices,
             totalInvoices,
-            paidInvoices
+            paidInvoices,
+            recentInvoices
         });
 
     } catch (error) {
         logger.error('Error rendering KFInvoices dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFInvoices dashboard: ' + error.message);
-        next(error); // Pass the error to the error handler
+        next(error);
     }
 };
 
+
 const renderKFCustomersDashboard = async (req, res, next) => {
     try {
-        const customers = await kf.KF_Customers.findAll({ order: [['Created', 'DESC']] });
+        const customers = await kf.KF_Customers.findAll({ order: [['Name', 'ASC']] });
         const totalCustomers = customers.length;
         const customersWithEmail = customers.filter(c => c.Email).length;
         const recentCustomers = customers.filter(c => new Date(c.Created) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
@@ -446,7 +462,15 @@ const renderKFProjectsDashboard = async (req, res, next) => {
 
 const renderKFQuotesDashboard = async (req, res, next) => {
     try {
-        const quotes = await kf.KF_Quotes.findAll();
+        const quotes = await kf.KF_Quotes.findAll({
+            include: [
+                {
+                    model: kf.KF_Customers,
+                    as: 'customer'
+                }
+            ],
+            order: [['InvoiceNumber', 'DESC']]
+        });
         const totalQuotes = quotes.length;
         const recentQuotes = quotes.filter(q => new Date(q.InvoiceDate) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length;
 
