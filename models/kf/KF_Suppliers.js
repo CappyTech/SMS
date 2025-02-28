@@ -36,6 +36,14 @@ module.exports = (sequelize, DataTypes) => {
         ContactLastName: DataTypes.STRING,
         TradeBorderType: DataTypes.INTEGER,
         Subcontractor: DataTypes.BOOLEAN,
+        CISRate: {
+            type: DataTypes.FLOAT,
+            allowNull: true
+        },
+        CISNumber: {
+            type: DataTypes.STRING,
+            allowNull: true
+        }
     }, {
         tableName: 'KF_Suppliers',
         timestamps: true,

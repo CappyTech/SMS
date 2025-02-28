@@ -7,23 +7,36 @@ const authService = require('../../../services/authService');
 
 const readQuote = async (req, res, next) => {
     try {
-        const Quote = await db.KF_Quotes.findByPk(req.params.uuid);
+        const Quote = await db.KF_Quotes.findByPk(req.params.uuid, {
+            include: [
+                {
+                    model: db.KF_Customers,
+                    as: 'customer',
+                    attributes: ['uuid', 'Name'],
+                }
+            ]
+        });
 
         if (!Quote) {
             req.flash('error', 'Quote not found.');
             return res.redirect('/dashboard/KFquote');
         }
+
+        // Parse Lines if stored as a JSON string
         Quote.Lines = typeof Quote.Lines === 'string' ? JSON.parse(Quote.Lines) : Quote.Lines || [];
+
         res.render(path.join('kashflow', 'viewQuote'), {
             title: 'Quote Overview',
             Quote,
+            Customer: Quote.customer, // Pass customer data to EJS
         });
     } catch (error) {
-        logger.error('Error reading kashflow Quote:' + error.message);
+        logger.error('Error reading kashflow Quote: ' + error.message);
         req.flash('error', 'Error: ' + error.message);
-        next(error); // Pass the error to the error handler
+        next(error);
     }
-}
+};
+
 
 router.get('/quote/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readQuote);
 

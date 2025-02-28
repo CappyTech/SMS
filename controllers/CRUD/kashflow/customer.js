@@ -7,7 +7,25 @@ const authService = require('../../../services/authService');
 
 const readCustomer = async (req, res, next) => {
     try {
-        const Customer = await db.KF_Customers.findByPk(req.params.uuid);
+        const Customer = await db.KF_Customers.findByPk(req.params.uuid, {
+            include: [
+                {
+                    model: db.KF_Invoices,
+                    as: 'invoices',
+                    attributes: ['uuid', 'InvoiceNumber', 'InvoiceDate', 'DueDate', 'NetAmount'],
+                },
+                {
+                    model: db.KF_Quotes,
+                    as: 'quotes',
+                    attributes: ['uuid', 'InvoiceNumber', 'InvoiceDate', 'NetAmount'],
+                },
+                {
+                    model: db.KF_Projects,
+                    as: 'projects',
+                    attributes: ['uuid', 'CustomerID', 'Name'],
+                }
+            ]
+        });
 
         if (!Customer) {
             req.flash('error', 'Customer not found.');
@@ -19,11 +37,12 @@ const readCustomer = async (req, res, next) => {
             Customer,
         });
     } catch (error) {
-        logger.error('Error reading kashflow customer:' + error.message);
+        logger.error('Error reading kashflow customer: ' + error.message);
         req.flash('error', 'Error: ' + error.message);
-        next(error); // Pass the error to the error handler
+        next(error);
     }
-}
+};
+
 
 router.get('/customer/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readCustomer);
 

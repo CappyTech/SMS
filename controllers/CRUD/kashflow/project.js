@@ -25,7 +25,7 @@ const readProject = async (req, res, next) => {
         const files = fs.readdirSync(projectDir);
 
         res.render(path.join('kashflow', 'viewProject'), {
-            title: 'Project Overview',
+            title: 'Job Overview',
             Project,
             files,
         });

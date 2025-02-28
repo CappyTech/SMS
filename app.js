@@ -224,7 +224,7 @@ const yearlyReturns = require('./controllers/yearlyReturns');
 const dailyAttendance = require('./controllers/dailyAttendance');
 const weeklyAttendance = require('./controllers/weeklyAttendance');
 
-//const kashflowRoutes = require('./kf/routes')
+const kashflowRoutes = require('./kf/routes')
 
 const verificationRoutes = require('./controllers/renderVerification');
 
@@ -236,6 +236,9 @@ const kashflowReceipt = require('./controllers/CRUD/kashflow/receipt');
 const kashflowSupplier = require('./controllers/CRUD/kashflow/supplier');
 
 const fileSystemProjects = require('./controllers/fileSystemProjects');
+
+const kashflowMonthlyReturns = require('./controllers/kashflowMonthlyReturns');
+const kashflowYearlyReturns = require('./controllers/kashflowYearlyReturns');
 
 app.use('/', index);
 
@@ -273,7 +276,7 @@ app.use('/yearly', yearlyReturns);
 app.use('/attendance', dailyAttendance);
 app.use('/attendance', weeklyAttendance);
 
-//app.use('/', kashflowRoutes);
+app.use('/', kashflowRoutes);
 
 app.use('/verify', verificationRoutes);
 
@@ -292,6 +295,9 @@ app.use("/api-docs", authService.ensureAuthenticated, authService.ensureRole('ad
     );
     swaggerUi.setup(swaggerDocument)(req, res, next);
   });
+
+app.use('/kashflow/monthly', kashflowMonthlyReturns);
+app.use('/kashflow/yearly', kashflowYearlyReturns);
 
 // Catch undefined routes (404 handler)
 app.use((req, res, next) => {

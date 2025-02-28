@@ -11,6 +11,7 @@ const getReceiptsForSupplier = require('./getReceiptsForSupplier');
 const getReceiptPayment = require('./getReceiptPayment');
 const getInvoicePayment = require('./getInvoicePayment');
 const logger = require('../services/loggerService');
+const taxService = require('../services/taxService');
 
 const ChargeTypes = {
     18685896: 'Materials',
@@ -28,7 +29,7 @@ async function logOperationDetails(filename, data) {
     }
 }
 
-const PLACEHOLDER_DATES = ['0001-01-01T00:00:00.000Z', '2001-01-01T00:01:15.000Z'];
+const PLACEHOLDER_DATES = ["0001-01-01T00:00:00.000Z", "2001-01-01T00:01:15.000Z", "2001-01-01T00:01:15.000Z", "0001-01-01T00:01:15.000Z"];
 
 function isPlaceholderDate(value) {
     return PLACEHOLDER_DATES.includes(value);
@@ -164,16 +165,13 @@ async function appendLogEntry(logFilePath, logEntry) {
 let isFetching = false;
 
 exports.fetchKashFlowData = async () => {
-
     if (isFetching) {
         logger.info('A fetch operation is already in progress.');
         return;
     }
-
     const operationLog = [];
     try {
         isFetching = true;
-
         const client = await new Promise((resolve, reject) => {
             authenticate((error, client) => {
                 if (error) {
@@ -182,8 +180,9 @@ exports.fetchKashFlowData = async () => {
                 resolve(client);
             });
         });
-
         const KF_Meta = db.KF_Meta;
+
+        //////////////////////////////////////////
 
         const modelsToFetch = [
             { name: 'customers', fetchFn: getCustomers, model: db.KF_Customers, uniqueKey: 'CustomerID' },
@@ -201,18 +200,18 @@ exports.fetchKashFlowData = async () => {
             }
         }
 
+        //////////////////////////////////////////
+
         // Fetch projects for all statuses (0 = Completed, 1 = Active, 2 = Archived)
         const [completedProjects, activeProjects, archivedProjects] = await Promise.all([
             getProjects(client, 0), // Completed
             getProjects(client, 1), // Active
             getProjects(client, 2), // Archived
         ]);
-    
         logger.info('Projects fetched for all statuses:');
         logger.info(`Completed: ${completedProjects.length}`);
         logger.info(`Active: ${activeProjects.length}`);
         logger.info(`Archived: ${archivedProjects.length}`);
-    
         // Merge or handle the results as needed
         const allProjects = [
             ...completedProjects,
@@ -233,10 +232,11 @@ exports.fetchKashFlowData = async () => {
             logger.info('No projects found.');
         }
 
-        const startDate = new Date('2014-01-01');
-        const endDate = new Date();
+        //////////////////////////////////////////
 
         logger.info('Fetching invoices...');
+        const startDate = new Date('2014-01-01');
+        const endDate = new Date();
         const invoices = await getInvoicesByDate(client, startDate, endDate);
         if (invoices.length > 0) {
 
@@ -270,6 +270,8 @@ exports.fetchKashFlowData = async () => {
             logger.info('No invoices found.');
         }
 
+        //////////////////////////////////////////
+
         logger.info('Fetching quotes...');
         const quotes = await getQuotes(client);
         if (quotes.length > 0) {
@@ -285,7 +287,7 @@ exports.fetchKashFlowData = async () => {
                     ...quote,
                     Lines: quote.Lines?.anyType?.map(mapLine),
                     ChargeTypeName: quote.ChargeType ? ChargeTypes[quote.ChargeType] : null,
-                    Payments: { Payment: payments },
+                    Payments: { Payment: payments }
                 };
             }));
 
@@ -300,12 +302,12 @@ exports.fetchKashFlowData = async () => {
         } else {
             logger.info('No quotes found.');
         }
-        
+
+        //////////////////////////////////////////
 
         for (const supplier of await db.KF_Suppliers.findAll({ raw: true })) {
             try {
                 logger.info(`Starting to fetch receipts for supplier: ${supplier.Name}, SupplierID: ${supplier.SupplierID}`);
-        
                 const receipts = await getReceiptsForSupplier(client, supplier.SupplierID);
         
                 if (receipts.length > 0) {
@@ -316,6 +318,15 @@ exports.fetchKashFlowData = async () => {
                         // Fetch payments for the receipt
                         const payments = await getReceiptPayment(client, receipt.InvoiceNumber);
                         //logger.debug(`Payments for ReceiptNumber ${receipt.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
+                        
+                        let taxYear;
+                        let taxMonth;
+
+                        if (payments && payments.Payment[0]?.PayDate) {
+                            ({ taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(payments.Payment[0].PayDate));
+                            //logger.debug(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
+                        }
+
                         return {
                             ...receipt,
                             // map line items to the expected format for upsert (e.g. Quantity, Description, Rate, etc.)
@@ -323,9 +334,11 @@ exports.fetchKashFlowData = async () => {
                             // if ChargeType equal known number:value key pair, push ChargeTypeName to the object
                             ChargeTypeName: receipt.ChargeType ? ChargeTypes[receipt.ChargeType] : null,
                             Payments: { Payment: payments },
+                            TaxMonth: taxMonth,
+                            TaxYear: taxYear
                         };
                     }));
-        
+
                     // Upsert receipts with payments
                     await upsertData(
                         db.KF_Receipts,
@@ -358,7 +371,7 @@ function mapLine(line) {
     return {
         LineID: line.LineID,
         Quantity: line.Quantity || null,
-        Description: line.Description || 'N/A',
+        Description: line.Description || null,
         Rate: line.Rate || null,
         ChargeType: line.ChargeType || null,
         // Add ChargeTypeName here to be able to display it in the view (e.g. Materials, Labour, CIS Deductions)

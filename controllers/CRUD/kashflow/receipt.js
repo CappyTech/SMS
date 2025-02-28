@@ -3,14 +3,14 @@ const router = express.Router();
 const logger = require('../../../services/loggerService');
 const moment = require('moment');
 const path = require('path');
-const db = require('../../../services/kashflowDatabaseService');
+const kf = require('../../../services/kashflowDatabaseService');
 const authService = require('../../../services/authService');
 
 const readReceipt = async (req, res, next) => {
     try {
         // Fetch Receipt with its associated supplier
-        const Receipt = await db.KF_Receipts.findByPk(req.params.uuid, {
-            include: [{ model: db.KF_Suppliers, as: 'supplier' }],
+        const Receipt = await kf.KF_Receipts.findByPk(req.params.uuid, {
+            include: [{ model: kf.KF_Suppliers, as: 'supplier' }],
         });
         logger.info('Receipt Data: ' + JSON.stringify(Receipt, null, 2));
         
@@ -47,7 +47,7 @@ const readReceipt = async (req, res, next) => {
         const projectIds = Receipt.Lines.map(line => line.ProjID).filter(id => id);
         logger.info('Project IDs: ' + JSON.stringify(projectIds, null, 2));
 
-        const Projects = await db.KF_Projects.findAll({
+        const Projects = await kf.KF_Projects.findAll({
             where: { ID: projectIds },
         });
         logger.info('Fetched Projects: ' + JSON.stringify(Projects, null, 2));
@@ -67,11 +67,55 @@ const readReceipt = async (req, res, next) => {
     }
 };
 
+const renderchangeReceiptForm = async (req, res, next) => {
+    try {
+        const supplier = await kf.KF_Receipt.findByPk(req.params.uuid);
+
+        if (!supplier) {
+            req.flash('error', 'Receipt not found.');
+            return res.redirect('/dashboard/KFreceipt');
+        }
+
+        res.render(path.join('kashflow', 'updateReceipt'), {
+            title: 'Change Supplier',
+            supplier,
+        });
+    } catch (error) {
+        logger.error('Error rendering kashflow Receipt: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        next(error); // Pass the error to the error handler
+    }
+}
+
+const changeReceipt = async (req, res, next) => {
+    try {
+        const { subcontractor, cisRate, cisNumber } = req.body;
+        await kf.KF_Receipt.update(
+            {
+                Subcontractor: subcontractor ? true : false, // Ensure boolean value
+                CISRate: parseFloat(cisRate), // Convert to float
+                CISNumber: cisNumber || null // Ensure empty string becomes null
+            },
+            { where: { uuid: req.params.uuid } }
+        );
+        logger.info('Receipt updated successfully.');
+        return res.redirect('/dashboard/KFreceipt');
+
+
+    } catch (error) {
+        logger.error('Error updating kashflow Receipt: ' + error.message);
+        req.flash('error', 'Error: ' + error.message);
+        next(error); // Pass the error to the error handler
+    }
+}
+
 router.get('/receipt/read/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), readReceipt);
+router.get('/receipt/change/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), renderchangeReceiptForm);
+router.post('/receipt/change/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), changeReceipt);
 
 router.post('/receipt/:uuid/submit', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
     try {
-        const receipt = await db.KF_Receipts.findOne({ where: { uuid: req.params.uuid } });
+        const receipt = await kf.KF_Receipts.findOne({ where: { uuid: req.params.uuid } });
 
         if (!receipt) {
             return res.status(404).send('Receipt not found');
@@ -91,7 +135,7 @@ router.post('/receipt/:uuid/submit', authService.ensureAuthenticated, authServic
 
 router.post('/receipt/:uuid/cancel', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
     try {
-        const receipt = await db.KF_Receipts.findOne({ where: { uuid: req.params.uuid } });
+        const receipt = await kf.KF_Receipts.findOne({ where: { uuid: req.params.uuid } });
 
         if (!receipt) {
             return res.status(404).send('Receipt not found');

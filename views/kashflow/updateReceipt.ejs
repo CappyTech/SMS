@@ -1,0 +1,16 @@
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Change Submission Date</h5>
+        </div>
+        <div class="card-body">
+            <form action="/receipt/change/{{uuid}}" method="POST">
+                <div class="mb-3">
+                    <label for="submissionDate" class="form-label">New Submission Date</label>
+                    <input type="date" class="form-control" id="submissionDate" name="submissionDate" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Date</button>
+            </form>
+        </div>
+    </div>
+</div>

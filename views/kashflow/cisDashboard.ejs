@@ -85,6 +85,7 @@
                                 <tr>
                                     <th>Supplier</th>
                                     <th>Gross Total</th>
+                                    <th>Labour Total</th>
                                     <th>Materials Total</th>
                                     <th>CIS Total</th>
                                     <th>Reverse Charge Total</th>
@@ -101,12 +102,13 @@
                                     <tr>
                                         <td><a href="/kashflow/supplier/read/<%= supplier.uuid %>"><%= supplier.Name %></a></td>
                                         <% if (supplierTotals[supplier.SupplierID]) { %>
-                                            <td><%= formatCurrency(supplierTotals[supplier.SupplierID].grossAmount) %></td>
-                                            <td><%= formatCurrency(supplierTotals[supplier.SupplierID].materialsCost) %></td>
-                                            <td><%= formatCurrency(supplierTotals[supplier.SupplierID].cisDeductions) %></td>
-                                            <td><%= formatCurrency(supplierTotals[supplier.SupplierID].reverseChargeVAT) %></td>
+                                        <td><%= formatCurrency(supplierTotals[supplier.SupplierID].grossAmount) %></td>
+                                        <td><%= formatCurrency(supplierTotals[supplier.SupplierID].labourCost) %></td>
+                                        <td><%= formatCurrency(supplierTotals[supplier.SupplierID].materialsCost) %></td>
+                                        <td><%= formatCurrency(supplierTotals[supplier.SupplierID].cisDeductions) %></td>
+                                        <td><%= formatCurrency(supplierTotals[supplier.SupplierID].reverseChargeVAT) %></td>
                                         <% } else { %>
-                                            <td colspan="5" class="text-center">No Data</td>
+                                        <td colspan="5" class="text-center">No Data</td>
                                         <% } %>
                                     </tr>
                                     <% }); %>

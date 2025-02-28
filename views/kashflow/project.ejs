@@ -1,24 +1,24 @@
 <div class="container my-5">
-    <h1 class="mb-4 text-center">Projects Dashboard</h1>
+    <h1 class="mb-4 text-center">Jobs Dashboard</h1>
 
     <!-- Tab navigation -->
     <ul class="nav" id="projectsTab" role="tablist">
         <li class="nav-item p-3">
-            <button class="btn btn-warning position-relative active" id="active-projects-tab" data-bs-toggle="tab" data-bs-target="#active-projects" type="button" role="tab" aria-controls="active-projects" aria-selected="true">Active Projects
+            <button class="btn btn-warning position-relative active" id="active-projects-tab" data-bs-toggle="tab" data-bs-target="#active-projects" type="button" role="tab" aria-controls="active-projects" aria-selected="true">Active Jobs
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-secondary">
                     <%= activeProjects.length %>
                 </span>
             </button>
         </li>
         <li class="nav-item p-3">
-            <button class="btn btn-success position-relative" id="completed-projects-tab" data-bs-toggle="tab" data-bs-target="#completed-projects" type="button" role="tab" aria-controls="completed-projects" aria-selected="false">Completed Projects
+            <button class="btn btn-success position-relative" id="completed-projects-tab" data-bs-toggle="tab" data-bs-target="#completed-projects" type="button" role="tab" aria-controls="completed-projects" aria-selected="false">Completed Jobs
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-secondary">
                     <%= completedProjects.length %>
                 </span>
             </button>
         </li>
         <li class="nav-item p-3" role="presentation">
-            <button class="btn btn-secondary position-relative" id="archived-projects-tab" data-bs-toggle="tab" data-bs-target="#archived-projects" type="button" role="tab" aria-controls="archived-projects" aria-selected="false">Archived Projects
+            <button class="btn btn-secondary position-relative" id="archived-projects-tab" data-bs-toggle="tab" data-bs-target="#archived-projects" type="button" role="tab" aria-controls="archived-projects" aria-selected="false">Archived Jobs
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-secondary">
                     <%= archivedProjects.length %>
                 </span>

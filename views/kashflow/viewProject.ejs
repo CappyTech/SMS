@@ -1,8 +1,7 @@
 <div class="container my-5">
-    <h1><%= title %></h1>
     <div class="list-group">
         <div class="list-group-item">
-            <h5 class="mb-1">Project Number: <%= Project.Number %></h5>
+            <h5 class="mb-1">Job Number: <%= Project.Number %></h5>
             <p class="mb-1">Name: <%= Project.Name %></p>
             <p class="mb-1">Reference: <%= Project.Reference %></p>
             <p class="mb-1">Description: <%= Project.Description %></p>
@@ -19,7 +18,7 @@
 </div>
 
 <div class="container my-5">
-    <h1>Files for Project <%= Project.Number %></h1>
+    <h1>Files for Job <%= Project.Number %></h1>
     <ul class="list-group">
         <% files.forEach(file => { %>
             <li class="list-group-item d-flex justify-content-between align-items-center">

@@ -138,7 +138,15 @@ module.exports = (sequelize, DataTypes) => {
                 const value = this.getDataValue('Payments');
                 return value || [];
             }
-        }
+        },
+        TaxMonth : {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        TaxYear : {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
     }, {
         tableName: 'KF_Receipts',
         timestamps: true,

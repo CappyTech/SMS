@@ -45,5 +45,17 @@ router.get('/fetch-status', authService.ensureAuthenticated, authService.ensureR
     });
 });
 
+const updateTaxMonthTaxYear = require('./updateTaxMonthTaxYear');
+
+router.get('/update-tax-month-year', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
+    try {
+        await updateTaxMonthTaxYear();
+        res.status(200).json({ message: 'Tax month and year updated successfully.' });
+    } catch (error) {
+        logger.error('Failed to update tax month and year:', error);
+        res.status(500).json({ message: 'Failed to update tax month and year.' });
+    }
+});
+
 module.exports = router;
 

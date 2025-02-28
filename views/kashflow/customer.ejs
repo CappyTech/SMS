@@ -1,99 +1,77 @@
 <div class="container my-5">
-    <h1 class="mb-4 text-center">Customers Overview</h1>
-    <div class="row">
+    <h1 class="text-center mb-4">Customers Dashboard</h1>
+
+    <!-- Dashboard Summary -->
+    <div class="row text-center mb-5">
         <div class="col-md-4">
-            <div class="card bg-primary text-white">
+            <div class="card text-bg-primary mb-3">
                 <div class="card-body">
-                    <h5>Total Customers</h5>
-                    <h2><%= customers.length %></h2>
+                    <h5 class="card-title">Total Customers</h5>
+                    <h2 class="card-text"><%= totalCustomers %></h2>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bg-success text-white">
+            <div class="card text-bg-success mb-3">
                 <div class="card-body">
-                    <h5>New This Month</h5>
-                    <h2><%= newCustomersCount %></h2>
+                    <h5 class="card-title">Customers with Email</h5>
+                    <h2 class="card-text"><%= customersWithEmail %></h2>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bg-warning text-white">
+            <div class="card text-bg-warning mb-3">
                 <div class="card-body">
-                    <h5>With Discounts</h5>
-                    <h2><%= discountedCustomersCount %></h2>
+                    <h5 class="card-title">Recently Added Customers</h5>
+                    <h2 class="card-text"><%= recentCustomersCount %></h2>
                 </div>
             </div>
         </div>
     </div>
-    <h3 class="mt-5">Recently Added Customers</h3>
-    <ul class="list-group">
-        <% recentCustomers.forEach(customer => { %>
-        <li class="list-group-item">
-            <strong><%= customer.Name %></strong> - <%= customer.Email %>
-        </li>
-        <% }) %>
-    </ul>
-</div>
 
-<div class="container my-5">
-    <h3 class="text-center fw-bold text-light">Customer Details</h3>
-    <div class="row mt-4">
-        <!-- Side Tabs -->
-        <div class="col-lg-3 mb-3 mb-lg-0">
-            <div class="nav flex-column nav-pills" id="customer-tabs" role="tablist" aria-orientation="vertical">
-                <% customers.forEach((customer, index) => { %>
-                    <button 
-                        class="nav-link <% if (index === 0) { %>active<% } %>" 
-                        id="customer-tab-<%= index %>" 
-                        data-bs-toggle="pill" 
-                        data-bs-target="#customer-content-<%= index %>" 
-                        type="button" 
-                        role="tab" 
-                        aria-controls="customer-content-<%= index %>" 
-                        aria-selected="<% if (index === 0) { %>true<% } else { %>false<% } %>">
-                        <%= customer.Name %>
-                    </button>
-                <% }); %>
-            </div>
+    <!-- Recent Customers -->
+    <div class="card">
+        <div class="card-header">
+            Recent Customers (Last 5 in 30 days)
         </div>
-
-        <!-- Content Area -->
-        <div class="col-lg-9">
-            <div class="tab-content" id="customer-tab-content">
-                <% customers.forEach((customer, index) => { %>
-                    <div 
-                        class="tab-pane fade <% if (index === 0) { %>show active<% } %>" 
-                        id="customer-content-<%= index %>" 
-                        role="tabpanel" 
-                        aria-labelledby="customer-tab-<%= index %>">
-                        <div class="card border-light shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title text-primary fw-bold"><%= customer.Name %></h5>
-                                <% if (customer.Code) { %>
-                                    <p><strong>Code:</strong> <%= customer.Code %></p>
-                                <% } %>
-                                <% if (customer.CountryName) { %>
-                                    <p><strong>Country:</strong> <%= customer.CountryName %></p>
-                                <% } %>
-                                <% if (customer.Postcode) { %>
-                                    <p><strong>Postcode:</strong> <%= customer.Postcode %></p>
-                                <% } %>
-                                <% if (customer.Address1 || customer.Address2 || customer.Address3 || customer.Address4) { %>
-                                    <p>
-                                        <strong>Address:</strong> 
-                                        <%= customer.Address1 %> 
-                                        <% if (customer.Address2) { %>, <%= customer.Address2 %> <% } %>
-                                        <% if (customer.Address3) { %>, <%= customer.Address3 %> <% } %>
-                                        <% if (customer.Address4) { %>, <%= customer.Address4 %> <% } %>
-                                    </p>
-                                <% } %>
-                            </div>
+        <div class="card-body">
+            <ul class="list-group">
+                <% recentCustomers.slice(0, 5).forEach((customer) => { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong><a href="/kashflow/customer/read/<%= customer.uuid %>"><%= customer.Name %></a></strong>
+                            <p class="mb-0 text-muted">Added on: <%= slimDateTime(customer.Created) %></p>
                         </div>
-                    </div>
-                <% }); %>
-            </div>
+                        <span><%= customer.Email || 'No Email' %></span>
+                    </li>
+                <% }) %>
+            </ul>
         </div>
     </div>
-</div>
 
+    <h2 class="mb-3 text-center">Customer List</h2>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Postcode</th>
+                <th>Phone</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% customers.forEach(customer => { %>
+            <tr>
+                <td><a href="/kashflow/customer/read/<%= customer.uuid %>"><%= customer.Name %></a></td>
+                <td><a href="mailto:<%= customer.Email %>"><%= customer.Email || 'No Email' %></a></td>
+                <td><%= [customer.Address1, customer.Address2, customer.Address3].filter(Boolean).join(', ') %></td>
+                <td><%= customer.Postcode %></td>
+                <td><%= customer.Telephone %></td>
+                <td><%= slimDateTime(customer.Created) %></td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
