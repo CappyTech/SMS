@@ -1,63 +1,45 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 /**
- * Gets the current tax year based on today's date.
+ * Gets the current tax year based on the UK timezone.
  * The tax year starts on April 6th.
  * 
  * @returns {number} - The current tax year.
  */
 function getCurrentTaxYear() {
-    const today = moment.utc();
-    const startOfTaxYear = moment.utc({ month: 3, day: 6 }); // April 6th
-    if (today.isBefore(startOfTaxYear)) {
-        return startOfTaxYear.subtract(1, 'years').year();
-    }
-    return startOfTaxYear.year();
+    const today = moment.tz('Europe/London');
+    const startOfTaxYear = moment.tz({ month: 3, day: 6 }, 'Europe/London'); // April 6th
+    return today.isBefore(startOfTaxYear) ? startOfTaxYear.subtract(1, 'years').year() : startOfTaxYear.year();
 }
 
 /**
  * Gets the start and end dates of a specified tax year.
  * 
  * @param {number} year - The tax year.
- * @returns {Object} - An object containing the start and end dates of the tax year.
- *   - start: The start date of the tax year (6th April).
- *   - end: The end date of the tax year (5th April of the next year).
+ * @param {string} [format='Do MMMM YYYY'] - The date format.
+ * @returns {Object} - The start and end dates of the tax year.
  */
-function getTaxYearStartEnd(year) {
-    const startOfTaxYear = moment.utc({ year, month: 3, day: 6 }); // 6th April of the specified year
-    const endOfTaxYear = moment.utc(startOfTaxYear).add(1, 'years').subtract(1, 'days'); // 5th April of the next year
-    return {
-        start: startOfTaxYear.format('Do MMMM YYYY'),
-        end: endOfTaxYear.format('Do MMMM YYYY')
-    };
+function getTaxYearStartEnd(year, format = 'Do MMMM YYYY') {
+    const startOfTaxYear = moment.tz({ year, month: 3, day: 6 }, 'Europe/London');
+    const endOfTaxYear = startOfTaxYear.clone().add(11, 'months').endOf('month');
+    return { start: startOfTaxYear.format(format), end: endOfTaxYear.format(format) };
 }
 
 /**
- * Gets the current monthly return period for a specified tax year and month.
+ * Gets the current monthly return period.
  * 
  * @param {number} year - The tax year.
  * @param {number} month - The month (1-12).
- * @returns {Object} - An object containing the start and end dates of the period, 
- *   submission deadline, HMRC update date, and the number of days until these dates.
- *   - periodStart: The start date of the period (YYYY-MM-DD).
- *   - periodEnd: The end date of the period (YYYY-MM-DD).
- *   - periodStartDisplay: The start date of the period (Do MMMM YYYY).
- *   - periodEndDisplay: The end date of the period (Do MMMM YYYY).
- *   - submissionDeadline: The submission deadline date (Do MMMM YYYY).
- *   - hmrcUpdateDate: The HMRC update date (Do MMMM YYYY).
- *   - submissionDeadlineInDays: The number of days until the submission deadline.
- *   - hmrcUpdateDateInDays: The number of days until the HMRC update date.
+ * @returns {Object} - The monthly return period details.
  */
 function getCurrentMonthlyReturn(year, month) {
-    const startOfTaxYear = moment.utc({ year, month: 3, day: 6 });
-    const startOfPeriod = moment.utc(startOfTaxYear).add(month - 1, 'months');
-    const endOfPeriod = moment.utc(startOfPeriod).add(1, 'months').subtract(1, 'days');
-    const today = moment.utc();
+    const startOfTaxYear = moment.tz({ year, month: 3, day: 6 }, 'Europe/London');
+    const startOfPeriod = startOfTaxYear.clone().add(month - 1, 'months');
+    const endOfPeriod = startOfPeriod.clone().endOf('month');
+    const today = moment.tz('Europe/London');
 
-    const submissionDeadline = moment.utc(endOfPeriod).add(6, 'days'); // 11th of the next month
-    const hmrcUpdateDate = moment.utc(endOfPeriod).add(11, 'days'); // 16th of the next month
-    const submissionDeadlineInDays = submissionDeadline.diff(today, 'days');
-    const hmrcUpdateDateInDays = hmrcUpdateDate.diff(today, 'days');
+    const submissionDeadline = endOfPeriod.clone().add(6, 'days'); // 11th of the next month
+    const hmrcUpdateDate = endOfPeriod.clone().add(11, 'days'); // 16th of the next month
 
     return {
         periodStart: startOfPeriod.format('YYYY-MM-DD'),
@@ -66,28 +48,27 @@ function getCurrentMonthlyReturn(year, month) {
         periodEndDisplay: endOfPeriod.format('Do MMMM YYYY'),
         submissionDeadline: submissionDeadline.format('Do MMMM YYYY'),
         hmrcUpdateDate: hmrcUpdateDate.format('Do MMMM YYYY'),
-        submissionDeadlineInDays,
-        hmrcUpdateDateInDays
+        submissionDeadlineInDays: submissionDeadline.diff(today, 'days'),
+        hmrcUpdateDateInDays: hmrcUpdateDate.diff(today, 'days'),
     };
 }
 
 /**
  * Calculates the tax year and tax month for a given date.
  * 
- * @param {string} date - The date to calculate the tax year and month for.
- * @returns {Object} - An object containing the tax year and tax month.
- *   - taxYear: The tax year.
- *   - taxMonth: The tax month (1-12).
+ * @param {string} date - The date in 'YYYY-MM-DD' format.
+ * @returns {Object} - The tax year and tax month.
  */
 const calculateTaxYearAndMonth = (date) => {
-    if (!date) return { taxYear: null, taxMonth: null };
+    if (!date || !moment.utc(date, 'YYYY-MM-DD', true).isValid()) {
+        return { taxYear: null, taxMonth: null, error: "Invalid date format" };
+    }
 
-    const remittanceMoment = moment.utc(date);
+    const remittanceMoment = moment.tz(date, 'Europe/London');
     const year = remittanceMoment.year();
-    const startOfTaxYear = moment.utc(`${year}-04-06T00:00:00Z`);
+    const startOfTaxYear = moment.tz(`${year}-04-06`, 'Europe/London');
     const taxYear = remittanceMoment.isBefore(startOfTaxYear) ? year - 1 : year;
-    const startOfCurrentTaxYear = remittanceMoment.isBefore(startOfTaxYear) ? moment.utc(`${year - 1}-04-06T00:00:00Z`) : startOfTaxYear;
-    const taxMonth = remittanceMoment.diff(startOfCurrentTaxYear, 'months') + 1;
+    const taxMonth = remittanceMoment.diff(startOfTaxYear, 'months') + 1;
 
     return { taxYear, taxMonth };
 };
