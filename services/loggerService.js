@@ -27,26 +27,13 @@ const errorTransport = new DailyRotateFile({
     maxFiles: '60d'
 });
 
+const util = require('util');
+
 const sanitizeLog = (info) => {
-    const sanitized = JSON.parse(JSON.stringify(info)); // Deep copy
-    const sensitiveKeys = ['password', 'token', 'session_id', 'apikey'];
-
-    const sanitizeObject = (obj) => {
-        for (const key in obj) {
-            if (sensitiveKeys.includes(key.toLowerCase())) {
-                obj[key] = '******';
-            } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-                sanitizeObject(obj[key]); // Recursive call for nested objects
-            }
-        }
-    };
-
-    sanitizeObject(sanitized);
-    sanitized.reqId = sanitized.reqId || 'N/A';
-
-    return sanitized;
+    if (info && info.sequelize) delete info.sequelize;
+    if (info && info.dialect) delete info.dialect;
+    return info;
 };
-
 
 const transportsList = [
     fileTransport
