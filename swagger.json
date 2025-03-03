@@ -13,56 +13,6 @@
     ],
     "components": {
         "schemas": {
-            "Attendance": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "date": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "off",
-                            "holiday",
-                            "sick",
-                            "work"
-                        ]
-                    },
-                    "locationId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "nullable": true
-                    },
-                    "employeeId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "nullable": true
-                    },
-                    "subcontractorId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "nullable": true
-                    },
-                    "hoursWorked": {
-                        "type": "number",
-                        "format": "decimal",
-                        "nullable": true
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updatedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
             "KF_Customers": {
                 "type": "object",
                 "properties": {
