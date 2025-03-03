@@ -12,6 +12,7 @@ const options = {
     clearExpired: true,
     checkExpirationInterval: 300000,
     expiration: 28800000,
+    rolling: true,
     createDatabaseTable: true,
     endConnectionOnClose: true,
     disableTouch: false,
