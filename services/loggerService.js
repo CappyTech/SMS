@@ -1,4 +1,5 @@
 const { createLogger, format, transports } = require('winston');
+<<<<<<< HEAD
 const { combine, timestamp, json } = format;
 const DailyRotateFile = require('winston-daily-rotate-file');
 const fs = require('fs');
@@ -43,8 +44,36 @@ const errorTransport = new DailyRotateFile({
 
 const baseLogger = createLogger({
     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+=======
+const { combine, timestamp, printf, colorize } = format;
+
+/**
+ * Custom log format for Winston logger.
+ * Formats log messages with timestamp, log level, and message.
+ * 
+ * @param {Object} info - Log information object.
+ * @param {string} info.level - Log level (e.g., 'info', 'error').
+ * @param {string} info.message - Log message.
+ * @param {string} info.timestamp - Timestamp of the log message.
+ * @returns {string} - Formatted log message.
+ */
+const logFormat = printf(({ level, message, timestamp }) => {
+    return `${timestamp} ${level}: ${message}`;
+});
+
+/**
+ * Creates a Winston logger instance with specified configuration.
+ * Logs messages to the console and a file.
+ * 
+ * @returns {Object} - Winston logger instance.
+ */
+const logger = createLogger({
+    level: 'debug',
+>>>>>>> parent of acd4089 (Update loggerService.js)
     format: combine(
+        colorize(),
         timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
+<<<<<<< HEAD
         format.printf(({ level, message, timestamp, ...meta }) => {
             let metaString = '';
             if (Object.keys(meta).length) {
@@ -63,6 +92,14 @@ const baseLogger = createLogger({
         warnTransport,
         errorTransport
     ]
+=======
+        logFormat
+    ),
+    transports: [
+        new transports.Console(), // Log to the console
+        new transports.File({ filename: 'app.log' }) // Log to a file
+    ],
+>>>>>>> parent of acd4089 (Update loggerService.js)
 });
 
 if (process.env.NODE_ENV !== 'production') {
