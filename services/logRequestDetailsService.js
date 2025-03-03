@@ -6,55 +6,58 @@ const logRequestDetailsService = (req, res, next) => {
     const platform = req.headers['sec-ch-ua-platform'] || 'Unknown';
     const isMobile = req.headers['sec-ch-ua-mobile'] === '?1';
 
-    // Browser Detection
+    // Detect Browser
     let browser = 'Unknown';
-    if (clientHints.includes('Brave')) {
-        browser = 'Brave';
-    } else if (clientHints.includes('Chrome')) {
-        browser = 'Chrome';
-    } else if (userAgent.includes('Firefox')) {
-        browser = 'Firefox';
-    } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
-        browser = 'Safari';
-    } else if (userAgent.includes('Edge')) {
-        browser = 'Edge';
-    } else if (userAgent.includes('Opera') || userAgent.includes('OPR')) {
-        browser = 'Opera';
-    } else if (userAgent.includes('MSIE') || userAgent.includes('Trident')) {
-        browser = 'Internet Explorer';
+    if (clientHints.includes('Brave')) browser = 'Brave';
+    else if (clientHints.includes('Chrome')) browser = 'Chrome';
+    else if (userAgent.includes('Firefox')) browser = 'Firefox';
+    else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari';
+    else if (userAgent.includes('Edge')) browser = 'Edge';
+    else if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
+    else if (userAgent.includes('MSIE') || userAgent.includes('Trident')) browser = 'Internet Explorer';
+
+    // Get real IP
+    const clientIP = req.headers['x-forwarded-for']?.split(',')[0] || req.ip;
+
+    // Detect Suspicious User-Agent
+    const suspiciousAgents = ['curl', 'wget', 'python', 'java', 'node'];
+    if (suspiciousAgents.some(agent => userAgent.toLowerCase().includes(agent))) {
+        logger.warn(`Possible bot detected from IP: ${clientIP}, User-Agent: ${userAgent}`);
     }
 
-    // Save the details in the session
+    // Store only loginTime in session
     req.session.user = {
-        ...req.session.user, // Preserve existing user data
-        userAgent: {
-            browser: browser,
-            version: userAgent.match(/(?:Chrome|Firefox|Version|MSIE|Opera|Safari|Edge|OPR)[/ ]([0-9.]+)/)?.[1] || 'Unknown',
-            os: platform,
-            mobile: isMobile ? 'Yes' : 'No',
-        },
-        ip: req.ip, // Save IP for tracking
-        loginTime: req.session.user?.loginTime || new Date().toISOString(), // Save login time
+        ...req.session.user,
+        loginTime: req.session.user?.loginTime || new Date().toISOString(),
     };
 
-    // Log Details
-    const logData = {
-        method: req.method,
-        url: req.originalUrl,
-        ip: req.ip,
-        userAgent: {
-            browser: browser,
+    // Sanitize headers before logging
+    const sanitizeLogData = (data) => {
+        const sanitized = { ...data };
+        if (sanitized.headers) {
+            delete sanitized.headers['authorization'];
+            delete sanitized.headers['cookie'];
+            delete sanitized.headers['set-cookie'];
+        }
+        return sanitized;
+    };
+
+    // Structured Logging (Only in Development)
+    if (process.env.NODE_ENV !== 'production') {
+        logger.info({
+            event: "incoming_request",
+            method: req.method,
+            url: req.originalUrl,
+            ip: clientIP,
+            userAgent: browser,
             platform: platform,
             mobile: isMobile ? 'Yes' : 'No',
-            fullUserAgent: userAgent,
-        },
-        headers: req.headers,
-        referer: req.headers['referer'] || 'N/A',
-        host: req.headers['host'] || 'N/A',
-        timestamp: new Date().toISOString(),
-    };
+            referer: req.headers['referer'] || 'N/A',
+            host: req.headers['host'] || 'N/A',
+            timestamp: new Date().toISOString(),
+        });
+    }
 
-    //logger.info('Incoming Request Details: ' + JSON.stringify(logData, null, 2));
     next();
 };
 
