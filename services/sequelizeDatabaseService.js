@@ -16,13 +16,8 @@ const sequelize = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'mysql',
-        dialectOptions: {
-            ssl: {
-                require: true,
-                rejectUnauthorized: true // Prevent MITM attacks
-            }
-        },
         logging: false, // Set to console.log for query debugging
+        native: true,
         pool: {
             max: 10, // Max 10 connections
             min: 1,  // Min 1 connection
@@ -71,12 +66,11 @@ Object.keys(db).forEach((modelName) => {
 if (process.env.NODE_ENV === 'development') {
     // Log model names and associations
     console.log('Models Loaded:', Object.keys(db));
+
+    Object.keys(db).forEach((modelName) => {
+        console.log(`Associations for ${modelName}:`, db[modelName].associations);
+    });
 }
-
-Object.keys(db).forEach((modelName) => {
-    console.log(`Associations for ${modelName}:`, db[modelName].associations);
-});
-
 // Export the database object with Sequelize instance and models
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
