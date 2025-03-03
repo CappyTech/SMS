@@ -1,20 +1,60 @@
 // /services/loggerService.js
 const { createLogger, format, transports } = require('winston');
-const { combine, timestamp, printf, colorize } = format;
+const { combine, timestamp, colorize } = format;
+const DailyRotateFile = require('winston-daily-rotate-file');
+const fs = require('fs');
+const path = require('path');
 
-/**
- * Custom log format for Winston logger.
- * Formats log messages with timestamp, log level, and message.
- * 
- * @param {Object} info - Log information object.
- * @param {string} info.level - Log level (e.g., 'info', 'error').
- * @param {string} info.message - Log message.
- * @param {string} info.timestamp - Timestamp of the log message.
- * @returns {string} - Formatted log message.
- */
-const logFormat = printf(({ level, message, timestamp }) => {
-    return `${timestamp} ${level}: ${message}`;
+const logDir = path.join(__dirname, '../logs');
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir);
+}
+
+const fileTransport = new DailyRotateFile({
+    filename: path.join(logDir, 'application-%DATE%.log'),
+    datePattern: 'YYYY-MM-DD',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '30d'
 });
+
+const errorTransport = new DailyRotateFile({
+    filename: path.join(logDir, 'errors-%DATE%.log'),
+    level: 'error',
+    datePattern: 'YYYY-MM-DD',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '60d'
+});
+
+const sanitizeLog = (info) => {
+    const sanitized = JSON.parse(JSON.stringify(info)); // Deep copy
+    const sensitiveKeys = ['password', 'token', 'session_id', 'apikey'];
+
+    const sanitizeObject = (obj) => {
+        for (const key in obj) {
+            if (sensitiveKeys.includes(key.toLowerCase())) {
+                obj[key] = '******';
+            } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                sanitizeObject(obj[key]); // Recursive call for nested objects
+            }
+        }
+    };
+
+    sanitizeObject(sanitized);
+    sanitized.reqId = sanitized.reqId || 'N/A';
+
+    return sanitized;
+};
+
+
+const transportsList = [
+    fileTransport
+];
+
+if (process.env.NODE_ENV !== 'production') {
+    transportsList.push(new transports.Console());
+}
 
 /**
  * Creates a Winston logger instance with specified configuration.
@@ -23,16 +63,17 @@ const logFormat = printf(({ level, message, timestamp }) => {
  * @returns {Object} - Winston logger instance.
  */
 const logger = createLogger({
-    level: 'debug',
+    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     format: combine(
-        colorize(),
         timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
-        logFormat
-    ),
+        format((info) => sanitizeLog(info))(),
+        format.json()
+    ),    
     transports: [
-        new transports.Console(), // Log to the console
-        new transports.File({ filename: 'app.log' }) // Log to a file
-    ],
+        fileTransport,
+        errorTransport,
+        ...(process.env.NODE_ENV !== 'production' ? [new transports.Console()] : [])
+    ]
 });
 
 module.exports = logger;
