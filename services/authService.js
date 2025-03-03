@@ -46,6 +46,16 @@ const ensureAuthenticated = async (req, res, next) => {
 
         // User is authenticated, proceed
         logger.info(`Authentication successful: User ID ${id}, Username ${username}, Role ${role}`);
+
+        req.session.regenerate((err) => {
+            if (err) {
+                logger.error('Session regeneration failed:', err);
+                return res.redirect('/user/signin');
+            }
+            req.session.user = dbUser; // Reassign the user object after regeneration
+            next();
+        });
+
         next();
     } catch (error) {
         logger.error(`Authentication error: ${error.message}`);
@@ -68,21 +78,32 @@ const ensureRole = (roles) => {
         try {
             const { id, username, role } = req.session.user || {};
 
-            // Log the request details regardless of access outcome
-            logger.info(`
-                Role Validation:
-                User ID: ${id || 'N/A'}
-                Username: ${username || 'N/A'}
-                Role: ${role || 'N/A'}
-                Allowed Roles: ${JSON.stringify(roles)}
-                Request Path: ${req.method} ${req.originalUrl}
-            `);
+            const dbUser = db.Users.findOne({
+                where: { id }
+            });
+
+            if (dbUser) {
+                // Log the request details regardless of access outcome
+                logger.info(`
+                    Role Validation:
+                    User ID: ${id || 'N/A'}
+                    Username: ${username || 'N/A'}
+                    Role: ${role || 'N/A'}
+                    Allowed Roles: ${JSON.stringify(roles)}
+                    Request Path: ${req.method} ${req.originalUrl}
+                `);
+                next();
+            }
 
             // Check if role exists and is valid
             if (!role || !roles.includes(role)) {
                 req.flash('error', 'Access denied. You do not have the correct role.');
                 logger.info(`Access denied: User ID ${id || 'N/A'}, Role: ${role || 'N/A'}, Path: ${req.method} ${req.originalUrl}`);
-                next(error); // Pass the error to the error handler
+                
+                // Properly handle the error
+                const err = new Error("Access Denied");
+                err.statusCode = 403;
+                return next(err);
             }
 
             // Role is valid, proceed
@@ -111,16 +132,23 @@ const ensurePermission = (requiredPermissions) => {
         // Extract user and permissions from session
         const user = req.session.user;
 
-        // Log details of the current request
-        logger.info(`
-            Permission Check:
-            User ID: ${user?.id || 'N/A'}
-            Username: ${user?.username || 'N/A'}
-            Role: ${user?.role || 'N/A'}
-            Current Permissions: ${JSON.stringify(user || {})}
-            Required Permissions: ${JSON.stringify(requiredPermissions)}
-            Request Path: ${req.method} ${req.originalUrl}
-        `);
+        const dbUser = db.Users.findOne({
+            where: { id }
+        });
+
+        if (dbUser) {
+            // Log details of the current request
+            logger.info(`
+                Permission Check:
+                User ID: ${user?.id || 'N/A'}
+                Username: ${user?.username || 'N/A'}
+                Role: ${user?.role || 'N/A'}
+                Current Permissions: ${JSON.stringify(user || {})}
+                Required Permissions: ${JSON.stringify(requiredPermissions)}
+                Request Path: ${req.method} ${req.originalUrl}
+            `);
+            next();
+        }
 
         // Check if the user is signed in
         if (!user) {
@@ -136,7 +164,11 @@ const ensurePermission = (requiredPermissions) => {
         if (!hasPermission) {
             req.flash('error', 'Access denied. You do not have the correct permissions.');
             logger.info(`Access denied: Insufficient permissions for user ID ${user.id}`);
-            next(error); // Pass the error to the error handler
+            
+            // Properly handle the error
+            const err = new Error("Insufficient Permissions");
+            err.statusCode = 403;
+            return next(err);
         }
 
         // If permissions are valid, proceed to the next middleware
