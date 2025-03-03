@@ -20,7 +20,13 @@ app.use(expressLayouts);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/resources', express.static(path.join(__dirname, 'node_modules')));
+
+// Dynamically serve specific node_modules packages under /resources/
+const vendorPackages = ['bootstrap', 'bootstrap-icons', '@popperjs/core'];
+vendorPackages.forEach(pkg => {
+    app.use(`/resources/${pkg}`, express.static(path.join(__dirname, `node_modules/${pkg}`)));
+});
+
 app.use(useragent.express());
 
 app.use(require('./services/securityService'));
