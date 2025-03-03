@@ -42,7 +42,7 @@ const logRequestDetailsService = (req, res, next) => {
         return sanitized;
     };
 
-    // Structured Logging (Only in Development)
+    /* Structured Logging (Only in Development)
     if (process.env.NODE_ENV !== 'production') {
         logger.info({
             event: "incoming_request",
@@ -57,6 +57,7 @@ const logRequestDetailsService = (req, res, next) => {
             timestamp: new Date().toISOString(),
         });
     }
+    */
 
     next();
 };
