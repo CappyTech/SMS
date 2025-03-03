@@ -1,4 +1,4 @@
-const moment = require('moment');
+const momentTz = require('moment-timezone');
 
 /**
  * Formats a given date string into a specified format.
@@ -6,31 +6,27 @@ const moment = require('moment');
  * @param {string|null|undefined} dateString - The date string to format.
  * @param {boolean} [includeTime=false] - Whether to include the time in the formatted string.
  * @param {boolean} [forDateInput=false] - Whether to format the date for an input[type="date"] field.
- * @returns {string} - The formatted date string, or 'Invalid date' if the input is not valid.
+ * @param {string} [timezone='Europe/London'] - The timezone to use for formatting.
+ * @returns {string|null} - The formatted date string, or `null` if the input is invalid.
  */
-function slimDateTime(dateString, includeTime = false, forDateInput = false) {
+function slimDateTime(dateString, includeTime = false, forDateInput = false, timezone = 'Europe/London') {
     if (!dateString) {
-        return 'N/A'; // Handle null or undefined dates
+        return forDateInput ? '' : null; // Use `''` for input fields, `null` otherwise
     }
 
-    const date = moment.utc(dateString);
+    const date = momentTz.tz(dateString, ['YYYY-MM-DD', 'DD-MM-YYYY', 'MM/DD/YYYY'], true, timezone);
 
     if (!date.isValid()) {
-        return 'Is not a valid date'; // Handle invalid date strings
+        return 'Invalid date';
     }
 
     if (forDateInput) {
-        return date.format('YYYY-MM-DD'); // Return in the format needed for input[type="date"]
+        return date.format('YYYY-MM-DD'); // Format for input fields
     }
 
     const formattedDate = date.format('DD/MM/YYYY');
 
-    if (includeTime) {
-        const formattedTime = date.format('HH:mm');
-        return `${formattedDate} ${formattedTime}`;
-    }
-
-    return formattedDate;
+    return includeTime ? `${formattedDate} ${date.format('HH:mm')}` : formattedDate;
 }
 
 module.exports = {
