@@ -59,16 +59,16 @@ modelFiles.forEach((file) => {
 Object.keys(db).forEach((modelName) => {
     if (db[modelName].associate) {
         db[modelName].associate(db);
-        console.log(`Associations defined for ${modelName}`);
+        //logger.info(`Associations defined for ${modelName}`);
     }
 });
 
 if (process.env.NODE_ENV === 'development') {
     // Log model names and associations
-    console.log('Models Loaded:', Object.keys(db));
+    //logger.info('Models Loaded:', Object.keys(db));
 
     Object.keys(db).forEach((modelName) => {
-        console.log(`Associations for ${modelName}:`, db[modelName].associations);
+        //logger.info(`Associations for ${modelName}:`, db[modelName].associations);
     });
 }
 // Export the database object with Sequelize instance and models
