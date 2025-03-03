@@ -4,24 +4,27 @@ const fetchKF = require('../kf/fetchKashFlowData');
 const holidayService = require('../services/holidayService');
 const logger = require('./loggerService');
 
-// Generate random minutes to distribute load
-const getRandomMinute = () => Math.floor(Math.random() * 60);
-
-// Schedule KashFlow job (Random minute every hour from 6 AM to 6 PM)
-const scheduleKashFlowData = process.env.NODE_ENV === "production"
-    ? `${getRandomMinute()} 6-18 * * *`
-    : `${getRandomMinute()} * * * *`;
-
-// Schedule Bank Holiday job (Runs once daily at midnight)
-const scheduleBankHoliday = '0 0 * * *';
+// Generate a random valid minute for cron jobs
+const getRandomMinute = () => {
+    const minute = Math.floor(Math.random() * 60);
+    return minute >= 0 && minute < 60 ? minute : 0; // Ensure valid minute
+};
 
 // Prevent duplicate execution
 let isFetchingKashFlow = false;
 let isFetchingBankHolidays = false;
+let cronJobsInitialized = false;
 
 // Function to initialize cron jobs (called once on app start)
 const initializeCronJobs = () => {
-    cron.schedule(scheduleKashFlowData, async () => {
+    if (cronJobsInitialized) {
+        logger.warn("Cron jobs are already initialized.");
+        return;
+    }
+    cronJobsInitialized = true;
+
+    // Schedule KashFlow job with a random minute each hour (6 AM - 6 PM)
+    cron.schedule(`${getRandomMinute()} 6-18 * * *`, async () => {
         if (isFetchingKashFlow) {
             logger.warn("Skipping job: fetchKashFlowData already running.");
             return;
@@ -32,12 +35,13 @@ const initializeCronJobs = () => {
             await fetchKF.fetchKashFlowData();
             logger.info("Cron job completed: KashFlow data fetched successfully.");
         } catch (error) {
-            logger.error("Cron job (fetchKashFlowData) failed:", { message: error.message, stack: error.stack });
+            logger.error(`Cron job (fetchKashFlowData) failed: ${error.message}\nStack: ${error.stack}`);
         }
         isFetchingKashFlow = false;
     });
 
-    cron.schedule(scheduleBankHoliday, async () => {
+    // Schedule Bank Holiday job at midnight
+    cron.schedule('0 0 * * *', async () => {
         if (isFetchingBankHolidays) {
             logger.warn("Skipping job: getBankHoliday already running.");
             return;
@@ -52,10 +56,12 @@ const initializeCronJobs = () => {
                 logger.info("Cron job completed: Bank Holiday data fetched successfully.");
             }
         } catch (error) {
-            logger.error("Cron job (getBankHoliday) failed:", { message: error.message, stack: error.stack });
+            logger.error(`Cron job (getBankHoliday) failed: ${error.message}\nStack: ${error.stack}`);
         }
         isFetchingBankHolidays = false;
     });
+
+    logger.info("Cron jobs initialized successfully.");
 };
 
 // Start cron jobs once when the app starts
