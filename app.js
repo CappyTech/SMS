@@ -33,8 +33,13 @@ app.use(require('./services/sessionService'));
 app.use(flash());
 app.use(require('./services/logRequestDetailsService'));
 app.use(require('./services/cronService'));
+
 const db = require('./services/sequelizeDatabaseService');
 const kf = require('./services/kashflowDatabaseService');
+
+const { slimDateTime } = require('./services/dateService');
+const { formatCurrency, rounding } = require('./services/currencyService');
+
 app.use(async (req, res, next) => {
     res.locals.session = req.session;
     res.locals.isAuthenticated = false;
@@ -42,6 +47,7 @@ app.use(async (req, res, next) => {
     res.locals.firstName = null;
     res.locals.permissions = {};
     res.locals.role = null;
+
     try {
         const user = req.session.user;
         if (user && user.id) {
@@ -56,22 +62,9 @@ app.use(async (req, res, next) => {
         }
     } catch (error) {
         logger.error(`Error validating user: ${error.message}`);
+        next();
     }
 
-    const username = req.session.user ? req.session.user.username : 'unknown user';
-    const logMessage = `${username} accessed path ${req.method} ${req.path}`;
-    if (req.path.includes('/update/')) {
-        logger.warn(`-------- Warn: ${logMessage}`);
-    } else if (req.path.includes('/delete/')) {
-        logger.error(`------- Danger: ${logMessage}`);
-    } else {
-        logger.info(`${logMessage}`);
-    }
-
-    next();
-});
-
-app.use(async (req, res, next) => {
     try {
         if (res.locals.isAuthenticated) {
             res.locals.unpaidInvoices = {};
@@ -112,18 +105,7 @@ app.use(async (req, res, next) => {
         logger.error('Error fetching invoices: ' + error);
         next();
     }
-});
 
-app.use((req, res, next) => {
-    res.locals.successMessage = req.flash('success');
-    res.locals.errorMessages = req.flash('error');
-    next();
-});
-
-const { slimDateTime } = require('./services/dateService');
-const { formatCurrency, rounding } = require('./services/currencyService');
-
-app.use((req, res, next) => {
     res.locals.session = req.session;
     res.locals.package = packageJson.version;
     res.locals.copyrightyearstart = 2023;
@@ -131,7 +113,7 @@ app.use((req, res, next) => {
     res.locals.slimDateTime = slimDateTime;
     res.locals.formatCurrency = formatCurrency;
     res.locals.rounding = rounding;
-    next();
+
 });
 
 app.disable('x-powered-by');
@@ -142,6 +124,7 @@ app.use((req, res, next) => {
   next();
 });
 
+/*
 const holidayService = require('./services/holidayService');
 
 app.use(async (req, res, next) => {
@@ -193,7 +176,7 @@ if (process.env.NODE_ENV === 'development') {
         //console.log('ENCRYPTION_KEY length:', encryptionKeyHEX.length);
     }
 }
-
+*/
 const index = require('./controllers/renderIndex');
 
 const formsUser = require('./controllers/forms/user');
@@ -295,15 +278,15 @@ app.use('/kashflow', kashflowSupplier);
 
 app.use('/', fileSystemProjects);
 
+app.use('/kashflow/monthly', kashflowMonthlyReturns);
+app.use('/kashflow/yearly', kashflowYearlyReturns);
+
 app.use("/api-docs", authService.ensureAuthenticated, authService.ensureRole('admin'), swaggerUi.serve, (req, res, next) => {
     const swaggerDocument = JSON.parse(
       fs.readFileSync(path.join(__dirname, "swagger.json"), "utf8")
     );
     swaggerUi.setup(swaggerDocument)(req, res, next);
   });
-
-app.use('/kashflow/monthly', kashflowMonthlyReturns);
-app.use('/kashflow/yearly', kashflowYearlyReturns);
 
 // Catch undefined routes (404 handler)
 app.use((req, res, next) => {
