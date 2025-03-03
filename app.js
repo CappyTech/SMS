@@ -33,7 +33,6 @@ app.use(require('./services/securityService'));
 app.use(require('./services/sessionService'));
 app.use(flash());
 app.use(require('./services/logRequestDetailsService'));
-app.use(require('./services/rateLimiterService'));
 app.use(require('./services/cronService'));
 const db = require('./services/sequelizeDatabaseService');
 const kf = require('./services/kashflowDatabaseService');
