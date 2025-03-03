@@ -11,6 +11,7 @@ const app = express();
 const authService = require('./services/authService');
 const swaggerUi = require('swagger-ui-express');
 const fs = require('fs');
+
 app.set('trust proxy', true);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
