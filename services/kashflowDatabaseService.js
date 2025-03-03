@@ -72,9 +72,9 @@ Object.keys(kf).forEach((modelName) => {
 
 // Log model names & associations in development only
 if (process.env.NODE_ENV !== 'production') {
-    logger.info("Models Loaded:", Object.keys(kf));
+    //logger.info("Models Loaded:", Object.keys(kf));
     Object.keys(kf).forEach((modelName) => {
-        logger.info(`Associations for ${modelName}:`, kf[modelName].associations);
+        //logger.info(`Associations for ${modelName}:`, kf[modelName].associations);
     });
 }
 
