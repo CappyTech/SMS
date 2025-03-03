@@ -16,7 +16,19 @@ const sequelize = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'mysql',
+        dialectOptions: {
+            ssl: {
+                require: true,
+                rejectUnauthorized: true // Prevent MITM attacks
+            }
+        },
         logging: false, // Set to console.log for query debugging
+        pool: {
+            max: 10, // Max 10 connections
+            min: 1,  // Min 1 connection
+            acquire: 30000, // Wait 30 sec before throwing error
+            idle: 10000, // Close connections idle for 10 sec
+        }
     }
 );
 
@@ -30,7 +42,7 @@ sequelize
     })
     .catch((error) => {
         logger.error('Unable to connect to the MySQL database: ' + error.message);
-        logger.error('Details:', error);
+        logger.error('Details: '+ error);
         process.exit(1);
     });
 
@@ -56,8 +68,10 @@ Object.keys(db).forEach((modelName) => {
     }
 });
 
-// Log model names and associations
-console.log('Models Loaded:', Object.keys(db));
+if (process.env.NODE_ENV === 'development') {
+    // Log model names and associations
+    console.log('Models Loaded:', Object.keys(db));
+}
 
 Object.keys(db).forEach((modelName) => {
     console.log(`Associations for ${modelName}:`, db[modelName].associations);
