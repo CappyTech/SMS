@@ -1,6 +1,5 @@
 const logger = require('./loggerService');
 const moment = require('moment');
-const Intl = require('intl');
 
 /**
  * Formats a given amount as a currency string in GBP (£).
@@ -10,12 +9,12 @@ const Intl = require('intl');
  * @throws {Error} - Throws an error if the input amount is not a number.
  */
 function formatCurrency(amount) {
-    if (typeof amount !== 'number' || isNaN(amount)) {
+    if (typeof amount !== 'number') {
         const errorMessage = 'Invalid input. Amount must be a number.';
         logger.error(errorMessage);
         throw new Error(errorMessage);
     }
-    return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(amount);
+    return '£' + amount.toFixed(2);
 }
 
 /**
@@ -43,37 +42,49 @@ const getIncomeExpenseData = async (db) => {
         const startDate = moment().subtract(30, 'days').startOf('day').toDate();
         const endDate = moment().endOf('day').toDate();
 
-        const incomeExpenseData = { dates: [], income: [], expenses: [] };
+        // Initialize the incomeExpenseData structure
+        const incomeExpenseData = {
+            dates: [],
+            income: [],
+            expenses: [],
+        };
 
+        // Get income from invoices (AmountPaid)
         const incomeData = await db.KF_Invoices.findAll({
             where: {
                 InvoiceDate: { [db.Sequelize.Op.between]: [startDate, endDate] },
-                AmountPaid: { [db.Sequelize.Op.gt]: 0 },
+                AmountPaid: { [db.Sequelize.Op.gt]: 0 }, // Only consider paid amounts
             },
             attributes: [
                 [db.Sequelize.fn('DATE', db.Sequelize.col('InvoiceDate')), 'date'],
                 [db.Sequelize.fn('SUM', db.Sequelize.col('AmountPaid')), 'totalIncome'],
             ],
             group: ['date'],
+            raw: true,
         });
 
+        // Get expenses from receipts (AmountPaid)
         const expenseData = await db.KF_Receipts.findAll({
             where: {
                 InvoiceDate: { [db.Sequelize.Op.between]: [startDate, endDate] },
-                AmountPaid: { [db.Sequelize.Op.gt]: 0 },
+                AmountPaid: { [db.Sequelize.Op.gt]: 0 }, // Only consider paid amounts
             },
             attributes: [
-                [db.Sequelize.fn('DATE', db.Sequelize.col('ReceiptDate')), 'date'],
+                [db.Sequelize.fn('DATE', db.Sequelize.col('InvoiceDate')), 'date'],
                 [db.Sequelize.fn('SUM', db.Sequelize.col('AmountPaid')), 'totalExpenses'],
             ],
             group: ['date'],
+            raw: true,
         });
 
-        const dateRange = Array.from({ length: 30 }, (_, i) =>
-            moment().subtract(i, 'days').format('YYYY-MM-DD')
-        ).reverse();
+        // Merge income and expenses into a single structure
+        const dateRange = [];
+        for (let i = 0; i < 30; i++) {
+            const date = moment().subtract(i, 'days').format('YYYY-MM-DD');
+            dateRange.push(date);
+        }
 
-        dateRange.forEach((date) => {
+        dateRange.reverse().forEach((date) => {
             const income = incomeData.find((entry) => entry.date === date)?.totalIncome || 0;
             const expenses = expenseData.find((entry) => entry.date === date)?.totalExpenses || 0;
 
@@ -84,13 +95,13 @@ const getIncomeExpenseData = async (db) => {
 
         return incomeExpenseData;
     } catch (error) {
-        logger.error({
-            event: 'getIncomeExpenseData_error',
-            message: error.message,
-            stack: error.stack,
-        });
+        console.error('Error generating incomeExpenseData:', error);
         throw error;
     }
 };
 
-module.exports = { formatCurrency, rounding, getIncomeExpenseData };
+module.exports = {
+    formatCurrency,
+    rounding,
+    getIncomeExpenseData
+};
