@@ -45,7 +45,6 @@ app.use(async (req, res, next) => {
     res.locals.firstName = null;
     res.locals.permissions = {};
     res.locals.role = null;
-    logger.debug(JSON.stringify(res.locals.session, null, 2))
     try {
         const user = req.session.user;
         if (user && user.id) {
