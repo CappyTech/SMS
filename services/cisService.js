@@ -38,7 +38,7 @@ function calculateInvoiceAmounts(labourCost, materialCost, deduction, cisNumber,
     const cisAmountTwo = labourCost * 0.2;
     const cisAmountThree = labourCost * 0.3;
     const netAmount = grossAmount - cisAmount;
-    reverseCharge = grossAmount * 0.2;
+    reverseCharge = labourCost * 0.2;
 
     return {
         cisRate,
