@@ -46,7 +46,7 @@ const sessionService = session({
 sessionStore.onReady().then(() => {
     //logger.info('MySQLStore ready');
 }).catch(error => {
-    logger.error(error);
+    logger.error("Session store error:", error.message);
 });
 
 module.exports = sessionService;
