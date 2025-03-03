@@ -33,6 +33,7 @@
                     <a type="button" class="btn btn-hcs-green btn-sm" href="/contact/update/<%= contact.id %>">Update Contact</a>
                     <span>Last Updated: <%= slimDateTime(contact.updatedAt,true) %></span>
                     <form action="/contact/delete/<%= contact.id %>" method="post" class="d-inline">
+                        
                         <button type="submit" class="btn btn-danger btn-sm">Delete Contact</button>
                     </form>
                 </div>

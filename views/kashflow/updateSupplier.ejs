@@ -1,6 +1,7 @@
 <div class="container mt-5">
     <h2>Change <%= supplier.Name %> Details</h2>
     <form action="/kashflow/supplier/change/<%= supplier.uuid %>" method="POST">
+        
         <small class="form-text text-muted">
             <% if (supplier.Subcontractor) { %>
                 Untick this box if the supplier is NOT a subcontractor under the Construction Industry Scheme (CIS).  

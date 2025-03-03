@@ -5,6 +5,7 @@
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Attendances</h1>
             <form action="/dashboard/attendance" method="GET" class="row g-3 mb-4">
+                
                 <div class="col-md-3">
                     <label for="dateFilter" class="form-label">Date</label>
                     <input type="date" id="dateFilter" name="date" class="form-control" value="<%= filters.date || '' %>">

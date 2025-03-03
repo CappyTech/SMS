@@ -1,6 +1,7 @@
 <div class="container mt-2">
     <h1>Update User</h1>
     <form action="/user/update/<%= user.id %>" method="POST">
+        
         <!-- Username -->
         <div class="form-floating mb-3">
             <input type="text" name="username" id="username" class="form-control" value="<%= user.username %>" required>
@@ -112,6 +113,7 @@
             </div>
             <div class="modal-footer d-flex justify-content-between">
                 <form action="/user/delete/<%= user.id %>" method="POST">
+                    
                     <button type="submit" class="btn btn-hcs-red">Delete</button>
                 </form>
                 <a type="button" class="text-hcs-black" data-bs-dismiss="modal">Close</a>

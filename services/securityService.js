@@ -1,6 +1,5 @@
 const helmet = require('helmet');
 const xss = require('xss-clean');
-const csurf = require('csurf');
 const logger = require('./loggerService');
 
 // XSS protection middleware with logging
@@ -33,8 +32,7 @@ const securityService = [
         }
     }),
     helmet.hsts({ maxAge: 31536000, includeSubDomains: true, preload: true }), // Enforce HTTPS
-    xssMiddleware,
-    csurf() // CSRF protection
+    xssMiddleware
 ];
 
 module.exports = securityService;

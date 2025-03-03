@@ -11,7 +11,6 @@ const app = express();
 const authService = require('./services/authService');
 const swaggerUi = require('swagger-ui-express');
 const fs = require('fs');
-
 app.set('trust proxy', true);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -28,7 +27,6 @@ vendorPackages.forEach(pkg => {
 });
 
 app.use(useragent.express());
-
 app.use(require('./services/securityService'));
 app.use(require('./services/sessionService'));
 app.use(flash());
@@ -36,7 +34,6 @@ app.use(require('./services/logRequestDetailsService'));
 app.use(require('./services/cronService'));
 const db = require('./services/sequelizeDatabaseService');
 const kf = require('./services/kashflowDatabaseService');
-
 app.use(async (req, res, next) => {
     res.locals.session = req.session;
     res.locals.isAuthenticated = false;
@@ -86,7 +83,7 @@ app.use(async (req, res, next) => {
                     order: [['kashflowNumber', 'ASC']]
                 });
                 res.locals.unpaidInvoices = unpaidInvoices;
-                res.locals.totalNotifications =+ res.locals.unpaidInvoices;
+                res.locals.totalNotifications += res.locals.unpaidInvoices;
             }
             if (res.locals.permissions.unsubmittedInvoices) {
                 const unsubmittedInvoices = await db.Invoices.findAll({
@@ -95,7 +92,7 @@ app.use(async (req, res, next) => {
                     order: [['kashflowNumber', 'ASC']]
                 });
                 res.locals.unsubmittedInvoices = unsubmittedInvoices;
-                res.locals.totalNotifications =+ res.locals.unsubmittedInvoices;
+                res.locals.totalNotifications += res.locals.unsubmittedInvoices;
             }
             const lastfetched = await kf.KF_Meta.findOne({
                 order: [['lastFetchedAt', 'DESC']]
@@ -152,7 +149,7 @@ app.use(async (req, res, next) => {
         const holidayDetails = await holidayService.isDateHoliday();
 
         if (holidayDetails?.isHoliday) {
-            console.log(`Holiday detected: ${holidayDetails.reason} (${holidayDetails.startDate} to ${holidayDetails.endDate})`);
+            logger.info(`Holiday detected: ${holidayDetails.reason} (${holidayDetails.startDate} to ${holidayDetails.endDate})`);
             
             // Render the holiday notice page if today is a holiday
             return res.render('holiday', {
@@ -168,7 +165,11 @@ app.use(async (req, res, next) => {
         // If not a holiday, proceed to the next middleware
         next();
     } catch (error) {
-        console.error('Error checking holiday status:', error.message);
+        logger.error({
+            event: 'holiday_error',
+            message: error.message,
+            stack: error.stack,
+        });
         next(error); // Pass the error to the error-handling middleware
     }
 });

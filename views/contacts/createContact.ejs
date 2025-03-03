@@ -3,6 +3,7 @@
         <h1 class="display-5">Create Contact</h1>
         <div class="container-fluid text-center">
             <form id="contactForm" action="/contact/create" method="POST" class="needs-validation">
+                
                 <div class="row mb-3">
                     <label for="clientId" class="col-sm-3 col-form-label">Select Client</label>
                     <div class="col-sm-9">
@@ -50,6 +51,7 @@
 </div>
 
 <script type="text/javascript">
+
     document.addEventListener('DOMContentLoaded', function () {
         const clientSelect = document.getElementById('clientId');
         const form = document.getElementById('contactForm');

@@ -45,7 +45,17 @@ const baseLogger = createLogger({
     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     format: combine(
         timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
-        json()
+        format.printf(({ level, message, timestamp, ...meta }) => {
+            let metaString = '';
+            if (Object.keys(meta).length) {
+                try {
+                    metaString = JSON.stringify(meta, null, 2);
+                } catch (error) {
+                    metaString = '[Error serializing metadata]';
+                }
+            }
+            return `${timestamp} [${level.toUpperCase()}] ${message} ${metaString}`;
+        })
     ),
     transports: [
         applicationTransport,

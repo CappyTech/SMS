@@ -4,6 +4,7 @@
         <h1 class="display-5">New Invoice</h1>
         <div class="container-fluid text-center">
             <form id="invoiceForm" action="/invoice/create" method="POST" class="needs-validation">
+                
                 <div class="row mb-3">
                     <label for="subcontractorId" class="col-sm-3 col-form-label">Subcontractor</label>
                     <div class="col-sm-9">
@@ -142,6 +143,7 @@
 </script>
 -->
 <script>
+
     document.getElementById('subcontractorId').addEventListener('change', function () {
         const selectedSubcontractorId = this.value;
 

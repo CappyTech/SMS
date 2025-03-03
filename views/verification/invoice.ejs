@@ -32,6 +32,7 @@
                     </td>
                     <td>
                         <form action="/verify/receipts" method="POST">
+                            
                             <input type="hidden" name="invoiceId" value="<%= invoice.id %>">
                             <input type="hidden" name="kfReceiptId" value="<%= receipts[index]?.InvoiceDBID || '' %>">
                             <% if (receipts[index]) { %>

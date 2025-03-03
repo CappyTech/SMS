@@ -18,6 +18,7 @@
                 <p><strong>Secret Key:</strong> <%= secret %></p>
 
                 <form action="/account/verify-totp" method="POST">
+                    
                     <div class="form-floating mb-3">
                         <input type="text" name="totpToken" class="form-control" id="totpToken" required>
                         <label for="totpToken" class="form-label">Enter the 6-digit code from your app:</label>
@@ -42,6 +43,7 @@
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold text-center">Account Details</h1>
             <form>
+                
                 <div class="form-floating mb-3">
                     <!-- Display Username as Readonly -->
                     <input type="text" readonly class="form-control" value="<%= user.username %>">
@@ -67,6 +69,7 @@
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <h1 class="text-center">Change Password</h1>
         <form action="/user/account/change-password" method="POST" class="mt-4">
+            
         <div class="mb-3">
             <label for="currentPassword" class="form-label">Current Password</label>
             <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
@@ -123,6 +126,7 @@
                 <td>
                     <!-- Option to log out from this session -->
                     <form action="/account/logout-session" method="POST">
+                        
                         <input type="hidden" name="sessionId" value="<%= session.sessionId %>">
                         <button type="submit" class="btn btn-danger">Logout</button>
                     </form>
@@ -145,6 +149,7 @@
             <!-- Modal Body -->
             <div class="modal-body">
                 <form action="/account/settings" method="POST">
+                    
                     <div class="form-floating mb-3">
                         <!-- Editable Username -->
                         <input type="text" name="newUsername" value="<%= user.username %>" class="form-control" id="username" required>
@@ -171,6 +176,7 @@
 
 <!-- Optional JS for focusing on a specific input when the modal is shown -->
 <script>
+
     // Automatically focus on the first input field in the modal when it opens
     const settingsModal = document.getElementById('settingsModal');
     settingsModal.addEventListener('shown.bs.modal', function () {
