@@ -1,3 +1,4 @@
+// /services/loggerService.js
 const { createLogger, format, transports } = require('winston');
 const { combine, timestamp, printf, colorize } = format;
 
@@ -33,22 +34,5 @@ const logger = createLogger({
         new transports.File({ filename: 'app.log' }) // Log to a file
     ],
 });
-
-if (process.env.NODE_ENV !== 'production') {
-    baseLogger.add(new transports.Console({
-        format: combine(
-            timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
-            format.colorize(),
-            format.simple()
-        )
-    }));
-}
-
-const logger = {
-    debug: baseLogger.debug.bind(baseLogger),
-    info: baseLogger.info.bind(baseLogger),
-    warn: baseLogger.warn.bind(baseLogger),
-    error: baseLogger.error.bind(baseLogger)
-};
 
 module.exports = logger;
