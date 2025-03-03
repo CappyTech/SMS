@@ -94,6 +94,8 @@
                         <span class="d-md-none">RC</span>
                     </th>
                     <% } %>
+                    <th>Month</th>
+                    <th>Year</th>
                     <th>
                         <span class="d-none d-md-table-cell">Submission Date</span>
                         <span class="d-md-none">Submission</span>
@@ -113,6 +115,8 @@
                         <td><%= formatCurrency(receipt.MaterialCost) %></td>
                         <td><%= formatCurrency(receipt.CISAmount) %></td>
                         <td><%= formatCurrency(receipt.NetAmount) %></td>
+                        <td><%= receipt.TaxMonth %></td>
+                        <td><%= receipt.TaxYear %></td>
                         <td><%= slimDateTime(receipt.SubmissionDate) %></td>
                     </tr>
                     <% totalGross += receipt.GrossAmount; %>
