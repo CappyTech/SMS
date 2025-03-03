@@ -55,7 +55,7 @@ const renderchangeSupplierForm = async (req, res, next) => {
 const changeSupplier = async (req, res, next) => {
     try {
         const { subcontractor, cisRate, cisNumber } = req.body;
-        await Supplier.update(
+        await db.KF_Suppliers.update(
             {
                 Subcontractor: subcontractor ? true : false, // Ensure boolean value
                 CISRate: parseFloat(cisRate), // Convert to float
