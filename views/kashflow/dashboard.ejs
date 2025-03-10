@@ -62,10 +62,11 @@
                 </div>
                 <div class="card-body text-center">
                     <ul class="list-group">
-                        <li class="list-group-item">Avg Days to Pay: <strong><%= paymentSpeedData[0].avgPaymentTime.toFixed(2) %></strong></li>
+                        <li class="list-group-item">Avg Days to Pay: <strong><%= paymentSpeedData[0].avgPaymentTime ? paymentSpeedData[0].avgPaymentTime.toFixed(2) : 'N/A' %></strong></li>
                         <li class="list-group-item">Paid within 30 Days: <strong><%= paymentSpeedData[0].paidWithin30Days.toLocaleString() %></strong></li>
                         <li class="list-group-item">Paid within 31-60 Days: <strong><%= paymentSpeedData[0].paidWithin31to60Days.toLocaleString() %></strong></li>
                         <li class="list-group-item">Paid After 60 Days: <strong><%= paymentSpeedData[0].paidAfter60Days.toLocaleString() %></strong></li>
+                        <li class="list-group-item text-danger">Unpaid Invoices: <strong><%= paymentSpeedData[0].unpaidInvoices.toLocaleString() %></strong></li>
                     </ul>
                 </div>
             </div>
