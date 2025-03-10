@@ -10,7 +10,7 @@ function getInvoicesByDate(client, startDate, endDate) {
 
     client.GetInvoicesByDateRange(invoicesParams, async (error, result) => {
       if (error) {
-        logger.error('Error calling GetInvoicesByDateRange method:', error);
+        logger.error('Error calling GetInvoicesByDateRange method: '+ error);
         return reject(error);
       }
 
