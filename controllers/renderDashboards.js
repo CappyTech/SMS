@@ -551,12 +551,14 @@ const renderKashflowDashboard = async (req, res, next) => {
     try {
         // Fetch all necessary data
         const [
+            totalInvoices,
             totalCustomers,
             totalReceipts,
             totalQuotes,
             totalSuppliers,
             totalProjects
         ] = await Promise.all([
+            kf.KF_Invoices.count(),
             kf.KF_Customers.count(),
             kf.KF_Receipts.count(),
             kf.KF_Quotes.count(),
@@ -573,38 +575,34 @@ const renderKashflowDashboard = async (req, res, next) => {
                 [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(NOW(), DueDate) BETWEEN 31 AND 60 THEN 1 END')), 'overdue_31_60'],
                 [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(NOW(), DueDate) > 60 THEN 1 END')), 'overdue_60_plus'],
             ],
-        });     
-        
-        logger.debug('Invoice Aging Data: ' + JSON.stringify(invoiceAgingData, null, 2));
+        });
 
         const summaryData = await kf.KF_Invoices.findAll({
             attributes: [
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.col('InvoiceDBID')), 'totalInvoices'],
                 [kf.Sequelize.fn('SUM', kf.Sequelize.col('NetAmount')), 'totalRevenue'],
-                [kf.Sequelize.fn('SUM', kf.Sequelize.col('Paid')), 'totalPaidAmount'],
-                [kf.Sequelize.fn('SUM', kf.Sequelize.literal('NetAmount - Paid')), 'totalUnpaidAmount'],
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN Paid = NetAmount THEN 1 END')), 'fullyPaidInvoices'],
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN Paid > 0 AND Paid < NetAmount THEN 1 END')), 'partiallyPaidInvoices'],
+                [kf.Sequelize.fn('SUM', kf.Sequelize.col('AmountPaid')), 'totalPaidAmount'],
+                [kf.Sequelize.fn('SUM', kf.Sequelize.literal('AmountPaid - NetAmount')), 'totalUnpaidAmount'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN AmountPaid = NetAmount THEN 1 END')), 'fullyPaidInvoices'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN Paid > 0 AND Paid < 1 THEN 1 END')), 'partiallyPaidInvoices'],
                 [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN Paid = 0 THEN 1 END')), 'unpaidInvoices'],
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DueDate < NOW() AND Paid < NetAmount THEN 1 END')), 'overdueInvoices'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DueDate < NOW() AND AmountPaid < NetAmount THEN 1 END')), 'overdueInvoices'],
             ],
         });
 
-        logger.debug('Summary Data: ' + JSON.stringify(summaryData, null, 2));
-
-        const avgInvoiceValue = summaryData[0].totalRevenue / (summaryData[0].totalInvoices || 1);
+        const avgInvoiceValue = summaryData[0].totalRevenue / (totalInvoices || 1);
         const invoiceAging = invoiceAgingData[0] || {}; // Avoids undefined errors
 
         // Get top customers by revenue
         const topCustomersData = await kf.KF_Invoices.findAll({
-            attributes: ['CustomerName', [kf.Sequelize.fn('SUM', kf.Sequelize.col('NetAmount')), 'totalRevenue']],
-            group: ['CustomerName'],
+            include: [ { model: kf.KF_Customers, as: 'customer' } ],
+            attributes: ['Customer', [kf.Sequelize.fn('SUM', kf.Sequelize.col('NetAmount')), 'totalRevenue']],
+            group: ['Customer'],
             order: [[kf.Sequelize.literal('totalRevenue'), 'DESC']],
             limit: 10,
         });
 
         const topCustomers = {
-            names: topCustomersData.map((customer) => customer.CustomerName),
+            names: topCustomersData.map((customer) => customer.customer.Name),
             revenue: topCustomersData.map((customer) => parseFloat(customer.get('totalRevenue'))),
         };
         /* 
@@ -625,43 +623,65 @@ const renderKashflowDashboard = async (req, res, next) => {
         */
         
         const supplierExpenses = await kf.KF_Receipts.findAll({
-            attributes: [
-                'CustomerID',
-                [kf.Sequelize.fn('SUM', kf.Sequelize.col('AmountPaid')), 'totalSpent'],
-            ],
-            group: ['CustomerID'],
+            include: [ { model: kf.KF_Suppliers, as: 'supplier' } ],
+            attributes: ['Customer',[kf.Sequelize.fn('SUM', kf.Sequelize.col('AmountPaid')), 'totalSpent'],],
+            group: ['Customer'],
             order: [[kf.Sequelize.literal('totalSpent'), 'DESC']],
             limit: 10, // Show top 10 suppliers
         });
         // Pie chart of top suppliers by amount spent.
+
+        const topSuppliers = {
+            names: supplierExpenses.map((supplier) => supplier.supplier.Name),
+            revenue: supplierExpenses.map((supplier) => parseFloat(supplier.get('totalSpent'))),
+        };
         
         const customerRetentionData = await kf.KF_Invoices.findAll({
             attributes: [
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.col('CustomerID')), 'totalCustomers'],
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('DISTINCT CustomerID')), 'uniqueCustomers'],
+                'Customer',[kf.Sequelize.fn('COUNT', kf.Sequelize.col('CustomerID')), 'totalCustomers'],
+                'Customer',[kf.Sequelize.fn('COUNT', kf.Sequelize.literal('DISTINCT CustomerID')), 'uniqueCustomers'],
             ],
         });
         
         const repeatCustomerRate = ((customerRetentionData[0].totalCustomers - customerRetentionData[0].uniqueCustomers) / customerRetentionData[0].totalCustomers) * 100;
 
+        logger.debug('Summary Data: ' + JSON.stringify(summaryData, null, 2));
+        logger.debug('Payment Speed Data: ' + JSON.stringify(paymentSpeedData, null, 2));
+        logger.debug('Customer Retention Data: ' + JSON.stringify(customerRetentionData, null, 2));
+        logger.debug('Repeat Customer Rate: ' + repeatCustomerRate);
+        logger.debug('Avg Invoice Value: ' + avgInvoiceValue);
+        logger.debug('Invoice Aging: ' + JSON.stringify(invoiceAging, null, 2));
+        logger.debug('Top Supplier: ' + JSON.stringify(topSuppliers, null, 2));
+        logger.debug('Top Customers: ' + JSON.stringify(topCustomers, null, 2));
+        logger.debug('Total Customers: ' + totalCustomers);
+        logger.debug('Total Receipts: ' + totalReceipts);
+        logger.debug('Total Quotes: ' + totalQuotes);
+        logger.debug('Total Suppliers: ' + totalSuppliers);
+        logger.debug('Total Projects: ' + totalProjects);
+        logger.debug('Total Invoices: ' + totalInvoices);
+        logger.debug('Total Revenue: ' + summaryData.totalRevenue);
+        logger.debug('Fully Paid Invoices: ' + summaryData.fullyPaidInvoices);
+        logger.debug('Partially Paid Invoices: ' + summaryData.partiallyPaidInvoices);
+        logger.debug('Unpaid Invoices: ' + summaryData.unpaidInvoices);
+        logger.debug('Overdue Invoices: ' + summaryData.overdueInvoices);
 
         // Render the dashboard
         res.render(path.join('kashflow', 'dashboard'), {
             title: 'KashFlow Dashboard',
             totalCustomers,
-            totalInvoices: summaryData.totalInvoices,
+            totalInvoices,
             totalReceipts,
             totalQuotes,
             totalSuppliers,
             totalProjects,
-            totalRevenue: summaryData.totalRevenue,
+            totalRevenue: summaryData[0].totalRevenue,
 
             incomeExpenseData,
 
-            fullyPaidInvoices: summaryData.fullyPaidInvoices,
-            partiallyPaidInvoices: summaryData.partiallyPaidInvoices,
-            unpaidInvoices: summaryData.unpaidInvoices,
-            overdueInvoices: summaryData.overdueInvoices,
+            fullyPaidInvoices: summaryData[0].fullyPaidInvoices,
+            partiallyPaidInvoices: summaryData[0].partiallyPaidInvoices,
+            unpaidInvoices: summaryData[0].unpaidInvoices,
+            overdueInvoices: summaryData[0].overdueInvoices,
 
             topCustomers,
 
