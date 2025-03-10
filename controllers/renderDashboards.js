@@ -602,15 +602,18 @@ const renderKashflowDashboard = async (req, res, next) => {
             names: topCustomersData.map((customer) => customer.CustomerName),
             revenue: topCustomersData.map((customer) => parseFloat(customer.get('totalRevenue'))),
         };
-
+        /* 
+        Payments{"Payment":{"Payment":[{"PayID":,"PayInvoice":,"PayDate":"","PayNote":"","PayMethod":,"PayAccount":,"PayAmount":}]}}
+        */
         const paymentSpeedData = await kf.KF_Invoices.findAll({
             attributes: [
-                [kf.Sequelize.fn('AVG', kf.Sequelize.literal('DATEDIFF(PaymentDate, InvoiceDate)')), 'avgPaymentTime'],
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(PaymentDate, InvoiceDate) <= 30 THEN 1 END')), 'paidWithin30Days'],
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(PaymentDate, InvoiceDate) BETWEEN 31 AND 60 THEN 1 END')), 'paidWithin31to60Days'],
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(PaymentDate, InvoiceDate) > 60 THEN 1 END')), 'paidAfter60Days'],
+                [kf.Sequelize.fn('AVG', kf.Sequelize.literal('DATEDIFF(JSON_UNQUOTE(JSON_EXTRACT(Payments, "$.Payment[0].PayDate")), InvoiceDate)')), 'avgPaymentTime'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(JSON_UNQUOTE(JSON_EXTRACT(Payments, "$.Payment[0].PayDate")), InvoiceDate) <= 30 THEN 1 END')), 'paidWithin30Days'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(JSON_UNQUOTE(JSON_EXTRACT(Payments, "$.Payment[0].PayDate")), InvoiceDate) BETWEEN 31 AND 60 THEN 1 END')), 'paidWithin31to60Days'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(JSON_UNQUOTE(JSON_EXTRACT(Payments, "$.Payment[0].PayDate")), InvoiceDate) > 60 THEN 1 END')), 'paidAfter60Days'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(Payments, "$.Payment[0].PayDate")) IS NULL THEN 1 END')), 'unpaidInvoices'],
             ],
-        });
+        });        
         /*
         Show average days to payment.
         Breakdown of customers who pay within 30, 60, or 60+ days.
