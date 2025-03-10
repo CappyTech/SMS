@@ -65,9 +65,10 @@
                 </td>
                 <td>£<%= receipt.NetAmount %></td>
                 <td>
-                    <% if (receipt.Paid) { %>
+                    <% if (receipt.AmountPaid > 0) { %>
                     <span class="badge bg-success">Paid</span>
-                    <% } else { %>
+                    <% } %>
+                    <% if (receipt.AmountPaid === 0) { %>
                     <span class="badge bg-warning">Unpaid</span>
                     <% } %>
                 </td>
