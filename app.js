@@ -78,27 +78,6 @@ app.use(async (req, res, next) => {
 app.use(async (req, res, next) => {
     try {
         if (res.locals.isAuthenticated) {
-            res.locals.unpaidInvoices = {};
-            res.locals.unsubmittedInvoices = {};
-            res.locals.totalNotifications = 0;
-            if (res.locals.permissions.unpaidInvoices) {
-                const unpaidInvoices = await db.Invoices.findAll({
-                    where: { remittanceDate: null },
-                    attributes: ['id', 'kashflowNumber'],
-                    order: [['kashflowNumber', 'ASC']]
-                });
-                res.locals.unpaidInvoices = unpaidInvoices;
-                res.locals.totalNotifications =+ res.locals.unpaidInvoices;
-            }
-            if (res.locals.permissions.unsubmittedInvoices) {
-                const unsubmittedInvoices = await db.Invoices.findAll({
-                    where: { submissionDate: null },
-                    attributes: ['id', 'kashflowNumber'],
-                    order: [['kashflowNumber', 'ASC']]
-                });
-                res.locals.unsubmittedInvoices = unsubmittedInvoices;
-                res.locals.totalNotifications =+ res.locals.unsubmittedInvoices;
-            }
             const lastfetched = await kf.KF_Meta.findOne({
                 order: [['lastFetchedAt', 'DESC']]
             })
@@ -106,10 +85,6 @@ app.use(async (req, res, next) => {
             res.locals.contactEmail = process.env.SUPPORTEMAIL;
             next();
         } else {
-            res.locals.unpaidInvoices = {};
-            res.locals.unsubmittedInvoices = {};
-            res.locals.totalNotifications = 0;
-            res.locals.lastfetched = null;
             next();
         }
     } catch (error) {
