@@ -133,6 +133,7 @@ const updateUser = async (req, res, next) => {
             }
         } else {
             req.flash('error', 'User not found.');
+            logger.error('User not found.');
         }
 
         res.redirect('/user/read/' + req.params.id);
@@ -161,7 +162,7 @@ const deleteUser = async (req, res, next) => {
             res.redirect('/dashboard/user');
         }
     } catch (error) {
-        logger.error('Error deleting user:  ', error.message);
+        logger.error('Error deleting user:  '+ error.message);
         req.flash('error', 'Error deleting user: ' + error.message);
         next(error); // Pass the error to the error handler
     }
