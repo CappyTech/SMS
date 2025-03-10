@@ -8,7 +8,7 @@ function getCustomers(client) {
 
     client.GetCustomers(customersParams, (error, result) => {
       if (error) {
-        logger.error('Error calling GetCustomers method:', error);
+        logger.error('Error calling GetCustomers method: '+ error);
         return reject(error);
       }
 
