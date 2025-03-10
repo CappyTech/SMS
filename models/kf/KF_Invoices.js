@@ -126,3 +126,21 @@ module.exports = (sequelize, DataTypes) => {
 
     return KF_Invoices;
 };
+
+/* 
+function mapLine(line) {
+    return {
+        LineID: line.LineID,
+        Quantity: line.Quantity || null,
+        Description: line.Description || null,
+        Rate: line.Rate || null,
+        ChargeType: line.ChargeType || null,
+        ChargeTypeName: line.ChargeType ? ChargeTypes[line.ChargeType] || null : null,
+        VatRate: line.VatRate || null,
+        VatAmount: line.VatAmount || null,
+        ProductID: line.ProductID || null,
+        Sort: line.Sort || null,
+        ProjID: line.ProjID || null,
+    };
+}    
+*/
