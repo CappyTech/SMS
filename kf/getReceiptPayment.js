@@ -10,7 +10,7 @@ function getReceiptPayment(client, receiptNumber) {
 
     client.GetReceiptPayment(receiptPaymentParams, (error, result) => {
       if (error) {
-        logger.error('Error calling GetReceiptPayment method:', error);
+        logger.error('Error calling GetReceiptPayment method: '+ error);
         return reject(error);
       }
 
