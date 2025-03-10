@@ -550,26 +550,37 @@ const renderKFSuppliersDashboard = async (req, res, next) => {
 const renderKashflowDashboard = async (req, res, next) => {
     try {
         // Fetch all necessary data
-        const totalCustomers = await kf.KF_Customers.count();
-        const totalInvoices = await kf.KF_Invoices.count();
-        const totalReceipts = await kf.KF_Receipts.count();
-        const totalQuotes = await kf.KF_Quotes.count();
-        const totalSuppliers = await kf.KF_Suppliers.count();
-        const totalProjects = await kf.KF_Projects.count();
-
-
+        const [
+            totalCustomers,
+            totalReceipts,
+            totalQuotes,
+            totalSuppliers,
+            totalProjects
+        ] = await Promise.all([
+            kf.KF_Customers.count(),
+            kf.KF_Receipts.count(),
+            kf.KF_Quotes.count(),
+            kf.KF_Suppliers.count(),
+            kf.KF_Projects.count(),
+        ]);
+        
         const incomeExpenseData = await currencyService.getIncomeExpenseData(kf);
 
-        // Calculate paid/unpaid invoices
-        const paidInvoices = await kf.KF_Invoices.count({ where: { Paid: { [kf.Sequelize.Op.gt]: 0 } } });
-        const unpaidInvoices = totalInvoices - paidInvoices;
+        const summaryData = await kf.KF_Invoices.findAll({
+            attributes: [
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.col('InvoiceID')), 'totalInvoices'],
+                [kf.Sequelize.fn('SUM', kf.Sequelize.col('NetAmount')), 'totalRevenue'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN Paid > 0 THEN 1 END')), 'paidInvoices'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN Paid = 0 THEN 1 END')), 'unpaidInvoices'],
+            ],
+        });
 
         // Get top customers by revenue
         const topCustomersData = await kf.KF_Invoices.findAll({
             attributes: ['CustomerName', [kf.Sequelize.fn('SUM', kf.Sequelize.col('NetAmount')), 'totalRevenue']],
             group: ['CustomerName'],
             order: [[kf.Sequelize.literal('totalRevenue'), 'DESC']],
-            limit: 5,
+            limit: 10,
         });
 
         const topCustomers = {
@@ -581,15 +592,16 @@ const renderKashflowDashboard = async (req, res, next) => {
         res.render(path.join('kashflow', 'dashboard'), {
             title: 'KashFlow Dashboard',
             totalCustomers,
-            totalInvoices,
+            totalInvoices: summaryData.totalInvoices,
             totalReceipts,
             totalQuotes,
             totalSuppliers,
             totalProjects,
             incomeExpenseData,
-            paidInvoices,
-            unpaidInvoices,
+            paidInvoices: summaryData.paidInvoices,
+            unpaidInvoices: summaryData.unpaidInvoices,
             topCustomers,
+            totalRevenue: summaryData.totalRevenue,
         });
     } catch (error) {
         logger.error('Error rendering KashFlow dashboard: ' + error.message);
