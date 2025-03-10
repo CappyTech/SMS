@@ -592,16 +592,16 @@ const renderKashflowDashboard = async (req, res, next) => {
         res.render(path.join('kashflow', 'dashboard'), {
             title: 'KashFlow Dashboard',
             totalCustomers,
-            totalInvoices: summaryData.totalInvoices,
+            totalInvoices: summaryData[0].totalInvoices,
             totalReceipts,
             totalQuotes,
             totalSuppliers,
             totalProjects,
             incomeExpenseData,
-            paidInvoices: summaryData.paidInvoices,
-            unpaidInvoices: summaryData.unpaidInvoices,
+            paidInvoices: summaryData[0].paidInvoices,
+            unpaidInvoices: summaryData[0].unpaidInvoices,
             topCustomers,
-            totalRevenue: summaryData.totalRevenue,
+            totalRevenue: summaryData[0].totalRevenue,
         });
     } catch (error) {
         logger.error('Error rendering KashFlow dashboard: ' + error.message);
