@@ -644,19 +644,19 @@ const renderKashflowDashboard = async (req, res, next) => {
         res.render(path.join('kashflow', 'dashboard'), {
             title: 'KashFlow Dashboard',
             totalCustomers,
-            totalInvoices: summaryData[0].totalInvoices,
+            totalInvoices: summaryData.totalInvoices,
             totalReceipts,
             totalQuotes,
             totalSuppliers,
             totalProjects,
-            totalRevenue: summaryData[0].totalRevenue,
+            totalRevenue: summaryData.totalRevenue,
 
             incomeExpenseData,
 
-            fullyPaidInvoices: summaryData[0].fullyPaidInvoices,
-            partiallyPaidInvoices: summaryData[0].partiallyPaidInvoices,
-            unpaidInvoices: summaryData[0].unpaidInvoices,
-            overdueInvoices: summaryData[0].overdueInvoices,
+            fullyPaidInvoices: summaryData.fullyPaidInvoices,
+            partiallyPaidInvoices: summaryData.partiallyPaidInvoices,
+            unpaidInvoices: summaryData.unpaidInvoices,
+            overdueInvoices: summaryData.overdueInvoices,
 
             topCustomers,
 
