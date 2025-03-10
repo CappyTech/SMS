@@ -23,7 +23,7 @@ const createUser = async (req, res, next) => {
         const { errors, value } = schema.validate(req.body);
         if (errors) {
             req.flash('error', 'Invalid input.' + errors);
-            next(error); // Pass the error to the error handler
+            next(); // Pass the error to the error handler
         }
         const { username, email, password, role } = value;
         const existingUser = await db.Users.findOne({
