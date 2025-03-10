@@ -564,6 +564,7 @@ const renderKashflowDashboard = async (req, res, next) => {
             kf.KF_Projects.count(),
         ]);
         
+        
         const incomeExpenseData = await currencyService.getIncomeExpenseData(kf);
 
         const invoiceAgingData = await kf.KF_Invoices.findAll({
@@ -572,7 +573,9 @@ const renderKashflowDashboard = async (req, res, next) => {
                 [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(NOW(), DueDate) BETWEEN 31 AND 60 THEN 1 END')), 'overdue_31_60'],
                 [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DATEDIFF(NOW(), DueDate) > 60 THEN 1 END')), 'overdue_60_plus'],
             ],
-        });        
+        });     
+        
+        logger.debug('Invoice Aging Data: ' + JSON.stringify(invoiceAgingData, null, 2));
 
         const summaryData = await kf.KF_Invoices.findAll({
             attributes: [
@@ -586,6 +589,8 @@ const renderKashflowDashboard = async (req, res, next) => {
                 [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN DueDate < NOW() AND Paid < NetAmount THEN 1 END')), 'overdueInvoices'],
             ],
         });
+
+        logger.debug('Summary Data: ' + JSON.stringify(summaryData, null, 2));
 
         const avgInvoiceValue = summaryData[0].totalRevenue / (summaryData[0].totalInvoices || 1);
         const invoiceAging = invoiceAgingData[0] || {}; // Avoids undefined errors
