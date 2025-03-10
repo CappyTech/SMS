@@ -622,9 +622,9 @@ const renderKashflowDashboard = async (req, res, next) => {
         const supplierExpenses = await kf.KF_Receipts.findAll({
             attributes: [
                 'CustomerID',
-                [kf.Sequelize.fn('SUM', kf.Sequelize.col('Amount')), 'totalSpent'],
+                [kf.Sequelize.fn('SUM', kf.Sequelize.col('AmountPaid')), 'totalSpent'],
             ],
-            group: ['SupplierName'],
+            group: ['CustomerID'],
             order: [[kf.Sequelize.literal('totalSpent'), 'DESC']],
             limit: 10, // Show top 10 suppliers
         });
