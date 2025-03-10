@@ -9,7 +9,7 @@ function getProjects(client,ProjStatus) {
 
     client.GetProjects_Full(projectFullParams, (error, result) => {
       if (error) {
-        logger.error('Error calling GetProjects_Full method:', error);
+        logger.error('Error calling GetProjects_Full method: '+ error);
         return reject(error); 
       }
 
