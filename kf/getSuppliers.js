@@ -8,7 +8,7 @@ function getSuppliers(client) {
 
     client.GetSuppliers(suppliersParams, async (error, result) => {
       if (error) {
-        logger.error('Error calling GetSuppliers method:', error);
+        logger.error('Error calling GetSuppliers method: '+ error);
         return reject(error);
       }
 
