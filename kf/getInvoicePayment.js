@@ -10,7 +10,7 @@ function getInvoicePayment(client, invoiceNumber) {
 
     client.GetInvoicePayment(invoicePaymentParams, (error, result) => {
       if (error) {
-        logger.error('Error calling GetInvoicePayment method:', error);
+        logger.error('Error calling GetInvoicePayment method: '+ error);
         return reject(error);
       }
 
