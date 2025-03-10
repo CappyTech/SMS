@@ -12,6 +12,7 @@ const getReceiptPayment = require('./getReceiptPayment');
 const getInvoicePayment = require('./getInvoicePayment');
 const logger = require('../services/loggerService');
 const taxService = require('../services/taxService');
+const getInvoiceNotes = require('./getInvoiceNotes');
 
 const ChargeTypes = {
     18685896: 'Materials',
@@ -247,10 +248,10 @@ exports.fetchKashFlowData = async () => {
                 // Fetch payments for the invoice
                 const payments = await getInvoicePayment(client, invoice.InvoiceNumber);
                 //logger.debug(`Payments for InvoiceNumber ${quote.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
+                const mappedLines = invoice.Lines?.anyType?.map(mapLine) || [];
                 return {
                     ...invoice,
-                    Lines: invoice.Lines?.anyType?.map(mapLine),
-                    ChargeTypeName: invoice.ChargeType ? ChargeTypes[invoice.ChargeType] : null,
+                    mappedLines,
                     Payments: { Payment: payments },
                 };
             }));
@@ -278,16 +279,18 @@ exports.fetchKashFlowData = async () => {
 
             logger.info(`Fetched ${quotes.length} quotes.`);
 
-            //transform quotes and include lines
+            //transform quotes and include lines and payment
             const transformedQuotes = await Promise.all(quotes.map(async (quote) => {
                 // Fetch payments for the quote
                 const payments = await getInvoicePayment(client, quote.InvoiceNumber);
+                const notes = await getInvoiceNotes(client, quote.InvoiceDBID);
                 //logger.debug(`Payments for InvoiceNumber ${quote.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
+                const mappedLines = quote.Lines?.anyType?.map(mapLine) || [];
                 return {
                     ...quote,
-                    Lines: quote.Lines?.anyType?.map(mapLine),
-                    ChargeTypeName: quote.ChargeType ? ChargeTypes[quote.ChargeType] : null,
-                    Payments: { Payment: payments }
+                    mappedLines,
+                    Payments: { Payment: payments },
+                    notes,
                 };
             }));
 
@@ -313,29 +316,26 @@ exports.fetchKashFlowData = async () => {
                 if (receipts.length > 0) {
                     logger.info(`Fetched ${receipts.length} receipts for supplier: ${supplier.Name} (SupplierID: ${supplier.SupplierID})`);
         
-                    // Transform receipts and include payments
+                    // Transform receipts and include lines and payments
                     const transformedReceipts = await Promise.all(receipts.map(async (receipt) => {
                         // Fetch payments for the receipt
                         const payments = await getReceiptPayment(client, receipt.InvoiceNumber);
+                        const notes = await getReceiptNotes(client, receipt.InvoiceDBID);
                         //logger.debug(`Payments for ReceiptNumber ${receipt.InvoiceNumber}: ${JSON.stringify(payments, null, 2)}`);
-                        
+                        const mappedLines = receipt.Lines?.anyType?.map(mapLine) || [];
                         let taxYear;
                         let taxMonth;
-
                         if (payments && payments.Payment[0]?.PayDate) {
                             ({ taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(payments.Payment[0].PayDate));
                             //logger.debug(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
                         }
-
                         return {
                             ...receipt,
-                            // map line items to the expected format for upsert (e.g. Quantity, Description, Rate, etc.)
-                            Lines: receipt.Lines?.anyType?.map(mapLine) || [],
-                            // if ChargeType equal known number:value key pair, push ChargeTypeName to the object
-                            ChargeTypeName: receipt.ChargeType ? ChargeTypes[receipt.ChargeType] : null,
+                            mappedLines,
                             Payments: { Payment: payments },
                             TaxMonth: taxMonth,
-                            TaxYear: taxYear
+                            TaxYear: taxYear,
+                            notes,
                         };
                     }));
 
@@ -374,8 +374,7 @@ function mapLine(line) {
         Description: line.Description || null,
         Rate: line.Rate || null,
         ChargeType: line.ChargeType || null,
-        // Add ChargeTypeName here to be able to display it in the view (e.g. Materials, Labour, CIS Deductions)
-        ChargeTypeName: line.ChargeTypeName || null,
+        ChargeTypeName: line.ChargeType ? ChargeTypes[line.ChargeType] || null : null,
         VatRate: line.VatRate || null,
         VatAmount: line.VatAmount || null,
         ProductID: line.ProductID || null,
