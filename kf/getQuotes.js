@@ -8,7 +8,7 @@ function getQuotes(client) {
 
     client.GetQuotes(quotesParams, async (error, result) => {
       if (error) {
-        logger.error('Error calling GetQuotes method:', error);
+        logger.error('Error calling GetQuotes method: '+ error);
         return reject(error);
       }
 
