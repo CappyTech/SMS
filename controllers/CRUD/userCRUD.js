@@ -33,7 +33,7 @@ const createUser = async (req, res, next) => {
         });
         if (existingUser) {
             req.flash('error', 'Registration failed.');
-            next(error); // Pass the error to the error handler
+            next(); // Pass the error to the error handler
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         await db.Users.create({
@@ -46,7 +46,7 @@ const createUser = async (req, res, next) => {
             clientId: null,
         });
         req.flash('success', 'User created successfully.');
-        next(error); // Pass the error to the error handler
+        next(); // Pass the error to the error handler
     } catch (error) {
         logger.error('Error creating user: ' + error.message);
         req.flash('error', 'An error occurred.');
@@ -72,7 +72,7 @@ const readUser = async (req, res, next) => {
             user,
         });
     } catch (error) {
-        logger.error('Error reading user:  ', error.message);
+        logger.error('Error reading user:  '+ error.message);
         res.status(500).send('An error occurred.');
     }
 };
