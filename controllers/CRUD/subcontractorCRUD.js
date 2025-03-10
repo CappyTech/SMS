@@ -234,7 +234,7 @@ router.get('/fetch/subcontractor/:id', authService.ensureAuthenticated, authServ
     }
 });
 
-router.post('/create/', authService.ensureAuthenticated, authService.ensureRole('admin'), createSubcontractor);
+router.post('/create', authService.ensureAuthenticated, authService.ensureRole('admin'), createSubcontractor);
 router.get('/read/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), readSubcontractor);
 router.post('/update/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), updateSubcontractor);
 router.post('/delete/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteSubcontractor);
