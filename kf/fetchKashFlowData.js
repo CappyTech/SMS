@@ -13,6 +13,7 @@ const getInvoicePayment = require('./getInvoicePayment');
 const logger = require('../services/loggerService');
 const taxService = require('../services/taxService');
 const getInvoiceNotes = require('./getInvoiceNotes');
+const getReceiptNotes = require('./getReceiptNotes');
 
 const ChargeTypes = {
     18685896: 'Materials',
