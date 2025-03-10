@@ -8,7 +8,7 @@ function getReceipts(client) {
 
     client.GetReceipts(receiptsParams, async (error, result) => {
       if (error) {
-        logger.error('Error calling GetReceipts method:', error);
+        logger.error('Error calling GetReceipts method: '+ error);
         return reject(error);
       }
 
