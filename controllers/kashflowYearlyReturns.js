@@ -50,7 +50,7 @@ const renderKFYearlyReturns = async (req, res, next) => {
             // Extract values from Lines
             const labourCost = parsedLines.filter(line => line.ChargeType === 18685897).reduce((sum, line) => sum + (line.Rate * line.Quantity), 0);
             const materialCost = parsedLines.filter(line => line.ChargeType === 18685896).reduce((sum, line) => sum + (line.Rate * line.Quantity), 0);
-            const cisAmount = parsedLines.filter(line => line.ChargeType === 18685964).reduce((sum, line) => sum + (line.Rate * line.Quantity), 0);
+            const cisAmount = Math.abs( parsedLines.filter(line => line.ChargeType === 18685964).reduce((sum, line) => sum + (line.Rate * line.Quantity), 0) );
             const grossAmount = labourCost + materialCost;
             const netAmount = grossAmount - cisAmount;
 
@@ -75,7 +75,7 @@ const renderKFYearlyReturns = async (req, res, next) => {
         });
 
         res.render(path.join('kashflow', 'yearlyReturns'), {
-            title: 'Subcontractor Monthly Returns',
+            title: 'Subcontractor Yearly Returns',
             year,
             supplier,
             receiptsByMonth,
