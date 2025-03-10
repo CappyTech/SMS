@@ -568,7 +568,7 @@ const renderKashflowDashboard = async (req, res, next) => {
 
         const summaryData = await kf.KF_Invoices.findAll({
             attributes: [
-                [kf.Sequelize.fn('COUNT', kf.Sequelize.col('InvoiceID')), 'totalInvoices'],
+                [kf.Sequelize.fn('COUNT', kf.Sequelize.col('InvoiceDBID')), 'totalInvoices'],
                 [kf.Sequelize.fn('SUM', kf.Sequelize.col('NetAmount')), 'totalRevenue'],
                 [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN Paid > 0 THEN 1 END')), 'paidInvoices'],
                 [kf.Sequelize.fn('COUNT', kf.Sequelize.literal('CASE WHEN Paid = 0 THEN 1 END')), 'unpaidInvoices'],
