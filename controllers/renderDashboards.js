@@ -496,6 +496,7 @@ const renderKFReceiptsDashboard = async (req, res, next) => {
                     as: 'supplier'
                 }
             ],
+            order: [['InvoiceNumber', 'DESC']]
         });
         const totalReceipts = receipts.length;
 
