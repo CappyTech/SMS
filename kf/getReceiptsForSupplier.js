@@ -9,7 +9,7 @@ function getReceiptsForSupplier(client, supplierID) {
 
     client.GetReceiptsForSupplier(params, (error, result) => {
       if (error) {
-        logger.error(`Error calling GetReceiptsForSupplier for SupplierID ${supplierID}:`, error);
+        logger.error(`Error calling GetReceiptsForSupplier for SupplierID ${supplierID}: `+ error);
         return reject(error);
       }
 
