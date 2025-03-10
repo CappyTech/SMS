@@ -77,16 +77,12 @@ app.use(async (req, res, next) => {
 
 app.use(async (req, res, next) => {
     try {
-        if (res.locals.isAuthenticated) {
-            const lastfetched = await kf.KF_Meta.findOne({
-                order: [['lastFetchedAt', 'DESC']]
-            })
-            res.locals.lastfetched = lastfetched || null;
-            res.locals.contactEmail = process.env.SUPPORTEMAIL;
-            next();
-        } else {
-            next();
-        }
+        const lastfetched = await kf.KF_Meta.findOne({
+            order: [['lastFetchedAt', 'DESC']]
+        })
+        res.locals.lastfetched = lastfetched || null;
+        res.locals.contactEmail = process.env.SUPPORTEMAIL;
+        next();
     } catch (error) {
         logger.error('Error fetching invoices: ' + error);
         next();
