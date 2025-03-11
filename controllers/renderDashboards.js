@@ -892,16 +892,24 @@ const renderCISDashboard = async (req, res, next) => {
         // Parse receipts once and store the processed version
         const processedReceipts = receipts.map(receipt => ({
             ...receipt.toJSON(),
-            Lines: typeof receipt.Lines === 'string' ? JSON.parse(receipt.Lines) : receipt.Lines,
+            Lines: (() => {
+                if (typeof receipt.Lines === 'string') {
+                    try {
+                        const parsedLines = JSON.parse(receipt.Lines);
+                        return Array.isArray(parsedLines) ? parsedLines : (parsedLines.anyType || []);
+                    } catch (error) {
+                        console.error("Error parsing Lines:", receipt.Lines, error);
+                        return [];
+                    }
+                }
+                return Array.isArray(receipt.Lines) ? receipt.Lines : (receipt.Lines?.anyType || []);
+            })(),
             Payments: typeof receipt.Payments === 'string' ? JSON.parse(receipt.Payments) : receipt.Payments
         }));
+        
 
         const taxYear = taxService.getTaxYearStartEnd(specifiedYear);
         const currentMonthlyReturn = taxService.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
-
-        if (processedReceipts.length > 0) {
-            logger.info('Receipt: '+ JSON.stringify(processedReceipts[0], null, 2));
-        }
 
         const filteredReceipts = processedReceipts.filter(receipt => {
             if (!receipt.Payments) return false;
@@ -914,6 +922,12 @@ const renderCISDashboard = async (req, res, next) => {
         });
 
         const receiptsWithLabourAndCIS = filteredReceipts.filter(receipt => {
+
+            if (!Array.isArray(receipt.Lines)) {
+                logger.warn("Invalid receipt.Lines: "+ JSON.stringify(receipt.Lines, null, 2));
+                return false; // Skip this receipt if Lines is not an array
+            }
+
             const hasLabourAndCIS = receipt.Lines.reduce((acc, line) => {
                 if (line.ChargeType === 18685897) acc.hasLabour = true;
                 if (line.ChargeType === 18685964) acc.hasCIS = true;
@@ -990,8 +1004,8 @@ const renderCISDashboard = async (req, res, next) => {
             specifiedMonth,
         });
     } catch (error) {
-        logger.error(`Error rendering CIS submission dashboard: ${error.message}`, { stack: error.stack });
-        req.flash('error', `Error rendering CIS submission dashboard: ${error.message}`);
+        logger.error(`Error rendering CIS dashboard: ${error.message}`, { stack: error.stack });
+        req.flash('error', `Error rendering CIS dashboard: ${error.message}`);
         next(error);
     }
 };
