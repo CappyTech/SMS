@@ -12,7 +12,7 @@ const getWeeklyAttendance = async (req, res, next) => {
         const year = req.params.year ? parseInt(req.params.year) : taxService.getCurrentTaxYear();
         const { start: startOfTaxYear } = taxService.getTaxYearStartEnd(year);
         const taxYearStart = moment.utc(startOfTaxYear, 'Do MMMM YYYY');
-        let firstPayrollWeekStart = taxYearStart.clone().day(1); 
+        let firstPayrollWeekStart = taxYearStart.clone().day(6); // 6 = Saturday
         if (firstPayrollWeekStart.isBefore(taxYearStart)) {
             firstPayrollWeekStart.add(7, 'days');
         }

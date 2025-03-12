@@ -52,8 +52,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     hourlyRate: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
       defaultValue: 0.0,
+    },
+    dailyRate: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
     },
   }, {
     timestamps: true,

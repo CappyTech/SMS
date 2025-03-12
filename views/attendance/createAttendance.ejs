@@ -1,9 +1,11 @@
+<!-- views/createAttendance.ejs -->
 
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <h1 class="display-5">Create Attendance</h1>
         <div class="container-fluid text-center">
             <form action="/attendance/create" method="POST" class="needs-validation">
+
                 <!-- Auto-populate Date field -->
                 <div class="row mb-3">
                     <label for="date" class="col-sm-3 col-form-label">Date</label>
@@ -19,17 +21,37 @@
                     </div>
                 </div>
 
+                <!-- Type Selection -->
+                <div class="row mb-3">
+                    <label for="type" class="col-sm-3 col-form-label">Type</label>
+                    <div class="col-sm-9">
+                        <select id="type" name="type" class="form-select">
+                            <option value="off" selected>Off</option>
+                            <option value="work">Work</option>
+                            <option value="holiday">Holiday</option>
+                            <option value="sick">Sick</option>
+                            <option value="training">Training</option>
+                            <option value="leave">Leave</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Location Selection -->
                 <div class="row mb-3">
                     <label for="locationId" class="col-sm-3 col-form-label">Location</label>
                     <div class="col-sm-9">
                         <div class="input-group">
-                            <select multiple id="locationId" name="locationId" class="form-select">
+                            <select id="locationId" name="locationId" class="form-select" onchange="toggleProjectLocation()">
                                 <option value="">Select Location</option>
                                 <% locations.forEach(location => { %>
                                     <% if (location.name) { %>
                                         <option value="<%= location.id %>"><%= location.name %></option>
                                     <% } else { %>
-                                    <option value="<%= location.id %>"><%= location.address %>, <%= location.city %>, <%= location.postalCode %></option>
+                                        <option value="<%= location.id %>">
+                                            <%= location.address %>, <%= location.city %>, <%= location.postalCode %>
+                                        </option>
                                     <% } %>
                                 <% }); %>
                             </select>
@@ -40,18 +62,38 @@
                     </div>
                 </div>
 
-                <!-- Auto-populate Employee field -->
+                <!-- Divider: OR -->
+                <div class="row mb-3">
+                    <label for="div1" class="col-sm-3 col-form-label"><small>OR</small></label>
+                    <input type="hidden" id="div1" name="div1">
+                </div>
+
+                <!-- Project Selection -->
+                <div class="row mb-3">
+                    <label for="projectId" class="col-sm-3 col-form-label">Job</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <select id="projectId" name="projectId" class="form-select" onchange="toggleProjectLocation()">
+                                <option value="">Select Job</option>
+                                <% projects.forEach(project => { %>
+                                    <option value="<%= project.uuid %>"><%= project.Number %> | <%= project.Name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Employee Selection -->
                 <div class="row mb-3">
                     <label for="employeeId" class="col-sm-3 col-form-label">Employee</label>
                     <div class="col-sm-9">
                         <div class="input-group">
-                            <select id="employeeId" name="employeeId" class="form-select">
-                                <option value="">N/A</option>
+                            <select id="employeeId" name="employeeId" class="form-select" onchange="toggleEmployeeSubcontractor()">
+                                <option value="">Select Employee</option>
                                 <% employees.forEach(employee => { %>
-                                    <% const selected = employeeId == employee.id ? 'selected' : ''; %>
-                                    <option value="<%= employee.id %>" <%= selected %>>
-                                        <%= employee.name %>
-                                    </option>
+                                    <option value="<%= employee.id %>"><%= employee.name %></option>
                                 <% }); %>
                             </select>
                             <a href="/employee/create">
@@ -61,45 +103,53 @@
                     </div>
                 </div>
 
-                <!-- Auto-populate Subcontractor field -->
+                <!-- Divider: OR -->
+                <div class="row mb-3">
+                    <label for="div2" class="col-sm-3 col-form-label"><small>OR</small></label>
+                    <input type="hidden" id="div2" name="div1">
+                </div>
+
+                
+                <!-- Subcontractor Selection -->
                 <div class="row mb-3">
                     <label for="subcontractorId" class="col-sm-3 col-form-label">Subcontractor</label>
                     <div class="col-sm-9">
                         <div class="input-group">
-                            <select id="subcontractorId" name="subcontractorId" class="form-select">
-                                <option value="">N/A</option>
+                            <select id="subcontractorId" name="subcontractorId" class="form-select" onchange="toggleEmployeeSubcontractor()">
+                                <option value="">Select Subcontractor</option>
                                 <% subcontractors.forEach(subcontractor => { %>
-                                    <% const selected = subcontractorId == subcontractor.id ? 'selected' : ''; %>
-                                    <option value="<%= subcontractor.id %>" <%= selected %>>
-                                        <%= subcontractor.company %>
-                                    </option>
+                                    <option value="<%= subcontractor.id %>"><%= subcontractor.Name %></option>
                                 <% }); %>
                             </select>
-                            <a href="/subcontractor/create">
-                                <button type="button" class="btn btn-hcs-green">+</button>
-                            </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="row mb-3">
-                    <label for="type" class="col-sm-3 col-form-label">Type</label>
-                    <div class="col-sm-9">
-                        <select id="type" name="type" class="form-select">
-                            <option value="Off" selected>Off</option>
-                            <option value="Work">Work</option>
-                            <option value="Holiday">Holiday</option>
-                            <option value="Sick">Sick</option>
-                        </select>
-                    </div>
-                </div>
+                <hr>
 
+                <!-- Hours Worked -->
                 <div class="row mb-3">
                     <label for="hoursWorked" class="col-sm-3 col-form-label">Hours Worked</label>
                     <div class="col-sm-9">
                         <input type="number" id="hoursWorked" name="hoursWorked" class="form-control" min="0" step="0.1">
                     </div>
                 </div>
+
+                <!-- Divider: OR -->
+                <div class="row mb-3">
+                    <label for="div1" class="col-sm-3 col-form-label"><small>OR</small></label>
+                    <input type="hidden" id="div1" name="div1">
+                </div>
+
+                <!-- Day Rate (For Subcontractors) -->
+                <div class="row mb-3">
+                    <label for="dayRate" class="col-sm-3 col-form-label">Day Rate (£)</label>
+                    <div class="col-sm-9">
+                        <input type="number" id="dayRate" name="dayRate" class="form-control" min="0" step="0.01">
+                    </div>
+                </div>
+
+                <hr>
 
                 <div class="d-grid">
                     <button type="submit" class="btn btn-hcs-green">Create Attendance</button>
@@ -108,3 +158,51 @@
         </div>
     </div>
 </div>
+
+<script>
+    function toggleProjectLocation() {
+        const locationSelect = document.getElementById("locationId");
+        const projectSelect = document.getElementById("projectId");
+
+        if (locationSelect.value) {
+            projectSelect.disabled = true;
+            projectSelect.value = "";
+        } else {
+            projectSelect.disabled = false;
+        }
+
+        if (projectSelect.value) {
+            locationSelect.disabled = true;
+            locationSelect.value = "";
+        } else {
+            locationSelect.disabled = false;
+        }
+    }
+
+    function toggleEmployeeSubcontractor() {
+        const employeeSelect = document.getElementById("employeeId");
+        const subcontractorSelect = document.getElementById("subcontractorId");
+        const dayRateField = document.getElementById("dayRate");
+        const hoursWorkedField = document.getElementById("hoursWorked");
+
+        if (employeeSelect.value) {
+            subcontractorSelect.disabled = true;
+            subcontractorSelect.value = "";
+            dayRateField.disabled = true;
+            hoursWorkedField.disabled = false;
+        } else {
+            subcontractorSelect.disabled = false;
+        }
+
+        if (subcontractorSelect.value) {
+            employeeSelect.disabled = true;
+            employeeSelect.value = "";
+            dayRateField.disabled = false;
+            hoursWorkedField.disabled = true;
+        } else {
+            employeeSelect.disabled = false;
+            dayRateField.disabled = true;
+            hoursWorkedField.disabled = false;
+        }
+    }
+</script>

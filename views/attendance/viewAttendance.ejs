@@ -8,20 +8,25 @@
                 <div class="card-header d-flex justify-content-between text-bg-secondary">
                     <span>
                         <!-- Show the name of the employee or subcontractor -->
-                        <%= attendance.Employee ? attendance.Employee.name : attendance.Subcontractor.company %>
+                        <%= attendance.Employee ? attendance.Employee.name : (attendance.Subcontractor ? attendance.Subcontractor.company : "Unknown") %>
                     </span>
-                    <a class="text-white" href="<%= attendance.Employee ? '/employee/read/' + attendance.Employee.id : '/subcontractor/read/' + attendance.Subcontractor.id %>">
-                        View <%= attendance.Employee ? 'Employee' : 'Subcontractor' %>
-                    </a>
+                    <% if (attendance.Employee) { %>
+                        <a class="text-white" href="/employee/read/<%= attendance.Employee.id %>">View Employee</a>
+                    <% } else if (attendance.Subcontractor) { %>
+                        <a class="text-white" href="/subcontractor/read/<%= attendance.Subcontractor.id %>">View Subcontractor</a>
+                    <% } %>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-6">
                             <ul class="list-group">
                                 <li class="list-group-item">Date</li>
-                                <li class="list-group-item">Location</li>
                                 <li class="list-group-item">Type</li>
-                                <li class="list-group-item">Hours Worked</li> <!-- New Hours Worked field -->
+                                <li class="list-group-item">
+                                    <%= attendance.projectId ? "Job" : "Location" %>
+                                </li>
+                                <li class="list-group-item">Hours Worked</li>
+                                <li class="list-group-item">Day Rate</li>
                             </ul>
                         </div>
                         <div class="col-6">
@@ -29,9 +34,16 @@
                                 <!-- Show Date -->
                                 <li class="list-group-item"><%= slimDateTime(attendance.date) %></li>
                                 
-                                <!-- Show Location with link to view location details -->
+                                <!-- Show Type -->
+                                <li class="list-group-item"><%= attendance.type ? attendance.type : 'N/A'%></li>
+
+                                <!-- Show Project OR Location -->
                                 <li class="list-group-item">
-                                    <% if (attendance.Location) { %>
+                                    <% if (attendance.projectId && project) { %>
+                                        <a href="/project/read/<%= project.uuid %>">
+                                            <%= project.Number %> | <%= project.Name %>
+                                        </a>
+                                    <% } else if (attendance.Location) { %>
                                         <a href="/location/read/<%= attendance.Location.id %>">
                                             <%= attendance.Location.name || (attendance.Location.address + ', ' + attendance.Location.city + ', ' + attendance.Location.postalCode) %>
                                         </a>
@@ -39,12 +51,12 @@
                                         N/A
                                     <% } %>
                                 </li>
-                                
-                                <!-- Show Type -->
-                                <li class="list-group-item"><%= attendance.type %></li>
-                                
+
                                 <!-- Show Hours Worked (if present) -->
                                 <li class="list-group-item"><%= attendance.hoursWorked ? attendance.hoursWorked + ' hours' : 'N/A' %></li>
+
+                                <!-- Show Day Rate (if subcontractor) -->
+                                <li class="list-group-item"><%= attendance.dayRate ? '£' + attendance.dayRate : 'N/A' %></li>
                             </ul>
                         </div>
                     </div>

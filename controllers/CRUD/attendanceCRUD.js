@@ -6,26 +6,47 @@ const attendanceService = require('../../services/attendanceService');
 const authService = require('../../services/authService');
 const taxService = require('../../services/taxService');
 const db = require('../../services/sequelizeDatabaseService');
+const kf = require('../../services/kashflowDatabaseService');
 const dateService = require('../../services/dateService');
 
 const createAttendance = async (req, res, next) => {
     try {
-        const {
-            date,
-            locationId,
-            employeeId,
-            subcontractorId,
-            type,
-            hoursWorked,
-        } = req.body;
+        const { date, locationId, projectId, employeeId, subcontractorId, type, hoursWorked, dayRate } = req.body;
+
+        // Ensure only one of locationId or projectId is provided
+        if (locationId && projectId) {
+            req.flash('error', 'You can only assign either a location OR a project, not both.');
+            return res.redirect('/attendance/create');
+        }
+        if (!locationId && !projectId) {
+            req.flash('error', 'You must assign either a location OR a project.');
+            return res.redirect('/attendance/create');
+        }
+
+        // Ensure only one of hoursWorked or dayRate is provided
+        if (hoursWorked && dayRate) {
+            req.flash('error', 'You can only enter either hours worked OR a day rate, not both.');
+            return res.redirect('/attendance/create');
+        }
+
+        // Validate projectId (if provided) exists in KF_Projects (manually fetching since it's in a different DB)
+        if (projectId) {
+            const projectExists = await db2.KF_Projects.findByPk(projectId);
+            if (!projectExists) {
+                req.flash('error', 'Invalid Project ID. Please select a valid project.');
+                return res.redirect('/attendance/create');
+            }
+        }
 
         await db.Attendances.create({
             date,
-            locationId,
+            locationId: locationId || null,
+            projectId: projectId || null,
             employeeId: employeeId || null,
             subcontractorId: subcontractorId || null,
             type,
-            hoursWorked,
+            hoursWorked: hoursWorked || null,
+            dayRate: dayRate || null,
         });
 
         req.flash('success', 'Attendance record created successfully.');
@@ -33,9 +54,10 @@ const createAttendance = async (req, res, next) => {
     } catch (error) {
         logger.error('Error creating attendance: ' + error.message);
         req.flash('error', 'Failed to create attendance.');
-        next(error); // Pass the error to the error handler
+        next(error);
     }
 };
+
 
 const readAttendance = async (req, res, next) => {
     try {
@@ -51,78 +73,64 @@ const readAttendance = async (req, res, next) => {
             return res.status(404).json({ error: 'Attendance record not found' });
         }
 
+        let project = null;
+        if (attendance.projectId) {
+            project = await kf.KF_Projects.findByPk(attendance.projectId);
+        }
+
         res.render(path.join('attendance', 'viewAttendance'), {
-            title: 'Attendance',
+            title: 'Attendance Details',
             attendance,
-            
+            project,
         });
     } catch (error) {
         logger.error('Error viewing attendance: ' + error.message);
         req.flash('error', 'Error viewing attendance: ' + error.message);
-        next(error); // Pass the error to the error handler
+        next(error);
     }
 };
+
+
 
 const updateAttendance = async (req, res, next) => {
     try {
         const { attendance } = req.params;
-        const {
-            date,
-            locationId,
-            employeeId,
-            subcontractorId,
-            hoursWorked,
-            type,
-        } = req.body;
+        const { date, locationId, projectId, employeeId, subcontractorId, hoursWorked, type, dayRate } = req.body;
 
-        // Convert employeeId and subcontractorId values to null if 'null' is passed as a string or if undefined
-        const updatedEmployeeId = employeeId === 'null' || !employeeId ? null : employeeId;
-        const updatedSubcontractorId = subcontractorId === 'null' || !subcontractorId ? null : subcontractorId;
-
-        // Set locationId to null if it's not provided or set to 'null'
-        const updatedLocationId = locationId === 'null' || !locationId ? null : locationId;
-
-        // Validation: ensure that either employeeId or subcontractorId is set, not both at the same time
-        if (updatedEmployeeId && updatedSubcontractorId) {
-            req.flash('error', 'Please select either an employee or a subcontractor, but not both.');
+        // Ensure only one of locationId or projectId is provided
+        if (locationId && projectId) {
+            req.flash('error', 'You can only assign either a location OR a project, not both.');
+            return res.redirect(`/attendance/update/${attendance}`);
+        }
+        if (!locationId && !projectId) {
+            req.flash('error', 'You must assign either a location OR a project.');
             return res.redirect(`/attendance/update/${attendance}`);
         }
 
-        // Validation: If employeeId is set, it must exist in the Employees table
-        if (updatedEmployeeId) {
-            const employeeExists = await db.Employees.findByPk(updatedEmployeeId);
-            if (!employeeExists) {
-                req.flash('error', 'Invalid Employee ID. Please select a valid employee.');
+        // Ensure only one of hoursWorked or dayRate is provided
+        if (hoursWorked && dayRate) {
+            req.flash('error', 'You can only enter either hours worked OR a day rate, not both.');
+            return res.redirect(`/attendance/update/${attendance}`);
+        }
+
+        // Validate projectId (if provided) exists in KF_Projects
+        if (projectId) {
+            const projectExists = await kf.KF_Projects.findByPk(projectId);
+            if (!projectExists) {
+                req.flash('error', 'Invalid Project ID. Please select a valid project.');
                 return res.redirect(`/attendance/update/${attendance}`);
             }
         }
 
-        // Validation: If subcontractorId is set, it must exist in the Subcontractors table
-        if (updatedSubcontractorId) {
-            const subcontractorExists = await db.Subcontractors.findByPk(updatedSubcontractorId);
-            if (!subcontractorExists) {
-                req.flash('error', 'Invalid Subcontractor ID. Please select a valid subcontractor.');
-                return res.redirect(`/attendance/update/${attendance}`);
-            }
-        }
-
-        // If locationId is provided and not null, validate its existence in the Locations table
-        if (updatedLocationId) {
-            const locationExists = await db.Locations.findByPk(updatedLocationId);
-            if (!locationExists) {
-                req.flash('error', 'Invalid Location ID. Please select a valid location.');
-                return res.redirect(`/attendance/update/${attendance}`);
-            }
-        }
-
-        // Update the attendance record with validated values
         await db.Attendances.update(
             {
                 date,
-                locationId: updatedLocationId, // Set the validated or null location ID
-                employeeId: updatedEmployeeId, // Set the validated or null employee ID
-                subcontractorId: updatedSubcontractorId, // Set the validated or null subcontractor ID
-                hoursWorked: updatedEmployeeId ? hoursWorked : null, // Set hoursWorked only if it's an employee
+                locationId: locationId || null,
+                projectId: projectId || null,
+                employeeId: employeeId || null,
+                subcontractorId: subcontractorId || null,
+                hoursWorked: employeeId ? hoursWorked || null : null, // Set to null if not an employee
+                dayRate: dayRate || null,
                 type,
             },
             { where: { id: attendance } }
@@ -138,11 +146,12 @@ const updateAttendance = async (req, res, next) => {
 };
 
 
+
 const deleteAttendance = async (req, res, next) => {
     try {
         const attendance = req.params.attendance;
 
-        await db.Attendances.destroy({ where: { attendance } });
+        await db.Attendances.destroy({ where: { id: attendance } });
 
         req.flash('success', 'Attendance record deleted successfully.');
         res.redirect('/dashboard/attendance');
@@ -153,22 +162,31 @@ const deleteAttendance = async (req, res, next) => {
     }
 };
 
-router.get('/fetch/attendance/:id', authService.ensureAuthenticated, async (req, res, next) => {
+router.get('/fetch/attendance/:id', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res, next) => {
     try {
-        const attendance = await db.Attendances.findAll({
+        const attendance = await db.Attendances.findOne({
             where: { id: req.params.id },
-            order: [['createdAt', 'ASC']],
+            include: [
+                { model: db.Employees },
+                { model: db.Subcontractors },
+                { model: db.Locations }
+            ]
         });
+
+        if (!attendance) {
+            return res.status(404).json({ error: 'Attendance record not found' });
+        }
 
         res.json({ attendance });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch attendance' });
+        res.status(500).json({ error: 'Failed to fetch attendance', details: error.message });
     }
 });
 
-router.post('/create', authService.ensureAuthenticated, createAttendance);
-router.get('/read/:attendance', authService.ensureAuthenticated, readAttendance);
-router.post('/update/:attendance', authService.ensureAuthenticated, updateAttendance);
-router.post('/delete/:attendance', authService.ensureAuthenticated, deleteAttendance);
+
+router.post('/create', authService.ensureAuthenticated, authService.ensureRole('admin'), createAttendance);
+router.get('/read/:attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), readAttendance);
+router.post('/update/:attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), updateAttendance);
+router.post('/delete/:attendance', authService.ensureAuthenticated, authService.ensureRole('admin'), deleteAttendance);
 
 module.exports = router;

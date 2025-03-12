@@ -11,7 +11,6 @@ const path = require('path');
 const logger = require('../services/loggerService');
 const attendanceService = require('../services/attendanceService');
 const authService = require('../services/authService');
-const db = require('../services/sequelizeDatabaseService');
 
 /**
  * Get daily attendance for a specific date or the current date if not provided.
@@ -26,7 +25,7 @@ const db = require('../services/sequelizeDatabaseService');
 const getDailyAttendance = async (req, res, next) => {
     const date = req.params.date || moment().format('YYYY-MM-DD'); // Default to today
     try {
-        const attendance = attendanceService.getAttendanceForDay(date,[db.Locations, db.Employees, db.Subcontractors]);
+        const attendance = await attendanceService.getAttendanceForDay(date);
         
         res.render(path.join('attendance', 'daily'), {
             moment,

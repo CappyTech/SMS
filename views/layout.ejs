@@ -65,45 +65,147 @@
     <nav class="navbar navbar-expand-lg bg-body-secondary d-print-none">
         <div class="container">
           <ul class="navbar-nav">
-            <!-- Dropdown: New 
+
+            <!-- Dropdown: Construction Industry Scheme -->
             <li class="nav-item dropdown">
               <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-plus-circle"></i> Create New
+                <i class="bi bi-building"></i> Construction Industry Scheme
               </button>
               <div class="dropdown-menu p-3 bg-body">
                 <ul class="nav flex-column">
                   <li class="nav-item">
-                    <a class="nav-link" href="/invoice/create"><i class="bi bi-receipt me-2"></i> Invoice</a>
+                    <a href="/dashboard/CIS" class="nav-link">
+                      <i class="bi bi-binoculars me-2"></i> CIS
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li class="nav-item">
+                    <a href="/kashflow/monthly/returns/form" class="nav-link">
+                      <i class="bi bi-file-spreadsheet-fill me-2"></i> Monthly Returns
+                    </a>
+                  </li>
+                  <!--
+                  <li class="nav-item">
+                    <a href="/dashboard/stats" class="nav-link">
+                      <i class="bi bi-binoculars me-2"></i> Overview
+                    </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/subcontractor/create"><i class="bi bi-people me-2"></i> Subcontractor</a>
+                    <a href="/dashboard/invoice" class="nav-link"><i class="bi bi-receipt me-2"></i> Invoices</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/quote/create"><i class="bi bi-file-earmark-text me-2"></i> Quote</a>
+                    <a href="/dashboard/subcontractor" class="nav-link"><i class="bi bi-people me-2"></i> Subcontractors</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/client/create"><i class="bi bi-people me-2"></i> Client</a>
+                    <a href="/monthly/returns/form" class="nav-link"><i class="bi bi-file-spreadsheet-fill me-2"></i> Monthly Returns</a>
+                  </li>
+                  -->
+                </ul>
+              </div>
+            </li>
+
+            <!-- Dropdown: Contract Management -->
+            <li class="nav-item dropdown">
+              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-folder2-open"></i> Management
+              </button>
+              <div class="dropdown-menu p-3 bg-body">
+                <ul class="nav flex-column">
+                  <!-- Projects -->
+                  <li class="nav-item">
+                    <a href="/dashboard/KFproject" class="nav-link">
+                      <i class="bi bi-kanban me-2"></i> Job Reg
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li class="nav-item">
+                    <a href="/attendance/weekly" class="nav-link">
+                      <i class="bi bi-person-raised-hand me-2"></i> Weekly Attendance
+                    </a>
+                  </li>
+                  <!--
+                  <li class="nav-item">
+                    <a href="/dashboard/quote" class="nav-link">
+                      <i class="bi bi-file-earmark-text me-2"></i> Quotes
+                    </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/contact/create"><i class="bi bi-telephone me-2"></i> Contact</a>
+                    <a href="/dashboard/job" class="nav-link">
+                      <i class="bi bi-briefcase me-2"></i> Jobs
+                    </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/location/create"><i class="bi bi-pin-map-fill me-2"></i> Location</a>
+                    <a href="/dashboard/client" class="nav-link">
+                      <i class="bi bi-people me-2"></i> Clients
+                    </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/attendance/create"><i class="bi bi-person-raised-hand me-2"></i> Attendance</a>
+                    <a href="/dashboard/contact" class="nav-link">
+                      <i class="bi bi-telephone me-2"></i> Contacts
+                    </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/employee/create"><i class="bi bi-person-standing me-2"></i> Employee</a>
+                    <a href="/dashboard/location" class="nav-link">
+                      <i class="bi bi-pin-map-fill me-2"></i> Locations
+                    </a>
                   </li>
+                  _-->
+                </ul>
+              </div>
+            </li>
+
+            <!-- Dropdown: Payroll -->
+            <li class="nav-item dropdown">
+              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-cash-coin"></i> Payroll
+              </button>
+              <div class="dropdown-menu p-3 bg-body">
+                <ul class="nav flex-column">
                   <li class="nav-item">
-                    <a class="nav-link" href="/user/create"><i class="bi bi-person me-2"></i> User</a>
+                    <a href="/dashboard/attendance" class="nav-link">
+                      <i class="bi bi-person-raised-hand me-2"></i> Attendance
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li class="nav-item">
+                    <a href="/attendance/weekly" class="nav-link">
+                      <i class="bi bi-person-raised-hand me-2"></i> Weekly Attendance
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li class="nav-item">
+                    <a href="/dashboard/employee" class="nav-link">
+                      <i class="bi bi-person-standing me-2"></i> Employees
+                    </a>
                   </li>
                 </ul>
               </div>
             </li>
-            -->
-            
+
+            <!-- Dropdown: HR (Administration) -->
+            <% if (isAuthenticated && isAdmin) { %>
+            <li class="nav-item dropdown">
+              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person"></i> HR
+              </button>
+              <div class="dropdown-menu p-3 bg-body">
+                <ul class="nav flex-column">
+                  <li class="nav-item">
+                    <a href="/user/create" class="nav-link">
+                      <i class="bi bi-person me-2"></i> Create User
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li class="nav-item">
+                    <a href="/dashboard/user" class="nav-link">
+                      <i class="bi bi-people me-2"></i> Manage Users
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <% } %>
+
             <li class="nav-item dropdown">
               <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-graph-up"></i> Kashflow
@@ -169,116 +271,43 @@
                 </ul>
               </div>
             </li>
-      
-            <!-- Dropdown: Construction Industry Scheme -->
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-building"></i> Construction Industry Scheme
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a href="/dashboard/stats" class="nav-link">
-                      <i class="bi bi-binoculars me-2"></i> Overview
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/invoice" class="nav-link"><i class="bi bi-receipt me-2"></i> Invoices</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/subcontractor" class="nav-link"><i class="bi bi-people me-2"></i> Subcontractors</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/monthly/returns/form" class="nav-link"><i class="bi bi-file-spreadsheet-fill me-2"></i> Monthly Returns</a>
-                  </li>
-                </ul>
-              </div>
-            </li>
 
-            <!-- Dropdown: Contract Management -->
             <li class="nav-item dropdown">
               <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-folder2-open"></i> Contract Management
+                <i class="bi bi-plus-circle"></i> Create New
               </button>
               <div class="dropdown-menu p-3 bg-body">
                 <ul class="nav flex-column">
+                  <!--<li class="nav-item">
+                    <a class="nav-link" href="/invoice/create"><i class="bi bi-receipt me-2"></i> Invoice</a>
+                  </li>-->
                   <li class="nav-item">
-                    <a href="/dashboard/quote" class="nav-link">
-                      <i class="bi bi-file-earmark-text me-2"></i> Quotes
-                    </a>
+                    <a class="nav-link" href="/subcontractor/create"><i class="bi bi-people me-2"></i> Subcontractor</a>
+                  </li>
+                  <!--<li class="nav-item">
+                    <a class="nav-link" href="/quote/create"><i class="bi bi-file-earmark-text me-2"></i> Quote</a>
+                  </li>-->
+                  <!--<li class="nav-item">
+                    <a class="nav-link" href="/client/create"><i class="bi bi-people me-2"></i> Client</a>
+                  </li>-->
+                  <!--<li class="nav-item">
+                    <a class="nav-link" href="/contact/create"><i class="bi bi-telephone me-2"></i> Contact</a>
+                  </li>-->
+                  <li class="nav-item">
+                    <a class="nav-link" href="/location/create"><i class="bi bi-pin-map-fill me-2"></i> Location</a>
                   </li>
                   <li class="nav-item">
-                    <a href="/dashboard/job" class="nav-link">
-                      <i class="bi bi-briefcase me-2"></i> Jobs
-                    </a>
+                    <a class="nav-link" href="/attendance/create"><i class="bi bi-person-raised-hand me-2"></i> Attendance</a>
                   </li>
                   <li class="nav-item">
-                    <a href="/dashboard/client" class="nav-link">
-                      <i class="bi bi-people me-2"></i> Clients
-                    </a>
+                    <a class="nav-link" href="/employee/create"><i class="bi bi-person-standing me-2"></i> Employee</a>
                   </li>
                   <li class="nav-item">
-                    <a href="/dashboard/contact" class="nav-link">
-                      <i class="bi bi-telephone me-2"></i> Contacts
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/location" class="nav-link">
-                      <i class="bi bi-pin-map-fill me-2"></i> Locations
-                    </a>
+                    <a class="nav-link" href="/user/create"><i class="bi bi-person me-2"></i> User</a>
                   </li>
                 </ul>
               </div>
             </li>
-
-            <!-- Dropdown: Payroll -->
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-cash-coin"></i> Payroll
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a href="/dashboard/attendance" class="nav-link">
-                      <i class="bi bi-person-raised-hand me-2"></i> Attendance
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/attendance/weekly" class="nav-link">
-                      <i class="bi bi-person-raised-hand me-2"></i> Weekly Attendance
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/employee" class="nav-link">
-                      <i class="bi bi-person-standing me-2"></i> Employees
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-
-            <!-- Dropdown: HR (Administration) -->
-            <% if (isAuthenticated && isAdmin) { %>
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person"></i> HR
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a href="/user/create" class="nav-link">
-                      <i class="bi bi-person me-2"></i> Create User
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/user" class="nav-link">
-                      <i class="bi bi-people me-2"></i> Manage Users
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <% } %>
 
           </ul>
         </div>

@@ -1,3 +1,5 @@
+// Description: Service for fetching attendance records from the database.
+// The service fetches attendance records for a given day or week and groups them by person.
 const moment = require('moment');
 const logger = require('./loggerService');
 const db = require('./sequelizeDatabaseService');
