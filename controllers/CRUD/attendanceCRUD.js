@@ -31,7 +31,7 @@ const createAttendance = async (req, res, next) => {
 
         // Validate projectId (if provided) exists in KF_Projects (manually fetching since it's in a different DB)
         if (projectId) {
-            const projectExists = await db2.KF_Projects.findByPk(projectId);
+            const projectExists = await kf.KF_Projects.findByPk(projectId);
             if (!projectExists) {
                 req.flash('error', 'Invalid Project ID. Please select a valid project.');
                 return res.redirect('/attendance/create');
