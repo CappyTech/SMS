@@ -281,9 +281,9 @@
                   <!--<li class="nav-item">
                     <a class="nav-link" href="/invoice/create"><i class="bi bi-receipt me-2"></i> Invoice</a>
                   </li>-->
-                  <li class="nav-item">
+                  <!--<li class="nav-item">
                     <a class="nav-link" href="/subcontractor/create"><i class="bi bi-people me-2"></i> Subcontractor</a>
-                  </li>
+                  </li>-->
                   <!--<li class="nav-item">
                     <a class="nav-link" href="/quote/create"><i class="bi bi-file-earmark-text me-2"></i> Quote</a>
                   </li>-->
@@ -294,17 +294,19 @@
                     <a class="nav-link" href="/contact/create"><i class="bi bi-telephone me-2"></i> Contact</a>
                   </li>-->
                   <li class="nav-item">
-                    <a class="nav-link" href="/location/create"><i class="bi bi-pin-map-fill me-2"></i> Location</a>
-                  </li>
-                  <li class="nav-item">
                     <a class="nav-link" href="/attendance/create"><i class="bi bi-person-raised-hand me-2"></i> Attendance</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="/employee/create"><i class="bi bi-person-standing me-2"></i> Employee</a>
                   </li>
                   <li class="nav-item">
+                    <a class="nav-link" href="/location/create"><i class="bi bi-pin-map-fill me-2"></i> Location</a>
+                  </li>
+                  <% if (isAuthenticated && isAdmin) { %>
+                  <li class="nav-item">
                     <a class="nav-link" href="/user/create"><i class="bi bi-person me-2"></i> User</a>
                   </li>
+                  <% } %>
                 </ul>
               </div>
             </li>

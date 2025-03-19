@@ -38,12 +38,54 @@
 
                 <hr>
 
+                <!-- Employee Selection -->
+                <div class="row mb-3">
+                    <label for="employeeId" class="col-sm-3 col-form-label">Employee</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <select id="employeeId" name="employeeId" class="form-select">
+                                <option value="">Select Employee</option>
+                                <% employees.forEach(employee => { %>
+                                    <option value="<%= employee.id %>"><%= employee.name %></option>
+                                <% }); %>
+                            </select>
+                            <a href="/employee/create">
+                                <button type="button" class="btn btn-hcs-green">+</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divider: OR -->
+                <div class="row mb-3">
+                    <label for="div2" class="col-sm-3 col-form-label"><small>OR</small></label>
+                    <input type="hidden" id="div2" name="div1">
+                </div>
+
+                
+                <!-- Subcontractor Selection -->
+                <div class="row mb-3">
+                    <label for="subcontractorId" class="col-sm-3 col-form-label">Subcontractor</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <select id="subcontractorId" name="subcontractorId" class="form-select">
+                                <option value="">Select Subcontractor</option>
+                                <% subcontractors.forEach(subcontractor => { %>
+                                    <option value="<%= subcontractor.uuid %>"><%= subcontractor.Name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
                 <!-- Location Selection -->
                 <div class="row mb-3">
                     <label for="locationId" class="col-sm-3 col-form-label">Location</label>
                     <div class="col-sm-9">
                         <div class="input-group">
-                            <select id="locationId" name="locationId" class="form-select" onchange="toggleProjectLocation()">
+                            <select id="locationId" name="locationId" class="form-select">
                                 <option value="">Select Location</option>
                                 <% locations.forEach(location => { %>
                                     <% if (location.name) { %>
@@ -73,52 +115,10 @@
                     <label for="projectId" class="col-sm-3 col-form-label">Job</label>
                     <div class="col-sm-9">
                         <div class="input-group">
-                            <select id="projectId" name="projectId" class="form-select" onchange="toggleProjectLocation()">
+                            <select id="projectId" name="projectId" class="form-select">
                                 <option value="">Select Job</option>
                                 <% projects.forEach(project => { %>
                                     <option value="<%= project.uuid %>"><%= project.Number %> | <%= project.Name %></option>
-                                <% }); %>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <hr>
-
-                <!-- Employee Selection -->
-                <div class="row mb-3">
-                    <label for="employeeId" class="col-sm-3 col-form-label">Employee</label>
-                    <div class="col-sm-9">
-                        <div class="input-group">
-                            <select id="employeeId" name="employeeId" class="form-select" onchange="toggleEmployeeSubcontractor()">
-                                <option value="">Select Employee</option>
-                                <% employees.forEach(employee => { %>
-                                    <option value="<%= employee.id %>"><%= employee.name %></option>
-                                <% }); %>
-                            </select>
-                            <a href="/employee/create">
-                                <button type="button" class="btn btn-hcs-green">+</button>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Divider: OR -->
-                <div class="row mb-3">
-                    <label for="div2" class="col-sm-3 col-form-label"><small>OR</small></label>
-                    <input type="hidden" id="div2" name="div1">
-                </div>
-
-                
-                <!-- Subcontractor Selection -->
-                <div class="row mb-3">
-                    <label for="subcontractorId" class="col-sm-3 col-form-label">Subcontractor</label>
-                    <div class="col-sm-9">
-                        <div class="input-group">
-                            <select id="subcontractorId" name="subcontractorId" class="form-select" onchange="toggleEmployeeSubcontractor()">
-                                <option value="">Select Subcontractor</option>
-                                <% subcontractors.forEach(subcontractor => { %>
-                                    <option value="<%= subcontractor.id %>"><%= subcontractor.Name %></option>
                                 <% }); %>
                             </select>
                         </div>
@@ -158,51 +158,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    function toggleProjectLocation() {
-        const locationSelect = document.getElementById("locationId");
-        const projectSelect = document.getElementById("projectId");
-
-        if (locationSelect.value) {
-            projectSelect.disabled = true;
-            projectSelect.value = "";
-        } else {
-            projectSelect.disabled = false;
-        }
-
-        if (projectSelect.value) {
-            locationSelect.disabled = true;
-            locationSelect.value = "";
-        } else {
-            locationSelect.disabled = false;
-        }
-    }
-
-    function toggleEmployeeSubcontractor() {
-        const employeeSelect = document.getElementById("employeeId");
-        const subcontractorSelect = document.getElementById("subcontractorId");
-        const dayRateField = document.getElementById("dayRate");
-        const hoursWorkedField = document.getElementById("hoursWorked");
-
-        if (employeeSelect.value) {
-            subcontractorSelect.disabled = true;
-            subcontractorSelect.value = "";
-            dayRateField.disabled = true;
-            hoursWorkedField.disabled = false;
-        } else {
-            subcontractorSelect.disabled = false;
-        }
-
-        if (subcontractorSelect.value) {
-            employeeSelect.disabled = true;
-            employeeSelect.value = "";
-            dayRateField.disabled = false;
-            hoursWorkedField.disabled = true;
-        } else {
-            employeeSelect.disabled = false;
-            dayRateField.disabled = true;
-            hoursWorkedField.disabled = false;
-        }
-    }
-</script>

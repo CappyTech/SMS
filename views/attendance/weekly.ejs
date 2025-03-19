@@ -1,8 +1,6 @@
-
-
 <div class="container py-4">
     <div class="mb-4 bg-body-tertiary rounded-3">
-        <!-- Vertical Navigation Tabs for Daily, Weekly, Monthly -->
+        <!-- Navigation Tabs -->
         <ul class="nav nav-tabs justify-content-center mb-4">
             <li class="nav-item">
                 <a href="/attendance/daily" class="nav-link <%= currentTab === 'daily' ? 'active' : '' %>">Daily</a>
@@ -11,134 +9,119 @@
                 <a href="/attendance/weekly" class="nav-link <%= currentTab === 'weekly' ? 'active' : '' %>">Weekly</a>
             </li>
         </ul>
-        <div class="container-fluid py-5 text-center">
-            <div class="d-flex justify-content-between mb-4 d-print-none">
-                <!-- Navigation buttons for Previous and Next week -->
-                <button class="btn btn-hcs-green" style="transform: rotate(0);">
-                    <a class="text-white stretched-link text-decoration-none" href="/attendance/weekly/<%= previousYear %>/<%= previousWeek %>">&laquo; Previous Week</a>
-                </button>
-                <h1 class="display-5 text-center">Weekly Attendance</h1>
-                <button class="btn btn-hcs-green" style="transform: rotate(0);">
-                    <a class="text-white stretched-link text-decoration-none" href="/attendance/weekly/<%= nextYear %>/<%= nextWeek %>">Next Week &raquo;</a>
-                </button>
-            </div>
 
-            <p class="text-center">From <%= moment(startDate).format('Do MMMM YYYY') %> to <%= moment(endDate).format('Do MMMM YYYY') %></p>
+        <!-- Week Navigation -->
+        <div class="d-flex justify-content-between mb-4 d-print-none">
+            <button class="btn btn-hcs-green">
+                <a class="text-white text-decoration-none" href="/attendance/weekly/<%= previousYear %>/<%= previousWeek %>">&laquo; Previous Week</a>
+            </button>
+            <h1 class="display-5 text-center">Weekly Attendance</h1>
+            <button class="btn btn-hcs-green">
+                <a class="text-white text-decoration-none" href="/attendance/weekly/<%= nextYear %>/<%= nextWeek %>">Next Week &raquo;</a>
+            </button>
+        </div>
 
-            <!-- Display Weekly Totals -->
-            <div class="row mb-4">
-                <div class="col-lg-6 col-md-6">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h4>Total Employee Payment</h4>
-                            <p class="display-6">£<%= totalEmployeePay %> <small class="fs-6">gross</small></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h4>Total Subcontractor Payment</h4>
-                            <p class="display-6">£<%= totalSubcontractorPay %> <small class="fs-6">net</small></p>
-                        </div>
+        <p class="text-center">From <%= moment(startDate).format('Do MMMM YYYY') %> to <%= moment(endDate).format('Do MMMM YYYY') %></p>
+
+        <!-- Weekly Totals -->
+        <div class="row mb-4">
+            <div class="col-lg-6 col-md-6">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4>Total Employee Payment</h4>
+                        <p class="display-6">£<%= totalEmployeePay ? totalEmployeePay : '0.00' %> <small class="fs-6">gross</small></p>
                     </div>
                 </div>
             </div>
-
-            <div class="row mb-4">
-                <div class="col-lg-6 col-md-6">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h4>Total Employee Hours Worked</h4>
-                            <p class="display-6"><%= totalEmployeeHours %> hours</p>
-                        </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4>Total Subcontractor Payment</h4>
+                        <p class="display-6">£<%= totalSubcontractorPay ? totalSubcontractorPay : '0.00' %> <small class="fs-6">net</small></p>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Attendance Table -->
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-sm">
-                    <thead>
-                        <tr>
-                            <th class="text-center fw-normal"></th>
-                            <% daysOfWeek.forEach(day => { %>
-                                <th class="text-center fs-6 fw-normal">
-                                    <a href="/attendance/daily/<%= day %>"><%= moment(day).format('DD/MM/YYYY') %></a><br><%= moment(day).format('dddd') %>
-                                </th>
-                            <% }); %>
-                            <!-- New column for Weekly Pay / Total Hours -->
-                            <th class="text-center fw-normal">Weekly Pay <br>/ Total Hours</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% Object.keys(groupedAttendance).forEach(person => { %>
+        <!-- Total Employee Hours -->
+        <div class="row mb-4">
+            <div class="col-lg-6 col-md-6">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4>Total Employee Hours Worked</h4>
+                        <p class="display-6"><%= totalEmployeeHours ? totalEmployeeHours : '0' %> hours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th class="text-center fw-normal"></th>
+                        <% daysOfWeek.forEach(day => { %>
+                            <th class="text-center fs-6 fw-normal">
+                                <a href="/attendance/daily/<%= day %>"><%= moment(day).format('DD/MM/YYYY') %></a><br><%= moment(day).format('dddd') %>
+                            </th>
+                        <% }); %>
+                        <th class="text-center fw-normal">Weekly Pay <br>/ Total Hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% Object.keys(groupedAttendance).forEach(person => { %>
+                        <% if (groupedAttendance[person].employeeId || groupedAttendance[person].subcontractorId) { %> <!-- ✅ Ensure projects are NOT listed -->
                             <tr class="fw-light">
                                 <td>
                                     <% if (groupedAttendance[person].employeeId) { %>
                                         <a href="/employee/read/<%= groupedAttendance[person].employeeId %>" class="text-decoration-none"><%= person %></a>
                                     <% } else if (groupedAttendance[person].subcontractorId) { %>
                                         <a href="/subcontractor/read/<%= groupedAttendance[person].subcontractorId %>" class="text-decoration-none"><%= person %></a>
-                                    <% } else { %>
-                                        <%= person %>
                                     <% } %>
                                 </td>
                                 <% daysOfWeek.forEach(day => { %>
                                     <% const dailyRecords = groupedAttendance[person].dailyRecords[day] || {}; %>
-                                    <% const invoices = groupedAttendance[person].invoices[day] || []; %>
                                     <td class="text-center">
-                                        <% Object.keys(dailyRecords).forEach(attendanceId => { %>
-                                            <% const record = dailyRecords[attendanceId]; %>
-                                            <a href="/attendance/read/<%= attendanceId %>" class="text-decoration-none">
-                                                <%= record.location ? (record.location.name || record.location.address || record.type) : record.type %>
-                                            </a><br>
-                                            <% if (record.hoursWorked) { %>
+                                        <% if (Object.keys(dailyRecords).length > 0) { %>
+                                            <% Object.keys(dailyRecords).forEach(attendanceId => { %>
+                                                <% const record = dailyRecords[attendanceId]; %>
                                                 <a href="/attendance/read/<%= attendanceId %>" class="text-decoration-none">
-                                                    <span><%= record.hoursWorked %> hours</span>
-                                                </a>
-                                            <% } %>
-                                            <!-- TODO: add holiday hours (hoursHoliday) -->
-                                            <!-- TODO: add sickpay rules --> 
-                                        <% }); %>
-                                        <% if (Object.keys(dailyRecords).length === 0) { %>
-                                            <!-- If no attendance or invoice records, show a link to create a new attendance for that day and person -->
-                                            <button class="btn btn-secondary" style="transform: rotate(0);">
-                                                <a href="/attendance/create?date=<%= day %><%= groupedAttendance[person].employeeId ? '&employeeId=' + groupedAttendance[person].employeeId : '' %><%= groupedAttendance[person].subcontractorId ? '&subcontractorId=' + groupedAttendance[person].subcontractorId : '' %>" 
-                                                class="text-white stretched-link text-decoration-none">+</a>
-                                            </button>
-                                        <% } %>
-
-                                        <!-- Show subcontractor invoices if available -->
-                                        <% if (invoices.length > 0) { %>
-                                            <% invoices.forEach(invoice => { %>
-                                                <div>
-                                                    <span><a href="/invoice/read/<%= invoice.id %>"><%= invoice.invoiceNumber %></a></span><br>
-                                                    <span>£<%= invoice.netAmount.toFixed(2) %></span>
-                                                </div>
+                                                    <%= record.location ? record.location.name : record.type %>
+                                                </a><br>
+                                                <% if (record.hoursWorked) { %>
+                                                    <a href="/attendance/read/<%= attendanceId %>" class="text-decoration-none">
+                                                        <span><%= record.hoursWorked %> hours</span>
+                                                    </a>
+                                                <% } %>
                                             <% }); %>
+                                        <% } else { %>
+                                            <!-- If no record exists, show a "Create Attendance" link -->
+                                            <a href="/attendance/create?date=<%= day %>" 
+                                               class="text-decoration-none text-muted">
+                                                Add Attendance
+                                            </a>
                                         <% } %>
                                     </td>
                                 <% }); %>
-                                <!-- Display weekly pay or total hours at the end of each row -->
                                 <td class="text-center">
-                                    <% if (groupedAttendance[person].totalHoursWorked) { %>
-                                        £<%= groupedAttendance[person].weeklyPay.toFixed(2) %> / <%= groupedAttendance[person].totalHoursWorked %> hours
-                                    <% } else { %>
-                                        £<%= groupedAttendance[person].weeklyPay.toFixed(2) %>
+                                    <% if (groupedAttendance[person].employeeId) { %>
+                                        <a href="/attendance/weekly/<%= startDate %>/<%= endDate %>/<%= groupedAttendance[person].employeeId %>" class="text-decoration-none">
+                                            £<%= groupedAttendance[person].totalEmployeePay ? groupedAttendance[person].totalEmployeePay : '0.00' %><br>
+                                            <%= groupedAttendance[person].totalEmployeeHours ? groupedAttendance[person].totalEmployeeHours : '0' %> hours
+                                        </a>
+                                    <% } else if (groupedAttendance[person].subcontractorId) { %>
+                                        <a href="/attendance/weekly/<%= startDate %>/<%= endDate %>/<%= groupedAttendance[person].subcontractorId %>" class="text-decoration-none">
+                                            £<%= groupedAttendance[person].totalSubcontractorPay ? groupedAttendance[person].totalSubcontractorPay : '0.00' %><br>
+                                            <%= groupedAttendance[person].totalSubcontractorHours ? groupedAttendance[person].totalSubcontractorHours : '0' %> hours
+                                        </a>
                                     <% } %>
                                 </td>
                             </tr>
-                        <% }); %>
-                        <tr class="fw-light">
-                            <td>
-                                <button class="btn btn-hcs-green" style="transform: rotate(0);">
-                                    <a href="/attendance/create" class="text-white stretched-link text-decoration-none">+</a>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                        <% } %>
+                    <% }); %>
+                </tbody>                                
+            </table>
         </div>
     </div>
 </div>

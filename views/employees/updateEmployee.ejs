@@ -93,10 +93,37 @@
                     </div>
                 </div>
 
-                <div class="d-grid">
+                <!-- Submit and Delete Options -->
+                <span class="d-flex justify-content-between mt-3">
                     <button type="submit" class="btn btn-hcs-green">Update Employee</button>
-                </div>
+                    <a type="button" class="text-hcs-red" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
+                        Delete Employee
+                    </a>
+                </span>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                Are you sure you want to delete this Employee?
+                <hr>
+                <span class="hcs-red-text lead">This action cannot be undone!</span>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <form action="/employee/delete/<%= employee.id %>" method="POST">
+                    <button type="submit" class="btn btn-hcs-red">Delete</button>
+                </form>
+                <a type="button" class="text-hcs-black" data-bs-dismiss="modal">Close</a>
+            </div>
         </div>
     </div>
 </div>

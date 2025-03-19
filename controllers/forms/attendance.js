@@ -20,10 +20,10 @@ const renderAttendanceCreateForm = async (req, res, next) => {
         });        
         const projects = await kf.KF_Projects.findAll({
             where: {
-                Status: 1 // Only fetch active projects
+                Status: 1
             },
             order: [['Number', 'DESC']]
-        }); // Fetch projects from KashFlow DB
+        });
 
         res.render(path.join('attendance', 'createAttendance'), {
             date: date ? dateService.slimDateTime(date, false, true) : '',
@@ -53,7 +53,7 @@ const renderAttendanceUpdateForm = async (req, res, next) => {
 
         const locations = await db.Locations.findAll();
         const employees = await db.Employees.findAll();
-        const subcontractors = await db.Subcontractors.findAll();
+        const subcontractors = await kf.KF_Suppliers.findAll();
         const projects = await kf.KF_Projects.findAll({});
 
         res.render(path.join('attendance', 'updateAttendance'), {
