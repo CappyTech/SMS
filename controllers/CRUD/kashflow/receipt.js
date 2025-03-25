@@ -69,7 +69,7 @@ const readReceipt = async (req, res, next) => {
 
 const renderchangeReceiptForm = async (req, res, next) => {
     try {
-        const supplier = await kf.KF_Receipt.findByPk(req.params.uuid);
+        const supplier = await kf.KF_Receipts.findByPk(req.params.uuid);
 
         if (!supplier) {
             req.flash('error', 'Receipt not found.');
@@ -90,7 +90,7 @@ const renderchangeReceiptForm = async (req, res, next) => {
 const changeReceipt = async (req, res, next) => {
     try {
         const { subcontractor, cisRate, cisNumber } = req.body;
-        await kf.KF_Receipt.update(
+        await kf.KF_Receipts.update(
             {
                 Subcontractor: subcontractor ? true : false, // Ensure boolean value
                 CISRate: parseFloat(cisRate), // Convert to float
