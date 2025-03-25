@@ -83,7 +83,7 @@ const updateUser = async (req, res, next) => {
             return res.status(400).send('Bad Request: Missing user id parameter.');
         }
 
-        const { username, email, role, permissions: incomingPermissions } = req.body;
+        const { username, email, password, role, permissions: incomingPermissions } = req.body;
 
         // Validate and sanitize permissions
         const validPermissions = rolePermissions[role] || {};
