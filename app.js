@@ -91,7 +91,7 @@ app.use(async (req, res, next) => {
 
 app.use((req, res, next) => {
     res.locals.successMessage = req.flash('success');
-    res.locals.errorMessages = req.flash('error');
+    res.locals.errorMessage = req.flash('error');
     next();
 });
 
