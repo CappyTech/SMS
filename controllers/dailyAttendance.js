@@ -31,8 +31,6 @@ const getDailyAttendance = async (req, res, next) => {
             moment,
             attendance,
             date,
-            errorMessage: req.flash('error'),
-            successMessage: req.flash('success'),
             currentTab: 'daily'
         });
     } catch (error) {
