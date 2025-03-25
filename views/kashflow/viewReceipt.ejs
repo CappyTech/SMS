@@ -106,7 +106,7 @@
             <button type="submit" class="btn btn-hcs-green">Mark as Submitted (Today)</button>
         </form>
         <br>
-        <form action="/kashflow/receipt/change/<%= Receipt.uuid %>" method="POST">
+        <form action="/kashflow/receipt/change/<%= Receipt.uuid %>" method="GET">
             <button type="submit" class="btn btn-warning ">Change to a Specific Submission Date</button>
         </form>
     </div>
@@ -118,7 +118,7 @@
             <button type="submit" class="btn btn-danger">Cancel Submission</button>
         </form>
         <br>
-        <form action="/kashflow/receipt/change/<%= Receipt.uuid %>" method="POST">
+        <form action="/kashflow/receipt/change/<%= Receipt.uuid %>" method="GET">
             <button type="submit" class="btn btn-warning">Change to a Specific Submission Date</button>
         </form>
     </div>
