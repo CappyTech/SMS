@@ -9,8 +9,6 @@ const renderRegistrationForm = (req, res) => {
     
     res.render(path.join('user', 'register'), {
         title: 'Register',
-        errorMessage: req.flash('error'),
-        successMessage: req.flash('success'),
         message: req.query.message || '',
     });
 };
