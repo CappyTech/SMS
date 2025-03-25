@@ -116,8 +116,6 @@ const render2FAPage = (req, res) => {
 
     res.render(path.join('user', '2fa'), {
         title: 'Two-Factor Authentication',
-        errorMessage: req.flash('error'),
-        successMessage: req.flash('success'),
     });
 };
 
