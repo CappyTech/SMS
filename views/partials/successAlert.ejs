@@ -14,10 +14,12 @@
         </div>
     <% }); %>
     <script>
-        var toastElements = document.querySelectorAll('.toast');
-        toastElements.forEach(function (toastElement) {
-            var toast = new bootstrap.Toast(toastElement);
-            toast.show();
+        window.addEventListener('load', function () {
+            var toastElements = document.querySelectorAll('.toast');
+            toastElements.forEach(function (toastElement) {
+                var toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            });
         });
     </script>
 <% } %>
