@@ -132,9 +132,7 @@ app.use(async (req, res, next) => {
                 title: 'Holiday Notice',
                 reason: holidayDetails.reason,
                 startDate: holidayDetails.startDate,
-                endDate: holidayDetails.endDate,
-                errorMessages : req.flash('error'),
-                successMessage : req.flash('success'),
+                endDate: holidayDetails.endDate
             });
         }
         
