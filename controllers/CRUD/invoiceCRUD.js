@@ -57,7 +57,7 @@ const createInvoice = async (req, res, next) => {
             logger.error(`Validation errors: ${errorMessages.join(', ')}`);
             return res.render('createInvoice', {
                 title: 'Create Invoice',
-                errorMessages: req.flash('error'),
+                errorMessage: req.flash('error'),
                 successMessage: req.flash('success'),
             });
         }
