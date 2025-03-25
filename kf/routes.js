@@ -12,7 +12,7 @@ router.get('/kashflow', authService.ensureAuthenticated, authService.ensureRole(
     res.render(path.join('kashflow', 'fetchStatus'), {
         title: 'Gathering KashFlow Data',
         isFetching,
-        errorMessages: req.flash('error'),
+        errorMessage: req.flash('error'),
         successMessage: req.flash('success'),
     });
 });
@@ -40,7 +40,7 @@ router.get('/fetch-status', authService.ensureAuthenticated, authService.ensureR
         messages: fetchMessages,
         completed: !isFetching,
         error: fetchError || null,
-        errorMessages: req.flash('error'),
+        errorMessage: req.flash('error'),
         successMessage: req.flash('success'),
     });
 });
