@@ -47,11 +47,11 @@ const getWeeklyAttendance = async (req, res, next) => {
         } = attendanceService.groupAttendanceByPerson(
             attendanceRecords,
             payrollWeekStart,
-            endDate,
+            endDate,              // ✅ Add this missing argument
             allEmployees,
             allSubcontractors,
             paidReceipts
-        );        
+        );    
 
         // ✅ Render the updated weekly attendance view
         res.render(path.join('attendance', 'weekly'), {
