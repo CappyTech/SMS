@@ -34,7 +34,8 @@ const getWeeklyAttendance = async (req, res, next) => {
             employeeCount,
             subcontractorCount,
             allEmployees,
-            allSubcontractors
+            allSubcontractors,
+            paidReceipts
         } = await attendanceService.getAttendanceForWeek(payrollWeekStart, endDate);
 
         const {
@@ -48,7 +49,8 @@ const getWeeklyAttendance = async (req, res, next) => {
             payrollWeekStart,
             endDate,
             allEmployees,
-            allSubcontractors
+            allSubcontractors,
+            paidReceipts
         );        
 
         // ✅ Render the updated weekly attendance view
