@@ -107,13 +107,13 @@
                                 <td class="text-center">
                                     <% if (groupedAttendance[person].employeeId) { %>
                                         <a href="/attendance/weekly/<%= startDate %>/<%= endDate %>/<%= groupedAttendance[person].employeeId %>" class="text-decoration-none">
-                                            £<%= groupedAttendance[person].totalEmployeePay ? groupedAttendance[person].totalEmployeePay : '0.00' %><br>
-                                            <%= groupedAttendance[person].totalEmployeeHours ? groupedAttendance[person].totalEmployeeHours : '0' %> hours
+                                            £<%= groupedAttendance[person].totalEmployeePay %><br>
+                                            <%= groupedAttendance[person].totalEmployeeHours %> hours
                                         </a>
                                     <% } else if (groupedAttendance[person].subcontractorId) { %>
                                         <a href="/attendance/weekly/<%= startDate %>/<%= endDate %>/<%= groupedAttendance[person].subcontractorId %>" class="text-decoration-none">
-                                            £<%= groupedAttendance[person].totalSubcontractorPay ? groupedAttendance[person].totalSubcontractorPay : '0.00' %><br>
-                                            <%= groupedAttendance[person].totalSubcontractorHours ? groupedAttendance[person].totalSubcontractorHours : '0' %> hours
+                                            £<%= groupedAttendance[person].totalSubcontractorPay %><br>
+                                            <%= groupedAttendance[person].totalSubcontractorHours %> hours
                                         </a>
                                     <% } %>
                                 </td>
