@@ -95,7 +95,9 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
 const groupAttendanceByPerson = (
     attendanceRecords,
     payrollWeekStart,
+    endDate, // ✅ Add this
     allEmployees,
+    allSubcontractors,
     paidReceipts = []
 ) => {
     const groupedAttendance = {};
