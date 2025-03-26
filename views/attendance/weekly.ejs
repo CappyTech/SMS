@@ -105,6 +105,7 @@
                                     </td>
                                 <% }); %>
                                 <td class="text-center">
+                                    <%= JSON.stringify(groupedAttendance[person], null, 2) %>
                                     <% if (groupedAttendance[person].employeeId) { %>
                                         <a href="/attendance/weekly/<%= startDate %>/<%= endDate %>/<%= groupedAttendance[person].employeeId %>" class="text-decoration-none">
                                             £<%= groupedAttendance[person].totalEmployeePay %><br>
@@ -125,4 +126,3 @@
         </div>
     </div>
 </div>
-<%= JSON.stringify(groupedAttendance[person], null, 2) %>
