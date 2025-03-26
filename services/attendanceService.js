@@ -26,31 +26,36 @@ const getAttendanceForDay = async (date) => {
  */
 const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
     try {
-        // Fetch attendance records for employees
         const attendanceRecords = await db.Attendances.findAll({
             where: {
                 date: {
                     [db.Sequelize.Op.between]: [payrollWeekStart.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
                 }
             },
-            include: [db.Employees, db.Locations], // Removed Subcontractors
+            include: [db.Employees, db.Locations],
             order: [['date', 'ASC']]
         });
 
-        // Fetch all employees
         const allEmployees = await db.Employees.findAll({
             where: { status: 'active' }
         });
 
-        // Fetch subcontractors with receipts paid this week
+        // ✅ Get subcontractors first
+        const allSubcontractors = await kf.KF_Suppliers.findAll({
+            where: { Subcontractor: true }
+        });
+
+        const subcontractorIds = allSubcontractors.map(s => s.SupplierID);
+
+        // ✅ Get receipts for just those subcontractors
         const paidReceipts = await kf.KF_Receipts.findAll({
             where: {
                 CustomerID: {
-                    [kf.Sequelize.Op.ne]: null
+                    [kf.Sequelize.Op.in]: subcontractorIds
                 },
-                Paid: 1, // must be explicitly marked as paid
+                Paid: 1,
                 AmountPaid: {
-                    [kf.Sequelize.Op.gt]: 0 // and have a real amount
+                    [kf.Sequelize.Op.gt]: 0
                 },
                 InvoiceDate: {
                     [kf.Sequelize.Op.between]: [
@@ -61,10 +66,7 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
             },
             include: [{
                 model: kf.KF_Suppliers,
-                as: 'supplier',
-                where: {
-                    Subcontractor: true
-                }
+                as: 'supplier'
             }]
         });
 
@@ -73,13 +75,15 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
             employeeCount: allEmployees.length,
             subcontractorCount: allSubcontractors.length,
             allEmployees,
+            allSubcontractors,
             paidReceipts
         };
     } catch (error) {
-        logger.error('Error fetching attendance records: ' + error);
+        logger.error('Error fetching attendance records: ' + error.message);
         throw new Error('Failed to fetch attendance records for the week');
     }
 };
+
 
 /**
  * Group attendance records by person.
