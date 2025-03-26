@@ -42,9 +42,30 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
             where: { status: 'active' }
         });
 
-        // Fetch subcontractors from a different database (KF_Suppliers)
-        const allSubcontractors = await kf.KF_Suppliers.findAll({
-            where: { Subcontractor: true }
+        // Fetch subcontractors with receipts paid this week
+        const paidReceipts = await kf.KF_Receipts.findAll({
+            where: {
+                CustomerID: {
+                    [kf.Sequelize.Op.ne]: null
+                },
+                Paid: 1, // must be explicitly marked as paid
+                AmountPaid: {
+                    [kf.Sequelize.Op.gt]: 0 // and have a real amount
+                },
+                InvoiceDate: {
+                    [kf.Sequelize.Op.between]: [
+                        payrollWeekStart.format('YYYY-MM-DD'),
+                        endDate.format('YYYY-MM-DD')
+                    ]
+                }
+            },
+            include: [{
+                model: kf.KF_Suppliers,
+                as: 'supplier',
+                where: {
+                    Subcontractor: true
+                }
+            }]
         });
 
         return {
@@ -52,7 +73,7 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
             employeeCount: allEmployees.length,
             subcontractorCount: allSubcontractors.length,
             allEmployees,
-            allSubcontractors
+            paidReceipts
         };
     } catch (error) {
         logger.error('Error fetching attendance records: ' + error);
@@ -64,89 +85,113 @@ const getAttendanceForWeek = async (payrollWeekStart, endDate) => {
  * Group attendance records by person.
  * @param {Array} attendanceRecords - Array of attendance records.
  * @param {Date} payrollWeekStart - Start date of the week.
- * @param {Date} endDate - End date of the week.
  * @param {Array} allEmployees - Array of employees.
- * @param {Array} allSubcontractors - Array of subcontractors from KF_Suppliers.
  * @returns {Object} - Grouped attendance records.
  */
-const groupAttendanceByPerson = (attendanceRecords, payrollWeekStart, endDate, allEmployees, allSubcontractors) => {
-    const totalEmployeePay = attendanceRecords
-        .filter(a => a.employeeId !== null && a.hoursWorked !== null && a.Employee) // Ensure Employee is loaded
-        .reduce((sum, record) => sum + (parseFloat(record.hoursWorked) * parseFloat(record.Employee.hourlyRate)), 0);
-
+const groupAttendanceByPerson = (
+    attendanceRecords,
+    payrollWeekStart,
+    allEmployees,
+    paidReceipts = []
+) => {
     const groupedAttendance = {};
     let totalEmployeeHours = 0;
     let totalSubcontractorPay = 0;
 
-    // Initialize groupedAttendance with all employees
+    // ✅ Initialize EMPLOYEES (they always appear)
     allEmployees.forEach(employee => {
         groupedAttendance[employee.name] = {
             employeeId: employee.id,
             subcontractorId: null,
             totalHoursWorked: 0,
-            totalPay: 0,
             weeklyPay: 0,
-            dailyRecords: {}
+            dailyRecords: {},
+            type: 'employee' // ✅ Add this
         };
     });
 
-    // Initialize subcontractors from KF_Suppliers
-    allSubcontractors.forEach(subcontractor => {
-        groupedAttendance[subcontractor.Name] = {
-            employeeId: null,
-            subcontractorId: subcontractor.id,
-            totalHoursWorked: 0,
-            totalPay: 0,
-            weeklyPay: 0,
-            dailyRecords: {}
+    // ✅ Add subcontractors ONLY if they have paid receipts this week
+    paidReceipts.forEach(receipt => {
+        const subcontractor = receipt.supplier;
+        if (!subcontractor) return;
+
+        const name = subcontractor.Name;
+        const dateKey = moment(receipt.InvoiceDate).format('YYYY-MM-DD');
+        const amount = parseFloat(receipt.AmountPaid || 0);
+
+        if (!groupedAttendance[name]) {
+            groupedAttendance[name] = {
+                employeeId: null,
+                subcontractorId: subcontractor.SupplierID,
+                totalHoursWorked: 0,
+                weeklyPay: 0,
+                dailyRecords: {},
+                type: 'subcontractor' // ✅ Add this
+            };
+        }
+
+        groupedAttendance[name].weeklyPay += amount;
+
+        if (!groupedAttendance[name].dailyRecords[dateKey]) {
+            groupedAttendance[name].dailyRecords[dateKey] = {};
+        }
+
+        groupedAttendance[name].dailyRecords[dateKey][`receipt-${receipt.InvoiceDBID}`] = {
+            location: null,
+            type: 'Receipt',
+            hoursWorked: null,
+            weeklyPay: amount
         };
+
+        totalSubcontractorPay += amount;
     });
 
+    // ✅ Process ATTENDANCE records (for employees only)
     attendanceRecords.forEach(record => {
-        const personName = record.Employee ? record.Employee.name : null;
+        if (!record.Employee) return;
 
-        if (!personName) return; // Skip if no valid personName
+        const personName = record.Employee.name;
+        const dateKey = moment(record.date).format('YYYY-MM-DD');
+        const hoursWorked = parseFloat(record.hoursWorked) || 0;
+        const hourlyRate = parseFloat(record.Employee.hourlyRate) || 0;
+        const calculatedPay = hoursWorked * hourlyRate;
 
         if (!groupedAttendance[personName]) {
             groupedAttendance[personName] = {
-                employeeId: record.Employee ? record.Employee.id : null,
+                employeeId: record.Employee.id,
                 subcontractorId: null,
                 totalHoursWorked: 0,
-                totalPay: 0,
                 weeklyPay: 0,
                 dailyRecords: {}
             };
         }
 
-        const dateKey = moment(record.date).format('YYYY-MM-DD');
-
         if (!groupedAttendance[personName].dailyRecords[dateKey]) {
             groupedAttendance[personName].dailyRecords[dateKey] = {};
         }
-
-        // Convert hoursWorked to a number
-        const hoursWorked = parseFloat(record.hoursWorked) || 0;
-        const hourlyRate = record.Employee ? parseFloat(record.Employee.hourlyRate) || 0 : 0;
-        const calculatedWeeklyPay = hoursWorked * hourlyRate;
 
         groupedAttendance[personName].dailyRecords[dateKey][record.id] = {
             location: record.Location,
             type: record.type,
             hoursWorked: hoursWorked,
-            weeklyPay: calculatedWeeklyPay
+            weeklyPay: calculatedPay
         };
 
-        if (record.Employee) {
-            groupedAttendance[personName].totalHoursWorked += hoursWorked;
-            groupedAttendance[personName].weeklyPay += calculatedWeeklyPay;
-            totalEmployeeHours += hoursWorked;
-        }
+        groupedAttendance[personName].totalHoursWorked += hoursWorked;
+        groupedAttendance[personName].weeklyPay += calculatedPay;
+        totalEmployeeHours += hoursWorked;
     });
 
+    // ✅ Build week date list (used in rendering headers)
     const daysOfWeek = [];
     for (let i = 0; i < 7; i++) {
         daysOfWeek.push(payrollWeekStart.clone().add(i, 'days').format('YYYY-MM-DD'));
     }
+
+    // ✅ Calculate total employee pay separately for accuracy
+    const totalEmployeePay = Object.values(groupedAttendance)
+        .filter(p => p.employeeId)
+        .reduce((sum, p) => sum + p.weeklyPay, 0);
 
     return {
         groupedAttendance,
