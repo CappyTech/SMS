@@ -14,12 +14,7 @@ const logger = require('../services/loggerService');
 const taxService = require('../services/taxService');
 const getInvoiceNotes = require('./getInvoiceNotes');
 const getReceiptNotes = require('./getReceiptNotes');
-
-const ChargeTypes = {
-    18685896: 'Materials',
-    18685897: 'Labour',
-    18685964: 'CIS Deductions',
-};
+const ChargeTypes = require('../controllers/CRUD/kashflow/chargeTypes.json');
 
 async function logOperationDetails(filename, data) {
     try {
