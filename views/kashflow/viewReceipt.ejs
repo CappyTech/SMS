@@ -35,7 +35,19 @@
                 <% Receipt.Lines.forEach(line => { %>
                     <tr>
                         <td><%= line.ChargeType %></td>
-                        <td><%= line.ProjID %></td>
+                        <td>
+                            <% 
+                                // Look for a matching project by ProjID
+                                const project = Projects.find(function(p) { 
+                                    return p.ID === line.ProjID; 
+                                });
+                                if (project) { 
+                            %>
+                                - <%= project.Name %>
+                            <% } else { %>
+                                <%= line.ProjID %>
+                            <% } %>
+                        </td>
                         <td><%= line.Quantity %></td>
                         <td><%= line.Description %></td>
                         <td><%= line.Rate %></td>
