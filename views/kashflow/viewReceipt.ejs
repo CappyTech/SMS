@@ -34,7 +34,7 @@
             <tbody>
                 <% Receipt.Lines.forEach(line => { %>
                     <tr>
-                        <td><%= line.ChargeType %></td>
+                        <td><%= line.ChargeTypeName %></td>
                         <td>
                             <% 
                                 // Look for a matching project by ProjID
