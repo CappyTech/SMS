@@ -5,12 +5,7 @@ const path = require('path');
 const kf = require('../services/kashflowDatabaseService');
 const authService = require('../services/authService');
 const slimDateTime = require('../services/dateService').slimDateTime;
-
-const ChargeTypes = {
-    18685896: 'Materials',
-    18685897: 'Labour',
-    18685964: 'CIS Deductions',
-};
+const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
 
 const renderKFMonthlyReturnsForm = async (req, res, next) => {
     try {
