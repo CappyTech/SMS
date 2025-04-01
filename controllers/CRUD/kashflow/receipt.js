@@ -21,6 +21,9 @@ const readReceipt = async (req, res, next) => {
 
         // Parse Lines and Payments from JSON to Object (if not already) and log them for debugging purposes
         Receipt.Lines = typeof Receipt.Lines === 'string' ? JSON.parse(Receipt.Lines) : Receipt.Lines || [];
+        if (Receipt.Lines.anyType) {
+            Receipt.Lines = Receipt.Lines.anyType;
+          }
         Receipt.Payments = typeof Receipt.Payments === 'string' ? JSON.parse(Receipt.Payments) : Receipt.Payments || [];
         logger.info('Parsed Receipt Lines: ' + JSON.stringify(Receipt.Lines, null, 2));
         logger.info('Parsed Payment Lines: ' + JSON.stringify(Receipt.Payments, null, 2));
