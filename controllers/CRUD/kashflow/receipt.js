@@ -28,12 +28,14 @@ const readReceipt = async (req, res, next) => {
         logger.info('Parsed Receipt Lines: ' + JSON.stringify(Receipt.Lines, null, 2));
         logger.info('Parsed Payment Lines: ' + JSON.stringify(Receipt.Payments, null, 2));
         
-        // Define Charge Types for Line Items (Materials, Labour, CIS Deductions) as per KashFlow API Documentation
+        /* Define Charge Types for Line Items (Materials, Labour, CIS Deductions) as per KashFlow API Documentation
         const ChargeTypes = {
             18685896: 'Materials',
             18685897: 'Labour',
             18685964: 'CIS Deductions'
         };
+        */
+        const ChargeTypes = require('./chargeTypes.json');
 
         // Group Line Items by Charge Type for easier rendering in the view
         Object.keys(ChargeTypes).forEach(type => {
