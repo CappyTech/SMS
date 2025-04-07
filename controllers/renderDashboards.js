@@ -890,22 +890,55 @@ const renderCISDashboard = async (req, res, next) => {
         const receipts = await kf.KF_Receipts.findAll({ order: [['InvoiceNumber', 'ASC']] });
 
         // Parse receipts once and store the processed version
-        const processedReceipts = receipts.map(receipt => ({
-            ...receipt.toJSON(),
-            Lines: (() => {
-                if (typeof receipt.Lines === 'string') {
-                    try {
-                        const parsedLines = JSON.parse(receipt.Lines);
-                        return Array.isArray(parsedLines) ? parsedLines : (parsedLines.anyType || []);
-                    } catch (error) {
-                        console.error("Error parsing Lines:", receipt.Lines, error);
-                        return [];
-                    }
+        const processedReceipts = receipts.map(receipt => {
+            const raw = receipt.toJSON();
+
+            // Parse Lines safely
+            let parsedLines = [];
+            try {
+                if (typeof raw.Lines === 'string') {
+                    const parsed = JSON.parse(raw.Lines);
+                    parsedLines = Array.isArray(parsed)
+                        ? parsed
+                        : Array.isArray(parsed.anyType)
+                            ? parsed.anyType
+                            : [];
+                } else if (Array.isArray(raw.Lines)) {
+                    parsedLines = raw.Lines;
+                } else if (Array.isArray(raw.Lines?.anyType)) {
+                    parsedLines = raw.Lines.anyType;
+                } else {
+                    logger.warn(`Unexpected Lines format for invoice ${raw.InvoiceNumber}: ${JSON.stringify(raw.Lines)}`);
                 }
-                return Array.isArray(receipt.Lines) ? receipt.Lines : (receipt.Lines?.anyType || []);
-            })(),
-            Payments: typeof receipt.Payments === 'string' ? JSON.parse(receipt.Payments) : receipt.Payments
-        }));
+            } catch (err) {
+                logger.warn(`Failed to parse Lines for invoice ${raw.InvoiceNumber}: ${err.message}`);
+            }
+
+            // Parse Payments safely
+            let parsedPayments = { Payment: { Payment: [] } };
+            try {
+                if (typeof raw.Payments === 'string') {
+                    const parsed = JSON.parse(raw.Payments);
+                    if (Array.isArray(parsed?.Payment?.Payment)) {
+                        parsedPayments = parsed;
+                    } else {
+                        logger.warn(`Unexpected Payments format for invoice ${raw.InvoiceNumber}: ${JSON.stringify(raw.Payments)}`);
+                    }
+                } else if (Array.isArray(raw.Payments?.Payment?.Payment)) {
+                    parsedPayments = raw.Payments;
+                } else {
+                    logger.warn(`Unexpected Payments structure for invoice ${raw.InvoiceNumber}`);
+                }
+            } catch (err) {
+                logger.warn(`Failed to parse Payments for invoice ${raw.InvoiceNumber}: ${err.message}`);
+            }
+
+            return {
+                ...raw,
+                Lines: parsedLines,
+                Payments: parsedPayments
+            };
+        });
         
 
         const taxYear = taxService.getTaxYearStartEnd(specifiedYear);

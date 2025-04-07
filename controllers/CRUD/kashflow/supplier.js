@@ -17,7 +17,8 @@ const readSupplier = async (req, res, next) => {
         const receipts = await db.KF_Receipts.findAll({
             where: {
                 CustomerID: supplier.SupplierID
-            }
+            },
+            order: [['InvoiceNumber', 'ASC']]
         });
 
         res.render(path.join('kashflow', 'viewSupplier'), {

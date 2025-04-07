@@ -43,9 +43,49 @@ const renderKFYearlyReturns = async (req, res, next) => {
                 receiptsByMonth[month] = [];
             }
 
-            // Parse Lines and Payments
-            const parsedLines = typeof receipt.Lines === 'string' ? JSON.parse(receipt.Lines) : receipt.Lines || [];
-            const parsedPayments = typeof receipt.Payments === 'string' ? JSON.parse(receipt.Payments) : receipt.Payments || { Payment: { Payment: [] } };
+            // Parse Lines
+            let parsedLines = [];
+            try {
+                if (typeof receipt.Lines === 'string') {
+                    const linesParsed = JSON.parse(receipt.Lines);
+                    if (Array.isArray(linesParsed)) {
+                        parsedLines = linesParsed;
+                    } else if (Array.isArray(linesParsed.anyType)) {
+                        parsedLines = linesParsed.anyType;
+                    } else {
+                        logger.warn(`Unexpected parsedLines object structure for invoice ${receipt.InvoiceNumber}: ${JSON.stringify(receipt.Lines)}`);
+                    }
+                } else if (Array.isArray(receipt.Lines)) {
+                    parsedLines = receipt.Lines;
+                } else if (Array.isArray(receipt.Lines?.anyType)) {
+                    parsedLines = receipt.Lines.anyType;
+                } else {
+                    logger.warn(`Unexpected parsedLines format for invoice ${receipt.InvoiceNumber}: ${JSON.stringify(receipt.Lines)}`);
+                }
+            } catch (e) {
+                logger.warn(`Failed to parse receipt lines for invoice ${receipt.InvoiceNumber}: ${e.message}`);
+                parsedLines = [];
+            }
+
+            // Parse Payments
+            let parsedPayments = { Payment: { Payment: [] } };
+            try {
+                if (typeof receipt.Payments === 'string') {
+                    const paymentsParsed = JSON.parse(receipt.Payments);
+                    if (Array.isArray(paymentsParsed?.Payment?.Payment)) {
+                        parsedPayments = paymentsParsed;
+                    } else {
+                        logger.warn(`Unexpected parsedPayments format for invoice ${receipt.InvoiceNumber}: ${JSON.stringify(receipt.Payments)}`);
+                    }
+                } else if (Array.isArray(receipt.Payments?.Payment?.Payment)) {
+                    parsedPayments = receipt.Payments;
+                } else {
+                    logger.warn(`Unexpected non-string parsedPayments structure for invoice ${receipt.InvoiceNumber}`);
+                }
+            } catch (e) {
+                logger.warn(`Failed to parse payments for invoice ${receipt.InvoiceNumber}: ${e.message}`);
+                parsedPayments = { Payment: { Payment: [] } };
+            }
 
             // Extract values from Lines
             const labourCost = parsedLines.filter(line => line.ChargeType === 18685897).reduce((sum, line) => sum + (line.Rate * line.Quantity), 0);
