@@ -15,7 +15,12 @@ const logger = createLogger({
     ),
     transports: [
         new transports.Console(), // Log to the console
-        new transports.File({ filename: 'app.log' }) // Log to a file
+        new transports.File({
+            filename: path.join(__dirname, '../logs/app.log'),
+            maxsize: 5 * 1024 * 1024, // 5 MB
+            maxFiles: 5,
+            tailable: true,
+        })
     ],
 });
 
