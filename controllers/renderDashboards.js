@@ -8,6 +8,8 @@ const taxService = require('../services/taxService');
 const currencyService = require('../services/currencyService');
 const authService = require('../services/authService');
 const kf = require('../services/kashflowDatabaseService');
+const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
+const { normalizeLines, normalizePayments } = require('../services/kashflowNormalizer');
 
 const renderStatsDashboard = async (req, res, next) => {
     try {
@@ -893,50 +895,13 @@ const renderCISDashboard = async (req, res, next) => {
         const processedReceipts = receipts.map(receipt => {
             const raw = receipt.toJSON();
 
-            // Parse Lines safely
-            let parsedLines = [];
-            try {
-                if (typeof raw.Lines === 'string') {
-                    const parsed = JSON.parse(raw.Lines);
-                    parsedLines = Array.isArray(parsed)
-                        ? parsed
-                        : Array.isArray(parsed.anyType)
-                            ? parsed.anyType
-                            : [];
-                } else if (Array.isArray(raw.Lines)) {
-                    parsedLines = raw.Lines;
-                } else if (Array.isArray(raw.Lines?.anyType)) {
-                    parsedLines = raw.Lines.anyType;
-                } else {
-                    logger.warn(`Unexpected Lines format for invoice ${raw.InvoiceNumber}: ${JSON.stringify(raw.Lines)}`);
-                }
-            } catch (err) {
-                logger.warn(`Failed to parse Lines for invoice ${raw.InvoiceNumber}: ${err.message}`);
-            }
-
-            // Parse Payments safely
-            let parsedPayments = { Payment: { Payment: [] } };
-            try {
-                if (typeof raw.Payments === 'string') {
-                    const parsed = JSON.parse(raw.Payments);
-                    if (Array.isArray(parsed?.Payment?.Payment)) {
-                        parsedPayments = parsed;
-                    } else {
-                        logger.warn(`Unexpected Payments format for invoice ${raw.InvoiceNumber}: ${JSON.stringify(raw.Payments)}`);
-                    }
-                } else if (Array.isArray(raw.Payments?.Payment?.Payment)) {
-                    parsedPayments = raw.Payments;
-                } else {
-                    logger.warn(`Unexpected Payments structure for invoice ${raw.InvoiceNumber}`);
-                }
-            } catch (err) {
-                logger.warn(`Failed to parse Payments for invoice ${raw.InvoiceNumber}: ${err.message}`);
-            }
+            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber);
+            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber);
 
             return {
                 ...raw,
-                Lines: parsedLines,
-                Payments: parsedPayments
+                Lines: normalizedLines,
+                Payments: normalizedPayments
             };
         });
         
