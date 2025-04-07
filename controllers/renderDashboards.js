@@ -962,14 +962,13 @@ const renderCISDashboard = async (req, res, next) => {
 
         const allReceiptsSubmitted = receiptsWithLabourAndCIS.every(receipt => receipt.submissionDate && receipt.submissionDate !== '0000-00-00 00:00:00');
         const submissionDate = allReceiptsSubmitted && receiptsWithLabourAndCIS.length > 0 ? receiptsWithLabourAndCIS[0].submissionDate : null;
-
-        const prevDate = moment({ year: specifiedYear, month: specifiedMonth - 2 });
-        const nextDate = moment({ year: specifiedYear, month: specifiedMonth });
         
-        const previousMonth = prevDate.month() + 1;
-        const previousYear = prevDate.year();
-        const nextMonth = nextDate.month() + 1;
-        const nextYear = nextDate.year();
+        // Handle CIS month wraparound manually
+        const previousMonth = specifiedMonth === 1 ? 12 : specifiedMonth - 1;
+        const previousYear = specifiedMonth === 1 ? specifiedYear - 1 : specifiedYear;
+
+        const nextMonth = specifiedMonth === 12 ? 1 : specifiedMonth + 1;
+        const nextYear = specifiedMonth === 12 ? specifiedYear + 1 : specifiedYear;
 
         const periodEnd = moment(currentMonthlyReturn.periodEndDisplay, 'Do MMMM YYYY');
         const submissionStartDate = periodEnd.clone().date(7).format('Do MMMM YYYY');
