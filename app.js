@@ -45,7 +45,7 @@ app.use(async (req, res, next) => {
     res.locals.firstName = null;
     res.locals.permissions = {};
     res.locals.role = null;
-    logger.debug(JSON.stringify(res.locals.session, null, 2))
+    //logger.debug(JSON.stringify(res.locals.session, null, 2))
     try {
         const user = req.session.user;
         if (user && user.id) {
@@ -215,6 +215,8 @@ const fileSystemProjects = require('./controllers/fileSystemProjects');
 const kashflowMonthlyReturns = require('./controllers/kashflowMonthlyReturns');
 const kashflowYearlyReturns = require('./controllers/kashflowYearlyReturns');
 
+const adminLogger = require('./controllers/admin/logger');
+
 app.use('/', index);
 
 app.use('/client', formsClient);
@@ -274,7 +276,10 @@ app.use("/api-docs", authService.ensureAuthenticated, authService.ensureRole('ad
 app.use('/kashflow/monthly', kashflowMonthlyReturns);
 app.use('/kashflow/yearly', kashflowYearlyReturns);
 
+app.use('/', adminLogger);
+
 // Catch undefined routes (404 handler)
+
 app.use((req, res, next) => {
     const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
     error.statusCode = 404;

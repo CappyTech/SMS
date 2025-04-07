@@ -12,13 +12,4 @@ const renderIndex = (req, res) => {
 
 router.get('/', renderIndex);
 
-router.get('/logs/app.log',
-    authService.ensureAuthenticated,
-    authService.ensureRole('admin'),
-    (req, res) => {
-        const logPath = path.join(__dirname, '..', 'logs', 'app.log');
-        // stream or return the file
-    }
-);
-
 module.exports = router;

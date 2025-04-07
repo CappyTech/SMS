@@ -647,7 +647,7 @@ const renderKashflowDashboard = async (req, res, next) => {
         });
         
         const repeatCustomerRate = ((customerRetentionData[0].totalCustomers - customerRetentionData[0].uniqueCustomers) / customerRetentionData[0].totalCustomers) * 100;
-
+        /*
         logger.debug('Summary Data: ' + JSON.stringify(summaryData, null, 2));
         logger.debug('Payment Speed Data: ' + JSON.stringify(paymentSpeedData, null, 2));
         logger.debug('Customer Retention Data: ' + JSON.stringify(customerRetentionData, null, 2));
@@ -667,7 +667,7 @@ const renderKashflowDashboard = async (req, res, next) => {
         logger.debug('Partially Paid Invoices: ' + summaryData.partiallyPaidInvoices);
         logger.debug('Unpaid Invoices: ' + summaryData.unpaidInvoices);
         logger.debug('Overdue Invoices: ' + summaryData.overdueInvoices);
-
+        */
         // Render the dashboard
         res.render(path.join('kashflow', 'dashboard'), {
             title: 'KashFlow Dashboard',

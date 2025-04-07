@@ -7,7 +7,7 @@ const taxService = require('../services/taxService');
 
 async function updateTaxMonthTaxYear() {
     try {
-        logger.debug('Fetching receipts with null TaxMonth and TaxYear...');
+        //logger.debug('Fetching receipts with null TaxMonth and TaxYear...');
         const receipts = await db.KF_Receipts.findAll({
             where: {
                 TaxMonth: null,
@@ -22,7 +22,7 @@ async function updateTaxMonthTaxYear() {
             }
         });
 
-        logger.debug(`Found ${receipts.length} receipts to update.`);
+        //logger.debug(`Found ${receipts.length} receipts to update.`);
 
         for (const receipt of receipts) {
             // Parse Payments if it's a string
@@ -35,16 +35,16 @@ async function updateTaxMonthTaxYear() {
                 continue;
             }
 
-            logger.debug(`Parsed Payments: ${JSON.stringify(parsedPayments, null, 2)}`);
+            //logger.debug(`Parsed Payments: ${JSON.stringify(parsedPayments, null, 2)}`);
             const { taxMonth, taxYear } = taxService.calculateTaxYearAndMonth(payment.PayDate);
-            logger.debug(`Calculated TaxMonth: ${taxMonth}, TaxYear: ${taxYear} for PayDate: ${payment.PayDate}`);
+            //logger.debug(`Calculated TaxMonth: ${taxMonth}, TaxYear: ${taxYear} for PayDate: ${payment.PayDate}`);
 
             // Update receipt with calculated TaxMonth and TaxYear
             await db.KF_Receipts.update(
                 { TaxMonth: taxMonth, TaxYear: taxYear },
                 { where: { InvoiceDBID: receipt.InvoiceDBID } }
             );
-            logger.debug(`Updated TaxMonth and TaxYear for receipt with InvoiceNumber: ${receipt.InvoiceNumber}`);
+            //logger.debug(`Updated TaxMonth and TaxYear for receipt with InvoiceNumber: ${receipt.InvoiceNumber}`);
         }
 
         logger.info('Successfully updated tax month and year for receipts.');

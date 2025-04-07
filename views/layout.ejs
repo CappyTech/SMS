@@ -37,6 +37,11 @@
                   <li class="nav-item">
                     <a href="/user/profile" class="nav-link hcs-green-text"><i class="bi bi-person me-2"></i> Profile</a>
                   </li>
+                  <% if (isAdmin) { %>
+                  <li class="nav-item">
+                    <a class="nav-link text-warning" href="/logs"><i class="bi bi-terminal me-2"></i> Logs</a>
+                  </li>
+                  <% } %>
                   <li class="nav-item">
                     <a class="nav-link text-warning" href="/user/account"><i class="bi bi-gear-wide me-2"></i> Settings</a>
                   </li>
