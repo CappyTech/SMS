@@ -921,11 +921,6 @@ const renderCISDashboard = async (req, res, next) => {
 
         const receiptsWithLabourAndCIS = filteredReceipts.filter(receipt => {
 
-            if (!Array.isArray(receipt.Lines)) {
-                logger.warn("Invalid receipt.Lines: "+ JSON.stringify(receipt.Lines, null, 2));
-                return false; // Skip this receipt if Lines is not an array
-            }
-
             const hasLabourAndCIS = receipt.Lines.reduce((acc, line) => {
                 if (line.ChargeType === 18685897) acc.hasLabour = true;
                 if (line.ChargeType === 18685964) acc.hasCIS = true;
