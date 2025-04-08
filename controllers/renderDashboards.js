@@ -960,8 +960,8 @@ const renderCISDashboard = async (req, res, next) => {
             supplierTotals[customerId].grossAmount = supplierTotals[customerId].materialsCost + supplierTotals[customerId].labourCost;
         });
 
-        const allReceiptsSubmitted = receiptsWithLabourAndCIS.every(receipt => receipt.submissionDate && receipt.submissionDate !== '0000-00-00 00:00:00');
-        const submissionDate = allReceiptsSubmitted && receiptsWithLabourAndCIS.length > 0 ? receiptsWithLabourAndCIS[0].submissionDate : null;
+        const allReceiptsSubmitted = receiptsWithLabourAndCIS.every(receipt => receipt.SubmissionDate && receipt.SubmissionDate !== '0000-00-00 00:00:00');
+        const submissionDate = allReceiptsSubmitted && receiptsWithLabourAndCIS.length > 0 ? receiptsWithLabourAndCIS[0].SubmissionDate : null;
         
         // Handle CIS month wraparound manually
         const previousMonth = specifiedMonth === 1 ? 12 : specifiedMonth - 1;
