@@ -43,6 +43,17 @@
                     </div>
                 </div>
             </div>
+            <% } else if (submissionDate) { %>
+            <div class="row mb-4">
+                <div class="col-lg-12">
+                    <div class="card bg-success text-white text-center">
+                        <div class="card-body">
+                            <h4>Submitted On:</h4>
+                            <p class="display-6"><%= slimDateTime(submissionDate) %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <% } %>
 
             <div class="row mb-4">
@@ -146,7 +157,7 @@
                         <a href="/kashflow/receipt/read/<%= receipt.uuid %>" class="list-group-item list-group-item-action">
                             <%= receipt.InvoiceNumber %> | <%= receipt.CustomerName %> | <%= receipt.CustomerReference %>
                             <i class="bi bi-pencil-square" style="font-size: 0.65rem;"></i>
-                            <% if (receipt.submissionDate) { %>
+                            <% if (receipt.SubmissionDate) { %>
                                 <i class="bi bi-check hcs-green-text"></i>
                             <% } else { %>
                                 <i class="bi bi-x hcs-red-text"></i>
