@@ -118,7 +118,11 @@
             <button type="submit" class="btn btn-hcs-green">Mark as Submitted (Today)</button>
         </form>
         <br>
-        <form action="/kashflow/receipt/change/<%= Receipt.uuid %>" method="GET">
+        <form action="/kashflow/receipt/<%= Receipt.uuid %>/change/" method="POST">
+            <div class="mb-3">
+                <label for="submissionDate" class="form-label">New Submission Date</label>
+                <input type="date" class="form-control" id="submissionDate" name="submissionDate" required>
+            </div>
             <button type="submit" class="btn btn-warning ">Change to a Specific Submission Date</button>
         </form>
     </div>
@@ -130,8 +134,12 @@
             <button type="submit" class="btn btn-danger">Cancel Submission</button>
         </form>
         <br>
-        <form action="/kashflow/receipt/change/<%= Receipt.uuid %>" method="GET">
-            <button type="submit" class="btn btn-warning">Change to a Specific Submission Date</button>
+        <form action="/kashflow/receipt/<%= Receipt.uuid %>/change/" method="POST">
+            <div class="mb-3">
+                <label for="submissionDate" class="form-label">New Submission Date</label>
+                <input type="date" class="form-control" id="submissionDate" name="submissionDate" required>
+            </div>
+            <button type="submit" class="btn btn-warning ">Change to a Specific Submission Date</button>
         </form>
     </div>
     <% } %>
