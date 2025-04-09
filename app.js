@@ -280,6 +280,10 @@ app.use('/', adminLogger);
 
 // Catch undefined routes (404 handler)
 
+app.get(/\.(env|js|json|ts|log|sql)$/, (req, res) => {
+    res.status(403).send('Forbidden');
+  });
+
 app.use((req, res, next) => {
     const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
     error.statusCode = 404;
