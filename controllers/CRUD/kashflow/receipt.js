@@ -96,6 +96,30 @@ router.post('/receipt/:uuid/change', authService.ensureAuthenticated, authServic
     }
 });
 
+router.post('/receipt/change', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
+    try {
+        const { submissionDate, uuids, redirectPath  } = req.body;
+        const targetUUIDs = uuids?.length ? Array.isArray(uuids) ? uuids : [uuids] : [req.params.uuid];
+        const receipt = await kf.KF_Receipts.findAll({ where: { uuid: targetUUIDs } });
+
+        if (!receipt) {
+            return res.status(404).send('Receipt not found');
+        }
+
+        // Update all matching receipts
+        await kf.KF_Receipts.update(
+            { SubmissionDate: submissionDate },
+            { where: { uuid: targetUUIDs } }
+        );
+
+        res.redirect(redirectPath || `/CIS`);
+    } catch (error) {
+        logger.error('Error updating submission date: '+ error.message);
+        req.flash('error', 'Error: ' + error.message);
+        next(error); // Pass the error to the error handler middleware in app.js for logging and debugging purposes (if needed)
+    }
+});
+
 router.post('/receipt/:uuid/submit', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res) => {
     try {
         const receipt = await kf.KF_Receipts.findOne({ where: { uuid: req.params.uuid } });
