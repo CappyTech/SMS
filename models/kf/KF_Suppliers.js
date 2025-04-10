@@ -37,9 +37,9 @@ module.exports = (sequelize, DataTypes) => {
         TradeBorderType: DataTypes.INTEGER,
         Subcontractor: DataTypes.BOOLEAN,
         CISRate: {
-            type: DataTypes.FLOAT,
-            defaultValue: 0.0,
-            allowNull: true
+            type: DataTypes.ENUM('0.3', '0.2', '0'),
+            allowNull: false,
+            defaultValue: '0.3'
         },
         CISNumber: {
             type: DataTypes.STRING,
