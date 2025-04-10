@@ -10,28 +10,34 @@
             <p class="display-5">Subcontractor</p>
             <%= supplier.Name %>
             <br>
-            CIS: <%= supplier.CISNumber %>
-            <br>
-            VAT: <%= supplier.VATNumber %>
-            <br>
             <address>
                 <%= supplier.Address1 %>,
                 <%= supplier.Address2 %>,
                 <%= supplier.Address3 %>,
+                <%= supplier.Address4 %>,
                 <%= supplier.PostCode %>
             </address>
+            <br>
+            CIS: <%= supplier.CISRate %>
+            <br>
+            VAT: <%= supplier.VATNumber %>
         </div>
         <div class="col-6 text-center">
             <p class="display-5">Contractor</p>
             Heron Constructive Solutions LTD
             <br>
+            <address>
+                103 Herondale Road,
+                Mossley Hill,
+                Liverpool,
+                Merseyside,
+                L18 1JZ.
+            </address>
+            <br>
             Company: 09276951
             <br>
             VAT: 252295994
             <br>
-            <address>
-                103 Herondale Road, Mossley Hill, Liverpool, Merseyside, L18 1JZ.
-            </address>
         </div>
     </div>
 </div>
