@@ -23,9 +23,9 @@
         <div class="mb-3">
             <label for="cisRate" class="form-label">CIS Rate</label>
             <select class="form-select" id="cisRate" name="cisRate">
-                <option value="0.0" <%= supplier.CISRate === 0.0 ? 'selected' : '' %>>0% (0.0)</option>
-                <option value="0.2" <%= supplier.CISRate === 0.2 ? 'selected' : '' %>>20% (0.2)</option>
-                <option value="0.3" <%= supplier.CISRate === 0.3 ? 'selected' : '' %>>30% (0.3)</option>
+                <option value="0" <%= supplier.CISRate === '0' ? 'selected' : '' %>>0% (0.0)</option>
+                <option value="0.2" <%= supplier.CISRate === '0.2' ? 'selected' : '' %>>20% (0.2)</option>
+                <option value="0.3" <%= supplier.CISRate === '0.3' ? 'selected' : '' %>>30% (0.3)</option>
             </select>
         </div>
         <small class="form-text text-muted">
