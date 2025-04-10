@@ -80,7 +80,14 @@
                     </th>
                     <th>
                         <span class="d-none d-md-table-cell">
-                            CIS @ <% if (supplier.CISRate===0.0) { %>0%<% } else if (supplier.CISRate===0.2) { %>20%<% } else if (supplier.CISRate===0.3) { %>30%<% } %>
+                            CIS @ 
+                            <% if (supplier.CISRate==='0') { %>
+                                0%
+                            <% } else if (supplier.CISRate==='0.2') { %>
+                                20%
+                            <% } else if (supplier.CISRate==='0.3') { %>
+                                30%
+                            <% } %>
                         </span>
                         <span class="d-md-none">CIS</span>
                     </th>
