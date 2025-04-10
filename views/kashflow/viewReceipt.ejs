@@ -1,26 +1,21 @@
 <div class="container mt-5">
-    <h1 class="display-3">Purchase: <%= Receipt.InvoiceNumber %></h1>
-    <p><strong>Date:</strong> <%= slimDateTime(Receipt.InvoiceDate) %></p>
+    <div class="row">
+        <div class="col-6"><h1 class="display-3"><%= Receipt.InvoiceNumber %></h1></div>
+        <div class="col-6 text-end"><h2 class="display-3"><%= slimDateTime(Receipt.InvoiceDate) %></h2></div>
+    </div>
 
     <!-- Supplier Information -->
     <% if (Supplier) { %>
-        <h2 class="display-4">Supplier Information</h3>
-        <p><strong>Name:</strong> <a href="/kashflow/supplier/read/<%= Supplier.uuid %>"><%= Supplier.Name %></a></p>
-        <p><strong>Address:</strong></p>
-        <ul>
-            <li><%= Supplier.Address1 %></li>
-            <li><%= Supplier.Address2 %></li>
-            <li><%= Supplier.Address3 %></li>
-            <li><%= Supplier.Postcode %></li>
-        </ul>
+        <p><a href="/kashflow/supplier/read/<%= Supplier.uuid %>"><%= Supplier.Name %></a></p>
+        <p><%= Supplier.Mobile %></p>
+        <p><%= Supplier.Email %></p>
+        <p><%= [Supplier.Address1, Supplier.Address2, Supplier.Address3, Supplier.Address4, Supplier.PostCode].filter(Boolean).join(', ') %></p>
     <% } %>
-
-    <h2 class="display-6">Purchase</h2>
 
     <% if (Array.isArray(Receipt.Lines) && Receipt.Lines.length > 0) { %>
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
-            <thead class="table-dark">
+            <thead>
                 <tr>
                     <th>Purchase Code</th>
                     <th>Job</th>
@@ -62,17 +57,13 @@
     <p class="text-danger">No line items available for this receipt.</p>
     <% } %>
 
-    <h2 class="display-6">Payment</h2>
-
-    <!-- <pre><%= JSON.stringify(Receipt.Payments, null, 2) %></pre> -->
-
     <% if (Receipt.Payments) { %>
         <% if (Receipt.Payments.Payment) { %>
             <% if (Array.isArray(Receipt.Payments.Payment.Payment)) { %>
                 <% if (Receipt.Payments.Payment.Payment.length > 0) { %>
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
-                            <thead class="table-dark">
+                            <thead>
                                 <tr>
                                     <th>Pay Invoice</th>
                                     <th>Pay Date</th>
@@ -104,43 +95,69 @@
     <% } else { %>
         <p class="text-danger">No payment items available for this receipt.</p>
     <% } %>
-
-    <h2 class="display-6">Summary</h2>
-    <p><strong>Net:</strong> £<%= Receipt.NetAmount %></p>
-    <p><strong>VAT:</strong> £<%= Receipt.VATAmount %></p>
-    <p><strong>Amount Paid:</strong> £<%= Receipt.AmountPaid %></p>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Summary</th>
+                    <th>Net:</th>
+                    <th>VAT:</th>
+                    <th>Amount Paid:</th>
+                    <th>Submission Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td>
+                        £<%= Receipt.NetAmount %>
+                    </td>
+                    <td>
+                        £<%= Receipt.VATAmount %>
+                    </td>
+                    <td>
+                        £<%= Receipt.AmountPaid %>
+                    </td>
+                    <td><%= Receipt.SubmissionDate || 'Not Submitted' %></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <% if (!Receipt.SubmissionDate) { %>
-    <div>
-        <h2 class="display-6">Purchase Details</h2>
-        <p><strong>Submission Date:</strong> <%= Receipt.SubmissionDate || 'Not Submitted' %></p>
-        <form action="/kashflow/receipt/<%= Receipt.uuid %>/submit" method="POST">
-            <button type="submit" class="btn btn-hcs-green">Mark as Submitted (Today)</button>
-        </form>
-        <br>
-        <form action="/kashflow/receipt/<%= Receipt.uuid %>/change/" method="POST">
-            <div class="mb-3">
-                <label for="submissionDate" class="form-label">New Submission Date</label>
-                <input type="date" class="form-control" id="submissionDate" name="submissionDate" required>
-            </div>
-            <button type="submit" class="btn btn-warning ">Change to a Specific Submission Date</button>
-        </form>
+    <div class="d-flex justify-content-between">
+        <div class="col-6 text-center">
+            <form action="/kashflow/receipt/<%= Receipt.uuid %>/submit" method="POST">
+                <button type="submit" class="btn btn-hcs-green">Mark as Submitted (Today)</button>
+            </form>
+        </div>
+        <div class="col-6">
+            <form action="/kashflow/receipt/<%= Receipt.uuid %>/change/" method="POST">
+                <div class="mb-3 d-grid gap-2">
+                    <label for="submissionDate" class="form-label text-center">Select Submission Date</label>
+                    <input type="date" class="form-control" id="submissionDate" name="submissionDate" required>
+                    <button type="submit" class="btn btn-warning d-grid gap-2">Change to a specific Submission Date</button>
+                </div>
+            </form>
+        </div>
     </div>
     <% } else { %>
-    <div>
-        <h2 class="display-6">Purchase Details</h2>
-        <p><strong>Submission Date:</strong> <%= Receipt.SubmissionDate %></p>
-        <form action="/kashflow/receipt/<%= Receipt.uuid %>/cancel" method="POST">
-            <button type="submit" class="btn btn-danger">Cancel Submission</button>
-        </form>
-        <br>
-        <form action="/kashflow/receipt/<%= Receipt.uuid %>/change/" method="POST">
-            <div class="mb-3">
-                <label for="submissionDate" class="form-label">New Submission Date</label>
-                <input type="date" class="form-control" id="submissionDate" name="submissionDate" required>
+        <div class="d-flex justify-content-between">
+            <div class="col-6 text-center">
+                <form action="/kashflow/receipt/<%= Receipt.uuid %>/cancel" method="POST">
+                    <button type="submit" class="btn btn-danger">Cancel Submission</button>
+                </form>
             </div>
-            <button type="submit" class="btn btn-warning ">Change to a Specific Submission Date</button>
-        </form>
-    </div>
+            <div class="col-6">
+                <form action="/kashflow/receipt/<%= Receipt.uuid %>/change/" method="POST">
+                    <div class="mb-3 d-grid gap-2">
+                        <label for="submissionDate" class="form-label text-center">Select Submission Date</label>
+                        <input type="date" class="form-control" id="submissionDate" name="submissionDate" required>
+                        <button type="submit" class="btn btn-warning d-grid gap-2">Change to a specific Submission Date</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     <% } %>
+
 </div>
