@@ -7,30 +7,30 @@
   "theme_color": "#4e4e4e",
   "icons": [
     {
-      "src": "/images/HCS-Logo-v4-Icon32.png",
+      "src": "/resources/images/HCS-Logo-v4-Icon32.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/images/HCS-Logo-v4-Icon64.png",
+      "src": "/resources/images/HCS-Logo-v4-Icon64.png",
       "sizes": "64x64",
       "type": "image/png"
     },
     {
-      "src": "/images/HCS-Logo-v4-Icon256.png",
+      "src": "/resources/images/HCS-Logo-v4-Icon256.png",
       "sizes": "256x256",
       "type": "image/png"
     }
   ],
   "screenshots": [
     {
-      "src": "/images/lg-hcs.jpg",
+      "src": "/resources/images/lg-hcs.jpg",
       "sizes": "1280x720",
       "type": "image/jpeg",
       "form_factor": "wide"
     },
     {
-      "src": "/images/sm-hcs.jpg",
+      "src": "/resources/images/sm-hcs.jpg",
       "sizes": "640x1136",
       "type": "image/jpeg",
       "form_factor": "narrow"
