@@ -8,19 +8,16 @@
     <div class="row justify-content-evenly">
         <div class="col-6 ms-auto text-center">
             <p class="display-5">Subcontractor</p>
-            <%= supplier.Name %>
-            <br>
-            <address>
+            <p><%= supplier.Name %></p>
+            <p><address>
                 <%= supplier.Address1 %>,
                 <%= supplier.Address2 %>,
                 <%= supplier.Address3 %>,
                 <%= supplier.Address4 %>,
                 <%= supplier.PostCode %>
-            </address>
-            <br>
-            CIS: <%= supplier.CISRate %>
-            <br>
-            VAT: <%= supplier.VATNumber %>
+            </address></p>
+            <p>CIS: <%= supplier.CISRate %></p>
+            <p>VAT: <%= supplier.VATNumber %></p>
         </div>
         <div class="col-6 text-center">
             <p class="display-5">Contractor</p>
