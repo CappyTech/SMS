@@ -10,6 +10,7 @@ const authService = require('../services/authService');
 const kf = require('../services/kashflowDatabaseService');
 const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
 const { normalizeLines, normalizePayments } = require('../services/kashflowNormalizer');
+const { where } = require('sequelize');
 
 const renderStatsDashboard = async (req, res, next) => {
     try {
@@ -1016,5 +1017,25 @@ router.get('/CIS', authService.ensureAuthenticated, authService.ensureRole('admi
 });
 
 router.get('/CIS/:year?/:month?', authService.ensureAuthenticated, authService.ensureRole('admin'), renderCISDashboard);
+
+const renderKFSubcontractorDashboard = async (req, res, next) => {
+    try {
+        const subcontractors = await kf.KF_Suppliers.findAll({
+            order: [['Name', 'ASC']],
+            where: {Subcontractor: true}
+        });
+
+        res.render(path.join('kashflow', 'subcontractor'), {
+            title: 'Subcontractors Dashboard',
+            subcontractors,
+        });
+    } catch (error) {
+        logger.error('Error rendering KFSubcontractors dashboard: ' + error.message);
+        req.flash('error', 'Error rendering KFSubcontractors dashboard: ' + error.message);
+        next(error); // Pass the error to the error handler
+    }
+};
+
+router.get('/KFsubcontractor', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFSubcontractorDashboard);
 
 module.exports = router;
