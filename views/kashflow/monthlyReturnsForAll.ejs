@@ -51,11 +51,13 @@
                                 <span class="d-md-none">Material</span>
                             </th>
                             <th>
-                                <span class="d-none d-md-table-cell">CIS @ <% if (supplier.deduction === 0.0) { %>
+                                <span class="d-none d-md-table-cell">
+                                    CIS @ 
+                                    <% if (supplier.CISRate==='0') { %>
                                         0%
-                                    <% } else if (supplier.deduction === 0.2) { %>
+                                    <% } else if (supplier.CISRate==='0.2') { %>
                                         20%
-                                    <% } else if (supplier.deduction === 0.3) { %>
+                                    <% } else if (supplier.CISRate==='0.3') { %>
                                         30%
                                     <% } %>
                                 </span>
