@@ -19,7 +19,9 @@ app.set('layout', 'layout');
 app.use(expressLayouts);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve everything from /public under /resources/
+app.use('/resources', express.static(path.join(__dirname, 'public')));
 
 // Dynamically serve specific node_modules packages under /resources/
 const vendorPackages = ['bootstrap', 'bootstrap-icons', '@popperjs/core'];
