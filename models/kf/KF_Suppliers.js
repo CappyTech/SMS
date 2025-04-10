@@ -38,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
         Subcontractor: DataTypes.BOOLEAN,
         CISRate: {
             type: DataTypes.FLOAT,
+            defaultValue: 0.0,
             allowNull: true
         },
         CISNumber: {
