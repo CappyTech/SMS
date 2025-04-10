@@ -12,8 +12,6 @@
                 <th>Postcode</th>
                 <th>Mobile</th>
                 <th>Email</th>
-                <th>Created</th>
-                <th>Updated</th>
                 <th>CIS Number</th>
                 <th>CIS Rate</th>
                 <th>Subcontractor</th>
@@ -31,8 +29,6 @@
                     <td>
                         <a href="mailto:<%= subcontractor.Email %>"><%= subcontractor.Email %></a>
                     </td>
-                    <td><%= slimDateTime(subcontractor.Created) %></td>
-                    <td><%= slimDateTime(subcontractor.Updated) %></td>
                     <td><%= subcontractor.CISNumber %></td>
                     <td><%= subcontractor.CISRate %></td>
                     <td><%= subcontractor.Subcontractor ? 'Yes' : 'No' %> <a href="/kashflow/supplier/change/<%= subcontractor.uuid %>">change</a></td>
