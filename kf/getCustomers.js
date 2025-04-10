@@ -18,7 +18,7 @@ function getCustomers(client) {
         logger.info('Total number of customers: '+ customers.length);
         resolve(customers);
       } else {
-        logger.log('No customers found.');
+        logger.info('No customers found.');
         resolve([]);
       }
     });
