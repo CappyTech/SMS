@@ -92,6 +92,109 @@ const renderKFYearlyReturns = async (req, res, next) => {
     }
 };
 
+const puppeteer = require('puppeteer');
+
+// Handle PDF download
+router.post('/download-pdf', async (req, res) => {
+    const {
+        format,
+        width,
+        height,
+        landscape,
+        printBackground,
+        scale,
+        pageRanges,
+        preferCSSPageSize,
+        displayHeaderFooter,
+        headerTemplate,
+        footerTemplate,
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
+        year,
+        uuid,
+        pageBreakMonths,
+        filename
+    } = req.body;
+
+    if (!year || !uuid) {
+        return res.status(400).send("Missing year or UUID for PDF generation.");
+    }
+
+    const queryString = pageBreakMonths ? `?page=${pageBreakMonths}` : '';
+    const fullUrl = `${req.protocol}://${req.get('host')}/kashflow/yearly/returns/${year}/${uuid}${queryString}`;
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+
+    const cookies = req.headers.cookie;
+
+    if (cookies) {
+        const cookieArray = cookies.split(';').map(cookieStr => {
+            const [name, ...val] = cookieStr.trim().split('=');
+            return {
+                name,
+                value: val.join('='),
+                domain: 'localhost', // or your production domain
+                path: '/',
+                httpOnly: true,
+                secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+            };
+        });
+
+        await page.browserContext().setCookie(...cookieArray);
+
+    }
+
+    await page.goto(fullUrl, { waitUntil: 'networkidle0' });
+
+
+
+    const options = {
+        landscape: !!parseInt(landscape), // "1" = true, "0" = false
+        printBackground: printBackground === 'off',
+        scale: parseFloat(scale) || 1,
+        pageRanges: pageRanges || undefined,
+        preferCSSPageSize: preferCSSPageSize === 'off',
+        displayHeaderFooter: displayHeaderFooter === 'off',
+        headerTemplate: headerTemplate || '',
+        footerTemplate: footerTemplate || '',
+        margin: {
+            top: marginTop || '20mm',
+            bottom: marginBottom || '20mm',
+            left: marginLeft || '15mm',
+            right: marginRight || '15mm'
+        }
+    };
+
+    // Only add format or custom size if provided
+    if (format) {
+        options.format = format;
+    } else {
+        if (width) options.width = width;
+        if (height) options.height = height;
+    }
+
+    const pdfBuffer = await page.pdf(options);
+
+    await browser.close();
+
+    let safeFilename = filename.replace(/[^\w\-\.]+/g, '_');
+
+    if (!safeFilename.endsWith('.pdf')) {
+        safeFilename += '.pdf';
+      }
+
+    res.set({
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': `attachment; filename="${safeFilename}"`,
+    'Content-Length': pdfBuffer.length,
+    });
+
+    res.send(pdfBuffer);
+});
+
 router.get('/returns/:year/:uuid', authService.ensureAuthenticated, authService.ensureRole('admin'), renderKFYearlyReturns);
 
 module.exports = router;
