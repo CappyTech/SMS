@@ -112,7 +112,7 @@
                         <td><%= receipt.InvoiceNumber %></td>
                         <td><%= receipt.KashflowNumber %></td>
                         <td><%= slimDateTime(receipt.InvoiceDate) %></td>
-                        <td><%= receipt.PayDate %></td>
+                        <td><%= slimDateTime(receipt.PayDate) %></td>
                         <td><%= formatCurrency(receipt.GrossAmount) %></td>
                         <td><%= formatCurrency(receipt.LabourCost) %></td>
                         <td><%= formatCurrency(receipt.MaterialCost) %></td>
