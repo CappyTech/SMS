@@ -15,7 +15,7 @@ mongoose
     })
     .then(() => {
         if (process.env.DEBUG) {
-            logger.info('Mongo Database connection has been established successfully.');
+            //logger.info('Mongo Database connection has been established successfully.');
         }
     })
     .catch((error) => {
