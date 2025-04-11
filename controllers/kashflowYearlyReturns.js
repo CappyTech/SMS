@@ -4,7 +4,6 @@ const logger = require('../services/loggerService');
 const path = require('path');
 const kf = require('../services/kashflowDatabaseService');
 const authService = require('../services/authService');
-const slimDateTime = require('../services/dateService').slimDateTime;
 const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
 const { normalizeLines, normalizePayments } = require('../services/kashflowNormalizer');
 
@@ -38,7 +37,7 @@ const renderKFYearlyReturns = async (req, res, next) => {
         // Process receipts to extract details
         const receiptsByMonth = {};
         receipts.forEach(receipt => {
-            const month = receipt.TaxMonth || moment.utc(receipt.InvoiceDate).month() + 1; // Ensure TaxMonth is used
+            const month = receipt.TaxMonth || moment.tz(receipt.InvoiceDate, 'Europe/London').month() + 1; // Ensure TaxMonth is used // ensure .tz
 
             // Ensure the month key exists
             if (!receiptsByMonth[month]) {
@@ -57,7 +56,7 @@ const renderKFYearlyReturns = async (req, res, next) => {
 
             // Extract first PayDate if available
             const payDates = normalizedPayments?.Payment?.Payment?.map(p => p.PayDate) || [];
-            const payDate = payDates.length > 0 ? slimDateTime(payDates[0]) : 'N/A';
+            const payDate = payDates.length > 0 ? payDates[0] : 'N/A';
 
             // Add to receiptsByMonth
             receiptsByMonth[month].push({
@@ -95,7 +94,7 @@ const renderKFYearlyReturns = async (req, res, next) => {
 const puppeteer = require('puppeteer');
 
 // Handle PDF download
-router.post('/download-pdf', async (req, res) => {
+router.post('/download-pdf', async (req, res, next) => {
     try {
         const {
             format,

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const moment = require('moment');
+const moment = require('moment-timezone');
 const path = require('path');
 const logger = require('../services/loggerService');
 const attendanceService = require('../services/attendanceService');
@@ -11,7 +11,7 @@ const getWeeklyAttendance = async (req, res, next) => {
     try {
         const year = req.params.year ? parseInt(req.params.year) : taxService.getCurrentTaxYear();
         const { start: startOfTaxYear } = taxService.getTaxYearStartEnd(year);
-        const taxYearStart = moment.utc(startOfTaxYear, 'Do MMMM YYYY');
+        const taxYearStart = moment.tz(startOfTaxYear, 'Do MMMM YYYY', 'Europe/London');
 
         // ✅ Set first payroll week to the first Saturday of the tax year
         let firstPayrollWeekStart = taxYearStart.clone().day(6);
@@ -19,7 +19,7 @@ const getWeeklyAttendance = async (req, res, next) => {
             firstPayrollWeekStart.add(7, 'days');
         }
 
-        const today = moment.utc();
+        const today = moment.tz('Europe/London');
         const requestedWeekNumber = req.params.week ? parseInt(req.params.week) : today.diff(firstPayrollWeekStart, 'weeks') + 1;
         const payrollWeekStart = firstPayrollWeekStart.clone().add((requestedWeekNumber - 1) * 7, 'days');
         const endDate = payrollWeekStart.clone().add(6, 'days');
@@ -83,7 +83,7 @@ router.get('/weekly', authService.ensureAuthenticated, authService.ensureRole('a
     try {
         const currentTaxYear = taxService.getCurrentTaxYear();
         const { start: startOfTaxYear } = taxService.getTaxYearStartEnd(currentTaxYear);
-        const taxYearStart = moment.utc(startOfTaxYear, 'Do MMMM YYYY');
+        const taxYearStart = moment.tz(startOfTaxYear, 'Do MMMM YYYY', 'Europe/London');
 
         // ✅ Ensure first payroll week starts on a Saturday
         let firstPayrollWeekStart = taxYearStart.clone().day(6);
@@ -91,7 +91,7 @@ router.get('/weekly', authService.ensureAuthenticated, authService.ensureRole('a
             firstPayrollWeekStart.add(7, 'days');
         }
 
-        const currentWeekNumber = moment.utc().diff(firstPayrollWeekStart, 'weeks') + 1;
+        const currentWeekNumber = momentTZ.tz('Europe/London').diff(firstPayrollWeekStart, 'weeks') + 1;
 
         logger.info(`Redirecting to current weekly attendance: Year: ${currentTaxYear}, Week Number: ${currentWeekNumber}`);
         return res.redirect(`/attendance/weekly/${currentTaxYear}/${currentWeekNumber}`);

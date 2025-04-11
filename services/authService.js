@@ -17,6 +17,7 @@ const ensureAuthenticated = async (req, res, next) => {
         const { id, username, email, role } = req.session.user || {};
 
         // Log request details regardless of the outcome
+        /*
         logger.info(`
             Authentication Check:
             User ID: ${id || 'N/A'}
@@ -25,7 +26,7 @@ const ensureAuthenticated = async (req, res, next) => {
             Role: ${role || 'N/A'}
             Request Path: ${req.method} ${req.originalUrl}
         `);
-
+        */
         // Validate all required properties
         if (!id || !username || !email || !role) {
             req.flash('error', 'Invalid session. Please sign in.');
@@ -45,7 +46,10 @@ const ensureAuthenticated = async (req, res, next) => {
         }
 
         // User is authenticated, proceed
+        /*
         logger.info(`Authentication successful: User ID ${id}, Username ${username}, Role ${role}`);
+        */
+
         next();
     } catch (error) {
         logger.error(`Authentication error: ${error.message}`);
@@ -69,6 +73,7 @@ const ensureRole = (roles) => {
             const { id, username, role } = req.session.user || {};
 
             // Log the request details regardless of access outcome
+            /*
             logger.info(`
                 Role Validation:
                 User ID: ${id || 'N/A'}
@@ -77,7 +82,7 @@ const ensureRole = (roles) => {
                 Allowed Roles: ${JSON.stringify(roles)}
                 Request Path: ${req.method} ${req.originalUrl}
             `);
-
+            */
             // Check if role exists and is valid
             if (!role || !roles.includes(role)) {
                 req.flash('error', 'Access denied. You do not have the correct role.');
@@ -112,6 +117,7 @@ const ensurePermission = (requiredPermissions) => {
         const user = req.session.user;
 
         // Log details of the current request
+        /*
         logger.info(`
             Permission Check:
             User ID: ${user?.id || 'N/A'}
@@ -121,7 +127,7 @@ const ensurePermission = (requiredPermissions) => {
             Required Permissions: ${JSON.stringify(requiredPermissions)}
             Request Path: ${req.method} ${req.originalUrl}
         `);
-
+        */
         // Check if the user is signed in
         if (!user) {
             req.flash('error', 'Please sign in.');

@@ -1,4 +1,4 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 /**
  * Gets the current tax year based on today's date.
@@ -7,8 +7,8 @@ const moment = require('moment');
  * @returns {number} - The current tax year.
  */
 function getCurrentTaxYear() {
-    const today = moment.utc();
-    const startOfTaxYear = moment.utc({ month: 3, day: 6 }); // April 6th
+    const today = moment.tz('Europe/London');
+    const startOfTaxYear = moment.tz({ year: today.year(), month: 3, day: 6 }, 'Europe/London'); // April 6th
     if (today.isBefore(startOfTaxYear)) {
         return startOfTaxYear.subtract(1, 'years').year();
     }
@@ -24,8 +24,8 @@ function getCurrentTaxYear() {
  *   - end: The end date of the tax year (5th April of the next year).
  */
 function getTaxYearStartEnd(year) {
-    const startOfTaxYear = moment.utc({ year, month: 3, day: 6 }); // 6th April of the specified year
-    const endOfTaxYear = moment.utc(startOfTaxYear).add(1, 'years').subtract(1, 'days'); // 5th April of the next year
+    const startOfTaxYear = moment.tz({ year, month: 3, day: 6 }, 'Europe/London'); // 6th April of the specified year
+    const endOfTaxYear = startOfTaxYear.clone().add(1, 'years').subtract(1, 'days'); // 5th April of the next year
     return {
         start: startOfTaxYear.format('Do MMMM YYYY'),
         end: endOfTaxYear.format('Do MMMM YYYY')
@@ -49,13 +49,13 @@ function getTaxYearStartEnd(year) {
  *   - hmrcUpdateDateInDays: The number of days until the HMRC update date.
  */
 function getCurrentMonthlyReturn(year, month) {
-    const startOfTaxYear = moment.utc({ year, month: 3, day: 6 });
-    const startOfPeriod = moment.utc(startOfTaxYear).add(month - 1, 'months');
-    const endOfPeriod = moment.utc(startOfPeriod).add(1, 'months').subtract(1, 'days');
-    const today = moment.utc();
+    const startOfTaxYear = moment.tz({ year, month: 3, day: 6 }, 'Europe/London');
+    const startOfPeriod = startOfTaxYear.clone().add(month - 1, 'months');
+    const endOfPeriod = startOfPeriod.clone().add(1, 'months').subtract(1, 'days');
+    const today = moment.tz('Europe/London');
 
-    const submissionDeadline = moment.utc(endOfPeriod).add(6, 'days'); // 11th of the next month
-    const hmrcUpdateDate = moment.utc(endOfPeriod).add(11, 'days'); // 16th of the next month
+    const submissionDeadline = endOfPeriod.clone().add(6, 'days'); // 11th of the next month
+    const hmrcUpdateDate = endOfPeriod.clone().add(11, 'days'); // 16th of the next month
     const submissionDeadlineInDays = submissionDeadline.diff(today, 'days');
     const hmrcUpdateDateInDays = hmrcUpdateDate.diff(today, 'days');
 
@@ -82,11 +82,11 @@ function getCurrentMonthlyReturn(year, month) {
 const calculateTaxYearAndMonth = (date) => {
     if (!date) return { taxYear: null, taxMonth: null };
 
-    const remittanceMoment = moment.utc(date);
+    const remittanceMoment = moment.tz(date, 'Europe/London');
     const year = remittanceMoment.year();
-    const startOfTaxYear = moment.utc(`${year}-04-06T00:00:00Z`);
+    const startOfTaxYear = moment.tz(`${year}-04-06T00:00:00`, 'Europe/London');;
     const taxYear = remittanceMoment.isBefore(startOfTaxYear) ? year - 1 : year;
-    const startOfCurrentTaxYear = remittanceMoment.isBefore(startOfTaxYear) ? moment.utc(`${year - 1}-04-06T00:00:00Z`) : startOfTaxYear;
+    const startOfCurrentTaxYear = remittanceMoment.isBefore(startOfTaxYear) ? moment.tz(`${year - 1}-04-06T00:00:00`, 'Europe/London') : startOfTaxYear;
     const taxMonth = remittanceMoment.diff(startOfCurrentTaxYear, 'months') + 1;
 
     return { taxYear, taxMonth };

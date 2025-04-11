@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const moment = require('moment');
+const moment = require('moment-timezone');
 const logger = require('../services/loggerService');
 const path = require('path');
 const db = require('../services/sequelizeDatabaseService');
@@ -916,7 +916,7 @@ const renderCISDashboard = async (req, res, next) => {
             const payment = receipt.Payments.Payment?.Payment?.[0];
             if (!payment || !payment.PayDate) return false;
 
-            const payDate = moment.utc(payment.PayDate);
+            const payDate = moment.tz(payment.PayDate, 'Europe/London'); // Ensure  .tz
             return payDate.isBetween(currentMonthlyReturn.periodStart, currentMonthlyReturn.periodEnd, null, '[]');
         });
 

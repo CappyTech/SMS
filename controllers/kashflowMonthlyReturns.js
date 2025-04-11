@@ -104,7 +104,7 @@ const renderKFMonthlyReturns = async (req, res, next) => {
         // Process receipts to extract details
         const receiptsByMonth = {};
         receipts.forEach(receipt => {
-            const month = receipt.TaxMonth || moment.utc(receipt.InvoiceDate).month() + 1; // Ensure TaxMonth is used
+            const month = receipt.TaxMonth || moment.tz(receipt.InvoiceDate, 'Europe/London').month() + 1; // Ensure TaxMonth is used // ensure .tz
 
             // Ensure the month key exists
             if (!receiptsByMonth[month]) {
