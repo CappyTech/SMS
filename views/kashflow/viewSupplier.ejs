@@ -1,19 +1,37 @@
 <div class="container mt-5">
     <p class="display-5 text-center">
-        <%= if (!supplier.Subcontractor) { =%>
-        Supplier
-        <% } else { %>
-        Subcontractor @ 
-        <% if
-        <% } %>
-        <br> <span class="fw-bold"><%= supplier.Name %></span></p>
+        <% if (!supplier.Subcontractor) { %>
+            Supplier
+            <% } else { %>
+                Subcontractor @
+                <% if (supplier.CISRate===0) { %>
+                    0%
+                    <% } else if (supplier.CISRate===0.2) { %>
+                        20%
+                        <% } else if (supplier.CISRate===0.3) { %>
+                            30%
+                            <% } %>
+                                <% } %>
+
+                                    <br> <span class="fw-bold">
+                                        <%= supplier.Name %>
+                                    </span>
+    </p>
     <div class="card">
         <div class="card-body">
             <ul>
-                <li><strong>Contact:</strong> <%= supplier.Contact %></li>
-                <li><strong>Email:</strong> <%= supplier.Email %></li>
-                <li><strong>Phone:</strong> <%= supplier.Telephone %></li>
-                <li><strong>Address:</strong> <%= [supplier.Address1, supplier.Address2, supplier.Address3, supplier.Address4, supplier.PostCode].filter(Boolean).join(', ') %></li>
+                <li><strong>Contact:</strong>
+                    <%= supplier.Contact %>
+                </li>
+                <li><strong>Email:</strong>
+                    <%= supplier.Email %>
+                </li>
+                <li><strong>Phone:</strong>
+                    <%= supplier.Telephone %>
+                </li>
+                <li><strong>Address:</strong>
+                    <%= [supplier.Address1, supplier.Address2, supplier.Address3, supplier.Address4,
+                        supplier.PostCode].filter(Boolean).join(', ') %></li>
             </ul>
         </div>
     </div>
