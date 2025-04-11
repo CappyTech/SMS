@@ -1007,7 +1007,6 @@ const renderCISDashboard = async (req, res, next) => {
 router.get('/CIS', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
     try {
         const { taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(moment());
-        logger.info(`Tax Year: ${taxYear}, Tax Month: ${taxMonth}`);
         return res.redirect(`/dashboard/CIS/${taxYear}/${taxMonth}`);
     } catch (error) {
         logger.error('Error rendering stats dashboard:' + error.message);
