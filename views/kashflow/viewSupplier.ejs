@@ -2,21 +2,22 @@
     <p class="display-5 text-center">
         <% if (!supplier.Subcontractor) { %>
             Supplier
-            <% } else { %>
-                Subcontractor @
-                <% if (supplier.CISRate===0) { %>
-                    0%
-                    <% } else if (supplier.CISRate===0.2) { %>
-                        20%
-                        <% } else if (supplier.CISRate===0.3) { %>
-                            30%
-                            <% } %>
-                                <% } %>
-
-                                    <br> <span class="fw-bold">
-                                        <%= supplier.Name %>
-                                    </span>
+        <% } else { %>
+            Subcontractor @ 
+            <% if (supplier.CISRate == 0) { %>
+                0%
+            <% } else if (supplier.CISRate == 0.2) { %>
+                20%
+            <% } else if (supplier.CISRate == 0.3) { %>
+                30%
+            <% } %>
+        <% } %>
+        <br>
+        <span class="fw-bold">
+            <%= supplier.Name %>
+        </span>
     </p>
+
     <div class="card">
         <div class="card-body">
             <ul>
