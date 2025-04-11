@@ -4,11 +4,11 @@
             Supplier
         <% } else { %>
             Subcontractor @ 
-            <% if (supplier.CISRate == 0) { %>
+            <% if (supplier.CISRate == '0') { %>
                 0%
-            <% } else if (supplier.CISRate == 0.2) { %>
+            <% } else if (supplier.CISRate == '0.2') { %>
                 20%
-            <% } else if (supplier.CISRate == 0.3) { %>
+            <% } else if (supplier.CISRate == '0.3') { %>
                 30%
             <% } %>
         <% } %>
