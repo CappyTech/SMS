@@ -65,7 +65,7 @@ const changeSupplier = async (req, res, next) => {
             },
             { where: { uuid: req.params.uuid } }
         );
-        logger.info('Supplier updated to false successfully.');
+        logger.info('Supplier updated successfully.');
         return res.redirect('/dashboard/KFsupplier');
 
 
