@@ -6,6 +6,7 @@ const kf = require('../services/kashflowDatabaseService');
 const authService = require('../services/authService');
 const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
 const { normalizeLines, normalizePayments } = require('../services/kashflowNormalizer');
+const slimDateTime = require('../services/dateService').slimDateTime;
 
 const renderKFYearlyReturns = async (req, res, next) => {
     try {
@@ -199,6 +200,254 @@ router.post('/download-pdf', async (req, res, next) => {
     } catch (error) {
         logger.error('[PDF Generation Error]' + error);
         next(error);
+    }
+});
+
+const { Parser } = require('json2csv');
+
+router.post('/download-csv', async (req, res) => {
+    try {
+        const { year, uuid, filename } = req.body;
+
+        if (!year || !uuid) {
+            return res.status(400).send("Missing year or UUID for CSV export.");
+        }
+
+        const supplier = await kf.KF_Suppliers.findOne({ where: { uuid } });
+        if (!supplier) {
+            return res.status(404).send("Supplier not found.");
+        }
+
+        const receipts = await kf.KF_Receipts.findAll({
+            where: { CustomerID: supplier.SupplierID, TaxYear: year },
+            order: [['InvoiceNumber', 'ASC']]
+        });
+
+        const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+        const receiptsByMonth = {};
+
+        receipts.forEach(receipt => {
+            const month = receipt.TaxMonth || new Date(receipt.InvoiceDate).getUTCMonth() + 1;
+            if (!receiptsByMonth[month]) receiptsByMonth[month] = [];
+
+            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber);
+            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber);
+
+            const labourCost = normalizedLines.filter(line => line.ChargeType === 18685897).reduce((sum, line) => sum + line.Rate * line.Quantity, 0);
+            const materialCost = normalizedLines.filter(line => line.ChargeType === 18685896).reduce((sum, line) => sum + line.Rate * line.Quantity, 0);
+            const cisAmount = Math.abs(normalizedLines.filter(line => line.ChargeType === 18685964).reduce((sum, line) => sum + line.Rate * line.Quantity, 0));
+            const grossAmount = labourCost + materialCost;
+            const netAmount = grossAmount - cisAmount;
+
+            const payDates = normalizedPayments?.Payment?.Payment?.map(p => slimDateTime(p.PayDate)) || [];
+
+            receiptsByMonth[month].push({
+                InvoiceNumber: receipt.CustomerReference,
+                KashflowNumber: receipt.InvoiceNumber,
+                InvoiceDate: slimDateTime(receipt.InvoiceDate),
+                PayDate: payDates[0] || 'N/A',
+                Gross: grossAmount,
+                Labour: labourCost,
+                Material: materialCost,
+                CIS: cisAmount,
+                Net: netAmount,
+                Submission: slimDateTime(receipt.SubmissionDate || '')
+            });
+        });
+
+        const safeFilename = (filename || `${supplier.Name}-${year}-CIS-Returns.csv`)
+            .replace(/[^\w\-.]+/g, '_')
+            .replace(/\.csv$/i, '') + '.csv';
+
+        let csvRows = [];
+
+        const header = `${supplier.Name} | Heron Constructive Solutions LTD | ${year}-${String(Number(year) + 1).slice(-2)} CIS Returns`;
+        csvRows.push([header], [],
+            ['Subcontractor', supplier.Name],
+            ['', [supplier.Address1, supplier.Address2, supplier.Address3, supplier.Address4, supplier.PostCode].filter(Boolean).join(', ')],
+            ['Contractor', 'Heron Constructive Solutions LTD'],
+            ['', '103 Herondale Road, Mossley Hill, Liverpool, Merseyside, L18 1JZ'],
+            []);
+
+        for (let monthIndex = 1; monthIndex <= 12; monthIndex++) {
+            const monthKey = monthIndex.toString();
+            const monthName = monthNames[monthIndex - 1];
+            const entries = receiptsByMonth[monthIndex] || [];
+            if (!entries.length) continue;
+
+            csvRows.push([`Month ${monthIndex} (${monthName} ${year})`]);
+            csvRows.push(['Invoice', 'Kashflow', 'Invoiced', 'Paid', 'Gross', 'Labour', 'Material', 'CIS', 'Net', 'Submission']);
+
+            let totalGross = 0, totalLabour = 0, totalMaterial = 0, totalCIS = 0, totalNet = 0;
+
+            for (const row of entries) {
+                csvRows.push([
+                    row.InvoiceNumber,
+                    row.KashflowNumber,
+                    row.InvoiceDate,
+                    row.PayDate,
+                    `£${row.Gross.toFixed(2)}`,
+                    `£${row.Labour.toFixed(2)}`,
+                    `£${row.Material.toFixed(2)}`,
+                    `£${row.CIS.toFixed(2)}`,
+                    `£${row.Net.toFixed(2)}`,
+                    row.Submission
+                ]);
+                totalGross += row.Gross;
+                totalLabour += row.Labour;
+                totalMaterial += row.Material;
+                totalCIS += row.CIS;
+                totalNet += row.Net;
+            }
+
+            csvRows.push([
+                `Total for Month ${monthIndex}:`, '', '', '',
+                `£${totalGross.toFixed(2)}`,
+                `£${totalLabour.toFixed(2)}`,
+                `£${totalMaterial.toFixed(2)}`,
+                `£${totalCIS.toFixed(2)}`,
+                `£${totalNet.toFixed(2)}`,
+                ''
+            ]);
+            csvRows.push([]);
+        }
+
+        const csvString = csvRows.map(row => row.join(',')).join('\r\n');
+
+        res.set({
+            'Content-Type': 'text/csv',
+            'Content-Disposition': `attachment; filename="${safeFilename}"`,
+            'Content-Length': Buffer.byteLength(csvString)
+        });
+
+        res.send(csvString);
+    } catch (err) {
+        console.error('CSV export failed:', err);
+        res.status(500).send('Could not generate CSV');
+    }
+});
+
+const ExcelJS = require('exceljs');
+
+router.post('/download-xlsx', async (req, res) => {
+    try {
+        const { year, uuid, filename } = req.body;
+
+        if (!year || !uuid) {
+            return res.status(400).send("Missing year or UUID for Excel export.");
+        }
+
+        const supplier = await kf.KF_Suppliers.findOne({ where: { uuid } });
+        if (!supplier) {
+            return res.status(404).send("Supplier not found.");
+        }
+
+        const receipts = await kf.KF_Receipts.findAll({
+            where: { CustomerID: supplier.SupplierID, TaxYear: year },
+            order: [['InvoiceNumber', 'ASC']]
+        });
+
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('CIS Returns');
+
+        const headerText = `${supplier.Name} | Heron Constructive Solutions LTD | ${year}-${String(Number(year) + 1).slice(-2)} CIS Returns`;
+        sheet.mergeCells('A1:L1');
+        sheet.getCell('A1').value = headerText;
+        sheet.getCell('A1').alignment = { horizontal: 'center' };
+        sheet.getRow(1).font = { bold: true, size: 14 };
+
+        sheet.getCell('K2').value = 'Subcontractor';
+        sheet.getCell('L2').value = supplier.Name;
+        sheet.getCell('K3').value = '';
+        sheet.getCell('L3').value = [supplier.Address1, supplier.Address2, supplier.Address3, supplier.Address4, supplier.PostCode].filter(Boolean).join(', ');
+        sheet.getCell('K4').value = 'Contractor';
+        sheet.getCell('L4').value = 'Heron Constructive Solutions LTD';
+        sheet.getCell('K5').value = '';
+        sheet.getCell('L5').value = '103 Herondale Road, Mossley Hill, Liverpool, Merseyside, L18 1JZ';
+
+        const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+        const receiptsByMonth = {};
+
+        receipts.forEach(receipt => {
+            const month = receipt.TaxMonth || new Date(receipt.InvoiceDate).getUTCMonth() + 1;
+            if (!receiptsByMonth[month]) receiptsByMonth[month] = [];
+
+            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber);
+            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber);
+
+            const labourCost = normalizedLines.filter(line => line.ChargeType === 18685897).reduce((sum, line) => sum + line.Rate * line.Quantity, 0);
+            const materialCost = normalizedLines.filter(line => line.ChargeType === 18685896).reduce((sum, line) => sum + line.Rate * line.Quantity, 0);
+            const cisAmount = Math.abs(normalizedLines.filter(line => line.ChargeType === 18685964).reduce((sum, line) => sum + line.Rate * line.Quantity, 0));
+            const grossAmount = labourCost + materialCost;
+            const netAmount = grossAmount - cisAmount;
+
+            const payDates = normalizedPayments?.Payment?.Payment?.map(p => slimDateTime(p.PayDate)) || [];
+
+            receiptsByMonth[month].push({
+                InvoiceNumber: receipt.CustomerReference,
+                KashflowNumber: receipt.InvoiceNumber,
+                InvoiceDate: slimDateTime(receipt.InvoiceDate),
+                PayDate: payDates[0],
+                Gross: grossAmount,
+                Labour: labourCost,
+                Material: materialCost,
+                CIS: cisAmount,
+                Net: netAmount,
+                Submission: slimDateTime(receipt.SubmissionDate || '')
+            });
+        });
+
+        for (let monthIndex = 1; monthIndex <= 12; monthIndex++) {
+            const monthName = monthNames[monthIndex - 1];
+            const entries = receiptsByMonth[monthIndex] || [];
+            if (!entries.length) continue;
+
+            sheet.addRow([`Month ${monthIndex} (${monthName} ${year})`]);
+            sheet.addRow(['Invoice', 'Kashflow', 'Invoiced', 'Paid', 'Gross', 'Labour', 'Material', 'CIS', 'Net', 'Submission']);
+
+            let totalGross = 0, totalLabour = 0, totalMaterial = 0, totalCIS = 0, totalNet = 0;
+
+            for (const row of entries) {
+                sheet.addRow([
+                    row.InvoiceNumber,
+                    row.KashflowNumber,
+                    row.InvoiceDate,
+                    row.PayDate,
+                    row.Gross,
+                    row.Labour,
+                    row.Material,
+                    row.CIS,
+                    row.Net,
+                    row.Submission
+                ]);
+                totalGross += row.Gross;
+                totalLabour += row.Labour;
+                totalMaterial += row.Material;
+                totalCIS += row.CIS;
+                totalNet += row.Net;
+            }
+
+            sheet.addRow([
+                `Total for Month ${monthIndex}:`, '', '', '',
+                totalGross,
+                totalLabour,
+                totalMaterial,
+                totalCIS,
+                totalNet,
+                ''
+            ]);
+            sheet.addRow([]);
+        }
+
+        const safeFilename = (filename || `${supplier.Name}-${year}-CIS-Returns.xlsx`).replace(/[^\w\-.]+/g, '_');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (err) {
+        console.error('Excel export failed:', err);
+        res.status(500).send('Could not generate Excel file');
     }
 });
 
