@@ -113,10 +113,10 @@ app.use((req, res, next) => {
 
 app.disable('x-powered-by');
 app.use((req, res, next) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  next();
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
 });
 
 const holidayService = require('./services/holidayService');
@@ -128,7 +128,7 @@ app.use(async (req, res, next) => {
 
         if (holidayDetails?.isHoliday) {
             console.log(`Holiday detected: ${holidayDetails.reason} (${holidayDetails.startDate} to ${holidayDetails.endDate})`);
-            
+
             // Render the holiday notice page if today is a holiday
             return res.render('holiday', {
                 title: 'Holiday Notice',
@@ -137,7 +137,7 @@ app.use(async (req, res, next) => {
                 endDate: holidayDetails.endDate
             });
         }
-        
+
         // If not a holiday, proceed to the next middleware
         next();
     } catch (error) {
@@ -270,10 +270,10 @@ app.use('/', fileSystemProjects);
 
 app.use("/api-docs", authService.ensureAuthenticated, authService.ensureRole('admin'), swaggerUi.serve, (req, res, next) => {
     const swaggerDocument = JSON.parse(
-      fs.readFileSync(path.join(__dirname, "swagger.json"), "utf8")
+        fs.readFileSync(path.join(__dirname, "swagger.json"), "utf8")
     );
     swaggerUi.setup(swaggerDocument)(req, res, next);
-  });
+});
 
 app.use('/kashflow/monthly', kashflowMonthlyReturns);
 app.use('/kashflow/yearly', kashflowYearlyReturns);
@@ -300,13 +300,5 @@ if (process.env.NODE_ENV === 'development') {
         logger.info(`Server is running production`);
     });
 }
-
-setInterval(() => {
-    db.sequelize.query('SELECT 1');
-  }, 60000); // ping every 1 minute
-
-  setInterval(() => {
-    kf.sequelize.query('SELECT 1');
-  }, 60000); // ping every 1 minute
 
 module.exports = app;
