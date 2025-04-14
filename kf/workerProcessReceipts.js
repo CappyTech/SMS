@@ -18,6 +18,9 @@
   
       const transformedReceipts = await Promise.all(receipts.map(async (receipt) => {
         const payments = await getReceiptPayment(client, receipt.InvoiceNumber);
+        const flattenedPayments = Array.isArray(payments?.Payment?.Payment)
+            ? payments.Payment.Payment
+            : payments?.Payment?.Payment ? [payments.Payment.Payment] : [];
         const notes = await getReceiptNotes(client, receipt.InvoiceDBID);
         const mappedLines = receipt.Lines?.anyType?.map(mapLine) || [];
   
@@ -28,8 +31,8 @@
   
         const transformed = {
           ...receipt,
-          mappedLines,
-          payments,
+          Lines: mappedLines,
+          Payments: flattenedPayments,
           TaxMonth: taxMonth,
           TaxYear: taxYear,
           notes,
@@ -52,11 +55,11 @@
       );
   
       await workerDebugLog(supplier.Name, `✅ Upserted ${transformedReceipts.length} receipts for ${supplier.Name}`);
-      parentPort.postMessage(`✅ Finished processing receipts for supplier: ${supplier.Name}`);
+      parentPort.postMessage({ type: 'done', result: transformedReceipts });
     } catch (err) {
       const errMsg = `❌ Error processing receipts for ${supplier.Name}: ${err.message}`;
       await workerDebugLog(supplier.Name, errMsg);
-      parentPort.postMessage(errMsg);
+      parentPort.postMessage({ type: 'error', message: err.message });
     } finally {
       if (db?.sequelize?.close) {
         await db.sequelize.close(); // ✅ clean close
