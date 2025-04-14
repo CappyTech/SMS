@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const authService = require('../services/authService');
-const fetch = require('./fetchKashFlowData');
+const fetch = require('./fetchKashFlowData-old');
 const logger = require('../services/loggerService');
 
 let isFetching = false;
@@ -15,23 +15,52 @@ router.get('/kashflow', authService.ensureAuthenticated, authService.ensureRole(
     });
 });
 
-// Controller for initiating the data fetch process
-router.get('/fetch-kashflow-data', authService.ensureAuthenticated, authService.ensureRole('admin'), async (req, res, next) => {
-    if (isFetching) {
-        return res.status(400).json({ message: 'Fetch is already in progress.' });
+const API_TOKEN = process.env.FETCH_API_TOKEN;
+
+router.get('/fetch-kashflow-data', async (req, res) => {
+    const token = req.query.token;
+    const validToken = process.env.FETCH_API_TOKEN;
+
+    if (!token || token !== validToken) {
+        res.status(403).send('Forbidden: Invalid token');
+        return;
     }
 
+    // Set headers to enable streaming
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Transfer-Encoding', 'chunked');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.flushHeaders();
+
+    // Send updates to curl
+    const sendUpdate = (msg) => {
+        const line = typeof msg === 'string' ? msg : JSON.stringify(msg);
+        res.write(`${line}\n`);
+    };
+
+    // Simulate an authenticated user for downstream logic
+    const fakeUser = {
+        id: 0,
+        username: 'token-triggered-bot',
+        role: 'admin',
+        tokenAuthenticated: true,
+    };
+
+    // Patch a fake session.user onto a mock req object if needed downstream
+    req.session = { user: fakeUser };
+
     try {
-        logger.info('Starting KashFlow data fetch...');
-        isFetching = true;
-        await fetch.fetchKashFlowData();
-        res.status(200).json({ message: 'Fetch started.' });
-    } catch (error) {
-        logger.error('Error during data fetch:', error);
-        isFetching = false;
-        res.status(500).json({ message: 'Error starting data fetch.' });
+        sendUpdate('⏳ Starting KashFlow fetch...');
+        await fetch.fetchKashFlowData(sendUpdate); // hook in live updates
+        sendUpdate('✅ All models processed. Fetch complete.');
+    } catch (err) {
+        sendUpdate(`❌ Error: ${err.message}`);
+    } finally {
+        res.end(); // End streaming cleanly
     }
 });
+
 
 router.get('/fetch-status', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
     res.status(200).json({

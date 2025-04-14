@@ -10,10 +10,11 @@ const options = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     clearExpired: true,
-    checkExpirationInterval: 300000,
-    expiration: 28800000,
+    checkExpirationInterval: 15 * 60 * 1000,
+    expiration: 24 * 60 * 60 * 1000,
     createDatabaseTable: true,
-    endConnectionOnClose: true,
+    connectionLimit: 10,
+    // 🔥 This helps avoid dropped connections
     disableTouch: false,
     charset: 'utf8mb4_bin',
     schema: {
@@ -23,7 +24,7 @@ const options = {
             expires: 'expires',
             data: 'data'
         }
-    }
+    },
 };
 
 const sessionStore = new MySQLStore(options);
@@ -43,9 +44,22 @@ const sessionService = session({
 });
 
 sessionStore.onReady().then(() => {
-    //logger.info('MySQLStore ready');
+    logger.info('MySQLStore ready');
 }).catch(error => {
     logger.error(error);
 });
+
+sessionStore.on('error', (err) => {
+    logger.error('Session store error: '+ err);
+  });
+
+  setInterval(() => {
+    sessionStore.query('SELECT 1', [], (err) => {
+      if (err) {
+        logger.warn('⚠️ Session DB ping failed, might auto-reconnect: ' + err.message);
+      }
+    });
+  }, 60000);
+  
 
 module.exports = sessionService;

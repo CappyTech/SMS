@@ -301,4 +301,12 @@ if (process.env.NODE_ENV === 'development') {
     });
 }
 
+setInterval(() => {
+    db.sequelize.query('SELECT 1');
+  }, 60000); // ping every 1 minute
+
+  setInterval(() => {
+    kf.sequelize.query('SELECT 1');
+  }, 60000); // ping every 1 minute
+
 module.exports = app;
