@@ -239,7 +239,7 @@ router.post('/download-csv', async (req, res) => {
             const grossAmount = labourCost + materialCost;
             const netAmount = grossAmount - cisAmount;
 
-            const payDates = normalizedPayments?.Payment?.Payment?.map(p => slimDateTime(p.PayDate)) || [];
+            const payDates = normalizedPayments?.Payment?.Payment?.map(p => p.PayDate) || [];
 
             receiptsByMonth[month].push({
                 InvoiceNumber: receipt.CustomerReference,
