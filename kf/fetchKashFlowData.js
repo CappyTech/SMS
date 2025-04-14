@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { Worker } = require('worker_threads');
 const authenticate = require('./autoAuth');
-const db = require('../services/kashflowDatabaseService-old');
+const db = require('../services/kashflowDatabaseService');
 const getCustomers = require('./getCustomers');
 const getProjects = require('./getProjects');
 const getQuotes = require('./getQuotes');
@@ -12,15 +12,19 @@ const getInvoicesByDate = require('./getInvoicesByDate');
 const getInvoicePayment = require('./getInvoicePayment');
 const getInvoiceNotes = require('./getInvoiceNotes');
 const logger = require('../services/loggerService');
-const taxService = require('../services/taxService');
 const ChargeTypes = require('../controllers/CRUD/kashflow/chargeTypes.json');
 const upsertData = require('./upsertData'); // Assuming extracted from main file
 
 let isFetching = false;
+let dbPingInterval = null;
 
 exports.fetchKashFlowData = async (sendUpdate = () => {}) => {
     if (isFetching) return;
     isFetching = true;
+    // 🟢 Start DB keepalive only while fetching
+    dbPingInterval = setInterval(() => {
+        db.sequelize.query('SELECT 1').catch(() => {});
+    }, 60000);
     const startfetch = Date.now();
     const operationLog = [];
 
@@ -108,6 +112,10 @@ exports.fetchKashFlowData = async (sendUpdate = () => {}) => {
         logger.error(`Fetch error: ${err.message}`);
     } finally {
         isFetching = false;
+        
+        // 🔴 Stop DB keepalive
+        if (dbPingInterval) clearInterval(dbPingInterval);
+        dbPingInterval = null;
     }
 };
 
