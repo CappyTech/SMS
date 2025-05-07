@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const authService = require('../services/authService');
-const fetch = require('./fetchKashFlowData-old');
+const fetch = require('./fetchKashFlowData');
 const logger = require('../services/loggerService');
 
 let isFetching = false;
@@ -45,6 +45,7 @@ router.get('/fetch-kashflow-data', async (req, res) => {
         username: 'token-triggered-bot',
         role: 'admin',
         tokenAuthenticated: true,
+        touch: () => {}, // ← avoids crash
     };
 
     // Patch a fake session.user onto a mock req object if needed downstream
