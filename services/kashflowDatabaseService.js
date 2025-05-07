@@ -18,6 +18,12 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     dialect: 'mysql',
     logging: false, // Set to console.log for query debugging
+    pool: {
+      max: 5,        // Maximum active connections
+      min: 0,        // Minimum idle
+      acquire: 30000, // Max time to get a connection before throwing error
+      idle: 10000     // Max idle time before releasing connection
+    }
   }
 );
 
