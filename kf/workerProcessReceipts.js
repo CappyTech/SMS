@@ -1,8 +1,53 @@
+const { parentPort, workerData, isMainThread } = require('worker_threads');
+const authenticate = require('./autoAuth');
+const upsertData = require('./upsertData');
+const getReceiptsForSupplier = require('./getReceiptsForSupplier');
+const getReceiptPayment = require('./getReceiptPayment');
+const getReceiptNotes = require('./getReceiptNotes');
+const taxService = require('../services/taxService');
+const createDbConnection = require('../services/kashflowDatabaseService').createDbConnection;
+function mapLine(line) {
+  return {
+      LineID: line.LineID,
+      Quantity: line.Quantity || null,
+      Description: line.Description || null,
+      Rate: line.Rate || null,
+      ChargeType: line.ChargeType || null,
+      ChargeTypeName: line.ChargeType ? ChargeTypes[line.ChargeType] || null : null,
+      VatRate: line.VatRate || null,
+      VatAmount: line.VatAmount || null,
+      ProductID: line.ProductID || null,
+      Sort: line.Sort || null,
+      ProjID: line.ProjID || null,
+  };
+}
+const ChargeTypes = require('../controllers/CRUD/kashflow/chargeTypes.json');
+
+if (isMainThread) {
+  console.error('❌ This file should only be run as a worker.');
+  process.exit(1);
+}
+const workerDebugLog = async (supplierName, message) => {
+  try {
+    parentPort.postMessage({
+      type: 'log',
+      supplier: supplierName,
+      timestamp: new Date().toISOString(),
+      log: typeof message === 'string' ? message : JSON.stringify(message, null, 2),
+    });
+  } catch (err) {
+    console.error(`Failed to post log message from worker: ${err.message}`);
+  }
+};
+
 (async () => {
+    if (!workerData || !workerData.supplier) {
+      console.error('❌ This script must be run as a worker with workerData.supplier');
+      process.exit(1);
+    }
     const supplier = workerData.supplier;
     const startfetch = workerData.startfetch;
     let db; // <-- declare outside so we can close it later
-  
     try {
       await workerDebugLog(supplier.Name, `📦 Starting processing for supplier: ${supplier.Name} (${supplier.SupplierID})`);
   
@@ -14,7 +59,8 @@
       });
   
       const receipts = await getReceiptsForSupplier(client, supplier.SupplierID);
-      await workerDebugLog(supplier.Name, { step: 'Fetched receipts', receipts });
+      const receiptsLength = receipts.length;
+      await workerDebugLog(supplier.Name, { step: 'Fetched receipts', receiptsLength });
   
       const transformedReceipts = await Promise.all(receipts.map(async (receipt) => {
         const payments = await getReceiptPayment(client, receipt.InvoiceNumber);
@@ -25,11 +71,16 @@
         const mappedLines = receipt.Lines?.anyType?.map(mapLine) || [];
   
         let taxYear, taxMonth;
-        if (payments?.Payment?.[0]?.PayDate) {
-          ({ taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(payments.Payment[0].PayDate));
+
+        const paymentArray = Array.isArray(payments?.Payment)
+          ? payments.Payment
+          : payments?.Payment ? [payments.Payment] : [];
+
+        if (paymentArray.length && paymentArray[0]?.PayDate) {
+          ({ taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(paymentArray[0].PayDate));
         }
   
-        // 🐛 Debug: Log raw receipt
+        /* 🐛 Debug: Log raw receipt
         await workerDebugLog(supplier.Name, {
           step: `Inspecting raw receipt`,
           invoiceNumber: receipt.InvoiceNumber,
@@ -42,6 +93,7 @@
             Date: receipt.InvoiceDate,
           },
         });
+        */
 
         const transformed = {
           ...receipt,
@@ -52,7 +104,7 @@
           notes,
         };
   
-        await workerDebugLog(supplier.Name, { step: `Transformed Receipt ${receipt.InvoiceNumber}`, transformed });
+        await workerDebugLog(supplier.Name, { step: `Transformed Receipt ${receipt.InvoiceNumber}` });
         return transformed;
       }));
   
