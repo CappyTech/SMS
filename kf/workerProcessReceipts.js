@@ -29,6 +29,20 @@
           ({ taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(payments.Payment[0].PayDate));
         }
   
+        // 🐛 Debug: Log raw receipt
+        await workerDebugLog(supplier.Name, {
+          step: `Inspecting raw receipt`,
+          invoiceNumber: receipt.InvoiceNumber,
+          receiptSummary: {
+            InvoiceDBID: receipt.InvoiceDBID,
+            InvoiceNumber: receipt.InvoiceNumber,
+            SupplierID: receipt.SupplierID,
+            Description: receipt.Description,
+            Total: receipt.Total,
+            Date: receipt.InvoiceDate,
+          },
+        });
+
         const transformed = {
           ...receipt,
           Lines: mappedLines,
