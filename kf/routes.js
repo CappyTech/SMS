@@ -6,7 +6,7 @@ const fetch = require('./fetchKashFlowData-old');
 const logger = require('../services/loggerService');
 
 let isFetching = false;
-
+/*
 // Route for rendering the fetch status page
 router.get('/kashflow', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
     res.render(path.join('kashflow', 'fetchStatus'), {
@@ -14,7 +14,7 @@ router.get('/kashflow', authService.ensureAuthenticated, authService.ensureRole(
         isFetching,
     });
 });
-
+*/
 const API_TOKEN = process.env.FETCH_API_TOKEN;
 
 router.get('/fetch-kashflow-data', async (req, res) => {
@@ -61,7 +61,7 @@ router.get('/fetch-kashflow-data', async (req, res) => {
     }
 });
 
-
+/*
 router.get('/fetch-status', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
     res.status(200).json({
         messages: fetchMessages,
@@ -81,6 +81,6 @@ router.get('/update-tax-month-year', authService.ensureAuthenticated, authServic
         res.status(500).json({ message: 'Failed to update tax month and year.' });
     }
 });
-
+*/
 module.exports = router;
 
