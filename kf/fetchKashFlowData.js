@@ -14,16 +14,20 @@ const getInvoiceNotes = require('./getInvoiceNotes');
 const logger = require('../services/loggerService');
 const ChargeTypes = require('../controllers/CRUD/kashflow/chargeTypes.json');
 const upsertData = require('./upsertData'); // Assuming extracted from main file
+const promiseLimit = require('promise-limit');
+const limit = promiseLimit(3); // Limit to 3 concurrent workers
 
 let isFetching = false;
 let dbPingInterval = null;
 
-exports.fetchKashFlowData = async (sendUpdate = () => {}) => {
+exports.fetchKashFlowData = async (sendUpdate = () => { }) => {
     if (isFetching) return;
     isFetching = true;
     // 🟢 Start DB keepalive only while fetching
     dbPingInterval = setInterval(() => {
-        db.sequelize.query('SELECT 1').catch(() => {});
+        db.sequelize.query('SELECT 1').catch((err) => {
+            logger.warn(`DB keepalive failed: ${err.message}`);
+        });
     }, 60000);
     const startfetch = Date.now();
     const operationLog = [];
@@ -36,7 +40,7 @@ exports.fetchKashFlowData = async (sendUpdate = () => {}) => {
         const KF_Meta = db.KF_Meta;
 
         const baseModels = [
-            { name: 'customers', fetchFn: getCustomers, model: db.KF_Customers, uniqueKey: 'CustomerID' },
+            //{ name: 'customers', fetchFn: getCustomers, model: db.KF_Customers, uniqueKey: 'CustomerID' },
             { name: 'supplier', fetchFn: getSuppliers, model: db.KF_Suppliers, uniqueKey: 'SupplierID' },
         ];
 
@@ -74,35 +78,35 @@ exports.fetchKashFlowData = async (sendUpdate = () => {}) => {
 
         const suppliers = await db.KF_Suppliers.findAll({ raw: true });
 
-        await Promise.all(suppliers.map(supplier => new Promise((resolve, reject) => {
-            const worker = new Worker(path.join(__dirname, 'workerProcessReceipts.js'), {
-                workerData: { supplier }
-            });
 
-            worker.on('message', async (msg) => {
-                if (msg.type === 'done') {
-                    await upsertData(
-                        db.KF_Receipts,
-                        msg.result,
-                        'InvoiceDBID',
-                        KF_Meta,
-                        operationLog,
-                        './logs/receipts.txt',
-                        sendUpdate,
-                        startfetch
-                    );
-                    resolve();
-                } else if (msg.type === 'error') {
-                    logger.error(`Worker error for ${supplier.Name}: ${msg.message}`);
-                    reject(new Error(msg.message));
-                }
-            });
+        await Promise.all(
+            suppliers.map(supplier => limit(() => new Promise((resolve, reject) => {
+                const worker = new Worker(path.join(__dirname, 'workerProcessReceipts.js'), {
+                    workerData: { supplier, startfetch }
+                });
 
-            worker.on('error', reject);
-            worker.on('exit', code => {
-                if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`));
-            });
-        })));
+                worker.on('message', async (msg) => {
+                    if (msg.type === 'done') {
+                        resolve();
+                    } else if (msg.type === 'log') {
+                        sendUpdate(`[${msg.timestamp}] [${msg.supplier}] ${msg.log}`);
+                    } else if (msg.type === 'error') {
+                        logger.error(`Worker error for ${supplier.Name}: ${msg.message}`);
+                        sendUpdate(`❌ Worker error for ${supplier.Name}: ${msg.message}`);
+                        reject(new Error(msg.message));
+                    }
+                });
+
+                worker.on('error', reject);
+
+                worker.on('exit', code => {
+                    if (code !== 0) {
+                        logger.error(`Worker for ${supplier.Name} exited with code ${code}`);
+                        reject(new Error(`Worker exited unexpectedly: ${code}`));
+                    }
+                });
+            })))
+        );
 
         logger.info('Data fetch and upsert completed.');
         const logFilename = `fetch-log-${new Date().toISOString().replace(/[:.]/g, '-')}.txt`;
@@ -112,7 +116,7 @@ exports.fetchKashFlowData = async (sendUpdate = () => {}) => {
         logger.error(`Fetch error: ${err.message}`);
     } finally {
         isFetching = false;
-        
+
         // 🔴 Stop DB keepalive
         if (dbPingInterval) clearInterval(dbPingInterval);
         dbPingInterval = null;
