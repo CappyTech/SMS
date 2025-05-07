@@ -1,7 +1,7 @@
 // upsertdata.js
 const fs = require('fs');
 const path = require('path');
-const logger = require('./loggerService');
+const logger = require('../services/loggerService');
 
 const PLACEHOLDER_DATES = [
   "0001-01-01T00:00:00.000Z",
