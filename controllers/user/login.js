@@ -7,15 +7,36 @@ const speakeasy = require('speakeasy');
 const db = require('../../services/sequelizeDatabaseService');
 
 const renderSigninForm = (req, res) => {
-    
     res.render(path.join('user', 'signin'), {
         title: 'Sign In',
+        siteKey: process.env.TURNSTILE_SITE_KEY,
     });
 };
 
 const loginUser = async (req, res) => {
     try {
         const { usernameOrEmail, password } = req.body;
+        const token = req.body['cf-turnstile-response'];
+        const ipadress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+        if (!token) {
+            req.flash('error', 'CAPTCHA token missing.');
+            return res.redirect('/user/signin');
+        }
+
+        const verifyResponse = await axios.post(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+            new URLSearchParams({
+                secret: process.env.TURNSTILE_SECRET_KEY,
+                response: token,
+                remoteip: ipadress
+            })
+        );
+
+        if (!verifyResponse.data.success) {
+            req.flash('error', 'CAPTCHA verification failed.');
+            return res.redirect('/user/signin');
+        }
 
         if (!usernameOrEmail || !password) {
             req.flash('error', 'Username and password are required.');
