@@ -21,6 +21,7 @@ const loginUser = async (req, res) => {
         const ipadress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
         if (!token) {
+            logger.error('CAPTCHA token missing.');
             req.flash('error', 'CAPTCHA token missing.');
             return res.redirect('/user/signin');
         }
@@ -35,11 +36,13 @@ const loginUser = async (req, res) => {
         );
 
         if (!verifyResponse.data.success) {
+            logger.error('CAPTCHA verification failed.');
             req.flash('error', 'CAPTCHA verification failed.');
             return res.redirect('/user/signin');
         }
 
         if (!usernameOrEmail || !password) {
+            logger.error('Username and password are required.');
             req.flash('error', 'Username and password are required.');
             return res.redirect('/user/signin');
         }
@@ -51,6 +54,7 @@ const loginUser = async (req, res) => {
         });
 
         if (!user) {
+            logger.error('Invalid username.');
             req.flash('error', 'Invalid username.');
             return res.redirect('/user/signin');
         }
@@ -58,6 +62,7 @@ const loginUser = async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
+            logger.error('Invalid password.');
             req.flash('error', 'Invalid password.');
             return res.redirect('/user/signin');
         }
@@ -107,7 +112,7 @@ const loginUser = async (req, res) => {
                 req.flash('error', 'An error occurred while logging in. Please try again.');
                 return res.redirect('/user/signin');
             }
-
+            logger.info('Successfully logged in.');
             req.flash('success', 'Successfully logged in.');
             return res.redirect('/');
         });
