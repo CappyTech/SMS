@@ -1,21 +1,43 @@
 const express = require('express');
 const router = express.Router();
-
+const axios = require('axios');
 const logger = require('../../services/loggerService'); 
 const path = require('path');
 const db = require('../../services/sequelizeDatabaseService');
 
 const renderRegistrationForm = (req, res) => {
-    
     res.render(path.join('user', 'register'), {
         title: 'Register',
         message: req.query.message || '',
+        siteKey: process.env.TURNSTILE_SITE_KEY,
     });
 };
 
 const registerUser = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
+        const token = req.body['cf-turnstile-response'];
+        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+        // Turnstile CAPTCHA validation
+        if (!token) {
+            req.flash('error', 'CAPTCHA verification failed (token missing).');
+            return res.redirect('/user/register');
+        }
+
+        const verifyResponse = await axios.post(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+            new URLSearchParams({
+                secret: process.env.TURNSTILE_SECRET_KEY,
+                response: token,
+                remoteip: ip
+            })
+        );
+
+        if (!verifyResponse.data.success) {
+            req.flash('error', 'CAPTCHA verification failed.');
+            return res.redirect('/user/register');
+        }
 
         // Check if the email or username already exists
         const existingUser = await db.User.findOne({
