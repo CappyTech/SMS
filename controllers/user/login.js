@@ -5,6 +5,7 @@ const logger = require('../../services/loggerService');
 const path = require('path');
 const speakeasy = require('speakeasy');
 const db = require('../../services/sequelizeDatabaseService');
+const axios = require('axios');
 
 const renderSigninForm = (req, res) => {
     res.render(path.join('user', 'signin'), {
