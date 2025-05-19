@@ -5,10 +5,30 @@ const securityService = [
     helmet(),
     helmet.contentSecurityPolicy({
         directives: {
-            defaultSrc: ["'self'", "https://app.heroncs.co.uk"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "https://unpkg.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com"],
-            fontSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
+            defaultSrc: [
+                "'self'", 
+                "https://app.heroncs.co.uk"
+            ],
+            styleSrc: [
+                "'self'", 
+                "'unsafe-inline'", 
+                "https://cdn.jsdelivr.net", 
+                "https://fonts.googleapis.com", 
+                "https://unpkg.com"
+            ],
+            scriptSrc: [
+                "'self'", 
+                "'unsafe-inline'", 
+                "https://cdn.jsdelivr.net", 
+                "https://unpkg.com", 
+                "https://challenges.cloudflare.com"
+            ],
+            fontSrc: ["'self'", 
+                "'unsafe-inline'", 
+                "https://cdn.jsdelivr.net", 
+                "https://fonts.gstatic.com", 
+                "https://fonts.googleapis.com"
+            ],
             imgSrc: [
                 "'self'",
                 "data:",
@@ -19,14 +39,20 @@ const securityService = [
                 "https://a.tile.openstreetmap.org",
                 "https://b.tile.openstreetmap.org",
                 "https://c.tile.openstreetmap.org",
-                "https://unpkg.com"
+                "https://unpkg.com",
+                "https://challenges.cloudflare.com"
             ],
             connectSrc: [
                 "'self'",
                 "https://app.heroncs.co.uk",
                 "https://nominatim.openstreetmap.org",
-                "https://api.openstreetmap.org"
-            ]
+                "https://api.openstreetmap.org",
+                "https://challenges.cloudflare.com"
+            ],
+            frameSrc: [
+                "'self'",
+                "https://challenges.cloudflare.com"
+            ],
         },
     }),
     xss()
