@@ -1,4 +1,4 @@
-<!-- views/signin.ejs: -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <div class="container py-4">
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
@@ -12,6 +12,9 @@
                 <div class="form-floating mb-3">
                     <input type="password" id="password" name="password" class="form-control" required>
                     <label for="password" class="form-label">Password:</label>
+                </div>
+                <div class="mb-3">
+                    <div class="cf-turnstile" data-sitekey="<%= siteKey %>"></div>
                 </div>
                 <div class="d-grid gap-2 mt-4">
                     <button class="btn btn-hcs-green btn-lg" type="submit"><i class="bi bi-box-arrow-in-right"></i> Sign in</button>
