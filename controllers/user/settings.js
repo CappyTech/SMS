@@ -129,7 +129,7 @@ const updateAccountSettings = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         req.flash('error', errors.array().map(error => error.msg).join('. '));
-        return res.redirect('/account');
+        return res.redirect('/user/account');
     }
 
     try {
@@ -137,7 +137,7 @@ const updateAccountSettings = async (req, res, next) => {
 
         if (!user) {
             req.flash('error', 'User not found');
-            return res.redirect('/account');
+            return res.redirect('/user/account');
         }
 
         // Update basic account details
@@ -148,11 +148,11 @@ const updateAccountSettings = async (req, res, next) => {
 
         logger.info('Account settings updated successfully');
         req.flash('success', 'Account settings updated successfully');
-        res.redirect('/account');
+        res.redirect('/user/account');
     } catch (error) {
         logger.error(`Error updating account settings: ${error.message}`);
         req.flash('error', 'Failed to update account settings');
-        res.redirect('/account');
+        res.redirect('/user/account');
     }
 };
 
@@ -163,7 +163,7 @@ const logoutSession = async (req, res, next) => {
 
         if (!sessionId) {
             req.flash('error', 'Session ID is required.');
-            return res.redirect('/account/');
+            return res.redirect('/user/account/');
         }
 
         // Remove the specific session from the store
@@ -171,17 +171,17 @@ const logoutSession = async (req, res, next) => {
             if (error) {
                 logger.error(`Error destroying session: ${error.message}`);
                 req.flash('error', 'Failed to log out session.');
-                return res.redirect('/account/');
+                return res.redirect('/user/account/');
             }
 
             logger.info(`Session ${sessionId} logged out successfully`);
             req.flash('success', 'Session logged out successfully.');
-            res.redirect('/account/');
+            res.redirect('/user/account/');
         });
     } catch (error) {
         logger.error(`Error logging out session: ${error.message}`);
         req.flash('error', 'Error logging out session.');
-        res.redirect('/account/');
+        res.redirect('/user/account/');
     }
 };
 
@@ -193,7 +193,7 @@ const validateAccountSettings = [
 
 // Route for change password
 router.post(
-    '/account/change-password',
+    '/user/account/change-password',
     [
       body('currentPassword').notEmpty().withMessage('Current password is required'),
       body('newPassword')
@@ -208,7 +208,7 @@ router.post(
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         req.flash('error', errors.array().map(error => error.msg).join('. '));
-        return res.redirect('/account/change-password');
+        return res.redirect('/user/account/change-password');
       }
   
       try {
@@ -219,14 +219,14 @@ router.post(
         const user = await db.Users.findOne({ where: { id: userId } });
         if (!user) {
           req.flash('error', 'User not found');
-          return res.redirect('/account/change-password');
+          return res.redirect('/user/account/change-password');
         }
   
         // Check if the current password matches
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
           req.flash('error', 'Current password is incorrect');
-          return res.redirect('/account/change-password');
+          return res.redirect('/user/account/change-password');
         }
   
         // Hash the new password
@@ -238,11 +238,11 @@ router.post(
   
         logger.info(`Password changed for user ID ${userId}`);
         req.flash('success', 'Password updated successfully');
-        res.redirect('/account');
+        res.redirect('/user/account');
       } catch (error) {
         logger.error('Error changing password: ' + error.message);
         req.flash('error', 'An error occurred while updating the password');
-        res.redirect('/account/change-password');
+        res.redirect('/user/account/change-password');
       }
     }
   );
