@@ -91,7 +91,7 @@ router.get('/weekly', authService.ensureAuthenticated, authService.ensureRole('a
             firstPayrollWeekStart.add(7, 'days');
         }
 
-        const currentWeekNumber = momentTZ.tz('Europe/London').diff(firstPayrollWeekStart, 'weeks') + 1;
+        const currentWeekNumber = moment.tz('Europe/London').diff(firstPayrollWeekStart, 'weeks') + 1;
 
         logger.info(`Redirecting to current weekly attendance: Year: ${currentTaxYear}, Week Number: ${currentWeekNumber}`);
         return res.redirect(`/attendance/weekly/${currentTaxYear}/${currentWeekNumber}`);
