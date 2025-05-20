@@ -65,8 +65,9 @@ const getAccountPage = async (req, res, next) => {
 
         // Retrieve or generate TOTP secret
         let secret;
+        
         if (!user.totpSecret) {
-            secret = totpService.generateTOTPSecret(user);
+            secret = await totpService.generateTOTPSecret(user);
         } else {
             secret = encryptionService.decrypt(user.totpSecret);
             logger.info(`Using existing decrypted TOTP Secret for user ${user.id}`);
