@@ -183,6 +183,7 @@ const renderDashboard = require('./controllers/renderDashboards');
 const userLogin = require('./controllers/user/login');
 const userRegister = require('./controllers/user/register');
 const userSettings = require('./controllers/user/settings');
+const user2FA = require('./controllers/user/2fa');
 
 const userCRUD = require('./controllers/CRUD/userCRUD');
 const subcontractorCRUD = require('./controllers/CRUD/subcontractorCRUD');
@@ -237,6 +238,7 @@ app.use('/dashboard', renderDashboard);
 app.use('/user', userLogin);
 app.use('/user', userRegister);
 app.use('/user', userSettings);
+app.use('/user', user2FA);
 
 app.use('/user', userCRUD);
 app.use('/subcontractor', subcontractorCRUD);
