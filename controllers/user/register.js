@@ -8,7 +8,6 @@ const db = require('../../services/sequelizeDatabaseService');
 const renderRegistrationForm = (req, res) => {
     res.render(path.join('user', 'register'), {
         title: 'Register',
-        message: req.query.message || '',
         siteKey: process.env.TURNSTILE_SITE_KEY,
     });
 };
@@ -17,10 +16,11 @@ const registerUser = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
         const token = req.body['cf-turnstile-response'];
-        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
+        const ip = req.ip;
+        console.log('req.body =', req.body);
         // Turnstile CAPTCHA validation
         if (!token) {
+            logger.error('CAPTCHA verification failed (token missing).');
             req.flash('error', 'CAPTCHA verification failed (token missing).');
             return res.redirect('/user/register');
         }
@@ -35,6 +35,7 @@ const registerUser = async (req, res, next) => {
         );
 
         if (!verifyResponse.data.success) {
+            logger.error('CAPTCHA verification failed.');
             req.flash('error', 'CAPTCHA verification failed.');
             return res.redirect('/user/register');
         }
