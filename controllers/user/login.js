@@ -18,8 +18,9 @@ const loginUser = async (req, res) => {
     try {
         const { usernameOrEmail, password } = req.body;
         const token = req.body['cf-turnstile-response'];
-        const ipadress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
+        const agent = req.useragent || {};
+        const ip = req.ip;
+        console.log('Turnstile token:', req.body['cf-turnstile-response']);
         if (!token) {
             logger.error('CAPTCHA token missing.');
             req.flash('error', 'CAPTCHA token missing.');
@@ -31,7 +32,7 @@ const loginUser = async (req, res) => {
             new URLSearchParams({
                 secret: process.env.TURNSTILE_SECRET_KEY,
                 response: token,
-                remoteip: ipadress
+                remoteip: ip
             })
         );
 
@@ -66,9 +67,6 @@ const loginUser = async (req, res) => {
             req.flash('error', 'Invalid password.');
             return res.redirect('/user/signin');
         }
-
-        const agent = req.useragent || {};
-        const ip = req.ip;
 
         if (user.totpEnabled) {
             req.session.userPending2FA = {
