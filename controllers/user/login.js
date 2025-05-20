@@ -3,7 +3,6 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const logger = require('../../services/loggerService');
 const path = require('path');
-const speakeasy = require('speakeasy');
 const db = require('../../services/sequelizeDatabaseService');
 const axios = require('axios');
 
@@ -134,90 +133,8 @@ const logoutUser = (req, res) => {
     });
 };
 
-const render2FAPage = (req, res) => {
-    if (!req.session.userPending2FA) {
-        return res.redirect('/user/signin');
-    }
-
-    res.render(path.join('user', '2fa'), {
-        title: 'Two-Factor Authentication',
-    });
-};
-
-const verify2FA = async (req, res, next) => {
-    try {
-        if (!req.session.userPending2FA) {
-            req.flash('error', 'Invalid session. Please sign in again.');
-            return res.redirect('/user/signin');
-        }
-
-        const { totpToken } = req.body;
-
-        const user = await db.Users.findOne({
-            where: { id: req.session.userPending2FA.id }
-        });
-
-        if (!user) {
-            req.flash('error', 'User not found. Please sign in again.');
-            return res.redirect('/user/signin');
-        }
-
-        const agent = req.useragent || {};
-        const ip = req.ip;
-
-        const decryptedSecret = user.totpSecret;
-        const tokenValidates = speakeasy.totp.verify({
-            secret: decryptedSecret,
-            encoding: 'base32',
-            token: totpToken,
-            window: 1
-        });
-
-        if (!tokenValidates) {
-            req.flash('error', 'Invalid 2FA code. Please try again.');
-            return res.redirect('/user/2fa');
-        }
-
-        req.session.user = {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            role: user.role,
-            permissions: user.permissions,
-            loginTime: new Date().toISOString(),
-            ip: ip,
-            userAgent: {
-                browser: agent.browser || 'Unknown',
-                version: agent.version || 'Unknown',
-                os: agent.os || 'Unknown',
-                platform: agent.platform || 'Unknown',
-            },
-        };
-
-        delete req.session.userPending2FA;
-
-        req.session.save((error) => {
-            if (error) {
-                logger.error('Error saving session: ' + error.message);
-                req.flash('error', 'An error occurred while logging in. Please try again.');
-                return res.redirect('/user/signin');
-            }
-
-            req.flash('success', 'Successfully logged in.');
-            next(error); // Pass the error to the error handler
-        });
-
-    } catch (error) {
-        logger.error('Error during 2FA verification: ' + error.message);
-        req.flash('error', 'An error occurred during 2FA verification. Please try again.');
-        return res.redirect('/user/2fa');
-    }
-};
-
 router.get('/signin', renderSigninForm);
 router.post('/login', loginUser);
 router.get('/logout', logoutUser);
-router.get('/2fa', render2FAPage);
-router.post('/2fa', verify2FA);
 
 module.exports = router;
