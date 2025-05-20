@@ -9,25 +9,36 @@ const taxService = require('../services/taxService');
 
 const getWeeklyAttendance = async (req, res, next) => {
     try {
-        const year = req.params.year ? parseInt(req.params.year) : taxService.getCurrentTaxYear();
-        const { start: startOfTaxYear } = taxService.getTaxYearStartEnd(year);
-        const taxYearStart = moment.tz(startOfTaxYear, 'Do MMMM YYYY', 'Europe/London');
+        const yearParam = parseInt(req.params.year);
+        const weekParam = parseInt(req.params.week);
+        const year = !isNaN(yearParam) ? yearParam : taxService.getCurrentTaxYear();
+        const { start: startOfTaxYear, end: endOfTaxYear } = taxService.getTaxYearStartEnd(year);
 
-        // ✅ Set first payroll week to the first Saturday of the tax year
+        const taxYearStart = moment.tz(startOfTaxYear, 'Do MMMM YYYY', 'Europe/London');
+        const taxYearEnd = moment.tz(endOfTaxYear, 'Do MMMM YYYY', 'Europe/London');
+
+        // Set first payroll week to the first Saturday of the tax year
         let firstPayrollWeekStart = taxYearStart.clone().day(6);
         if (firstPayrollWeekStart.isBefore(taxYearStart)) {
             firstPayrollWeekStart.add(7, 'days');
         }
 
+        const totalWeeksInYear = taxYearEnd.diff(firstPayrollWeekStart, 'weeks') + 1;
+
         const today = moment.tz('Europe/London');
-        const requestedWeekNumber = req.params.week ? parseInt(req.params.week) : today.diff(firstPayrollWeekStart, 'weeks') + 1;
+        let requestedWeekNumber = !isNaN(weekParam) ? weekParam : today.diff(firstPayrollWeekStart, 'weeks') + 1;
+
+        // Clamp week number between 1 and totalWeeksInYear
+        if (requestedWeekNumber < 1) requestedWeekNumber = 1;
+        if (requestedWeekNumber > totalWeeksInYear) requestedWeekNumber = totalWeeksInYear;
+
         const payrollWeekStart = firstPayrollWeekStart.clone().add((requestedWeekNumber - 1) * 7, 'days');
         const endDate = payrollWeekStart.clone().add(6, 'days');
 
-        const previousWeek = requestedWeekNumber === 1 ? 52 : requestedWeekNumber - 1;
+        const previousWeek = requestedWeekNumber === 1 ? totalWeeksInYear : requestedWeekNumber - 1;
         const previousYear = requestedWeekNumber === 1 ? year - 1 : year;
-        const nextWeek = requestedWeekNumber === 52 ? 1 : requestedWeekNumber + 1;
-        const nextYear = requestedWeekNumber === 52 ? year + 1 : year;
+        const nextWeek = requestedWeekNumber === totalWeeksInYear ? 1 : requestedWeekNumber + 1;
+        const nextYear = requestedWeekNumber === totalWeeksInYear ? year + 1 : year;
 
         const {
             attendanceRecords,
@@ -47,13 +58,12 @@ const getWeeklyAttendance = async (req, res, next) => {
         } = attendanceService.groupAttendanceByPerson(
             attendanceRecords,
             payrollWeekStart,
-            endDate,              // ✅ Add this missing argument
+            endDate,
             allEmployees,
             allSubcontractors,
             paidReceipts
-        );    
+        );
 
-        // ✅ Render the updated weekly attendance view
         res.render(path.join('attendance', 'weekly'), {
             moment,
             groupedAttendance,
@@ -74,27 +84,30 @@ const getWeeklyAttendance = async (req, res, next) => {
     } catch (error) {
         logger.error('Error fetching weekly attendance: ' + error.message);
         req.flash('error', 'Error fetching weekly attendance: ' + error.message);
-        next(error); // Pass the error to the error handler
+        next(error);
     }
 };
 
-// ✅ Redirect `/attendance/weekly` to the current week's attendance
+// Redirect `/attendance/weekly` to the current week's attendance
 router.get('/weekly', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res, next) => {
     try {
         const currentTaxYear = taxService.getCurrentTaxYear();
-        const { start: startOfTaxYear } = taxService.getTaxYearStartEnd(currentTaxYear);
+        const { start: startOfTaxYear, end: endOfTaxYear } = taxService.getTaxYearStartEnd(currentTaxYear);
         const taxYearStart = moment.tz(startOfTaxYear, 'Do MMMM YYYY', 'Europe/London');
+        const taxYearEnd = moment.tz(endOfTaxYear, 'Do MMMM YYYY', 'Europe/London');
 
-        // ✅ Ensure first payroll week starts on a Saturday
         let firstPayrollWeekStart = taxYearStart.clone().day(6);
         if (firstPayrollWeekStart.isBefore(taxYearStart)) {
             firstPayrollWeekStart.add(7, 'days');
         }
 
-        const currentWeekNumber = moment.tz('Europe/London').diff(firstPayrollWeekStart, 'weeks') + 1;
+        const totalWeeksInYear = taxYearEnd.diff(firstPayrollWeekStart, 'weeks') + 1;
 
-        logger.info(`Redirecting to current weekly attendance: Year: ${currentTaxYear}, Week Number: ${currentWeekNumber}`);
-        return res.redirect(`/attendance/weekly/${currentTaxYear}/${currentWeekNumber}`);
+        const currentWeekNumber = moment.tz('Europe/London').diff(firstPayrollWeekStart, 'weeks') + 1;
+        const safeWeekNumber = Math.min(Math.max(currentWeekNumber, 1), totalWeeksInYear);
+
+        logger.info(`Redirecting to current weekly attendance: Year: ${currentTaxYear}, Week Number: ${safeWeekNumber}`);
+        return res.redirect(`/attendance/weekly/${currentTaxYear}/${safeWeekNumber}`);
     } catch (error) {
         logger.error('Error redirecting to current weekly attendance: ' + error.message);
         req.flash('error', 'Error redirecting to current weekly attendance: ' + error.message);
