@@ -79,7 +79,7 @@ const getWeeklyAttendance = async (req, res, next) => {
 };
 
 // ✅ Redirect `/attendance/weekly` to the current week's attendance
-router.get('/weekly', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
+router.get('/weekly', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res, next) => {
     try {
         const currentTaxYear = taxService.getCurrentTaxYear();
         const { start: startOfTaxYear } = taxService.getTaxYearStartEnd(currentTaxYear);
