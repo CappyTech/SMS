@@ -20,7 +20,7 @@ const loginUser = async (req, res) => {
         const token = req.body['cf-turnstile-response'];
         const agent = req.useragent || {};
         const ip = req.ip;
-        console.log('Turnstile token:', req.body['cf-turnstile-response']);
+
         if (!token) {
             logger.error('CAPTCHA token missing.');
             req.flash('error', 'CAPTCHA token missing.');
