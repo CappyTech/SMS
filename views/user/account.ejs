@@ -17,7 +17,7 @@
                 <p class="mb-3">Alternatively, enter this key manually into your app:</p>
                 <p><strong>Secret Key:</strong> <%= secret %></p>
 
-                <form action="/account/verify-totp" method="POST">
+                <form action="/user/2fa" method="POST">
                     <div class="form-floating mb-3">
                         <input type="text" name="totpToken" class="form-control" id="totpToken" required>
                         <label for="totpToken" class="form-label">Enter the 6-digit code from your app:</label>
@@ -122,7 +122,7 @@
                 </td>
                 <td>
                     <!-- Option to log out from this session -->
-                    <form action="/account/logout-session" method="POST">
+                    <form action="/user/account/logout-session" method="POST">
                         <input type="hidden" name="sessionId" value="<%= session.sessionId %>">
                         <button type="submit" class="btn btn-danger">Logout</button>
                     </form>
@@ -144,7 +144,7 @@
             </div>
             <!-- Modal Body -->
             <div class="modal-body">
-                <form action="/account/settings" method="POST">
+                <form action="/user/account/settings" method="POST">
                     <div class="form-floating mb-3">
                         <!-- Editable Username -->
                         <input type="text" name="newUsername" value="<%= user.username %>" class="form-control" id="username" required>
