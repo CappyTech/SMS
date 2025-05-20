@@ -17,8 +17,7 @@ const registerUser = async (req, res, next) => {
         const { username, email, password } = req.body;
         const token = req.body['cf-turnstile-response'];
         const ip = req.ip;
-        console.log('req.body =', req.body);
-        // Turnstile CAPTCHA validation
+
         if (!token) {
             logger.error('CAPTCHA verification failed (token missing).');
             req.flash('error', 'CAPTCHA verification failed (token missing).');
