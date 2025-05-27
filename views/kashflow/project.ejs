@@ -1,5 +1,28 @@
 <div class="container my-5">
     <h1 class="mb-4 text-center">Jobs Dashboard</h1>
+    
+    <div class="container mb-4">
+        <form id="sort-form" method="GET" action="/dashboard/KFproject" class="row align-items-center">
+            <div class="col-2">
+                <label class="visually-hidden" for="sort">Sort by</label>
+                <select name="sort" id="sort" class="form-select">
+                    <option value="Number" <%= sortOption === 'Number' ? 'selected' : '' %>>Job Number</option>
+                    <option value="Name" <%= sortOption === 'Name' ? 'selected' : '' %>>Name (A–Z)</option>
+                    <option value="Files" <%= sortOption === 'Files' ? 'selected' : '' %>>Number of files in Job</option>
+                </select>
+            </div>
+
+            <div class="col-8">
+                <label class="visually-hidden" for="search">Search</label>
+                <input type="text" name="search" id="search" class="form-control" placeholder="Search by name or number..." value="<%= searchQuery %>">
+            </div>
+
+            <div class="col-2">
+                <button type="submit" class="btn btn-hcs-green w-100">Search</button>
+            </div>
+        </form>
+    </div>
+
 
     <!-- Tab navigation -->
     <ul class="nav" id="projectsTab" role="tablist">
@@ -35,6 +58,7 @@
                     <% activeProjects.forEach(project => { %>
                     <li class="list-group-item">
                         <strong><a href="/kashflow/project/read/<%= project.uuid %>" target="_blank"><%= project.Number %> | <%= project.Name %></a></strong>
+                        <small class="text-muted d-block">Files: <%= project.fileCount %></small>
                         <p><%= project.Description %></p>
                     </li>
                     <% }) %>
@@ -49,6 +73,7 @@
                     <% completedProjects.forEach(project => { %>
                     <li class="list-group-item">
                         <strong><a href="/kashflow/project/read/<%= project.uuid %>" target="_blank"><%= project.Number %> | <%= project.Name %></a></strong>
+                        <small class="text-muted d-block">Files: <%= project.fileCount %></small>
                         <p><%= project.Description %></p>
                     </li>
                     <% }) %>
@@ -63,6 +88,7 @@
                     <% archivedProjects.forEach(project => { %>
                     <li class="list-group-item">
                         <strong><a href="/kashflow/project/read/<%= project.uuid %>" target="_blank"><%= project.Number %> | <%= project.Name %></a></strong>
+                        <small class="text-muted d-block">Files: <%= project.fileCount %></small>
                         <p><%= project.Description %></p>
                     </li>
                     <% }) %>
@@ -71,3 +97,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sortSelect = document.getElementById('sort');
+        sortSelect.addEventListener('change', function () {
+            document.getElementById('sort-form').submit();
+        });
+    });
+</script>
