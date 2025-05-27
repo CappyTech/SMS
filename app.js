@@ -12,7 +12,7 @@ const authService = require('./services/authService');
 const swaggerUi = require('swagger-ui-express');
 const fs = require('fs');
 
-app.set('trust proxy', false);
+app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set('layout', 'layout');
