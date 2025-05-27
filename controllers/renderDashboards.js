@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const moment = require('moment-timezone');
 const logger = require('../services/loggerService');
+const fs = require('fs');
 const path = require('path');
 const db = require('../services/sequelizeDatabaseService');
 const taxService = require('../services/taxService');
@@ -436,30 +437,56 @@ const renderKFCustomersDashboard = async (req, res, next) => {
     } catch (error) {
         logger.error('Error rendering KFCustomers dashboard: ' + error.message);
         req.flash('error', 'Error rendering KFCustomers dashboard: ' + error.message);
-        next(error); // Pass the error to the error handler
+        next(error);
     }
 };
 
+const projectsDir = path.join(__dirname, '../Projects');
+
 const renderKFProjectsDashboard = async (req, res, next) => {
     try {
-        const projects = await kf.KF_Projects.findAll({
-            order: [['Number', 'DESC']]
+        const sortOption = req.query.sort || 'Number';
+        const searchQuery = req.query.search?.trim() || '';
+
+        const rawProjects = await kf.KF_Projects.findAll();
+
+        const withFileCounts = rawProjects.map(project => {
+            const dir = path.join(projectsDir, project.Number.toString());
+            const fileCount = fs.existsSync(dir) ? fs.readdirSync(dir).length : 0;
+            return { ...project.dataValues, fileCount };
         });
 
-        const activeProjects = projects.filter(project => project.Status === 1);
-        const archivedProjects = projects.filter(project => project.Status === 2);
-        const completedProjects = projects.filter(project => project.Status === 0);
+        // Filter by search (if provided)
+        const filteredProjects = withFileCounts.filter(p => {
+            const nameMatch = p.Name.toLowerCase().includes(searchQuery.toLowerCase());
+            const numberMatch = p.Number.toString().includes(searchQuery);
+            return nameMatch || numberMatch;
+        });
+        // Sort
+        if (sortOption === 'Name') {
+            filteredProjects.sort((a, b) => a.Name.localeCompare(b.Name));
+        } else if (sortOption === 'Files') {
+            filteredProjects.sort((a, b) => b.fileCount - a.fileCount);
+        } else {
+            filteredProjects.sort((a, b) => b.Number - a.Number);
+        }
+
+        const activeProjects = filteredProjects.filter(p => p.Status === 1);
+        const archivedProjects = filteredProjects.filter(p => p.Status === 2);
+        const completedProjects = filteredProjects.filter(p => p.Status === 0);
 
         res.render(path.join('kashflow', 'project'), {
             title: 'Jobs Dashboard',
             activeProjects,
             archivedProjects,
             completedProjects,
+            sortOption,
+            searchQuery
         });
     } catch (error) {
         logger.error('Error rendering KFProjects dashboard: ' + error.message);
-        req.flash('error', 'Error rendering KFProjects dashboard: ' + error.message);
-        next(error); // Pass the error to the error handler
+        req.flash('error', 'Error rendering KFProjects dashboard');
+        next(error);
     }
 };
 
