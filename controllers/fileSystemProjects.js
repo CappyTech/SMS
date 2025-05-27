@@ -59,9 +59,21 @@ router.post('/project/:uuid/:number/upload', authService.ensureAuthenticated, au
 });
 
 router.get('/project/:uuid/:number/download/:filename', authService.ensureAuthenticated, authService.ensureRole('admin'), (req, res) => {
-    const filePath = path.join(projectsDir, req.params.number.toString(), req.params.filename);
-    res.download(filePath);
-    res.redirect(`/kashflow/project/read/${req.params.uuid}`);
-});
+        const filePath = path.join(projectsDir, req.params.number.toString(), req.params.filename);
+
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).send("File not found.");
+        }
+
+        res.download(filePath, (err) => {
+            if (err) {
+                logger.error(`Download error: ${err.message}`);
+                return res.status(500).send("Failed to download file.");
+            } else {
+                logger.info(`Download successful.`);
+            }
+        });
+    }
+);
 
 module.exports = router;
