@@ -21,9 +21,9 @@ const loginUser = async (req, res) => {
         const ip = req.ip;
 
         if (!token) {
-            logger.error('CAPTCHA token missing.');
-            req.flash('error', 'CAPTCHA token missing.');
-            return res.redirect('/user/signin');
+            logger.error('CAPTCHA token missing.'); // notifying the server
+            req.flash('error', 'CAPTCHA token missing.'); // notifying the user
+            return res.redirect('/user/signin'); // redirecting to the signin page
         }
 
         const verifyResponse = await axios.post(
@@ -36,15 +36,15 @@ const loginUser = async (req, res) => {
         );
 
         if (!verifyResponse.data.success) {
-            logger.error('CAPTCHA verification failed.');
-            req.flash('error', 'CAPTCHA verification failed.');
-            return res.redirect('/user/signin');
+            logger.error('CAPTCHA verification failed.'); // notifying the server
+            req.flash('error', 'CAPTCHA verification failed.'); // notifying the user
+            return res.redirect('/user/signin'); // redirecting to the signin page
         }
 
         if (!usernameOrEmail || !password) {
-            logger.error('Username and password are required.');
-            req.flash('error', 'Username and password are required.');
-            return res.redirect('/user/signin');
+            logger.error('Username and password are required.'); // notifying the server
+            req.flash('error', 'Username and password are required.'); // notifying the user
+            return res.redirect('/user/signin'); // redirecting to the signin page
         }
 
         const user = await db.Users.findOne({
@@ -54,17 +54,17 @@ const loginUser = async (req, res) => {
         });
 
         if (!user) {
-            logger.error('Invalid username.');
-            req.flash('error', 'Invalid username.');
-            return res.redirect('/user/signin');
+            logger.error('Invalid username.'); // notifying the server
+            req.flash('error', 'Invalid username.'); // notifying the user
+            return res.redirect('/user/signin'); // redirecting to the signin page
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            logger.error('Invalid password.');
-            req.flash('error', 'Invalid password.');
-            return res.redirect('/user/signin');
+            logger.error('Invalid password.'); // notifying the server
+            req.flash('error', 'Invalid password.'); // notifying the user
+            return res.redirect('/user/signin'); // redirecting to the signin page
         }
 
         if (user.totpEnabled) {
@@ -84,7 +84,7 @@ const loginUser = async (req, res) => {
                 },
             };
 
-            return res.redirect('/user/2fa');
+            return res.redirect('/user/2fa'); // redirecting to 2FA page
         }
 
         req.session.user = {
@@ -105,27 +105,27 @@ const loginUser = async (req, res) => {
         
         req.session.save((error) => {
             if (error) {
-                logger.error('Error saving session: ' + error.message);
-                req.flash('error', 'An error occurred while logging in. Please try again.');
-                return res.redirect('/user/signin');
+                logger.error('Error saving session: ' + error.message); // notifying the server
+                req.flash('error', 'An error occurred while logging in. Please try again.'); // notifying the user
+                return res.redirect('/user/signin'); // redirecting to the signin page
             }
-            logger.info('Successfully logged in.');
-            req.flash('success', 'Successfully logged in.');
-            return res.redirect('/');
+            logger.info(req.session.user.username + ' successfully logged in.'); // notifying the server
+            req.flash('success', req.session.user.username + ' you\'re logged in.'); // notifying the user
+            return res.redirect('/'); // redirecting to the home page
         });
 
     } catch (error) {
-        logger.error('Error during login: ' + error.message);
-        req.flash('error', 'An error occurred during login. Please try again.');
-        return res.redirect('/user/signin');
+        logger.error('Error during login: ' + error.message); // notifying the server
+        req.flash('error', 'An error occurred during login. Please try again.'); // notifying the user
+        return res.redirect('/user/signin'); // redirecting to the signin page
     }
 };
 
 const logoutUser = (req, res) => {
     req.session.destroy((error) => {
         if (error) {
-            logger.error('Error logging out: ' + error.message);
-            req.flash('error', 'An error occurred while logging out. Please try again.');
+            logger.error('Error logging out: ' + error.message); // notifying the server
+            req.flash('error', 'An error occurred while logging out. Please try again.'); // notifying the user
             next(error); // Pass the error to the error handler
         }
         res.clearCookie('connect.sid');
