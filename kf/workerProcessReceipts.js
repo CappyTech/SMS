@@ -51,8 +51,9 @@ const workerDebugLog = async (supplierName, message) => {
     try {
       await workerDebugLog(supplier.Name, `📦 Starting processing for supplier: ${supplier.Name} (${supplier.SupplierID})`);
   
+      const context = `worker thread - working on: ${supplier.Name}`;
       const client = await new Promise((resolve, reject) => {
-        authenticate((err, client) => {
+        authenticate(context, (err, client) => {
           if (err) return reject(err);
           resolve(client);
         });
