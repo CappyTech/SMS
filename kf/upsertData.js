@@ -67,7 +67,12 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
         }
 
         if (hasRealChange) {
-          logger.info(`Updating record with changes: ${JSON.stringify(changes)}`);
+          logger.info(`Updating ${model.name} record`, {
+            model: model.name,
+            action: 'update',
+            key: item[uniqueKey],
+            changes
+          });
           await model.update(item, { where: whereClause });
           updatedCount++;
           const logEntry = {
@@ -80,7 +85,12 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
           await appendLogEntry(logFilePath, logEntry);
         }
       } else {
-        logger.info(`Creating new record: ${JSON.stringify(item)}`);
+        logger.info(`Creating new ${model.name} record`, {
+          model: model.name,
+          action: 'create',
+          uniqueKey: item[uniqueKey],
+          data: item
+        });
         await model.create(item);
         createdCount++;
         const logEntry = {
@@ -103,7 +113,14 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
     });
 
     const summary = `Created ${createdCount}, Updated ${updatedCount}, Checked ${checkedCount}`;
-    logger.info(`✅ ${model.name} Done: ${summary}`);
+    logger.info(`✅ ${model.name} sync complete`, {
+      model: model.name,
+      action: 'summary',
+      created: createdCount,
+      updated: updatedCount,
+      checked: checkedCount,
+      durationMs: Date.now() - startupsertData
+    });
     sendUpdate(`✅ ${model.name} Done: ${summary}`);
     const ms = Date.now() - startupsertData;
     sendUpdate(`⏱ ${model.name} took ${ms}ms`);
