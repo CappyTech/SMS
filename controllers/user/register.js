@@ -34,9 +34,9 @@ const registerUser = async (req, res, next) => {
         );
 
         if (!verifyResponse.data.success) {
-            logger.error('CAPTCHA verification failed.');
-            req.flash('error', 'CAPTCHA verification failed.');
-            return res.redirect('/user/register');
+            logger.error('CAPTCHA verification failed.'); // Notify the server
+            req.flash('error', 'CAPTCHA verification failed.'); // Notify the user
+            return res.redirect('/user/register'); // Redirect to the registration page
         }
 
         // Check if the email or username already exists
@@ -50,19 +50,19 @@ const registerUser = async (req, res, next) => {
         });
 
         if (existingUser) {
-            logger.error('Username or email already exists');
-            req.flash('error', 'Username or email already exists');
-            return res.redirect('/user/register');
+            logger.error('Username or email already exists'); // Notify the server
+            req.flash('error', 'Username or email already exists'); // Notify the user
+            return res.redirect('/user/register'); // Redirect to the registration page
         }
 
         // Create a new user in the database
         await User.create({ username, email, password });
-        logger.info('New User Created.');
+        logger.info('New User Created.'); // Notify the server
         next(error); // Pass the error to the error handler
     } catch (error) {
-        logger.error('Error registering user: ' + error.message);
-        req.flash('error', 'Error registering user: ' + error.message);
-        return res.redirect('/user/register');
+        logger.error('Error registering user: ' + error.message); // Notify the server
+        req.flash('error', 'Error registering user: ' + error.message); // Notify the user
+        return res.redirect('/user/register'); // Redirect to the registration page
     }
 };
 
