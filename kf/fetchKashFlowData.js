@@ -34,7 +34,7 @@ exports.fetchKashFlowData = async (sendUpdate = () => { }) => {
 
     try {
         const client = await new Promise((resolve, reject) => {
-            authenticate((err, c) => err ? reject(err) : resolve(c));
+            authenticate('main thread',(err, c) => err ? reject(err) : resolve(c));
         });
 
         const KF_Meta = db.KF_Meta;
@@ -70,6 +70,7 @@ exports.fetchKashFlowData = async (sendUpdate = () => { }) => {
         const quotes = await getQuotes(client);
         const quoteTransformed = await Promise.all(quotes.map(async quote => {
             const payments = await getInvoicePayment(client, quote.InvoiceNumber);
+            logger.debug(`Checking quote.InvoiceDBID: value=${quote.InvoiceDBID}, type=${typeof quote.InvoiceDBID}`);
             const notes = await getInvoiceNotes(client, quote.InvoiceDBID);
             const mappedLines = quote.Lines?.anyType?.map(mapLine) || [];
             return { ...quote, mappedLines, payments, notes };
