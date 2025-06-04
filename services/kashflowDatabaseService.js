@@ -6,6 +6,7 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const logger = require('./loggerService');
 const basename = path.basename(__filename);
+const { isMainThread } = require('worker_threads');
 
 const kf = {};
 
@@ -59,8 +60,8 @@ Object.keys(kf).forEach((modelName) => {
   }
 });
 
-// Sync only in development
-if (process.env.NODE_ENV === 'development') {
+// Sync only if main thread in development
+if (isMainThread && process.env.NODE_ENV === 'development') {
   sequelize.sync({ alter: false })
     .then(() => logger.info('All models were synchronized successfully.'))
     .catch((error) => {
@@ -104,6 +105,10 @@ function createDbConnection() {
 
   db.sequelize = sequelizeInstance;
   db.Sequelize = Sequelize;
+
+  if (!isMainThread) {
+    logger.debug('[worker thread] DB connection established (no sync).');
+  }
 
   return db;
 }
