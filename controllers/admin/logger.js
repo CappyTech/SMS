@@ -61,6 +61,3 @@ router.get('/logs', authService.ensureAuthenticated, authService.ensureRole('adm
 });
 
 module.exports = router;
-
-
-module.exports = router;
