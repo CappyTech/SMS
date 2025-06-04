@@ -1,13 +1,15 @@
 const soap = require('soap');
 require('dotenv').config({ path: '../.env' });
-function authenticate(callback) {
+const logger = require('../services/loggerService');
+
+function authenticate(context = 'main thread', callback) {
   soap.createClient('https://securedwebapp.com/api/service.asmx?WSDL', (error, client) => {
     if (error) {
-      console.error('Error creating SOAP client: ' + error);
+      logger.error(`[${context}] Error creating SOAP client: ${error}`);
       return callback(error);
     }
 
-    console.log('SOAP client created successfully.');
+    logger.info(`[${context}] SOAP client created successfully.`);
 
     const authParams = {
       UserName: process.env.KFUSERNAME,
@@ -18,15 +20,15 @@ function authenticate(callback) {
 
     client.AutoAuthIP(authParams, (error, authResult) => {
       if (error) {
-        console.error('Error calling AutoAuthIP method: ' + error);
+        logger.error(`[${context}] Error calling AutoAuthIP method: ${error}`);
         return callback(error);
       }
 
       if (authResult.Status === 'OK') {
-        console.log('AutoAuthIP successful.');
+        logger.info(`[${context}] AutoAuthIP successful.`);
         return callback(null, client);
       } else {
-        console.error('Failed to authenticate with AutoAuthIP: ' + authResult.StatusDetail);
+        logger.error(`[${context}] Failed to authenticate: ${authResult.StatusDetail}`);
         return callback(new Error(authResult.StatusDetail));
       }
     });
