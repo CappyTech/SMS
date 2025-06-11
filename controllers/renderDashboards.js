@@ -920,31 +920,31 @@ const renderCISDashboard = async (req, res, next) => {
         const receipts = await kf.KF_Receipts.findAll({ order: [['InvoiceNumber', 'ASC']] });
 
         // Parse receipts once and store the processed version
-        const processedReceipts = receipts.map(receipt => {
+        const processedReceipts = await Promise.all(receipts.map(async receipt => {
             const raw = receipt.toJSON();
 
-            // Normalize with parent type awareness
-            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber, receipt.CustomerID,);
-            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber, receipt.CustomerID,);
+            const normalizedLines = await normalizeLines(receipt.Lines, receipt.InvoiceNumber, receipt.CustomerID);
+            const normalizedPayments = await normalizePayments(receipt.Payments, receipt.InvoiceNumber, receipt.CustomerID);
 
             return {
                 ...raw,
                 Lines: normalizedLines,
                 Payments: normalizedPayments
             };
-        });
+        }));
         
-
         const taxYear = taxService.getTaxYearStartEnd(specifiedYear);
         const currentMonthlyReturn = taxService.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
 
         const filteredReceipts = processedReceipts.filter(receipt => {
             if (!receipt.Payments) return false;
 
-            const payment = receipt.Payments.Payment?.Payment?.[0];
-            if (!payment || !payment.PayDate) return false;
+            const payments = receipt.Payments?.Payment?.Payment || [];
+            const payment = payments.find(p => p.PayDate);
 
-            const payDate = moment.tz(payment.PayDate, 'Europe/London'); // Ensure  .tz
+            if (!payment) return false;
+
+            const payDate = moment.tz(payment.PayDate, 'Europe/London');
             return payDate.isBetween(currentMonthlyReturn.periodStart, currentMonthlyReturn.periodEnd, null, '[]');
         });
 
