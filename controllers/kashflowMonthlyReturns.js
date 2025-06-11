@@ -6,7 +6,7 @@ const kf = require('../services/kashflowDatabaseService');
 const authService = require('../services/authService');
 const slimDateTime = require('../services/dateService').slimDateTime;
 const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
-const { normalizeLines, normalizePayments } = require('../services/kashflowNormalizer');
+const { normalizeLines, normalizePayments, identifyParentType } = require('../services/kashflowNormalizer');
 
 const renderKFMonthlyReturnsForm = async (req, res, next) => {
     try {
@@ -103,30 +103,38 @@ const renderKFMonthlyReturns = async (req, res, next) => {
 
         // Process receipts to extract details
         const receiptsByMonth = {};
-        receipts.forEach(receipt => {
-            const month = receipt.TaxMonth || moment.tz(receipt.InvoiceDate, 'Europe/London').month() + 1; // Ensure TaxMonth is used // ensure .tz
 
-            // Ensure the month key exists
+        receipts.forEach(receipt => {
+            const month = receipt.TaxMonth || moment.tz(receipt.InvoiceDate, 'Europe/London').month() + 1;
+
             if (!receiptsByMonth[month]) {
                 receiptsByMonth[month] = [];
             }
 
-            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber);
-            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber);
+            // Normalize with parent type awareness
+            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber, receipt.CustomerID);
+            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber, receipt.CustomerID);
 
-            // Extract values from Lines
-            const labourCost = normalizedLines.filter(line => line.ChargeType === 18685897).reduce((sum, line) => sum + (line.Rate * line.Quantity), 0);
-            const materialCost = normalizedLines.filter(line => line.ChargeType === 18685896).reduce((sum, line) => sum + (line.Rate * line.Quantity), 0);
-            const cisAmount = Math.abs( normalizedLines.filter(line => line.ChargeType === 18685964).reduce((sum, line) => sum + (line.Rate * line.Quantity), 0) );
-            
+            // Extract financial values from Lines
+            const labourCost = normalizedLines
+                .filter(line => line.ChargeType === 18685897)
+                .reduce((sum, line) => sum + (parseFloat(line.Rate) * parseFloat(line.Quantity) || 0), 0);
+
+            const materialCost = normalizedLines
+                .filter(line => line.ChargeType === 18685896)
+                .reduce((sum, line) => sum + (parseFloat(line.Rate) * parseFloat(line.Quantity) || 0), 0);
+
+            const cisAmount = Math.abs(normalizedLines
+                .filter(line => line.ChargeType === 18685964)
+                .reduce((sum, line) => sum + (parseFloat(line.Rate) * parseFloat(line.Quantity) || 0), 0));
+
             const grossAmount = labourCost + materialCost;
             const netAmount = grossAmount - cisAmount;
 
-            // Extract first PayDate if available
+            // Extract payment dates
             const payDates = normalizedPayments?.Payment?.Payment?.map(p => p.PayDate) || [];
             const payDate = payDates.length > 0 ? slimDateTime(payDates[0]) : 'N/A';
 
-            // Add to receiptsByMonth
             receiptsByMonth[month].push({
                 InvoiceNumber: receipt.CustomerReference,
                 KashflowNumber: receipt.InvoiceNumber,
