@@ -52,12 +52,8 @@ const workerDebugLog = async (supplierName, message) => {
       await workerDebugLog(supplier.Name, `📦 Starting processing for supplier: ${supplier.Name} (${supplier.SupplierID})`);
   
       const context = `worker thread - working on: ${supplier.Name}`;
-      const client = await new Promise((resolve, reject) => {
-        authenticate(context, (err, client) => {
-          if (err) return reject(err);
-          resolve(client);
-        });
-      });
+      const client = await authenticate(context);
+
   
       const receipts = await getReceiptsForSupplier(client, supplier.SupplierID);
       const receiptsLength = receipts.length;
