@@ -40,7 +40,12 @@ const modelsDirectory = path.join(__dirname, '../models/sequelize');
 // Load model files
 const modelFiles = fs
     .readdirSync(modelsDirectory)
-    .filter((file) => file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js');
+    .filter((file) => {
+        const isJsFile = file.endsWith('.js');
+        const isNotSelf = file !== basename;
+        // const isNotDeprecated = !file.includes('-replacedby') && !file.includes('-notused') && !file.includes('-notimplemented');
+        return isJsFile && isNotSelf;
+    });
 
 // Define models (Step 1)
 modelFiles.forEach((file) => {
@@ -52,15 +57,15 @@ modelFiles.forEach((file) => {
 Object.keys(db).forEach((modelName) => {
     if (db[modelName].associate) {
         db[modelName].associate(db);
-        console.log(`Associations defined for ${modelName}`);
+        logger.debug(`Associations defined for ${modelName}`);
     }
 });
 
 // Log model names and associations
-console.log('Models Loaded:', Object.keys(db));
+logger.debug('Models Loaded:', Object.keys(db));
 
 Object.keys(db).forEach((modelName) => {
-    console.log(`Associations for ${modelName}:`, db[modelName].associations);
+    logger.debug(`Associations for ${modelName}: ${db[modelName].associations}`);
 });
 
 // Export the database object with Sequelize instance and models
