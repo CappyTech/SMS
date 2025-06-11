@@ -425,3 +425,52 @@ body {
     padding: 3px 8px;
   }
 }
+
+.tooltip-inner {
+  background-color: #212529;
+  color: #f8f9fa;
+  border: 1px solid #343a40;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+  border-top-color: #212529;
+}
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+  border-bottom-color: #212529;
+}
+.tooltip.bs-tooltip-start .tooltip-arrow::before {
+  border-left-color: #212529;
+}
+.tooltip.bs-tooltip-end .tooltip-arrow::before {
+  border-right-color: #212529;
+}
+
+/* Default layout */
+.app-wrapper {
+  display: flex;
+}
+
+.sidebar {
+  width: 16%;
+}
+
+/* Mobile layout when under 1100px */
+@media (max-width: 1080px) {
+  .app-wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    order: 1;
+  }
+
+  #main-content {
+    order: 2;
+  }
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
