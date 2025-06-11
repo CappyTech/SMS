@@ -303,14 +303,5 @@ function setupApp() {
     // Register the error handler
     app.use(require('./services/errorHandlerService'));
 
-    if (process.env.NODE_ENV === 'development') {
-        app.listen(80, '127.0.0.1', () => {
-            logger.debug(`Server is running development`);
-        });
-    } else {
-        app.listen(443, '0.0.0.0', () => {
-            logger.debug(`Server is running production`);
-        });
-    }
 }
 module.exports = app;
