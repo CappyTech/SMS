@@ -165,142 +165,152 @@ if (process.env.NODE_ENV === 'development') {
     }
 }
 
-const index = require('./controllers/renderIndex');
-
-const formsUser = require('./controllers/forms/user');
-const formsSubcontractor = require('./controllers/forms/subcontractor');
-const formsInvoice = require('./controllers/forms/invoice');
-const formsQuote = require('./controllers/forms/quote');
-const formsClient = require('./controllers/forms/client');
-const formsContact = require('./controllers/forms/contact');
-const formsJob = require('./controllers/forms/job');
-const formsLocation = require('./controllers/forms/location');
-const formsAttendance = require('./controllers/forms/attendance');
-const formsEmployee = require('./controllers/forms/employee');
-
-const renderDashboard = require('./controllers/renderDashboards');
-
-const userLogin = require('./controllers/user/login');
-const userRegister = require('./controllers/user/register');
-const userSettings = require('./controllers/user/settings');
-const user2FA = require('./controllers/user/2fa');
-
-const userCRUD = require('./controllers/CRUD/userCRUD');
-const subcontractorCRUD = require('./controllers/CRUD/subcontractorCRUD');
-const invoiceCRUD = require('./controllers/CRUD/invoiceCRUD');
-const quoteCRUD = require('./controllers/CRUD/quoteCRUD');
-const clientCRUD = require('./controllers/CRUD/clientCRUD');
-const contactCRUD = require('./controllers/CRUD/contactCRUD');
-const attendanceCRUD = require('./controllers/CRUD/attendanceCRUD');
-const employeeCRUD = require('./controllers/CRUD/employeeCRUD');
-const jobCRUD = require('./controllers/CRUD/jobCRUD');
-const locationCRUD = require('./controllers/CRUD/locationCRUD');
-
-const monthlyReturns = require('./controllers/monthlyReturns');
-const yearlyReturns = require('./controllers/yearlyReturns');
-
-const dailyAttendance = require('./controllers/dailyAttendance');
-const weeklyAttendance = require('./controllers/weeklyAttendance');
-
-const kashflowRoutes = require('./kf/routes')
-
-const verificationRoutes = require('./controllers/renderVerification');
-
-const kashflowCustomer = require('./controllers/CRUD/kashflow/customer');
-const kashflowInvoice = require('./controllers/CRUD/kashflow/invoice');
-const kashflowProject = require('./controllers/CRUD/kashflow/project');
-const kashflowQuote = require('./controllers/CRUD/kashflow/quote');
-const kashflowReceipt = require('./controllers/CRUD/kashflow/receipt');
-const kashflowSupplier = require('./controllers/CRUD/kashflow/supplier');
-
-const fileSystemProjects = require('./controllers/fileSystemProjects');
-
-const kashflowMonthlyReturns = require('./controllers/kashflowMonthlyReturns');
-const kashflowYearlyReturns = require('./controllers/kashflowYearlyReturns');
-
-const adminLogger = require('./controllers/admin/logger');
-
-app.use('/', index);
-
-app.use('/client', formsClient);
-app.use('/contact', formsContact);
-app.use('/invoice', formsInvoice);
-app.use('/quote', formsQuote);
-app.use('/subcontractor', formsSubcontractor);
-app.use('/user', formsUser);
-app.use('/job', formsJob);
-app.use('/location', formsLocation);
-app.use('/attendance', formsAttendance);
-app.use('/employee', formsEmployee);
-
-app.use('/dashboard', renderDashboard);
-
-app.use('/user', userLogin);
-app.use('/user', userRegister);
-app.use('/user', userSettings);
-app.use('/user', user2FA);
-
-app.use('/user', userCRUD);
-app.use('/subcontractor', subcontractorCRUD);
-app.use('/invoice', invoiceCRUD);
-app.use('/quote', quoteCRUD);
-app.use('/client', clientCRUD);
-app.use('/contact', contactCRUD);
-app.use('/attendance', attendanceCRUD);
-app.use('/employee', employeeCRUD);
-app.use('/job', jobCRUD);
-app.use('/location', locationCRUD);
-
-app.use('/monthly', monthlyReturns);
-app.use('/yearly', yearlyReturns);
-
-app.use('/attendance', dailyAttendance);
-app.use('/attendance', weeklyAttendance);
-
-app.use('/', kashflowRoutes);
-
-app.use('/verify', verificationRoutes);
-
-app.use('/kashflow', kashflowCustomer);
-app.use('/kashflow', kashflowInvoice);
-app.use('/kashflow', kashflowProject);
-app.use('/kashflow', kashflowQuote);
-app.use('/kashflow', kashflowReceipt);
-app.use('/kashflow', kashflowSupplier);
-
-app.use('/', fileSystemProjects);
-
-app.use("/api-docs", authService.ensureAuthenticated, authService.ensureRole('admin'), swaggerUi.serve, (req, res, next) => {
-    const swaggerDocument = JSON.parse(
-        fs.readFileSync(path.join(__dirname, "swagger.json"), "utf8")
-    );
-    swaggerUi.setup(swaggerDocument)(req, res, next);
+const normalizer = require('./services/kashflowNormalizer');
+normalizer.initializeParentTypeMaps().then(() => {
+    setupApp();
+}).catch(err => {
+    console.error('Failed to initialize parent type maps:', err);
+    process.exit(1); // crash early
 });
 
-app.use('/kashflow/monthly', kashflowMonthlyReturns);
-app.use('/kashflow/yearly', kashflowYearlyReturns);
 
-app.use('/', adminLogger);
+function setupApp() {
+    const index = require('./controllers/renderIndex');
 
-// Catch undefined routes (404 handler)
+    const formsUser = require('./controllers/forms/user');
+    // const formsSubcontractor = require('./controllers/forms/subcontractor');
+    // const formsInvoice = require('./controllers/forms/invoice');
+    // const formsQuote = require('./controllers/forms/quote');
+    // const formsClient = require('./controllers/forms/client');
+    // const formsContact = require('./controllers/forms/contact');
+    // const formsJob = require('./controllers/forms/job');
+    // const formsLocation = require('./controllers/forms/location');
+    const formsAttendance = require('./controllers/forms/attendance');
+    const formsEmployee = require('./controllers/forms/employee');
 
-app.use((req, res, next) => {
-    const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
-    error.statusCode = 404;
-    next(error);
-});
+    const renderDashboard = require('./controllers/renderDashboards');
 
-// Register the error handler
-app.use(require('./services/errorHandlerService'));
+    const userLogin = require('./controllers/user/login');
+    const userRegister = require('./controllers/user/register');
+    const userSettings = require('./controllers/user/settings');
+    const user2FA = require('./controllers/user/2fa');
 
-if (process.env.NODE_ENV === 'development') {
-    app.listen(80, '127.0.0.1', () => {
-        logger.info(`Server is running development`);
+    const userCRUD = require('./controllers/CRUD/userCRUD');
+    // const subcontractorCRUD = require('./controllers/CRUD/subcontractorCRUD');
+    // const invoiceCRUD = require('./controllers/CRUD/invoiceCRUD');
+    // const quoteCRUD = require('./controllers/CRUD/quoteCRUD');
+    // const clientCRUD = require('./controllers/CRUD/clientCRUD');
+    // const contactCRUD = require('./controllers/CRUD/contactCRUD');
+    // const jobCRUD = require('./controllers/CRUD/jobCRUD');
+    // const locationCRUD = require('./controllers/CRUD/locationCRUD');
+    const attendanceCRUD = require('./controllers/CRUD/attendanceCRUD');
+    const employeeCRUD = require('./controllers/CRUD/employeeCRUD');
+
+    const monthlyReturns = require('./controllers/monthlyReturns');
+    const yearlyReturns = require('./controllers/yearlyReturns');
+
+    const dailyAttendance = require('./controllers/dailyAttendance');
+    const weeklyAttendance = require('./controllers/weeklyAttendance');
+
+    const kashflowRoutes = require('./kf/routes')
+
+    //const verificationRoutes = require('./controllers/renderVerification');
+
+    const kashflowCustomer = require('./controllers/CRUD/kashflow/customer');
+    const kashflowInvoice = require('./controllers/CRUD/kashflow/invoice');
+    const kashflowProject = require('./controllers/CRUD/kashflow/project');
+    const kashflowQuote = require('./controllers/CRUD/kashflow/quote');
+    const kashflowReceipt = require('./controllers/CRUD/kashflow/receipt');
+    const kashflowSupplier = require('./controllers/CRUD/kashflow/supplier');
+
+    const fileSystemProjects = require('./controllers/fileSystemProjects');
+
+    const kashflowMonthlyReturns = require('./controllers/kashflowMonthlyReturns');
+    const kashflowYearlyReturns = require('./controllers/kashflowYearlyReturns');
+
+    const adminLogger = require('./controllers/admin/logger');
+
+    app.use('/', index);
+
+    app.use('/user', formsUser);
+    // app.use('/client', formsClient);
+    // app.use('/contact', formsContact);
+    // app.use('/invoice', formsInvoice);
+    // app.use('/quote', formsQuote);
+    // app.use('/subcontractor', formsSubcontractor);
+    // app.use('/job', formsJob);
+    // app.use('/location', formsLocation);
+    app.use('/attendance', formsAttendance);
+    app.use('/employee', formsEmployee);
+
+    app.use('/dashboard', renderDashboard);
+
+    app.use('/user', userLogin);
+    app.use('/user', userRegister);
+    app.use('/user', userSettings);
+    app.use('/user', user2FA);
+
+    app.use('/user', userCRUD);
+    // app.use('/subcontractor', subcontractorCRUD);
+    // app.use('/invoice', invoiceCRUD);
+    // app.use('/quote', quoteCRUD);
+    // app.use('/client', clientCRUD);
+    // app.use('/contact', contactCRUD);
+    // app.use('/job', jobCRUD);
+    // app.use('/location', locationCRUD);
+    app.use('/attendance', attendanceCRUD);
+    app.use('/employee', employeeCRUD);
+
+    app.use('/monthly', monthlyReturns);
+    app.use('/yearly', yearlyReturns);
+
+    app.use('/attendance', dailyAttendance);
+    app.use('/attendance', weeklyAttendance);
+
+    app.use('/', kashflowRoutes);
+
+    //app.use('/verify', verificationRoutes);
+
+    app.use('/kashflow', kashflowCustomer);
+    app.use('/kashflow', kashflowInvoice);
+    app.use('/kashflow', kashflowProject);
+    app.use('/kashflow', kashflowQuote);
+    app.use('/kashflow', kashflowReceipt);
+    app.use('/kashflow', kashflowSupplier);
+
+    app.use('/', fileSystemProjects);
+
+    app.use("/api-docs", authService.ensureAuthenticated, authService.ensureRole('admin'), swaggerUi.serve, (req, res, next) => {
+        const swaggerDocument = JSON.parse(
+            fs.readFileSync(path.join(__dirname, "swagger.json"), "utf8")
+        );
+        swaggerUi.setup(swaggerDocument)(req, res, next);
     });
-} else {
-    app.listen(443, '0.0.0.0', () => {
-        logger.info(`Server is running production`);
+
+    app.use('/kashflow/monthly', kashflowMonthlyReturns);
+    app.use('/kashflow/yearly', kashflowYearlyReturns);
+
+    app.use('/', adminLogger);
+
+    // Catch undefined routes (404 handler)
+
+    app.use((req, res, next) => {
+        const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
+        error.statusCode = 404;
+        next(error);
     });
+
+    // Register the error handler
+    app.use(require('./services/errorHandlerService'));
+
+    if (process.env.NODE_ENV === 'development') {
+        app.listen(80, '127.0.0.1', () => {
+            logger.debug(`Server is running development`);
+        });
+    } else {
+        app.listen(443, '0.0.0.0', () => {
+            logger.debug(`Server is running production`);
+        });
+    }
 }
-
 module.exports = app;
