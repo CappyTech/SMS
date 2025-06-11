@@ -2,463 +2,119 @@
 <html lang="en" data-bs-theme="light">
 
 <head>
-  <link rel="icon" type="image/x-icon" href="/resources/images/favicon.ico">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>
     <%= typeof title !=='undefined' ? title : 'Subcontractor Management System' %>
   </title>
+
+  <link rel="icon" href="/resources/images/favicon.ico" type="image/x-icon">
+  <link rel="manifest" href="/resources/manifest/manifest.json">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
   <link href="/resources/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="/resources/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link href="/resources/css/styles.css" rel="stylesheet">
-  <link rel="manifest" href="/resources/manifest/manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
 </head>
 
 <body>
-  <header>
-    <nav class="navbar navbar-expand-lg bg-body-secondary d-print-none">
-      <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="/">
-          <img src="/resources/images/favicon.png" alt="Favicon" class="me-2" width="32" height="32">
-          <span class="d-none d-md-inline">Heron Constructive Solutions LTD</span>
-        </a>
-        <ul class="navbar-nav ms-auto hstack gap-3">
-          <% if (isAuthenticated) { %>
-            <!-- Dropdown: My Account -->
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle"></i> My Account
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a href="/user/profile" class="nav-link hcs-green-text"><i class="bi bi-person me-2"></i> Profile</a>
-                  </li>
-                  <% if (isAdmin) { %>
-                  <li class="nav-item">
-                    <a class="nav-link text-warning" href="/logs"><i class="bi bi-terminal me-2"></i> Logs</a>
-                  </li>
-                  <% } %>
-                  <li class="nav-item">
-                    <a class="nav-link text-warning" href="/user/account"><i class="bi bi-gear-wide me-2"></i> Settings</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link text-danger" href="/user/logout"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-          <% } else { %>
-          <li class="nav-item">
-            <a class="nav-link" href="/user/signin"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/user/register"><i class="bi bi-book"></i> Create an account</a>
-          </li>
-          <% } %>
-          <div class="form-check form-switch">
-            <label class="form-check-label me-2" for="darkModeToggle">Dark/Light</label>
-            <input class="form-check-input" type="checkbox" id="darkModeToggle">
-          </div>
-        </ul>
-      </div>
-    </nav>
-    <% if (isAuthenticated) { %>
-    <nav class="navbar navbar-expand-lg bg-body-secondary d-print-none">
-        <div class="container">
-          <ul class="navbar-nav">
+  <div class="app-wrapper d-flex flex-column flex-lg-row">
+    <aside id="sidebar" class="sidebar bg-body-secondary">
+      <%- include('./partials/aside.ejs') %>
+    </aside>
 
-            <!-- Dropdown: Construction Industry Scheme -->
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-building"></i> Construction Industry Scheme
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a href="/dashboard/CIS" class="nav-link">
-                      <i class="bi bi-binoculars me-2"></i> CIS
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li class="nav-item">
-                    <a href="/kashflow/monthly/returns/form" class="nav-link">
-                      <i class="bi bi-file-spreadsheet-fill me-2"></i> Monthly Returns
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li class="nav-item">
-                    <a href="/dashboard/KFsubcontractor" class="nav-link">
-                      <i class="bi bi-person-standing me-2"></i> Subcontractors
-                    </a>
-                  </li>
-                  <!--
-                  <li class="nav-item">
-                    <a href="/dashboard/stats" class="nav-link">
-                      <i class="bi bi-binoculars me-2"></i> Overview
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/invoice" class="nav-link"><i class="bi bi-receipt me-2"></i> Invoices</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/subcontractor" class="nav-link"><i class="bi bi-people me-2"></i> Subcontractors</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/monthly/returns/form" class="nav-link"><i class="bi bi-file-spreadsheet-fill me-2"></i> Monthly Returns</a>
-                  </li>
-                  -->
-                </ul>
-              </div>
-            </li>
-
-            <!-- Dropdown: Contract Management -->
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-folder2-open"></i> Management
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column">
-                  <!-- Projects -->
-                  <li class="nav-item">
-                    <a href="/dashboard/KFproject" class="nav-link">
-                      <i class="bi bi-kanban me-2"></i> Job Reg
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li class="nav-item">
-                    <a href="/attendance/weekly" class="nav-link">
-                      <i class="bi bi-person-raised-hand me-2"></i> Weekly Attendance
-                    </a>
-                  </li>
-                  <!--
-                  <li class="nav-item">
-                    <a href="/dashboard/quote" class="nav-link">
-                      <i class="bi bi-file-earmark-text me-2"></i> Quotes
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/job" class="nav-link">
-                      <i class="bi bi-briefcase me-2"></i> Jobs
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/client" class="nav-link">
-                      <i class="bi bi-people me-2"></i> Clients
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/contact" class="nav-link">
-                      <i class="bi bi-telephone me-2"></i> Contacts
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/dashboard/location" class="nav-link">
-                      <i class="bi bi-pin-map-fill me-2"></i> Locations
-                    </a>
-                  </li>
-                  _-->
-                </ul>
-              </div>
-            </li>
-
-            <!-- Dropdown: Payroll -->
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-cash-coin"></i> Payroll
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a href="/dashboard/attendance" class="nav-link">
-                      <i class="bi bi-person-raised-hand me-2"></i> Attendance
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li class="nav-item">
-                    <a href="/attendance/weekly" class="nav-link">
-                      <i class="bi bi-person-raised-hand me-2"></i> Weekly Attendance
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li class="nav-item">
-                    <a href="/dashboard/employee" class="nav-link">
-                      <i class="bi bi-person-standing me-2"></i> Employees
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-
-            <!-- Dropdown: HR (Administration) -->
-            <% if (isAuthenticated && isAdmin) { %>
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person"></i> HR
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a href="/user/create" class="nav-link">
-                      <i class="bi bi-person me-2"></i> Create User
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li class="nav-item">
-                    <a href="/dashboard/user" class="nav-link">
-                      <i class="bi bi-people me-2"></i> Manage Users
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <% } %>
-
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-graph-up"></i> Kashflow
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column" aria-labelledby="kashflowDropdown" id="nestedDropdownMenu">
-                  <li class="nav-item">
-                    <a href="/dashboard/KF" class="nav-link">
-                      <i class="bi bi-binoculars me-2"></i> Overview
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <!-- Customers -->
-                  <li class="nav-item">
-                    <a href="/dashboard/KFcustomer" class="nav-link">
-                      <i class="bi bi-people me-2"></i> Customers
-                    </a>
-                  </li>
-                  <!-- Suppliers -->
-                  <li class="nav-item">
-                    <a href="/dashboard/KFsupplier" class="nav-link">
-                      <i class="bi bi-truck me-2"></i> Suppliers
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <!-- Invoices -->
-                  <li class="nav-item">
-                    <a href="/dashboard/KFinvoice" class="nav-link">
-                      <i class="bi bi-receipt me-2"></i> Invoices
-                    </a>
-                  </li>
-                  <!-- Quotes -->
-                  <li class="nav-item">
-                    <a href="/dashboard/KFquote" class="nav-link">
-                      <i class="bi bi-card-text me-2"></i> Quotes
-                    </a>
-                  </li>
-                  <!-- Receipts -->
-                  <li class="nav-item">
-                    <a href="/dashboard/KFreceipt" class="nav-link">
-                      <i class="bi bi-cash-stack me-2"></i> Purchases
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <!-- Projects -->
-                  <li class="nav-item">
-                    <a href="/dashboard/KFproject" class="nav-link">
-                      <i class="bi bi-kanban me-2"></i> Jobs
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li class="nav-item">
-                    <a href="/dashboard/CIS" class="nav-link">
-                      <i class="bi bi-binoculars me-2"></i> CIS
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li class="nav-item">
-                    <a href="/kashflow/monthly/returns/form" class="nav-link">
-                      <i class="bi bi-file-spreadsheet-fill me-2"></i> Monthly Returns
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-
-            <li class="nav-item dropdown">
-              <button class="btn btn-outline me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-plus-circle"></i> Create New
-              </button>
-              <div class="dropdown-menu p-3 bg-body">
-                <ul class="nav flex-column">
-                  <!--<li class="nav-item">
-                    <a class="nav-link" href="/invoice/create"><i class="bi bi-receipt me-2"></i> Invoice</a>
-                  </li>-->
-                  <!--<li class="nav-item">
-                    <a class="nav-link" href="/subcontractor/create"><i class="bi bi-people me-2"></i> Subcontractor</a>
-                  </li>-->
-                  <!--<li class="nav-item">
-                    <a class="nav-link" href="/quote/create"><i class="bi bi-file-earmark-text me-2"></i> Quote</a>
-                  </li>-->
-                  <!--<li class="nav-item">
-                    <a class="nav-link" href="/client/create"><i class="bi bi-people me-2"></i> Client</a>
-                  </li>-->
-                  <!--<li class="nav-item">
-                    <a class="nav-link" href="/contact/create"><i class="bi bi-telephone me-2"></i> Contact</a>
-                  </li>-->
-                  <li class="nav-item">
-                    <a class="nav-link" href="/attendance/create"><i class="bi bi-person-raised-hand me-2"></i> Attendance</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/employee/create"><i class="bi bi-person-standing me-2"></i> Employee</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/location/create"><i class="bi bi-pin-map-fill me-2"></i> Location</a>
-                  </li>
-                  <% if (isAuthenticated && isAdmin) { %>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/user/create"><i class="bi bi-person me-2"></i> User</a>
-                  </li>
-                  <% } %>
-                </ul>
-              </div>
-            </li>
-
-          </ul>
-        </div>
-    </nav>
-    <% } %>
-  </header>
-
-  <!-- Main Content -->
-  <section class="content bg-body">
-    <%- include('./partials/successAlert.ejs') %>
-    <%- include('./partials/errorAlert.ejs') %>
-    <%- body %>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer mt-auto d-print-none bg-body">
-    <nav class="navbar navbar-expand d-flex justify-content-center align-items-center mt-5 p-4 text-center">
-      <div class="stack-on-small">
-        <div>
-          <a href="/"><img src="/resources/images/HCS-Logo-v4-Icon32.png" alt="HCS Logo" height="32" width="32"></a>
-          <a class="hcs-green-text" href="https://www.heroncs.co.uk">Heron Constructive Solutions Ltd.</a><br>
-          Copyright &copy; <%= copyrightyearstart %> - <%= copyrightyear %> | All Rights Reserved.
-              <div>
-                VAT No: <a class="hcs-green-text"
-                  href="https://beta.companieshouse.gov.uk/company/09276951">252295994</a>
-                |
-                Company No: <a class="hcs-green-text"
-                  href="https://beta.companieshouse.gov.uk/company/09276951">09276951</a>
-              </div>
-          <small>v<%= package %> | <%= lastfetched ? slimDateTime(lastfetched.lastFetchedAt,true) : 'Never' %> | <span id="pageLoadTime"></span></small>
-        </div>
-      </div>
-    </nav>
-  </footer>
-
-  <div id="cookieConsent" style="display: none;">
-    <div class="container d-flex justify-content-between align-items-center flex-wrap">
-      <div>
-        <p class="mb-0">
-          This site uses cookies to improve your experience. By using our site, you agree to our
-          <a href="/privacy-policy" target="_blank">Privacy Policy</a>.
-        </p>
-      </div>
-      <button id="acceptCookies" class="btn btn-hcs-green btn-sm">Accept</button>
-    </div>
+    <main id="main-content" class="p-4 bg-body flex-grow-1">
+      <%- include('./partials/topnav.ejs') %>
+      <%- include('./partials/successAlert.ejs') %>
+      <%- include('./partials/errorAlert.ejs') %>
+      <%- body %>
+    </main>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const cookieBanner = document.getElementById('cookieConsent');
-      const acceptButton = document.getElementById('acceptCookies');
 
-      // Show the banner if cookie not accepted
-      if (!document.cookie.includes('cookieAccepted=true')) {
-        cookieBanner.style.display = 'block';
-      }
 
-      // Accept Cookies Event
-      acceptButton.addEventListener('click', function () {
-        cookieBanner.style.display = 'none';
-        document.cookie = "cookieAccepted=true; path=/; max-age=31536000"; // 1 year
-      });
-    });
-  </script>
+  <!-- JS: Bootstrap & Popper -->
   <script defer src="/resources/@popperjs/core/dist/umd/popper.min.js"></script>
   <script defer src="/resources/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <!-- JS: Bootstrap Tooltips -->
   <script defer>
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    document.addEventListener('DOMContentLoaded', () => {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltipTriggerList].forEach(el => new bootstrap.Tooltip(el));
+    });
   </script>
+
+  <!-- JS: Theme Toggle -->
   <script defer>
     (() => {
-      'use strict';
       const getStoredTheme = () => localStorage.getItem('theme');
       const setStoredTheme = theme => localStorage.setItem('theme', theme);
       const getPreferredTheme = () => {
-        const storedTheme = getStoredTheme();
-        if (storedTheme) {
-          return storedTheme;
-        }
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const stored = getStoredTheme();
+        return stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       };
       const setTheme = theme => {
-        if (theme === 'auto') {
-          document.documentElement.setAttribute('data-bs-theme', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        } else {
-          document.documentElement.setAttribute('data-bs-theme', theme);
-        }
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? getPreferredTheme() : theme);
       };
       setTheme(getPreferredTheme());
-      const showActiveTheme = (theme, focus = false) => {
-        const themeSwitcher = document.querySelector('#darkModeToggleLabel');
-        if (!themeSwitcher) {
-          return;
-        }
-        if (focus) {
-          themeSwitcher.focus();
-        }
-      };
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        const storedTheme = getStoredTheme();
-        if (storedTheme !== 'light' && storedTheme !== 'dark') {
-          setTheme(getPreferredTheme());
-        }
-      });
-      window.addEventListener('DOMContentLoaded', () => {
-        showActiveTheme(getPreferredTheme());
-        document.getElementById('darkModeToggle').addEventListener('change', () => {
-          toggleDarkMode();
-        });
-      });
-      const toggleDarkMode = () => {
-        const currentTheme = getStoredTheme();
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.getElementById('darkModeToggle')?.addEventListener('change', () => {
+        const newTheme = getStoredTheme() === 'dark' ? 'light' : 'dark';
         setStoredTheme(newTheme);
         setTheme(newTheme);
-        showActiveTheme(newTheme, true);
-      };
+      });
     })();
   </script>
+
+  <!-- JS: Service Worker -->
   <script defer>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/js/service-worker.js')
-          .then(registration => {
-            //console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          }, error => {
-            console.log('ServiceWorker registration failed: ', error);
-          });
+        navigator.serviceWorker.register('/resources/js/service-worker.js').catch(console.error);
       });
     }
   </script>
+
   <script>
-    window.addEventListener('load', () => {
-      const pageLoadTime = performance.now();
-      const pageLoadTimeElement = document.getElementById('pageLoadTime');
-      pageLoadTimeElement.innerHTML = `${Math.round(pageLoadTime)} ms`;
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.getElementById('sidebar');
+      const main = document.getElementById('main-content');
+      const topnav = document.getElementById('top-nav');
+
+      const SIDEBAR_KEY = 'sidebarCollapsed';
+
+      function setSidebarState(collapsed) {
+        if (collapsed) {
+          sidebar.classList.add('collapsed');
+          sidebar.style.display = 'none';
+          topnav.style.display = 'flex';
+          localStorage.setItem(SIDEBAR_KEY, 'true');
+        } else {
+          sidebar.classList.remove('collapsed');
+          sidebar.style.display = 'flex';
+          topnav.style.display = 'none';
+          localStorage.setItem(SIDEBAR_KEY, 'false');
+        }
+      }
+
+      // Apply saved state on load
+      const isCollapsed = localStorage.getItem(SIDEBAR_KEY) === 'true';
+      setSidebarState(isCollapsed);
+
+      // Toggle on button click
+      document.querySelectorAll('.toggle-sidebar').forEach(button => {
+        button.addEventListener('click', () => {
+          const isCollapsed = sidebar.classList.contains('collapsed');
+          setSidebarState(!isCollapsed);
+        });
+      });
     });
   </script>
 </body>
+
 </html>
