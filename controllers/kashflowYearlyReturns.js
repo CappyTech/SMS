@@ -45,8 +45,10 @@ const renderKFYearlyReturns = async (req, res, next) => {
                 receiptsByMonth[month] = [];
             }
 
-            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber);
-            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber);
+            const ParentType = identifyParentType(receipt.CustomerID);
+            // Normalize with parent type awareness
+            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber, receipt.CustomerID, ParentType);
+            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber, receipt.CustomerID, ParentType);
 
             // Extract values from Lines
             const labourCost = normalizedLines.filter(line => line.ChargeType === 18685897).reduce((sum, line) => sum + (line.Rate * line.Quantity), 0);
@@ -230,8 +232,10 @@ router.post('/download-csv', async (req, res) => {
             const month = receipt.TaxMonth || new Date(receipt.InvoiceDate).getUTCMonth() + 1;
             if (!receiptsByMonth[month]) receiptsByMonth[month] = [];
 
-            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber);
-            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber);
+            const ParentType = identifyParentType(receipt.CustomerID);
+            // Normalize with parent type awareness
+            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber, receipt.CustomerID, ParentType);
+            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber, receipt.CustomerID, ParentType);
 
             const labourCost = normalizedLines.filter(line => line.ChargeType === 18685897).reduce((sum, line) => sum + line.Rate * line.Quantity, 0);
             const materialCost = normalizedLines.filter(line => line.ChargeType === 18685896).reduce((sum, line) => sum + line.Rate * line.Quantity, 0);
@@ -372,8 +376,9 @@ router.post('/download-xlsx', async (req, res) => {
             const month = receipt.TaxMonth || new Date(receipt.InvoiceDate).getUTCMonth() + 1;
             if (!receiptsByMonth[month]) receiptsByMonth[month] = [];
 
-            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber);
-            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber);
+            // Normalize with parent type awareness
+            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber, receipt.CustomerID);
+            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber, receipt.CustomerID);
 
             const labourCost = normalizedLines.filter(line => line.ChargeType === 18685897).reduce((sum, line) => sum + line.Rate * line.Quantity, 0);
             const materialCost = normalizedLines.filter(line => line.ChargeType === 18685896).reduce((sum, line) => sum + line.Rate * line.Quantity, 0);
