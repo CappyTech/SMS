@@ -1,30 +1,41 @@
-<nav id="top-nav" class="navbar navbar-expand bg-body-secondary px-3 py-2 d-flex w-100">
-    <div class="container-fluid d-flex align-items-center justify-content-between">
-        <!-- Left: Logo + Company + Sidebar Toggle -->
-        <div class="d-flex align-items-center">
-            <button class="toggle-sidebar btn btn-outline-secondary btn-sm me-3" title="Toggle Sidebar">
-                <i class="bi bi-layout-sidebar-inset"></i>
-            </button>
-            <a href="/" class="text-decoration-none">
-                <img src="/resources/images/favicon.png" alt="Favicon" class="mb-1" width="32" height="32">
-                <span class="hcs-green-text">Heron CS LTD</span>
-            </a>
-            <button class="btn btn-hcs-green btn-sm ms-3" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle"></i> My Account
-            </button>
-            <div class="dropdown-menu">
-                <a href="/user/account" class="dropdown-item">My Account</a>
-            </div>
-        </div>
+<nav id="top-nav" class="navbar navbar-expand bg-body-secondary border-bottom px-3 py-2">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
 
-        <!-- Right: Icons -->
-        <div class="d-flex align-items-center">
-            <a href="/dashboard" class="btn btn-outline-dark btn-sm me-2" title="Dashboard">
-                <i class="bi bi-speedometer2"></i>
-            </a>
-            <a href="/user/logout" class="btn btn-outline-danger btn-sm" title="Logout">
-                <i class="bi bi-box-arrow-right"></i>
-            </a>
-        </div>
+    <!-- Left: Sidebar Toggle, Logo + Name, Account Dropdown -->
+    <div class="d-flex align-items-center">
+      <!-- Sidebar Toggle -->
+      <button class="btn btn-outline-secondary btn-sm me-3 toggle-sidebar" title="Toggle Sidebar">
+        <i class="bi bi-layout-sidebar-inset"></i>
+      </button>
+
+      <!-- Logo + Name -->
+      <a href="/" class="d-flex align-items-center text-decoration-none">
+        <img src="/resources/images/favicon.png" alt="Logo" width="32" height="32" class="me-2">
+        <span class="text-success fw-semibold">Heron CS LTD</span>
+      </a>
+
+      <!-- Account Dropdown -->
+      <div class="dropdown ms-3">
+        <button class="btn btn-hcs-green btn-sm dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-person-circle me-1"></i> My Account
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/account">My Account</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="/user/logout">Logout</a></li>
+        </ul>
+      </div>
     </div>
+
+    <!-- Right: Icons -->
+    <div class="d-flex align-items-center">
+      <a href="/dashboard" class="btn btn-outline-dark btn-sm me-2" title="Dashboard">
+        <i class="bi bi-speedometer2"></i>
+      </a>
+      <a href="/user/logout" class="btn btn-outline-danger btn-sm" title="Logout">
+        <i class="bi bi-box-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
 </nav>
