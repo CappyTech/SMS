@@ -10,7 +10,7 @@ const currencyService = require('../services/currencyService');
 const authService = require('../services/authService');
 const kf = require('../services/kashflowDatabaseService');
 const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
-const { normalizeLines, normalizePayments } = require('../services/kashflowNormalizer');
+const { normalizeLines, normalizePayments, identifyParentType } = require('../services/kashflowNormalizer');
 const { where } = require('sequelize');
 
 const renderStatsDashboard = async (req, res, next) => {
@@ -923,8 +923,9 @@ const renderCISDashboard = async (req, res, next) => {
         const processedReceipts = receipts.map(receipt => {
             const raw = receipt.toJSON();
 
-            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber);
-            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber);
+            // Normalize with parent type awareness
+            const normalizedLines = normalizeLines(receipt.Lines, receipt.InvoiceNumber, receipt.CustomerID,);
+            const normalizedPayments = normalizePayments(receipt.Payments, receipt.InvoiceNumber, receipt.CustomerID,);
 
             return {
                 ...raw,
