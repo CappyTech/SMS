@@ -33,9 +33,7 @@ exports.fetchKashFlowData = async (sendUpdate = () => { }) => {
     const operationLog = [];
 
     try {
-        const client = await new Promise((resolve, reject) => {
-            authenticate('main thread',(err, c) => err ? reject(err) : resolve(c));
-        });
+        const client = await authenticate('main thread');
 
         const KF_Meta = db.KF_Meta;
 
