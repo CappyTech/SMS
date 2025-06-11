@@ -5,7 +5,7 @@ const moment = require('moment');
 const path = require('path');
 const kf = require('../../../services/kashflowDatabaseService');
 const authService = require('../../../services/authService');
-const {normalizeLines,normalizePayments} = require('../../../services/kashflowNormalizer');
+const kashflowNormalizer = require('../../../services/kashflowNormalizer');
 
 const readReceipt = async (req, res, next) => {
     try {
@@ -27,8 +27,9 @@ const readReceipt = async (req, res, next) => {
           }
         Receipt.Payments = typeof Receipt.Payments === 'string' ? JSON.parse(Receipt.Payments) : Receipt.Payments || [];
 
-        const normalizedLines = normalizeLines(Receipt.Lines, Receipt.InvoiceNumber);
-        const normalizedPayments = normalizePayments(Receipt.Payments, Receipt.InvoiceNumber);
+        // Normalize with parent type awareness
+        const normalizedLines = await kashflowNormalizer.normalizeLines(Receipt.Lines, Receipt.InvoiceNumber, Receipt.CustomerID);
+        const normalizedPayments = await kashflowNormalizer.normalizePayments(Receipt.Payments, Receipt.InvoiceNumber, Receipt.CustomerID);
         //logger.info('Parsed Receipt Lines: ' + JSON.stringify(Receipt.Lines, null, 2));
         //logger.info('Parsed Payment Lines: ' + JSON.stringify(Receipt.Payments, null, 2));
         
