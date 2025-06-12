@@ -13,10 +13,10 @@ function getReceiptsForSupplier(client, supplierID) {
         return reject(error);
       }
 
-      const receipts = result?.GetReceiptsForSupplierResult?.Invoice;
+      const receiptsForSuppliers = result?.GetReceiptsForSupplierResult?.Invoice;
 
-      if (receipts) {
-        const receiptArray = Array.isArray(receipts) ? receipts : [receipts];
+      if (receiptsForSuppliers) {
+        const receiptArray = Array.isArray(receiptsForSuppliers) ? receiptsForSuppliers : [receiptsForSuppliers];
         logger.info(`Total number of receipts: ${receiptArray.length}, for SupplierID ${supplierID}.`);
         resolve(receiptArray);
       } else {

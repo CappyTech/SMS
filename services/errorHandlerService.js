@@ -16,7 +16,7 @@ const errorHandlerService = (error, req, res, next) => {
         URL: ${req.originalUrl}
         Method: ${req.method}`);
 
-    logger.error(`Request Headers: ${JSON.stringify(req.headers, null, 2)}`);
+    logger.info(`Request Headers: ${JSON.stringify(req.headers, null, 2)}`);
 
     // Render the error page
     res.status(statusCode);

@@ -57,45 +57,6 @@
     <p class="text-danger">No line items available for this receipt.</p>
     <% } %>
 
-    <% if (Receipt.Payments) { %>
-        <% if (Receipt.Payments.Payment) { %>
-            <% if (Array.isArray(Receipt.Payments.Payment.Payment)) { %>
-                <% if (Receipt.Payments.Payment.Payment.length > 0) { %>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Pay Invoice</th>
-                                    <th>Pay Date</th>
-                                    <th>Pay Note</th>
-                                    <th>Pay Amount (£)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% Receipt.Payments.Payment.Payment.forEach(payment => { %>
-                                    <tr>
-                                        <td><%= payment.PayInvoice %></td>
-                                        <td><%= slimDateTime(payment.PayDate) %></td>
-                                        <td><%= payment.PayNote %></td>
-                                        <td><%= payment.PayAmount %></td>
-                                    </tr>
-                                <% }) %>
-                            </tbody>
-                        </table>
-                    </div>
-                <% } else { %>
-                    <p class="text-danger">Payments.Payment.Payment array is empty.</p>
-                <% } %>
-            <% } else { %>
-                <p class="text-danger">Payments.Payment.Payment is not an array.</p>
-            <% } %>
-        <% } else { %>
-            <p class="text-danger">Payments.Payment object does not exist.</p>
-        <% } %>
-    <% } else { %>
-        <p class="text-danger">No payment items available for this receipt.</p>
-    <% } %>
-
     <% if (Array.isArray(Receipt.Payments) && Receipt.Payments.length > 0) { %>
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
@@ -188,5 +149,4 @@
             </div>
         </div>
     <% } %>
-
 </div>

@@ -15,10 +15,10 @@ function getReceiptPayment(client, receiptNumber) {
       }
 
       // Safely handle the response structure
-      const receiptPaymentResult = result?.GetReceiptPaymentResult;
+      const receiptPayments = result?.GetReceiptPaymentResult;
 
-      if (receiptPaymentResult) {
-        resolve(receiptPaymentResult);
+      if (receiptPayments) {
+        resolve(receiptPayments);
       } else {
         logger.info('No payments found for the given receipt.');
         resolve([]);

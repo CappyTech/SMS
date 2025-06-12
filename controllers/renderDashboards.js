@@ -939,7 +939,7 @@ const renderCISDashboard = async (req, res, next) => {
         const filteredReceipts = processedReceipts.filter(receipt => {
             if (!receipt.Payments) return false;
 
-            const payments = receipt.Payments?.Payment?.Payment || [];
+            const payments = Array.isArray(receipt.Payments) ? receipt.Payments : [];
             const payment = payments.find(p => p.PayDate);
 
             if (!payment) return false;

@@ -25,7 +25,7 @@ function getInvoiceNotes(client, invoiceId) {
         
         resolve(notesArray);
       } else {
-        logger.info('No notes found for the given invoice.');
+        //logger.info('No notes found for the given invoice.');
         resolve([]);
       }
     });

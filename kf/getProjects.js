@@ -19,7 +19,7 @@ function getProjects(client,ProjStatus) {
         logger.info('Total number of projects: '+ projects.length);
         resolve(projects);
       } else {
-        logger.info('No projects found.');
+        //logger.info('No projects found.');
         resolve([]);
       }
     });

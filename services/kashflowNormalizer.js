@@ -75,39 +75,63 @@ async function normalizeLines(linesInput, invoiceNumber = 'unknown', customerID 
 /**
  * Normalize payment records from various possible formats.
  */
+// Asynchronously normalizes various KashFlow payment formats into a consistent array format
 async function normalizePayments(paymentsInput, invoiceNumber = 'unknown', customerID = 'unknown') {
-    let parsedPayments = { Payment: { Payment: [] } };
+    // Initialize the result array that will store the normalized payment records
+    let parsedPayments = [];
+
+    // Determine whether the associated entity is a customer or supplier, based on the ID
     const parentType = await identifyParentType(customerID);
 
+    // Determine the document type label (used in logging)
     let docType;
-    if (parentType === 'customer') docType = 'Invoice';
-    else if (parentType === 'supplier') docType = 'Receipt';
-    else docType = 'Unknown';
+    if (parentType === 'customer') docType = 'Invoice';      // For customers, it's an invoice
+    else if (parentType === 'supplier') docType = 'Receipt'; // For suppliers, it's a receipt
+    else docType = 'Unknown';                                // Default fallback if identification fails
 
     try {
+        // If the input is a string, try parsing it as JSON first
         if (typeof paymentsInput === 'string') {
-            const parsed = JSON.parse(paymentsInput);
+            const parsed = JSON.parse(paymentsInput); // Parse the JSON string into a JS object
 
+            // Handle the deeply nested format: { Payment: { Payment: [ ... ] } }
             if (Array.isArray(parsed?.Payment?.Payment)) {
-                parsedPayments = parsed;
+                parsedPayments = parsed.Payment.Payment;
+
+            // Handle the moderately nested format: { Payment: [ ... ] }
             } else if (Array.isArray(parsed?.Payment)) {
-                parsedPayments = { Payment: { Payment: parsed.Payment } };
+                parsedPayments = parsed.Payment;
+
+            // Log a warning if the format is not recognized
             } else {
-                logger.warn(`[${parentType}] Unexpected Payments format for ${docType} ${invoiceNumber} (ID: ${customerID}): ${JSON.stringify(paymentsInput)}`);
+                logger.warn(`[${parentType}] Unexpected Payments format for ${docType} ${invoiceNumber} (ID: ${customerID}): ${JSON.stringify(parsed)}`);
             }
+
+        // Handle already-parsed input with deep nesting: { Payment: { Payment: [ ... ] } }
         } else if (Array.isArray(paymentsInput?.Payment?.Payment)) {
-            parsedPayments = paymentsInput;
+            parsedPayments = paymentsInput.Payment.Payment;
+
+        // Handle already-parsed input with moderate nesting: { Payment: [ ... ] }
         } else if (Array.isArray(paymentsInput?.Payment)) {
-            parsedPayments = { Payment: { Payment: paymentsInput.Payment } };
+            parsedPayments = paymentsInput.Payment;
+
+        // Handle flat array input: [ ... ]
+        } else if (Array.isArray(paymentsInput)) {
+            parsedPayments = paymentsInput;
+
+        // Log a warning if none of the expected formats match
         } else {
-            logger.warn(`[${parentType}] Unexpected Payments structure for ${docType} ${invoiceNumber} (ID: ${customerID})`);
+            logger.warn(`[${parentType}] Unexpected Payments structure for ${docType} ${invoiceNumber} (ID: ${customerID}): ${JSON.stringify(paymentsInput)}`);
         }
     } catch (err) {
+        // Log any errors that occur during JSON parsing or normalization
         logger.warn(`[${parentType}] Failed to parse Payments for ${docType} ${invoiceNumber} (ID: ${customerID}): ${err.message}`);
     }
 
-    return parsedPayments || { Payment: { Payment: [] } };
+    // Return the normalized array of payment objects (or an empty array if none were found)
+    return parsedPayments;
 }
+
 
 
 module.exports = {

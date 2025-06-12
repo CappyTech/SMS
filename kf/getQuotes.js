@@ -18,7 +18,7 @@ function getQuotes(client) {
         logger.info('Total number of quotes: '+ quotes.length);
         resolve(quotes);
       } else {
-        logger.info('No quotes found.');
+        //logger.info('No quotes found.');
         resolve([]);
       }
     });

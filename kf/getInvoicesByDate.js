@@ -20,7 +20,7 @@ function getInvoicesByDate(client, startDate, endDate) {
         logger.info('Total number of invoices: '+ invoices.length);
         resolve(invoices);
       } else {
-        logger.info('No invoices found.');
+        //logger.info('No invoices found.');
         resolve([]);
       }
     });

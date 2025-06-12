@@ -12,13 +12,13 @@ function getReceipts(client) {
         return reject(error);
       }
 
-      const receipts = result.GetReceiptsResult.Invoice;
+      const Receipts = result.GetReceiptsResult.Invoice;
 
-      if (receipts && receipts.length) {
-        logger.info('Total number of receipts: '+ receipts.length);
-        resolve(receipts);
+      if (Receipts && Receipts.length) {
+        logger.info('Total number of receipts: '+ Receipts.length);
+        resolve(Receipts);
       } else {
-        logger.info('No receipts found.');
+        //logger.info('No receipts found.');
         resolve([]);
       }
     });

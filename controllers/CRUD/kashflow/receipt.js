@@ -6,6 +6,8 @@ const path = require('path');
 const kf = require('../../../services/kashflowDatabaseService');
 const authService = require('../../../services/authService');
 const kashflowNormalizer = require('../../../services/kashflowNormalizer');
+const authenticate = require('../../../kf/autoAuth');
+const getReceiptPayment = require('../../../kf/getReceiptPayment');
 
 const readReceipt = async (req, res, next) => {
     try {
@@ -20,13 +22,18 @@ const readReceipt = async (req, res, next) => {
             return res.redirect('/dashboard/KFreceipt');
         }
 
+        // let's get the payment from GetReceiptPayment function
+        const context = `debug thread - working on: ${Receipt.InvoiceNumber}`;
+        const client = await authenticate(context);
+        const payments = await getReceiptPayment(client, Receipt.InvoiceNumber);
+        console.log(payments);
         // Parse Lines and Payments from JSON to Object (if not already) and log them for debugging purposes
         Receipt.Lines = typeof Receipt.Lines === 'string' ? JSON.parse(Receipt.Lines) : Receipt.Lines || [];
         if (Receipt.Lines.anyType) {
             Receipt.Lines = Receipt.Lines.anyType;
           }
         Receipt.Payments = typeof Receipt.Payments === 'string' ? JSON.parse(Receipt.Payments) : Receipt.Payments || [];
-
+        console.log('Parsed Receipt Payments: ', Receipt.Payments);
         // Normalize with parent type awareness
         const normalizedLines = await kashflowNormalizer.normalizeLines(Receipt.Lines, Receipt.InvoiceNumber, Receipt.CustomerID);
         const normalizedPayments = await kashflowNormalizer.normalizePayments(Receipt.Payments, Receipt.InvoiceNumber, Receipt.CustomerID);
@@ -65,7 +72,7 @@ const readReceipt = async (req, res, next) => {
         // Render the View with the Receipt Data and associated Supplier and Projects for Line Items (if any)
         res.render(path.join('kashflow', 'viewReceipt'), {
             title: 'Receipt Overview',
-            Receipt: { ...Receipt.toJSON() },
+            Receipt: { ...Receipt.toJSON(), Lines: normalizedLines, Payments: normalizedPayments },
             ChargeTypes,
             Supplier: Receipt.supplier, // Use the associated supplier object instead of the CustomerID for better readability in the view (e.g. Supplier.Name instead of Receipt.CustomerID)
             Projects,

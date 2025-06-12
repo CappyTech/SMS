@@ -15,17 +15,17 @@ function getReceiptNotes(client, receiptId) {
       }
 
       // Safely handle the response structure
-      const receiptNotesResult = result?.GetReceiptNotesResponse?.GetReceiptNotesResult;
+      const receiptNotes = result?.GetReceiptNotesResponse?.GetReceiptNotesResult;
       
-      if (receiptNotesResult && receiptNotesResult.ReceiptNotes) {
+      if (receiptNotes && receiptNotes.ReceiptNotes) {
         // Ensure it's always returned as an array
-        const notesArray = Array.isArray(receiptNotesResult.ReceiptNotes)
-          ? receiptNotesResult.ReceiptNotes
-          : [receiptNotesResult.ReceiptNotes];
+        const notesArray = Array.isArray(receiptNotes.ReceiptNotes)
+          ? receiptNotes.ReceiptNotes
+          : [receiptNotes.ReceiptNotes];
         
         resolve(notesArray);
       } else {
-        logger.info('No notes found for the given receipt.');
+        //logger.info('No notes found for the given receipt.');
         resolve([]);
       }
     });

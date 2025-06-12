@@ -15,29 +15,23 @@ function getInvoicePayment(client, invoiceNumber) {
       }
 
       // Ensure we safely access the response
-      const invoicePaymentResult = result?.GetInvoicePaymentResult;
+      const invoicePayments = result?.GetInvoicePaymentResult;
       //logger.debug('GetInvoicePayment result: ' + JSON.stringify(invoicePaymentResult, null, 2));
-      if (invoicePaymentResult === null) {
+      if (invoicePayments === null) {
         logger.info(`No payments found for Invoice #${invoiceNumber}`);
         return resolve([]);
       }
-      if (!invoicePaymentResult) {
+      if (!invoicePayments) {
         logger.warn('Unexpected API response format for GetInvoicePayment:', result);
         return resolve([]);
       }
 
-      // Normalize payments into an array
-      const payments = Array.isArray(invoicePaymentResult)
-        ? invoicePaymentResult.Payment
-        : invoicePaymentResult.Payment
-        ? [invoicePaymentResult.Payment]
-        : [];
-
-      if (payments.length === 0) {
-        logger.info(`No payments found for Invoice #${invoiceNumber}`);
+      if (invoicePayments === 0) {
+        //logger.info(`No payments found for Invoice #${invoiceNumber}`);
+        return resolve([]);
       }
 
-      resolve(payments);
+      resolve(invoicePayments);
     });
   });
 }
