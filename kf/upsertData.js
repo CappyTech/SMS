@@ -45,7 +45,7 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
           const currentValue = existing[key];
           const newValue = item[key];
 
-          if (isPlaceholderDate(currentValue) || isPlaceholderDate(newValue)) continue;
+          if (isPlaceholderDate(currentValue) && isPlaceholderDate(newValue)) continue;
 
           if (key.toLowerCase().includes('created') || key.toLowerCase().includes('updated')) {
             const normalizedCurrent = currentValue ? new Date(currentValue).toISOString().split('.')[0] : null;

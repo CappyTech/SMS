@@ -30,7 +30,7 @@ const renderUserUpdateForm = async (req, res, next) => {
         } else {
             return res.status(404).send('User not found');
         }
-        console.log(user.permissions);
+        logger.info(user.permissions);
         res.render(path.join('users', 'updateUser'), {
             title: 'Update User',
             user,

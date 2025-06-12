@@ -1,11 +1,11 @@
 {
   "name": "sms",
-  "version": "4.8.1",
+  "version": "4.8.2",
   "description": "SMS, developed by Heron CS LTD, is a comprehensive web-based application designed to streamline the management of subcontractors in construction projects. It facilitates efficient data entry, automates monthly returns for CIS/HMRC compliance, tracks payments, manages deductions, and enables subcontractor verification. SMS ensures accurate record-keeping, regulatory compliance, and effective communication among project stakeholders, enhancing overall subcontractor management efficiency and transparency.",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "keywords": [
     "SMS, developed, Heron CS LTD, comprehensive, web-based application, streamline, management, subcontractors, construction projects, efficient, data entry, automates, monthly returns, CIS/HMRC compliance, tracks payments, manages deductions, subcontractor verification, accurate record-keeping, regulatory compliance, effective communication, project stakeholders, subcontractor management efficiency, transparency"

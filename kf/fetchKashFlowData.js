@@ -60,15 +60,16 @@ exports.fetchKashFlowData = async (sendUpdate = () => { }) => {
         const invoices = await getInvoicesByDate(client, new Date('2014-01-01'), new Date());
         const invoiceTransformed = await Promise.all(invoices.map(async invoice => {
             const payments = await getInvoicePayment(client, invoice.InvoiceNumber);
+            const notes = await getInvoiceNotes(client, invoice.InvoiceDBID);
             const mappedLines = invoice.Lines?.anyType?.map(mapLine) || [];
-            return { ...invoice, mappedLines, payments };
+            return { ...invoice, mappedLines, payments, notes };
         }));
         await upsertData(db.KF_Invoices, invoiceTransformed, 'InvoiceDBID', KF_Meta, operationLog, './logs/invoices.txt', sendUpdate, startfetch);
 
         const quotes = await getQuotes(client);
         const quoteTransformed = await Promise.all(quotes.map(async quote => {
             const payments = await getInvoicePayment(client, quote.InvoiceNumber);
-            logger.debug(`Checking quote.InvoiceDBID: value=${quote.InvoiceDBID}, type=${typeof quote.InvoiceDBID}`);
+            //logger.debug(`Checking quote.InvoiceDBID: value=${quote.InvoiceDBID}, type=${typeof quote.InvoiceDBID}`);
             const notes = await getInvoiceNotes(client, quote.InvoiceDBID);
             const mappedLines = quote.Lines?.anyType?.map(mapLine) || [];
             return { ...quote, mappedLines, payments, notes };

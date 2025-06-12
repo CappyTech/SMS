@@ -6,7 +6,7 @@ const kf = require('../services/kashflowDatabaseService');
 const authService = require('../services/authService');
 const slimDateTime = require('../services/dateService').slimDateTime;
 const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
-const { normalizeLines, normalizePayments, identifyParentType } = require('../services/kashflowNormalizer');
+const normalizePayments = require('../services/kashflowNormalizer').normalizePayments;
 
 const renderKFMonthlyReturnsForm = async (req, res, next) => {
     try {

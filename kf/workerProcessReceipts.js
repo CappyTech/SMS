@@ -1,3 +1,4 @@
+const logger = require('../services/loggerService');
 const { parentPort, workerData, isMainThread } = require('worker_threads');
 const authenticate = require('./autoAuth');
 const upsertData = require('./upsertData');
@@ -6,6 +7,7 @@ const getReceiptPayment = require('./getReceiptPayment');
 const getReceiptNotes = require('./getReceiptNotes');
 const taxService = require('../services/taxService');
 const createDbConnection = require('../services/kashflowDatabaseService').createDbConnection;
+const normalizePayments = require('../services/kashflowNormalizer').normalizePayments;
 function mapLine(line) {
   return {
       LineID: line.LineID,
@@ -24,7 +26,7 @@ function mapLine(line) {
 const ChargeTypes = require('../controllers/CRUD/kashflow/chargeTypes.json');
 
 if (isMainThread) {
-  console.error('❌ This file should only be run as a worker.');
+  logger.error('❌ This file should only be run as a worker.');
   process.exit(1);
 }
 const workerDebugLog = async (supplierName, message) => {
@@ -36,18 +38,18 @@ const workerDebugLog = async (supplierName, message) => {
       log: typeof message === 'string' ? message : JSON.stringify(message, null, 2),
     });
   } catch (err) {
-    console.error(`Failed to post log message from worker: ${err.message}`);
+    logger.error(`Failed to post log message from worker: ${err.message}`);
   }
 };
 
 (async () => {
     if (!workerData || !workerData.supplier) {
-      console.error('❌ This script must be run as a worker with workerData.supplier');
+      logger.error('❌ This script must be run as a worker with workerData.supplier');
       process.exit(1);
     }
     const supplier = workerData.supplier;
     const startfetch = workerData.startfetch;
-    let db; // <-- declare outside so we can close it later
+    let db;
     try {
       await workerDebugLog(supplier.Name, `📦 Starting processing for supplier: ${supplier.Name} (${supplier.SupplierID})`);
   
@@ -61,73 +63,52 @@ const workerDebugLog = async (supplierName, message) => {
   
       const transformedReceipts = await Promise.all(receipts.map(async (receipt) => {
         const payments = await getReceiptPayment(client, receipt.InvoiceNumber);
-        const flattenedPayments = Array.isArray(payments?.Payment?.Payment)
-            ? payments.Payment.Payment
-            : payments?.Payment?.Payment ? [payments.Payment.Payment] : [];
         const notes = await getReceiptNotes(client, receipt.InvoiceDBID);
+
         const mappedLines = receipt.Lines?.anyType?.map(mapLine) || [];
-  
+        const flattenedPayments = normalizePayments(payments);
+
         let taxYear, taxMonth;
-
-        const paymentArray = Array.isArray(payments?.Payment)
-          ? payments.Payment
-          : payments?.Payment ? [payments.Payment] : [];
-
-        if (paymentArray.length && paymentArray[0]?.PayDate) {
-          ({ taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(paymentArray[0].PayDate));
+        if (flattenedPayments.length && flattenedPayments[0]?.PayDate) {
+          ({ taxYear, taxMonth } = taxService.calculateTaxYearAndMonth(flattenedPayments[0].PayDate));
         }
-  
-        /* 🐛 Debug: Log raw receipt
-        await workerDebugLog(supplier.Name, {
-          step: `Inspecting raw receipt`,
-          invoiceNumber: receipt.InvoiceNumber,
-          receiptSummary: {
-            InvoiceDBID: receipt.InvoiceDBID,
-            InvoiceNumber: receipt.InvoiceNumber,
-            SupplierID: receipt.SupplierID,
-            Description: receipt.Description,
-            Total: receipt.Total,
-            Date: receipt.InvoiceDate,
-          },
-        });
-        */
 
         const transformed = {
           ...receipt,
-          Lines: mappedLines,
-          Payments: flattenedPayments,
+          Lines: mappedLines,               // ✔ always flat
+          Payments: flattenedPayments,      // ✔ always flat
           TaxMonth: taxMonth,
           TaxYear: taxYear,
           notes,
         };
-  
+
         await workerDebugLog(supplier.Name, { step: `Transformed Receipt ${receipt.InvoiceNumber}` });
         return transformed;
       }));
-  
-      db = createDbConnection(); // <-- assign here
+
+      db = createDbConnection();
       await upsertData(
-        db.KF_Receipts,
-        transformedReceipts,
-        'InvoiceDBID',
-        db.KF_Meta,
-        [],
-        './logs/receipts.txt',
-        (msg) => parentPort.postMessage(msg),
-        startfetch
-      );
-  
-      await workerDebugLog(supplier.Name, `✅ Upserted ${transformedReceipts.length} receipts for ${supplier.Name}`);
-      parentPort.postMessage({ type: 'done', result: transformedReceipts });
-    } catch (err) {
-      const errMsg = `❌ Error processing receipts for ${supplier.Name}: ${err.message}`;
-      await workerDebugLog(supplier.Name, errMsg);
-      parentPort.postMessage({ type: 'error', message: err.message });
-    } finally {
-      if (db?.sequelize?.close) {
-        await db.sequelize.close(); // ✅ clean close
-        await workerDebugLog(supplier.Name, `🔒 Closed DB connection for ${supplier.Name}`);
+          db.KF_Receipts,
+          transformedReceipts,
+          'InvoiceDBID',
+          db.KF_Meta,
+          [],
+          './logs/receipts.txt',
+          (msg) => parentPort.postMessage(msg),
+          startfetch
+        );
+    
+        await workerDebugLog(supplier.Name, `✅ Upserted ${transformedReceipts.length} receipts for ${supplier.Name}`);
+        parentPort.postMessage({ type: 'done', result: transformedReceipts });
+      } catch (err) {
+        const errMsg = `❌ Error processing receipts for ${supplier.Name}: ${err.message}`;
+        await workerDebugLog(supplier.Name, errMsg);
+        parentPort.postMessage({ type: 'error', message: err.message });
+      } finally {
+        if (db?.sequelize?.close) {
+          await db.sequelize.close();
+          await workerDebugLog(supplier.Name, `🔒 Closed DB connection for ${supplier.Name}`);
+        }
       }
-    }
   })();
   

@@ -18,7 +18,7 @@ function getInvoicePayment(client, invoiceNumber) {
       const invoicePayments = result?.GetInvoicePaymentResult;
       //logger.debug('GetInvoicePayment result: ' + JSON.stringify(invoicePaymentResult, null, 2));
       if (invoicePayments === null) {
-        logger.info(`No payments found for Invoice #${invoiceNumber}`);
+        //logger.info(`No payments found for Invoice #${invoiceNumber}`);
         return resolve([]);
       }
       if (!invoicePayments) {

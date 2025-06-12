@@ -24,9 +24,6 @@
 
 <body>
   <div class="app-wrapper d-flex flex-column flex-lg-row">
-    <aside id="sidebar" class="sidebar bg-body-secondary">
-      <%- include('./partials/aside.ejs') %>
-    </aside>
 
     <main id="main-content" class="p-4 bg-body flex-grow-1">
       <%- include('./partials/topnav.ejs') %>
@@ -53,23 +50,42 @@
   <!-- JS: Theme Toggle -->
   <script defer>
     (() => {
+      const icon = document.getElementById('theme-icon');
+      const toggleBtn = document.getElementById('theme-toggle');
+
       const getStoredTheme = () => localStorage.getItem('theme');
       const setStoredTheme = theme => localStorage.setItem('theme', theme);
       const getPreferredTheme = () => {
         const stored = getStoredTheme();
         return stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       };
+
       const setTheme = theme => {
-        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? getPreferredTheme() : theme);
+        const appliedTheme = theme === 'auto' ? getPreferredTheme() : theme;
+        document.documentElement.setAttribute('data-bs-theme', appliedTheme);
+        icon.className = appliedTheme === 'dark'
+          ? 'bi bi-sun me-2'
+          : 'bi bi-moon-stars me-2';
+        toggleBtn.title = appliedTheme === 'dark'
+          ? 'Enable Light Mode'
+          : 'Enable Dark Mode';
       };
-      setTheme(getPreferredTheme());
-      document.getElementById('darkModeToggle')?.addEventListener('change', () => {
-        const newTheme = getStoredTheme() === 'dark' ? 'light' : 'dark';
+
+      // Apply on load
+      const initialTheme = getPreferredTheme();
+      setTheme(initialTheme);
+
+      // Toggle on click
+      toggleBtn?.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-bs-theme');
+        const newTheme = current === 'dark' ? 'light' : 'dark';
         setStoredTheme(newTheme);
         setTheme(newTheme);
       });
     })();
   </script>
+
+
 
   <!-- JS: Service Worker -->
   <script defer>
@@ -78,42 +94,6 @@
         navigator.serviceWorker.register('/resources/js/service-worker.js').catch(console.error);
       });
     }
-  </script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('main-content');
-      const topnav = document.getElementById('top-nav');
-
-      const SIDEBAR_KEY = 'sidebarCollapsed';
-
-      function setSidebarState(collapsed) {
-        if (collapsed) {
-          sidebar.classList.add('collapsed');
-          sidebar.style.display = 'none';
-          topnav.style.display = 'flex';
-          localStorage.setItem(SIDEBAR_KEY, 'true');
-        } else {
-          sidebar.classList.remove('collapsed');
-          sidebar.style.display = 'flex';
-          topnav.style.display = 'none';
-          localStorage.setItem(SIDEBAR_KEY, 'false');
-        }
-      }
-
-      // Apply saved state on load
-      const isCollapsed = localStorage.getItem(SIDEBAR_KEY) === 'true';
-      setSidebarState(isCollapsed);
-
-      // Toggle on button click
-      document.querySelectorAll('.toggle-sidebar').forEach(button => {
-        button.addEventListener('click', () => {
-          const isCollapsed = sidebar.classList.contains('collapsed');
-          setSidebarState(!isCollapsed);
-        });
-      });
-    });
   </script>
 </body>
 

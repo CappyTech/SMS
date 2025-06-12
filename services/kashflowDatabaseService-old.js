@@ -52,15 +52,15 @@ modelFiles.forEach((file) => {
 Object.keys(kf).forEach((modelName) => {
     if (kf[modelName].associate) {
         kf[modelName].associate(kf);
-        console.log(`Associations defined for ${modelName}`);
+        logger.info(`Associations defined for ${modelName}`);
     }
 });
 
 // Log model names and associations
-console.log('Models Loaded:', Object.keys(kf));
+logger.info('Models Loaded:', Object.keys(kf));
 
 Object.keys(kf).forEach((modelName) => {
-    console.log(`Associations for ${modelName}:`, kf[modelName].associations);
+    logger.info(`Associations for ${modelName}:`, kf[modelName].associations);
 });
 
 // Synchronize with logging (only in development)

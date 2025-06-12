@@ -10,7 +10,6 @@ const currencyService = require('../services/currencyService');
 const authService = require('../services/authService');
 const kf = require('../services/kashflowDatabaseService');
 const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
-const { normalizeLines, normalizePayments, identifyParentType } = require('../services/kashflowNormalizer');
 const { where } = require('sequelize');
 
 const renderStatsDashboard = async (req, res, next) => {
@@ -811,11 +810,8 @@ const renderCISSubmissionDashboard = async (req, res, next) => {
 
         // Further filter receipts to include only those with both Labour Costs and CIS Deductions
         const receiptsWithLabourAndCIS = filteredReceipts.filter(receipt => {
-            const lines = typeof receipt.Lines === 'string' ? JSON.parse(receipt.Lines) : receipt.Lines;
-
             const hasLabourCost = lines.some(line => line.ChargeType === 18685897); // Labour Costs
             const hasCISDeductions = lines.some(line => line.ChargeType === 18685964); // CIS Deductions
-
             return hasLabourCost && hasCISDeductions;
         });
 
@@ -918,27 +914,12 @@ const renderCISDashboard = async (req, res, next) => {
 
         const suppliers = await kf.KF_Suppliers.findAll({ order: [['Name', 'ASC']] });
         const receipts = await kf.KF_Receipts.findAll({ order: [['InvoiceNumber', 'ASC']] });
+        const processedReceipts = receipts.map(r => r.toJSON());
 
-        // Parse receipts once and store the processed version
-        const processedReceipts = await Promise.all(receipts.map(async receipt => {
-            const raw = receipt.toJSON();
-
-            const normalizedLines = await normalizeLines(receipt.Lines, receipt.InvoiceNumber, receipt.CustomerID);
-            const normalizedPayments = await normalizePayments(receipt.Payments, receipt.InvoiceNumber, receipt.CustomerID);
-
-            return {
-                ...raw,
-                Lines: normalizedLines,
-                Payments: normalizedPayments
-            };
-        }));
-        
         const taxYear = taxService.getTaxYearStartEnd(specifiedYear);
         const currentMonthlyReturn = taxService.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
 
         const filteredReceipts = processedReceipts.filter(receipt => {
-            if (!receipt.Payments) return false;
-
             const payments = Array.isArray(receipt.Payments) ? receipt.Payments : [];
             const payment = payments.find(p => p.PayDate);
 
@@ -949,53 +930,47 @@ const renderCISDashboard = async (req, res, next) => {
         });
 
         const receiptsWithLabourAndCIS = filteredReceipts.filter(receipt => {
-
-            const hasLabourAndCIS = receipt.Lines.reduce((acc, line) => {
-                if (line.ChargeType === 18685897) acc.hasLabour = true;
-                if (line.ChargeType === 18685964) acc.hasCIS = true;
-                return acc;
-            }, { hasLabour: false, hasCIS: false });
-
-            return hasLabourAndCIS.hasLabour && hasLabourAndCIS.hasCIS;
+            return receipt.Lines?.some(line => line.ChargeType === 18685897) &&
+                   receipt.Lines?.some(line => line.ChargeType === 18685964);
         });
 
-        const SupplierIDs = [...new Set(receiptsWithLabourAndCIS.map(receipt => receipt.CustomerID))];
-        const supplierIDSet = new Set(SupplierIDs);
-        const filteredSuppliers = suppliers.filter(supplier => supplierIDSet.has(supplier.SupplierID));
+        const supplierIDSet = new Set(receiptsWithLabourAndCIS.map(r => r.CustomerID));
+        const filteredSuppliers = suppliers.filter(s => supplierIDSet.has(s.SupplierID));
 
         const supplierTotals = {};
-        receiptsWithLabourAndCIS.forEach(receipt => {
+        for (const receipt of receiptsWithLabourAndCIS) {
             const customerId = String(receipt.CustomerID);
+            supplierTotals[customerId] ??= {
+                grossAmount: 0,
+                materialsCost: 0,
+                cisDeductions: 0,
+                labourCost: 0,
+                reverseChargeVAT: 0,
+                reverseChargeNet: 0,
+            };
 
-            if (!supplierTotals[customerId]) {
-                supplierTotals[customerId] = {
-                    grossAmount: 0,
-                    materialsCost: 0,
-                    cisDeductions: 0,
-                    labourCost: 0,
-                    reverseChargeVAT: 0,
-                    reverseChargeNet: 0,
-                };
+            for (const line of receipt.Lines) {
+                const value = parseFloat(line.Rate * line.Quantity || 0);
+                if (line.ChargeType === 18685896) supplierTotals[customerId].materialsCost += value;
+                if (line.ChargeType === 18685897) supplierTotals[customerId].labourCost += value;
+                if (line.ChargeType === 18685964) supplierTotals[customerId].cisDeductions += value;
             }
-
-            receipt.Lines.forEach(line => {
-                if (line.ChargeType === 18685896) supplierTotals[customerId].materialsCost += parseFloat(line.Rate * line.Quantity || 0);
-                if (line.ChargeType === 18685897) supplierTotals[customerId].labourCost += parseFloat(line.Rate * line.Quantity || 0);
-                if (line.ChargeType === 18685964) supplierTotals[customerId].cisDeductions += parseFloat(line.Rate * line.Quantity || 0);
-            });
 
             supplierTotals[customerId].reverseChargeVAT += parseFloat(receipt.CISRCVatAmount || 0);
             supplierTotals[customerId].reverseChargeNet += parseFloat(receipt.CISRCNetAmount || 0);
-            supplierTotals[customerId].grossAmount = supplierTotals[customerId].materialsCost + supplierTotals[customerId].labourCost;
-        });
+            supplierTotals[customerId].grossAmount =
+                supplierTotals[customerId].materialsCost + supplierTotals[customerId].labourCost;
+        }
 
-        const allReceiptsSubmitted = receiptsWithLabourAndCIS.every(receipt => receipt.SubmissionDate && receipt.SubmissionDate !== '0000-00-00 00:00:00');
-        const submissionDate = allReceiptsSubmitted && receiptsWithLabourAndCIS.length > 0 ? receiptsWithLabourAndCIS[0].SubmissionDate : null;
-        
-        // Handle CIS month wraparound manually
+        const allReceiptsSubmitted = receiptsWithLabourAndCIS.every(
+            r => r.SubmissionDate && r.SubmissionDate !== '0000-00-00 00:00:00'
+        );
+        const submissionDate = allReceiptsSubmitted && receiptsWithLabourAndCIS.length > 0
+            ? receiptsWithLabourAndCIS[0].SubmissionDate
+            : null;
+
         const previousMonth = specifiedMonth === 1 ? 12 : specifiedMonth - 1;
         const previousYear = specifiedMonth === 1 ? specifiedYear - 1 : specifiedYear;
-
         const nextMonth = specifiedMonth === 12 ? 1 : specifiedMonth + 1;
         const nextYear = specifiedMonth === 12 ? specifiedYear + 1 : specifiedYear;
 

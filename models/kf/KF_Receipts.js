@@ -95,7 +95,7 @@ module.exports = (sequelize, DataTypes) => {
                     try {
                         this.setDataValue('Lines', JSON.parse(value));
                     } catch (error) {
-                        console.error('Failed to parse JSON for Lines:', error);
+                        logger.error('Failed to parse JSON for Lines:', error);
                         this.setDataValue('Lines', []);
                     }
                 } else {
@@ -127,7 +127,7 @@ module.exports = (sequelize, DataTypes) => {
                     try {
                         this.setDataValue('Payments', JSON.parse(value));
                     } catch (error) {
-                        console.error('Failed to parse JSON for Payments:', error);
+                        logger.error('Failed to parse JSON for Payments:', error);
                         this.setDataValue('Payments', []);
                     }
                 } else {

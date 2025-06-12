@@ -95,7 +95,7 @@ const getIncomeExpenseData = async (db) => {
 
         return incomeExpenseData;
     } catch (error) {
-        console.error('Error generating incomeExpenseData:', error);
+        logger.error('Error generating incomeExpenseData:', error);
         throw error;
     }
 };
