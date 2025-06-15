@@ -39,6 +39,7 @@ app.use(require('./services/rateLimiterService'));
 app.use(require('./services/cronService'));
 const db = require('./services/sequelizeDatabaseService');
 const kf = require('./services/kashflowDatabaseService');
+const mdb = require('./services/mongooseDatabaseService');
 
 app.use(async (req, res, next) => {
     res.locals.session = req.session;
@@ -202,7 +203,8 @@ const yearlyReturns = require('./controllers/yearlyReturns');
 const dailyAttendance = require('./controllers/dailyAttendance');
 const weeklyAttendance = require('./controllers/weeklyAttendance');
 
-const kashflowRoutes = require('./kf/routes')
+const kashflowRoutes = require('./kf/routes');
+const kashflowRoutesMongoose = require('./kf/mongoose/routes');
 
 //const verificationRoutes = require('./controllers/renderVerification');
 
@@ -219,6 +221,8 @@ const kashflowMonthlyReturns = require('./controllers/kashflowMonthlyReturns');
 const kashflowYearlyReturns = require('./controllers/kashflowYearlyReturns');
 
 const adminLogger = require('./controllers/admin/logger');
+
+const testMongoose = require('./controllers/mongoose/receipts');
 
 app.use('/', index);
 
@@ -258,6 +262,7 @@ app.use('/attendance', dailyAttendance);
 app.use('/attendance', weeklyAttendance);
 
 app.use('/', kashflowRoutes);
+app.use('/', kashflowRoutesMongoose);
 
 //app.use('/verify', verificationRoutes);
 
@@ -282,6 +287,8 @@ app.use('/kashflow/yearly', kashflowYearlyReturns);
 
 app.use('/', adminLogger);
 
+app.use('/', testMongoose);
+
 // Catch undefined routes (404 handler)
 
 app.use((req, res, next) => {
@@ -292,6 +299,16 @@ app.use((req, res, next) => {
 
 // Register the error handler
 app.use(require('./services/errorHandlerService'));
+
+const { ensureUUIDs } = require('./services/uuidCheckService');
+
+ensureUUIDs()
+  .then(() => {
+    console.log('UUID check complete.');
+  })
+  .catch((err) => {
+    console.error('Error running UUID check:', err);
+  });
 
 const port = process.env.NODE_ENV === 'development' ? 80 : 443;
 const host = process.env.NODE_ENV === 'development' ? '127.0.0.1' : '0.0.0.0';

@@ -1,16 +1,17 @@
+// models/mongoose/KF_Receipt.js
 const mongoose = require('mongoose');
 
-const receiptSchema = new mongoose.Schema({
-  InvoiceDBID: Number,
+const ReceiptSchema = new mongoose.Schema({
+  uuid: { type: String, unique: true, required: true },
+  InvoiceDBID: { type: Number, unique: true, required: true },
   InvoiceNumber: Number,
   InvoiceDate: Date,
   DueDate: Date,
   Customer: String,
-  CustomerID: Number,
+  CustomerID: { type: Number, unique: true, required: true },
   Paid: Number,
   CustomerReference: String,
   EstimateCategory: String,
-  SuppressTotal: Number,
   ProjectID: Number,
   CurrencyCode: String,
   ExchangeRate: Number,
@@ -19,21 +20,20 @@ const receiptSchema = new mongoose.Schema({
   AmountPaid: Number,
   CustomerName: String,
   PermaLink: String,
-  DeliveryAddress: {
-    Name: String,
-    Line1: String,
-    Line2: String,
-    Line3: String,
-    Line4: String,
-    PostCode: String,
-    CountryName: String,
-    CountryCode: String
-  },
+  DeliveryAddress: mongoose.Schema.Types.Mixed,
   UseCustomDeliveryAddress: Boolean,
   CISRCNetAmount: Number,
   CISRCVatAmount: Number,
-  IsCISReverseCharge: Boolean
+  IsCISReverseCharge: Boolean,
+  ReadableString: String,
+  SubmissionDate: Date,
+  TaxMonth: Number,
+  TaxYear: Number,
+
+  Payments: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  Lines: { type: [mongoose.Schema.Types.Mixed], default: [] }
+}, { 
+  timestamps: true 
 });
 
-const Receipt = mongoose.model('Receipt', receiptSchema);
-module.exports = Receipt;
+module.exports = mongoose.model('receipt', ReceiptSchema);

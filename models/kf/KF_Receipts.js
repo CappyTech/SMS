@@ -127,7 +127,7 @@ module.exports = (sequelize, DataTypes) => {
                     try {
                         this.setDataValue('Payments', JSON.parse(value));
                     } catch (error) {
-                        logger.error('Failed to parse JSON for Payments:', error);
+                        logger.error('Failed to parse JSON for Payments: '+ error);
                         this.setDataValue('Payments', []);
                     }
                 } else {
@@ -135,8 +135,7 @@ module.exports = (sequelize, DataTypes) => {
                 }
             },
             get() {
-                const value = this.getDataValue('Payments');
-                return value || [];
+                return this.getDataValue('Payments') || [];
             }
         },
         TaxMonth : {

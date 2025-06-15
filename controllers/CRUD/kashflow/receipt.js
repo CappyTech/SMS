@@ -5,7 +5,9 @@ const moment = require('moment');
 const path = require('path');
 const kf = require('../../../services/kashflowDatabaseService');
 const authService = require('../../../services/authService');
-const kashflowNormalizer = require('../../../services/kashflowNormalizer');
+const normalizePayments = require('../../../services/kashflowNormalizer').normalizePayments;
+const getReceiptPayment = require('../../../kf/getReceiptPayment');
+const authenticate = require('../../../kf/autoAuth');
 
 const readReceipt = async (req, res, next) => {
     try {
@@ -13,32 +15,25 @@ const readReceipt = async (req, res, next) => {
         const Receipt = await kf.KF_Receipts.findByPk(req.params.uuid, {
             include: [{ model: kf.KF_Suppliers, as: 'supplier' }],
         });
-        //logger.info('Receipt Data: ' + JSON.stringify(Receipt, null, 2));
+        logger.debug('Receipt Data: ' + JSON.stringify(Receipt, null, 2));
         
         if (!Receipt) {
             req.flash('error', 'Receipt not found.');
             return res.redirect('/dashboard/KFreceipt');
         }
 
-        const ChargeTypes = require('./chargeTypes.json');
+        const context = `read receipt  - working on: ${Receipt.supplier.Name} (${Receipt.InvoiceNumber})`;
+        const client = await authenticate(context);
+        const receiptPayments = await getReceiptPayment(client, Receipt.InvoiceNumber);
+        logger.debug('Receipt Payments: ' + JSON.stringify(receiptPayments, null, 2));
 
-        // Group Line Items by Charge Type for easier rendering in the view
-        Object.keys(ChargeTypes).forEach(type => {
-            Receipt[ChargeTypes[type]] = Receipt.Lines.filter(line => line.ChargeType === parseInt(type));
-        });
-
-        const projectIds = Receipt.Lines.map(line => line.ProjID).filter(id => id);
-
-        const Projects = await kf.KF_Projects.findAll({
-            where: { ID: projectIds },
-        });
+        const flatPayments = normalizePayments(Receipt.Payments);
+        await Receipt.update({ Payments: flatPayments });
 
         res.render(path.join('kashflow', 'viewReceipt'), {
             title: 'Receipt Overview',
             Receipt: Receipt,
-            ChargeTypes,
-            Supplier: Receipt.supplier,
-            Projects,
+            Supplier: Receipt.supplier
         });
     } catch (error) {
         logger.error('Error reading KashFlow Receipt: ' + error.message);

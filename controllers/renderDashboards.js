@@ -11,6 +11,7 @@ const authService = require('../services/authService');
 const kf = require('../services/kashflowDatabaseService');
 const ChargeTypes = require('./CRUD/kashflow/chargeTypes.json');
 const { where } = require('sequelize');
+const { log } = require('console');
 
 const renderStatsDashboard = async (req, res, next) => {
     try {
@@ -784,22 +785,15 @@ const renderCISSubmissionDashboard = async (req, res, next) => {
         // Log one of the receipts in full, JSON Parse
         if (receipts.length > 0) {
             const receiptToLog = receipts[0];
-            const parsedReceipt = typeof receiptToLog.Lines === 'string' ? JSON.parse(receiptToLog.Lines) : receiptToLog.Lines;
-            const parsedPayments = typeof receiptToLog.Payments === 'string' ? JSON.parse(receiptToLog.Payments) : receiptToLog.Payments;
-            logger.info('Receipt:'+ JSON.stringify({ ...receiptToLog.toJSON(), Lines: parsedReceipt, Payments: parsedPayments }, null, 2));
+            logger.info('Receipt:'+ JSON.stringify({ ...receiptToLog.toJSON(), Lines: receiptToLog.Lines, Payments: receiptToLog.Payments }, null, 2));
         }
         // Filter receipts based on the CIS period using PayDate
         const filteredReceipts = receipts.filter(receipt => {
             if (!receipt.Payments) return false;
 
-            // Parse Payments if it's a string
-            const parsedPayments = typeof receipt.Payments === 'string' ? JSON.parse(receipt.Payments) : receipt.Payments;
+            if (!receipt.Payments?.Payment?.[0] || !receipt.Payments?.Payment?.[0].PayDate) return false;
 
-            // Extract the PayDate from the Payments
-            const payment = parsedPayments.Payment?.Payment?.[0];
-            if (!payment || !payment.PayDate) return false;
-
-            const payDate = moment(payment.PayDate);
+            const payDate = moment(receipt.Payments.Payment[0].PayDate);
             return payDate.isBetween(
                 currentMonthlyReturn.periodStart,
                 currentMonthlyReturn.periodEnd,
@@ -913,21 +907,49 @@ const renderCISDashboard = async (req, res, next) => {
         }
 
         const suppliers = await kf.KF_Suppliers.findAll({ order: [['Name', 'ASC']] });
-        const receipts = await kf.KF_Receipts.findAll({ order: [['InvoiceNumber', 'ASC']] });
-        const processedReceipts = receipts.map(r => r.toJSON());
+        const receipts = await kf.KF_Receipts.findAll({
+            where: {
+                TaxYear: specifiedYear,
+                TaxMonth: specifiedMonth,
+            },
+            order: [['InvoiceNumber', 'ASC']],
+        });
 
         const taxYear = taxService.getTaxYearStartEnd(specifiedYear);
         const currentMonthlyReturn = taxService.getCurrentMonthlyReturn(specifiedYear, specifiedMonth);
 
-        const filteredReceipts = processedReceipts.filter(receipt => {
+        logger.info(`Rendering CIS Dashboard for Year: ${specifiedYear}, Month: ${specifiedMonth}`);
+        logger.debug(`Current Monthly Return: ${JSON.stringify(currentMonthlyReturn, null, 2)}`);
+        logger.debug(`Total Receipts: ${receipts.length}`);
+        logger.debug(`Total Suppliers: ${suppliers.length}`);
+        logger.debug(
+        'Receipts Sample: ' +
+            JSON.stringify(
+            receipts.slice(0, 5).map(r => ({
+                InvoiceNumber: r.InvoiceNumber,
+                Lines: r.Lines,
+                Payments: r.Payments,
+            })),
+            null,
+            2
+            )
+        );
+
+        const skippedReceipts = [];
+        const filteredReceipts = receipts.filter(receipt => {
             const payments = Array.isArray(receipt.Payments) ? receipt.Payments : [];
-            const payment = payments.find(p => p.PayDate);
+            const paymentWithDate = payments.find(p => p?.PayDate);
 
-            if (!payment) return false;
+            if (!paymentWithDate?.PayDate) {
+                skippedReceipts.push(receipt.InvoiceNumber);
+                return false;
+            }
 
-            const payDate = moment.tz(payment.PayDate, 'Europe/London');
+            const payDate = moment.tz(paymentWithDate.PayDate, 'Europe/London');
             return payDate.isBetween(currentMonthlyReturn.periodStart, currentMonthlyReturn.periodEnd, null, '[]');
         });
+
+        logger.info(`Skipped receipts with missing PayDate: ${skippedReceipts.join(', ')}`);
 
         const receiptsWithLabourAndCIS = filteredReceipts.filter(receipt => {
             return receipt.Lines?.some(line => line.ChargeType === 18685897) &&
@@ -977,6 +999,8 @@ const renderCISDashboard = async (req, res, next) => {
         const periodEnd = moment(currentMonthlyReturn.periodEndDisplay, 'Do MMMM YYYY');
         const submissionStartDate = periodEnd.clone().date(7).format('Do MMMM YYYY');
         const submissionEndDate = periodEnd.clone().date(11).format('Do MMMM YYYY');
+
+        logger.debug('Receipts with Labour and CIS: '+ JSON.stringify(receiptsWithLabourAndCIS, null, 2));
 
         res.render(path.join('kashflow', 'cisDashboard'), {
             title: 'CIS Submission Dashboard',

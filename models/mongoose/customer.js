@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
+  uuid: { type: String, unique: true, required: true },
   CustomerID: Number,
   Code: String,
   Name: String,
@@ -20,5 +21,5 @@ const customerSchema = new mongoose.Schema({
   Updated: Date,
 });
 
-const Customer = mongoose.model('Customer', customerSchema);
+const Customer = mongoose.model('customer', customerSchema);
 module.exports = Customer;

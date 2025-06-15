@@ -1,6 +1,8 @@
-
 function normalizePayments(payments) {
-  if (Array.isArray(payments)) return payments;
+  // Already normalized (array of payment objects)
+  if (Array.isArray(payments) && payments.every(p => typeof p === 'object' && 'PayAmount' in p)) {
+    return payments;
+  }
 
   if (Array.isArray(payments?.Payment?.Payment)) {
     return payments.Payment.Payment;
@@ -14,7 +16,6 @@ function normalizePayments(payments) {
 
   return [];
 }
-
 module.exports = {
   normalizePayments
 };

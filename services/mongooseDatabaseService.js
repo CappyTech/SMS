@@ -1,26 +1,27 @@
 'use strict';
 
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
 const logger = require('./loggerService');
 const basename = path.basename(__filename);
-const db = {};
+const mdb = {};
 
 // Connect to MongoDB
-const mongoURI = process.env.MONGO_URI || `mongodb://localhost:27017/${process.env.DB_DATABASE}`;
+const mongoURI = process.env.MONGO_URI;
 mongoose
     .connect(mongoURI, {
+        
     })
     .then(() => {
         if (process.env.DEBUG) {
-            //logger.info('Mongo Database connection has been established successfully.');
+            logger.info('Mongo Database connection has been established successfully.');
         }
     })
     .catch((error) => {
-        logger.error('Unable to connect to the Mongo database: ', error.message);
-        logger.error('Details:', error);
+        logger.error('Unable to connect to the Mongo database: '+ error.message);
+        logger.error('Details:'+ error);
     });
 
 // Dynamically load all models from the models directory
@@ -36,9 +37,9 @@ fs.readdirSync(modelsDirectory)
     })
     .forEach((file) => {
         const model = require(path.join(modelsDirectory, file));
-        db[model.modelName] = model;
+        mdb[model.modelName] = model;
         logger.info(`Mongoose Model Loaded: ${model.modelName}`);
     });
 
 // Export the database object with models
-module.exports = db;
+module.exports = mdb;

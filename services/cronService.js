@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 require('dotenv').config();
 const fetchKF = require('../kf/fetchKashFlowData');
+const fetchKFMongoose = require('../kf/mongoose/fetchKashFlowDataMongoose');
 const holidayService = require('../services/holidayService');
 const logger = require('./loggerService');
 
@@ -17,8 +18,11 @@ module.exports = (req, res, next) => {
   // Schedule KashFlow sync
   cron.schedule(scheduleKashFlowData, async () => {
     try {
-      logger.info('Cron job started: Fetching KashFlow data...');
+      logger.info('Cron job started: Fetching KashFlow data... to MySQL...');
       await fetchKF.fetchKashFlowData();
+      logger.info('Cron job completed: KashFlow data fetched successfully.');
+      logger.info('Cron job started: Fetching KashFlow data... to MongoDB...');
+      await fetchKFMongoose.fetchKashFlowDataMongoose();
       logger.info('Cron job completed: KashFlow data fetched successfully.');
     } catch (error) {
       logger.error('Cron job (fetchKashFlowData) failed: ' + error.message);

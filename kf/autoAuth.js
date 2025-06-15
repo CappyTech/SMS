@@ -1,5 +1,6 @@
 const soap = require('soap');
-require('dotenv').config({ path: '../.env' });
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const logger = require('../services/loggerService');
 
 function authenticate(context = 'main thread') {
@@ -25,12 +26,12 @@ function authenticate(context = 'main thread') {
           return reject(err);
         }
 
-        if (result.Status === 'OK') {
+        if (result?.Status === 'OK') {
           logger.info(`[${context}] AutoAuthIP successful.`);
           return resolve(client);
         } else {
-          logger.error(`[${context}] AutoAuthIP failed: ${result.StatusDetail}`);
-          return reject(new Error(result.StatusDetail));
+          logger.error(`[${context}] AutoAuthIP failed: ${result?.StatusDetail}`);
+          return reject(new Error(result?.StatusDetail));
         }
       });
     });

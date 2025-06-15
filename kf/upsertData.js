@@ -1,7 +1,7 @@
 // upsertdata.js
 const fs = require('fs');
-const path = require('path');
 const logger = require('../services/loggerService');
+const mdb = require('../services/mongooseDatabaseService');
 
 const PLACEHOLDER_DATES = [
   "0001-01-01T00:00:00.000Z",
@@ -101,6 +101,20 @@ async function upsertData(model, data, uniqueKey, metaModel, logDetails, logFile
         };
         logDetails.push(logEntry);
         await appendLogEntry(logFilePath, logEntry);
+        /*
+          * MongoDB Upsert
+          * If the item is new, we will upsert it into MongoDB as well.
+        */
+        try {
+          // Attempt to upsert into MongoDB
+          await mdb.KF_Receipt.updateOne(
+            { InvoiceDBID: item.InvoiceDBID },
+            { $set: item },
+            { upsert: true }
+          );
+        } catch (e) {
+          logger.error(`❌ Mongo sync error for InvoiceDBID ${item.InvoiceDBID}: ${e.message}`);
+        }
       }
     }
 

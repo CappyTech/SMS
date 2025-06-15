@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
+  uuid: { type: String, unique: true, required: true },
   ID: Number,
   Number: Number,
   Name: String,
@@ -12,5 +13,5 @@ const projectSchema = new mongoose.Schema({
   Status: Number,
 });
 
-const Project = mongoose.model('Project', projectSchema);
+const Project = mongoose.model('project', projectSchema);
 module.exports = Project;

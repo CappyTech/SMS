@@ -25,7 +25,7 @@ sequelize
     .authenticate()
     .then(() => {
         if (process.env.DEBUG) {
-            //logger.info('MySQL Database connection has been established successfully.');
+            logger.info('MySQL Database connection has been established successfully.');
         }
     })
     .catch((error) => {

@@ -16,7 +16,7 @@ function getReceiptPayment(client, receiptNumber) {
 
       // Safely handle the response structure
       const receiptPayments = result?.GetReceiptPaymentResult;
-
+      //logger.debug('GetReceiptPayment raw result: ' + JSON.stringify(receiptPayments, null, 2));
       if (receiptPayments) {
         resolve(receiptPayments);
       } else {

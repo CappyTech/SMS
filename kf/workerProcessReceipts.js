@@ -8,6 +8,9 @@ const getReceiptNotes = require('./getReceiptNotes');
 const taxService = require('../services/taxService');
 const createDbConnection = require('../services/kashflowDatabaseService').createDbConnection;
 const normalizePayments = require('../services/kashflowNormalizer').normalizePayments;
+const upsertDataMongoose = require('./mongoose/upsertDataMongoose');
+const mdb = require('../services/mongooseDatabaseService');
+
 function mapLine(line) {
   return {
       LineID: line.LineID,
@@ -88,18 +91,28 @@ const workerDebugLog = async (supplierName, message) => {
 
       db = createDbConnection();
       await upsertData(
-          db.KF_Receipts,
-          transformedReceipts,
-          'InvoiceDBID',
-          db.KF_Meta,
-          [],
-          './logs/receipts.txt',
-          (msg) => parentPort.postMessage(msg),
-          startfetch
-        );
-    
-        await workerDebugLog(supplier.Name, `✅ Upserted ${transformedReceipts.length} receipts for ${supplier.Name}`);
-        parentPort.postMessage({ type: 'done', result: transformedReceipts });
+        db.KF_Receipts,
+        transformedReceipts,
+        'InvoiceDBID',
+        db.KF_Meta,
+        [],
+        './logs/receipts.txt',
+        (msg) => parentPort.postMessage(msg),
+        startfetch
+      );
+      await upsertDataMongoose(
+        mdb.KF_Receipt,
+        transformedReceipts,
+        'InvoiceDBID',
+        mdb.KF_Meta,
+        [],
+        './logs/receipts_mongoose.txt',
+        (msg) => parentPort.postMessage(msg),
+        startfetch
+      );
+      await workerDebugLog(supplier.Name, `📥 Upserted ${transformedReceipts.length} receipts for ${supplier.Name}`);
+
+      parentPort.postMessage({ type: 'done', result: transformedReceipts });
       } catch (err) {
         const errMsg = `❌ Error processing receipts for ${supplier.Name}: ${err.message}`;
         await workerDebugLog(supplier.Name, errMsg);
