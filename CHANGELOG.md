@@ -2,6 +2,13 @@
 
 All notable changes to hcs-app will be documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [6.34.0] - 2026-08-28
+
+### Added
+- **Reassign a KashFlow link onto a replacement Paperless document.** The OCR match page handled the KashFlow-side case — a linked purchase deleted in KashFlow shows the "purchase not found in REST" panel and lets you re-link to another purchase — but had no symmetric handling for the Paperless side. When a document was deleted in Paperless and the same invoice re-uploaded under a new Paperless ID, the KashFlow link was stranded on the dead record and the custom-field write-back 404'd against the missing doc.
+
+  Added the mirror-image flow. `POST /paperless/ocr/:id/reassign` (`reassignPaperlessDocument`) moves the KashFlow linkage and send history onto the replacement document — fetching it from Paperless on demand if it hasn't been ingested yet — writes the KashFlow custom fields back onto the live copy, and removes the dead record (or clears its linkage and Paperless fields if it unexpectedly still exists). The match page and the document read page now show a "deleted in Paperless" banner when a document is flagged `deletedInPaperlessAt`, and the match page's **Replacement Document** panel takes the new Paperless ID.
+
 ## [6.33.0] - 2026-08-21
 
 ### Changed

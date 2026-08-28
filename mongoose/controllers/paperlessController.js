@@ -1819,6 +1819,140 @@ export const unlinkKashflow = async (req, res, next) => {
   }
 };
 
+/**
+ * POST /paperless/ocr/:paperlessId/reassign — re-point this document's KashFlow
+ * linkage onto a DIFFERENT (replacement) Paperless document.
+ *
+ * Use case: the original Paperless document was deleted and the same invoice was
+ * re-uploaded under a new Paperless ID. The KashFlow purchase link (and send
+ * history) needs to move from the dead record onto the live replacement, and the
+ * dead record cleaned up — none of which the KashFlow-only match flow handles.
+ *
+ * Body: { newPaperlessId }
+ */
+export const reassignPaperlessDocument = async (req, res, next) => {
+  try {
+    await mdb.connect();
+    const { OcrDocument, OcrDocumentIngest } = mdb.PAPERLESS;
+    const oldId = parseInt(req.params.paperlessId, 10);
+    const newId = parseInt(req.body.newPaperlessId, 10);
+
+    if (!Number.isFinite(oldId)) {
+      return res.status(400).render('error', { message: 'Invalid paperlessId' });
+    }
+    if (!Number.isFinite(newId)) {
+      req.flash('error', 'Enter the replacement Paperless document ID.');
+      return res.redirect(`/paperless/ocr/${oldId}/match`);
+    }
+    if (newId === oldId) {
+      req.flash('error', 'The replacement document ID must be different from this one.');
+      return res.redirect(`/paperless/ocr/${oldId}/match`);
+    }
+
+    const oldDoc = await OcrDocument.findOne({ paperlessId: oldId }).lean();
+    if (!oldDoc) {
+      req.flash('error', `Document #${oldId} not found in MongoDB.`);
+      return res.redirect('/overview/documents');
+    }
+
+    // Ensure the replacement exists in Mongo and reflects the live Paperless doc.
+    // Fetch on demand when it hasn't been grabbed yet, or when our copy is flagged
+    // deleted-in-Paperless (a stale flag would otherwise block the reassign).
+    let newDoc = await OcrDocument.findOne({ paperlessId: newId }).lean();
+    if (!newDoc || newDoc.deletedInPaperlessAt) {
+      try {
+        await ingestOnePaperlessDoc(newId);
+      } catch (e) {
+        const msg = e?.status === 404
+          ? `Replacement document #${newId} was not found in Paperless. Check the ID and try again.`
+          : `Could not fetch replacement document #${newId} from Paperless: ${e.message}`;
+        req.flash('error', msg);
+        return res.redirect(`/paperless/ocr/${oldId}/match`);
+      }
+      newDoc = await OcrDocument.findOne({ paperlessId: newId }).lean();
+    }
+    if (!newDoc) {
+      req.flash('error', `Replacement document #${newId} could not be loaded.`);
+      return res.redirect(`/paperless/ocr/${oldId}/match`);
+    }
+    if (newDoc.deletedInPaperlessAt) {
+      req.flash('error', `Replacement document #${newId} is itself deleted in Paperless.`);
+      return res.redirect(`/paperless/ocr/${oldId}/match`);
+    }
+
+    // Carry the KashFlow linkage + send history from the old record onto the new one.
+    const linkage = {
+      kashflowPurchaseId:     oldDoc.kashflowPurchaseId ?? null,
+      kashflowPurchaseNumber: oldDoc.kashflowPurchaseNumber ?? null,
+      kashflowPermalink:      oldDoc.kashflowPermalink ?? null,
+      lastSentAt:             oldDoc.lastSentAt ?? null,
+      lastSendMode:           oldDoc.lastSendMode ?? null,
+      lastSendStatus:         oldDoc.lastSendStatus ?? null,
+      modifiedAtLastSend:     oldDoc.modifiedAtLastSend ?? null,
+    };
+    const update = { $set: linkage };
+    if (typeof oldDoc.sendCount === 'number') {
+      update.$max = { sendCount: oldDoc.sendCount };
+    }
+    await OcrDocument.updateOne({ paperlessId: newId }, update);
+
+    // Write the KashFlow custom fields onto the live replacement doc, so the
+    // Paperless-side record matches (mirrors postMatchPurchase's write-back).
+    if (linkage.kashflowPurchaseId != null || linkage.kashflowPurchaseNumber != null) {
+      try {
+        await updatePaperlessWithKashFlowInfo(
+          newId,
+          {
+            Id:        linkage.kashflowPurchaseId,
+            Number:    linkage.kashflowPurchaseNumber,
+            Permalink: linkage.kashflowPermalink,
+          },
+          linkage.lastSendStatus ?? 200,
+          { existingCf: newDoc.customFields || [] },
+        );
+      } catch (cfErr) {
+        logger.warn(`[reassign] CF write-back failed for paperlessId=${newId}: ${cfErr.message}`);
+      }
+      // Re-ingest so our copy reflects the freshly written custom fields.
+      try {
+        await ingestOnePaperlessDoc(newId);
+      } catch (ingestErr) {
+        logger.warn(`[reassign] Re-ingest failed for paperlessId=${newId}: ${ingestErr.message}`);
+      }
+    }
+
+    // Clean up the old record. If it is genuinely gone from Paperless, drop the
+    // Mongo copy (matching removeDeletedOcrDocument). If it somehow still exists,
+    // just clear its linkage so two docs don't both claim the same purchase.
+    if (oldDoc.deletedInPaperlessAt) {
+      await Promise.all([
+        OcrDocument.deleteOne({ paperlessId: oldId }),
+        OcrDocumentIngest.deleteOne({ paperlessId: oldId }),
+      ]);
+    } else {
+      await OcrDocument.updateOne(
+        { paperlessId: oldId },
+        { $set: { kashflowPurchaseId: null, kashflowPurchaseNumber: null, kashflowPermalink: null } },
+      );
+      try {
+        await clearPaperlessKashFlowFields(oldId, oldDoc.customFields || []);
+      } catch (clearErr) {
+        logger.warn(`[reassign] Could not clear KashFlow fields on old doc ${oldId}: ${clearErr.message}`);
+      }
+    }
+
+    const purchaseLabel = linkage.kashflowPurchaseNumber != null
+      ? `KashFlow purchase #${linkage.kashflowPurchaseNumber}`
+      : 'the KashFlow link';
+    logger.info(`[reassign] Moved ${purchaseLabel} from paperlessId=${oldId} → paperlessId=${newId}`);
+    req.flash('success', `Reassigned ${purchaseLabel} from deleted document #${oldId} to document #${newId}.`);
+    res.redirect(`/paperless/ocr/${newId}`);
+  } catch (err) {
+    logger.error(`reassignPaperlessDocument error for paperlessId=${req.params.paperlessId}: ${err.message}`);
+    next(err);
+  }
+};
+
 /** POST /paperless/clear-orphans — manually trigger an orphan-link sweep (runs in background) */
 let _clearOrphansRunning = false;
 export const clearOrphans = async (req, res) => {
@@ -2327,4 +2461,4 @@ export const deleteOcrDocument = async (req, res, next) => {
   }
 };
 
-export default { listOcr, readOcr, listIngest, triggerGrab, getPurchaseDraft, saveDraftExtraLines, sendDraftToKashflow, searchSuppliers, createSupplier, reIngestOne, getMatchPurchase, postMatchPurchase, unlinkKashflow, clearOrphans, resolveNumbers, matchReferences, repairDrift, syncPaperlessFields, removeDeletedOcrDocument, deleteOcrDocument };
+export default { listOcr, readOcr, listIngest, triggerGrab, getPurchaseDraft, saveDraftExtraLines, sendDraftToKashflow, searchSuppliers, createSupplier, reIngestOne, getMatchPurchase, postMatchPurchase, unlinkKashflow, reassignPaperlessDocument, clearOrphans, resolveNumbers, matchReferences, repairDrift, syncPaperlessFields, removeDeletedOcrDocument, deleteOcrDocument };

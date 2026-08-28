@@ -32,6 +32,7 @@ router.post("/paperless/ocr/:paperlessId/draft/extra-lines", ...paperlessGuard, 
 router.post("/paperless/ocr/:paperlessId/ingest", ...paperlessGuard, ctrl.reIngestOne);
 router.post("/paperless/ocr/:paperlessId/sync-fields", ...paperlessGuard, ctrl.syncPaperlessFields);
 router.post("/paperless/ocr/:paperlessId/unlink", ...paperlessGuard, ctrl.unlinkKashflow);
+router.post("/paperless/ocr/:paperlessId/reassign", ...paperlessGuard, ctrl.reassignPaperlessDocument);
 router.delete("/paperless/ocr/:paperlessId", ...paperlessGuard, ctrl.deleteOcrDocument);
 router.post("/paperless/ocr/:paperlessId/remove", ...paperlessGuard, ctrl.removeDeletedOcrDocument);
 router.get("/paperless/suppliers", ...paperlessGuard, ctrl.searchSuppliers);
