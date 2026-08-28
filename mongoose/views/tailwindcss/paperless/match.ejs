@@ -15,6 +15,15 @@
     <div class="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 text-sm text-green-800 dark:text-green-300"><%= flash.success[0] %></div>
   <% } %>
 
+  <%# ── Deleted-in-Paperless banner ────────────────────────────────────────── %>
+  <% if (doc.deletedInPaperlessAt) { %>
+    <div class="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 text-sm text-red-800 dark:text-red-300">
+      <div class="font-semibold flex items-center gap-1"><i class="bi bi-trash3-fill"></i> This document was deleted in Paperless</div>
+      <div class="mt-1">It is no longer available in Paperless (noticed <%= new Date(doc.deletedInPaperlessAt).toLocaleString('en-GB') %>). If the same invoice was
+        re-uploaded under a new Paperless ID, use <strong>Reassign to a replacement document</strong> below to move the KashFlow link onto the live copy.</div>
+    </div>
+  <% } %>
+
   <div class="grid lg:grid-cols-5 gap-6">
 
     <%# ── Left: document details ──────────────────────────────────────────────── %>
@@ -83,6 +92,30 @@
                class="text-xs text-green-700 dark:text-green-400 hover:underline">Open in KashFlow ↗</a>
           </div>
         <% } %>
+      </div>
+
+      <%# ── Reassign to a replacement Paperless document ─────────────────────── %>
+      <div class="rounded-2xl border shadow-sm p-4
+        <% if (doc.deletedInPaperlessAt) { %>border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20<% } else { %>border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900<% } %>">
+        <h2 class="font-semibold text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">Replacement Document</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          If this Paperless document was deleted and the same invoice re-uploaded under a
+          <strong>new Paperless ID</strong>, enter that ID to move the KashFlow link
+          <% if (doc.kashflowPurchaseNumber) { %>(purchase #<%= doc.kashflowPurchaseNumber %>) <% } %>onto the live copy.
+          This document's record will then be removed.
+        </p>
+        <form method="POST" action="/paperless/ocr/<%= doc.paperlessId %>/reassign" class="flex gap-2 flex-wrap items-center">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input name="newPaperlessId" type="number" min="1" step="1" required placeholder="New Paperless ID"
+                 class="flex-1 min-w-0 text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2
+                        bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+          <button type="submit" data-submit-once
+                  onclick="return confirm('Move the KashFlow link to the replacement document and remove this record?');"
+                  class="text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg shadow-sm font-medium transition">
+            Reassign
+          </button>
+        </form>
       </div>
 
     </div>

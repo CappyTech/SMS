@@ -2,6 +2,22 @@
   <a href="/paperless/ocr" class="text-sm text-green-700 dark:text-green-400 hover:underline">← Back to list</a>
   <h1 class="text-2xl font-bold mt-2 mb-4"><%= title %></h1>
 
+  <% if (doc.deletedInPaperlessAt) { %>
+    <div class="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 text-sm text-red-800 dark:text-red-300">
+      <div class="font-semibold flex items-center gap-1"><i class="bi bi-trash3-fill"></i> Deleted in Paperless</div>
+      <div class="mt-1">This document is no longer in Paperless (noticed <%= new Date(doc.deletedInPaperlessAt).toLocaleString('en-GB') %>).
+        <% if (doc.kashflowPurchaseNumber) { %>The KashFlow link (purchase #<%= doc.kashflowPurchaseNumber %>) is stranded on this dead record. <% } %>
+        If the same invoice was re-uploaded under a new Paperless ID, use
+        <a href="/paperless/ocr/<%= doc.paperlessId %>/match" class="underline font-medium hover:no-underline">Match &rarr; Replacement Document</a>
+        to move it onto the live copy. Otherwise you can remove this record.</div>
+      <form method="POST" action="/paperless/ocr/<%= doc.paperlessId %>/remove" class="mt-2"
+            onsubmit="return confirm('Remove this deleted-in-Paperless record from the app?');">
+        <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+        <button type="submit" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-medium">Remove record</button>
+      </form>
+    </div>
+  <% } %>
+
   <div class="grid md:grid-cols-2 gap-4">
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4">
       <h2 class="font-semibold mb-2">Document</h2>
