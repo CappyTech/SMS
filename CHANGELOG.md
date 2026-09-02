@@ -2,6 +2,17 @@
 
 All notable changes to hcs-app will be documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [6.35.0] - 2026-09-02
+
+### Added
+- **Bulk supplier payments at `/payments/bulk` (finance department — admin and accountant).** Select many outstanding purchase invoices and record one payment against them in KashFlow, the write half of the reconciliation story `bankLinkService` already reads (a `purchasebatchpayment` bank line resolved via `PaymentLines.BulkPaymentNumber`). The KashFlow write is `POST /purchases/bulk/payments` (BulkPayment_Create), issued directly from `bulkPaymentService.js` using the same session-token auth (`withKfAuth` + `KfToken`) that the paperless flow uses to create purchases — hcs-sync has no wrapper for it because that service is a read-only mirror by design.
+
+  **The flow is three stateless steps — select, preview, confirm — because this moves real money.** The outstanding list is read from the synced `purchases` mirror, which lags the live KashFlow ledger, so every selected line is re-verified live (`GET /purchases/:number`) at the preview step and **again server-side at the moment of the write**: a line that has since been settled, deleted, or drawn beyond its remaining balance is excluded rather than paid, and if anything shifts between preview and confirm the confirm bounces back rather than silently paying a subset. Amounts are editable per line, defaulting to the full amount due and capped at it.
+
+  **Payment `Method` is a raw KashFlow numeric code with datalist suggestions from past payments**, matching how the paperless purchase draft already handles it. The "pay from" account comes from the synced `bankAccount` collection.
+
+  Every completed run writes a manual `auditLog` entry (`collectionName: 'bulkPayment'`, `op: 'create'`) naming the actor, account, total and purchase numbers — the write lands in KashFlow, not a Mongo model, so the global audit plugin never sees it — and the paid purchases are re-fetched into the mirror immediately so the list and bank reconciliation reflect the payment without waiting for the next sync. The confirm route carries a strict rate limiter on top of CSRF, and `/payments` is pinned to `['admin', 'accountant']` in `rolePermissionsConfig.routeAccess`.
+
 ## [6.34.0] - 2026-08-28
 
 ### Added

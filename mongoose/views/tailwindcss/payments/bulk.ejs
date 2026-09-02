@@ -1,0 +1,210 @@
+<%
+/* Preserve the active filters on pagination links. */
+const qs = (over = {}) => {
+  const p = new URLSearchParams();
+  const merged = { ...filters, page, ...over };
+  Object.entries(merged).forEach(([k, v]) => {
+    if (v !== '' && v != null && k !== 'pageSize') p.set(k, v);
+  });
+  return p.toString();
+};
+const gbp = (n) => '£' + Number(n || 0).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const dISO = (d) => d ? new Date(d).toISOString().slice(0, 10) : '';
+const INPUT = 'text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent';
+%>
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+
+  <div class="flex items-center gap-3 mb-2">
+    <h1 class="text-2xl font-bold">Bulk Supplier Payment</h1>
+    <span class="text-gray-400">/</span>
+    <a href="/bank" class="text-sm text-green-700 dark:text-green-400 hover:underline">Bank reconciliation</a>
+  </div>
+  <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+    Select outstanding purchase invoices and record one payment against them in KashFlow.
+    Amounts are re-checked against the live KashFlow ledger before anything is sent.
+  </p>
+
+  <!-- Filters (GET) -->
+  <form method="GET" action="/payments/bulk" class="flex gap-2 flex-wrap mb-4">
+    <select name="supplierId" class="<%= INPUT %>">
+      <option value="">All suppliers</option>
+      <% (suppliers || []).forEach(s => { %>
+        <option value="<%= s.SupplierId %>" <%= String(filters.supplierId) === String(s.SupplierId) ? 'selected' : '' %>>
+          <%= s.SupplierName %> (<%= s.count %>)
+        </option>
+      <% }); %>
+    </select>
+    <input name="search" value="<%= filters.search %>" placeholder="Invoice #, supplier or reference&hellip;" class="flex-1 min-w-0 <%= INPUT %>" />
+    <input type="date" name="from" value="<%= filters.from %>" class="<%= INPUT %>" title="Issued from" />
+    <input type="date" name="to" value="<%= filters.to %>" class="<%= INPUT %>" title="Issued to" />
+    <button type="submit" class="text-sm font-medium px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600">Filter</button>
+    <% if (filters.supplierId || filters.search || filters.from || filters.to) { %>
+      <a href="/payments/bulk" class="text-sm px-3 py-2 text-gray-500 hover:underline self-center">Clear</a>
+    <% } %>
+  </form>
+
+  <% if (!rows.length) { %>
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-8 text-center text-gray-500 dark:text-gray-400">
+      No outstanding purchase invoices match these filters.
+    </div>
+  <% } else { %>
+
+  <!-- Payment form (POST → preview) -->
+  <form id="pay-form" method="POST" action="/payments/bulk/preview">
+    <%- include('../partials/csrfHidden') %>
+
+    <div class="overflow-x-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+          <tr>
+            <th class="px-3 py-2 text-left w-8"><input type="checkbox" id="select-all" class="align-middle" /></th>
+            <th class="px-3 py-2 text-left">Invoice</th>
+            <th class="px-3 py-2 text-left">Supplier</th>
+            <th class="px-3 py-2 text-left">Issued</th>
+            <th class="px-3 py-2 text-left">Due</th>
+            <th class="px-3 py-2 text-right">Gross</th>
+            <th class="px-3 py-2 text-right">Paid</th>
+            <th class="px-3 py-2 text-right">Outstanding</th>
+            <th class="px-3 py-2 text-right">Pay now</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+          <% rows.forEach(r => { %>
+            <tr class="pay-row hover:bg-gray-50 dark:hover:bg-gray-800/50" data-outstanding="<%= r.outstanding %>">
+              <td class="px-3 py-2">
+                <input type="checkbox" name="selected" value="<%= r.Number %>" class="pay-check align-middle" />
+                <input type="hidden" name="number" value="<%= r.Number %>" />
+              </td>
+              <td class="px-3 py-2 font-medium">
+                #<%= r.Number %>
+                <% if (r.SupplierReference) { %><div class="text-[11px] text-gray-400"><%= r.SupplierReference %></div><% } %>
+              </td>
+              <td class="px-3 py-2"><%= r.SupplierName || '—' %></td>
+              <td class="px-3 py-2 whitespace-nowrap"><%= dISO(r.IssuedDate) || '—' %></td>
+              <td class="px-3 py-2 whitespace-nowrap">
+                <%= dISO(r.DueDate) || '—' %>
+                <% if (Number(r.OverdueDays) > 0) { %>
+                  <span class="ml-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700"><%= r.OverdueDays %>d</span>
+                <% } %>
+              </td>
+              <td class="px-3 py-2 text-right whitespace-nowrap"><%= gbp(r.GrossAmount) %></td>
+              <td class="px-3 py-2 text-right whitespace-nowrap text-gray-500"><%= gbp(r.TotalPaidAmount) %></td>
+              <td class="px-3 py-2 text-right whitespace-nowrap font-semibold"><%= gbp(r.outstanding) %></td>
+              <td class="px-3 py-2 text-right">
+                <input type="number" name="amount" step="0.01" min="0" max="<%= r.outstanding %>"
+                       value="<%= Number(r.outstanding).toFixed(2) %>"
+                       class="pay-amount w-28 text-right <%= INPUT %>" />
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <% if (pages > 1) { %>
+      <div class="flex items-center justify-between mt-3 text-sm">
+        <div class="text-gray-500"><%= total.toLocaleString('en-GB') %> outstanding · page <%= page %> of <%= pages %></div>
+        <div class="flex gap-2">
+          <% if (page > 1) { %><a href="/payments/bulk?<%= qs({ page: page - 1 }) %>" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800">Prev</a><% } %>
+          <% if (page < pages) { %><a href="/payments/bulk?<%= qs({ page: page + 1 }) %>" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800">Next</a><% } %>
+        </div>
+      </div>
+      <p class="text-[11px] text-gray-400 mt-1">Selections and edited amounts apply to this page only.</p>
+    <% } %>
+
+    <!-- Payment settings -->
+    <div class="mt-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-5">
+      <h2 class="text-lg font-semibold mb-4">Payment details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <label class="block">
+          <span class="text-sm text-gray-500 dark:text-gray-400">Pay from account</span>
+          <select name="accountId" required class="mt-1 w-full <%= INPUT %>">
+            <option value="">Choose account&hellip;</option>
+            <% (bankAccounts || []).forEach(a => { %>
+              <option value="<%= a.Id %>" <%= a.IsDefaultAccount ? 'selected' : '' %>><%= a.AccountName %><%= a.Code ? ' (' + a.Code + ')' : '' %></option>
+            <% }); %>
+          </select>
+        </label>
+        <label class="block">
+          <span class="text-sm text-gray-500 dark:text-gray-400">Payment date</span>
+          <input type="date" name="date" value="<%= todayIso %>" required class="mt-1 w-full <%= INPUT %>" />
+        </label>
+        <label class="block">
+          <span class="text-sm text-gray-500 dark:text-gray-400">Method <span class="text-gray-400">(KashFlow code)</span></span>
+          <input type="number" name="method" list="pay-methods" required placeholder="e.g. 5"
+                 value="<%= (suggestions.methods && suggestions.methods[0]) ? suggestions.methods[0].Method : '' %>"
+                 class="mt-1 w-full <%= INPUT %>" />
+          <datalist id="pay-methods">
+            <% (suggestions.methods || []).forEach(m => { %><option value="<%= m.Method %>">Method <%= m.Method %> (used <%= m.count %>×)</option><% }); %>
+          </datalist>
+        </label>
+        <label class="block">
+          <span class="text-sm text-gray-500 dark:text-gray-400">Comment <span class="text-gray-400">(optional)</span></span>
+          <input type="text" name="comment" maxlength="500" class="mt-1 w-full <%= INPUT %>" />
+        </label>
+      </div>
+
+      <div class="flex items-center justify-between mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
+        <div class="text-sm">
+          <span class="text-gray-500 dark:text-gray-400"><span id="sel-count">0</span> selected</span>
+          <span class="mx-2 text-gray-300">·</span>
+          <span class="font-semibold">Total <span id="sel-total">£0.00</span></span>
+        </div>
+        <button type="submit" id="review-btn" disabled
+                class="text-sm font-semibold px-5 py-2.5 rounded-lg bg-green-600 text-white hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed">
+          Review payment &rarr;
+        </button>
+      </div>
+    </div>
+  </form>
+  <% } %>
+</div>
+
+<script>
+  (function () {
+    var form = document.getElementById('pay-form');
+    if (!form) return;
+    var selectAll = document.getElementById('select-all');
+    var rows = Array.prototype.slice.call(form.querySelectorAll('.pay-row'));
+    var countEl = document.getElementById('sel-count');
+    var totalEl = document.getElementById('sel-total');
+    var btn = document.getElementById('review-btn');
+
+    function recompute() {
+      var count = 0, total = 0;
+      rows.forEach(function (row) {
+        var chk = row.querySelector('.pay-check');
+        var amt = row.querySelector('.pay-amount');
+        var due = parseFloat(row.getAttribute('data-outstanding')) || 0;
+        // readOnly (not disabled) so the amount still POSTs — the controller
+        // pairs the number[] and amount[] arrays by index and filters by the
+        // ticked `selected` set, so every row must submit both.
+        amt.readOnly = !chk.checked;
+        row.classList.toggle('opacity-50', !chk.checked);
+        if (chk.checked) {
+          var v = parseFloat(amt.value);
+          if (!isFinite(v) || v <= 0) v = 0;
+          if (v > due) { v = due; amt.value = due.toFixed(2); }
+          count += 1;
+          total += v;
+        }
+      });
+      countEl.textContent = count;
+      totalEl.textContent = '£' + total.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      btn.disabled = count === 0;
+    }
+
+    rows.forEach(function (row) {
+      row.querySelector('.pay-check').addEventListener('change', recompute);
+      row.querySelector('.pay-amount').addEventListener('input', recompute);
+    });
+    if (selectAll) {
+      selectAll.addEventListener('change', function () {
+        rows.forEach(function (row) { row.querySelector('.pay-check').checked = selectAll.checked; });
+        recompute();
+      });
+    }
+    recompute();
+  })();
+</script>

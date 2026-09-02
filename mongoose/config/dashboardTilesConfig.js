@@ -231,6 +231,13 @@ export default {
         department: ['finance'],
         buttonClass: 'bg-amber-600 hover:bg-amber-700'
     },
+    BulkPayment: {
+        title: 'Bulk Supplier Payment',
+        description: 'Select outstanding purchase invoices and record one payment against them in KashFlow.',
+        link: '/payments/bulk',
+        department: ['finance'],
+        buttonClass: 'bg-green-700 hover:bg-green-800'
+    },
     // ── Inbound mail ──────────────────────────────────────────────────
     MailFilteringLog: {
         title: 'Mail Filtering Log',

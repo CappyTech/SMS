@@ -182,6 +182,12 @@ const routeAccess = {
   // are enforced by the adminGuard on those routes in bankRoutes.js.
   '/bank':                ['admin', 'accountant'],
 
+  // Bulk supplier payments. Same longest-prefix rule and same finance audience
+  // as '/bank': the one '/payments' entry covers the whole module. The confirm
+  // step writes real payments to KashFlow — see the strict limiter in
+  // paymentRoutes.js.
+  '/payments':            ['admin', 'accountant'],
+
   // Inbound mail filtering log. Same longest-prefix rule as '/bank': the one
   // '/mail' entry covers the whole module.
   //
