@@ -154,7 +154,19 @@ const main = async () => {
   // Branding images and vendored browser libraries must be public: they are needed by
   // the login and setup pages, and the manifest icons are fetched by the browser while
   // the user is logged out (which is exactly when installability is evaluated).
-  app.use('/resources/images', express.static(path.join(__dirname, 'public', 'images')));
+  //
+  // These brand assets are also embedded by sibling subdomains — hcs-sync's
+  // (sync.heroncs.co.uk) layout, footer and web manifest all reference the logo,
+  // favicon and icons here. Helmet's default `Cross-Origin-Resource-Policy:
+  // same-origin` blocks that cross-origin load (ERR_BLOCKED_BY_RESPONSE.NotSameOrigin),
+  // so relax it to `same-site` for this route only: app and sync are both
+  // heroncs.co.uk, so same-site permits the sibling while still refusing any
+  // unrelated origin. Scoped to the branding images; the rest of the app keeps
+  // same-origin.
+  app.use('/resources/images', (_req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'same-site');
+    next();
+  }, express.static(path.join(__dirname, 'public', 'images')));
   app.use('/resources/vendor', express.static(path.join(__dirname, 'public', 'vendor')));
 
   // PWA. The service worker's scope is the path it is served from, so it MUST be served

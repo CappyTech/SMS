@@ -2,6 +2,11 @@
 
 All notable changes to hcs-app will be documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [6.35.1] - 2026-09-02
+
+### Fixed
+- **Sibling subdomains can load the shared brand assets again.** hcs-sync (`sync.heroncs.co.uk`) references the logo, favicon and PWA manifest icons served here at `/resources/images`, but Helmet's default `Cross-Origin-Resource-Policy: same-origin` blocked the cross-origin load — the sync debug page logged `ERR_BLOCKED_BY_RESPONSE.NotSameOrigin` and its installed-app icon failed to download. That route now sends `Cross-Origin-Resource-Policy: same-site`: app and sync are both `heroncs.co.uk`, so same-site admits the sibling while still refusing any unrelated origin. Scoped to the branding-images route only; every other response keeps `same-origin`.
+
 ## [6.35.0] - 2026-09-02
 
 ### Added
