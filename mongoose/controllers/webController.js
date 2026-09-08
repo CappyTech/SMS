@@ -19,6 +19,7 @@ import webContentConfig from '../config/webContentConfig.js';
 import { slugify } from '../../services/webContentService.js';
 import webMediaService from '../../services/webMediaService.js';
 import { notifyWebRevalidate } from '../../services/webRevalidateService.js';
+import { buildUsageMap, usageFor, repointReferences } from '../../services/webMediaUsageService.js';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -351,12 +352,49 @@ const upload = multer({
   limits: { fileSize: 25 * 1024 * 1024 },
 });
 
+/** One page of the grid. The form pickers still get the full list via mediaChoices. */
+const MEDIA_PAGE_SIZE = 24;
+
+/** Escape a user string for use inside a case-insensitive RegExp. */
+function escapeRegex(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export const getMedia = async (req, res, next) => {
   try {
+    const q = str(req.query.q);
+    const filter = q
+      ? { $or: ['filename', 'originalName', 'alt'].map((f) => ({ [f]: new RegExp(escapeRegex(q), 'i') })) }
+      : {};
+
+    const total = await mdb.WEB.webMedia.countDocuments(filter);
+    const totalPages = Math.max(1, Math.ceil(total / MEDIA_PAGE_SIZE));
+    // Clamp rather than 404: a search that shrinks the result set below the page
+    // someone was on should land them on the last real page, not an error.
+    const page = Math.min(Math.max(1, parseInt(req.query.page, 10) || 1), totalPages);
+
+    const media = await mdb.WEB.webMedia.find(filter)
+      .select('-bytes')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * MEDIA_PAGE_SIZE)
+      .limit(MEDIA_PAGE_SIZE)
+      .lean();
+
+    // Only the images on this page need their usage resolved, but the content
+    // collections are small enough that one scan is cheaper than a query each.
+    const usageMap = await buildUsageMap();
+    const usage = {};
+    media.forEach((m) => { usage[m.uuid] = usageMap.get(m.uuid) || []; });
+
     res.render('tailwindcss/website/media', {
       title: 'Media Library',
-      media: await mediaChoices(),
+      media,
       maxBytes: webMediaService.MAX_BYTES,
+      usage,
+      q,
+      page,
+      totalPages,
+      total,
     });
   } catch (err) {
     next(err);
@@ -383,53 +421,77 @@ export const getMediaFile = async (req, res, next) => {
   }
 };
 
+/** Re-encode one uploaded file into a stored, deduped webMedia record. */
+async function storeUpload(file, { alt = '', createdBy } = {}) {
+  const processed = await webMediaService.processImage(file.buffer, file.originalname);
+
+  // Same bytes as something already here — hand back the existing record rather
+  // than storing a second copy for the mirror to fetch again.
+  const existing = await mdb.WEB.webMedia.findOne({ hash: processed.hash }).select('uuid filename').lean();
+  if (existing) return { doc: existing, duplicate: true, processed };
+
+  const doc = await mdb.WEB.webMedia.create({
+    filename: processed.filename,
+    originalName: file.originalname,
+    mime: processed.mime,
+    bytes: processed.bytes,
+    size: processed.size,
+    width: processed.width,
+    height: processed.height,
+    hash: processed.hash,
+    alt: String(alt || '').trim(),
+    // Images are published immediately: an unpublished image referenced by
+    // a published page renders as a hole on the live site, and the media
+    // library is not itself a public listing.
+    status: 'published',
+    publishedAt: new Date(),
+    createdBy,
+    updatedBy: createdBy,
+  });
+  return { doc, duplicate: false, processed };
+}
+
 // csrfService.validate runs AFTER multer: the global CSRF middleware cannot see
 // a multipart body, so the token is only readable once multer has parsed it.
 export const postMediaUpload = [
-  upload.single('image'),
+  upload.array('images', 12),
   csrfService.validate,
   async (req, res, next) => {
     try {
-      if (!req.file) {
-        req.flash('error', 'Choose an image to upload.');
+      const files = req.files || [];
+      if (!files.length) {
+        req.flash('error', 'Choose at least one image to upload.');
         return res.redirect('/website/media');
       }
-      const processed = await webMediaService.processImage(req.file.buffer, req.file.originalname);
+      // Alt describes one photograph, so it only makes sense to apply the field
+      // when a single image is uploaded. A batch gets its alt text added after,
+      // per image, from the grid.
+      const alt = files.length === 1 ? str(req.body.alt) : '';
 
-      // Same bytes as something already here — reuse it rather than storing a
-      // second copy for the mirror to fetch again.
-      const existing = await mdb.WEB.webMedia.findOne({ hash: processed.hash }).select('uuid filename').lean();
-      if (existing) {
-        req.flash('success', `That image is already in the library as "${existing.filename}".`);
-        return res.redirect('/website/media');
+      let uploaded = 0;
+      let duplicates = 0;
+      const failed = [];
+      for (const file of files) {
+        try {
+          const { duplicate, processed } = await storeUpload(file, { alt, createdBy: req.user?._id });
+          if (duplicate) { duplicates += 1; continue; }
+          uploaded += 1;
+          logger.info('[website] media uploaded', {
+            filename: processed.filename, from: `${file.size}b`, to: `${processed.size}b`,
+          });
+        } catch (err) {
+          failed.push(file.originalname);
+          logger.warn('[website] media upload failed', { file: file.originalname, error: err.message });
+        }
       }
 
-      await mdb.WEB.webMedia.create({
-        filename: processed.filename,
-        originalName: req.file.originalname,
-        mime: processed.mime,
-        bytes: processed.bytes,
-        size: processed.size,
-        width: processed.width,
-        height: processed.height,
-        hash: processed.hash,
-        alt: String(req.body.alt || '').trim(),
-        // Images are published immediately: an unpublished image referenced by
-        // a published page renders as a hole on the live site, and the media
-        // library is not itself a public listing.
-        status: 'published',
-        publishedAt: new Date(),
-        createdBy: req.user?._id,
-        updatedBy: req.user?._id,
-      });
+      if (uploaded) notifyWebRevalidate('media uploaded');
 
-      logger.info('[website] media uploaded', {
-        filename: processed.filename,
-        from: `${req.file.size}b`,
-        to: `${processed.size}b`,
-      });
-      notifyWebRevalidate('media uploaded');
-      req.flash('success', `Uploaded "${processed.filename}" (${Math.round(processed.size / 1024)}KB).`);
+      const parts = [];
+      if (uploaded) parts.push(`${uploaded} uploaded`);
+      if (duplicates) parts.push(`${duplicates} already in the library`);
+      if (failed.length) parts.push(`${failed.length} failed (${failed.join(', ')})`);
+      req.flash(failed.length ? 'error' : 'success', `Media upload: ${parts.join(', ') || 'nothing to do'}.`);
       res.redirect('/website/media');
     } catch (err) {
       next(err);
@@ -437,11 +499,117 @@ export const postMediaUpload = [
   },
 ];
 
+/**
+ * Edit an image's default alt text in place.
+ *
+ * A plain urlencoded POST, so the global CSRF middleware guards it — no multer,
+ * no per-route revalidation exception. The default alt is what the manifest
+ * publishes and what a usage falls back to when it supplies none, so a change
+ * here can change the public site: revalidate.
+ */
+export const postMediaUpdate = async (req, res, next) => {
+  try {
+    const doc = await mdb.WEB.webMedia.findOne({ uuid: req.params.uuid }).select('uuid').lean();
+    if (!doc) {
+      return next(Object.assign(new Error('Image not found'), { statusCode: 404 }));
+    }
+    await mdb.WEB.webMedia.updateOne(
+      { uuid: doc.uuid },
+      { $set: { alt: str(req.body.alt), updatedBy: req.user?._id } },
+    );
+    notifyWebRevalidate('media alt updated');
+    req.flash('success', 'Alt text saved.');
+    res.redirect('/website/media');
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Replace an image with a new upload, keeping every page that used it pointed at
+ * the replacement.
+ *
+ * The replacement is a NEW record with a new uuid — never a rewrite of the old
+ * bytes in place. The public API caches /api/web/media/:uuid as immutable for a
+ * year (see webApiController.js), so reusing a uuid for different bytes would
+ * serve the old image from any cache in front of heroncs.co.uk. Instead:
+ *   1. store the new file (deduped by hash),
+ *   2. repoint every reference from the old uuid to the new one,
+ *   3. delete the old record.
+ * The result is a true replacement — same pages, same alt text — with a clean
+ * cache story.
+ */
+export const postMediaReplace = [
+  upload.single('image'),
+  csrfService.validate,
+  async (req, res, next) => {
+    try {
+      const oldDoc = await mdb.WEB.webMedia.findOne({ uuid: req.params.uuid }).select('uuid filename alt').lean();
+      if (!oldDoc) {
+        return next(Object.assign(new Error('Image not found'), { statusCode: 404 }));
+      }
+      if (!req.file) {
+        req.flash('error', 'Choose a replacement image.');
+        return res.redirect('/website/media');
+      }
+
+      const { doc: newDoc, duplicate } = await storeUpload(req.file, {
+        // The replacement inherits the old image's default alt: it stands in for
+        // the same thing, and losing the alt on replace would be a silent
+        // regression on accessibility the brief treats as content.
+        alt: oldDoc.alt,
+        createdBy: req.user?._id,
+      });
+
+      if (duplicate && newDoc.uuid === oldDoc.uuid) {
+        req.flash('success', 'The replacement is identical to the current image — nothing changed.');
+        return res.redirect('/website/media');
+      }
+
+      const repointed = await repointReferences(oldDoc.uuid, newDoc.uuid, req.user?._id);
+      await mdb.WEB.webMedia.deleteOne({ uuid: oldDoc.uuid });
+      notifyWebRevalidate('media replaced');
+
+      const where = repointed ? ` and updated ${repointed} page${repointed === 1 ? '' : 's'}` : '';
+      req.flash('success', `Replaced "${oldDoc.filename}"${where}.`);
+      res.redirect('/website/media');
+    } catch (err) {
+      next(err);
+    }
+  },
+];
+
+/**
+ * Delete an image, refusing by default when a page still uses it.
+ *
+ * A published page referencing a deleted uuid renders as a hole on the live
+ * site, so the usual path blocks and names the pages instead. `force=1` (the
+ * grid's "Delete anyway") overrides for the case where the editor means it.
+ */
 export const postMediaDelete = async (req, res, next) => {
   try {
-    await mdb.WEB.webMedia.deleteOne({ uuid: req.params.uuid });
+    const doc = await mdb.WEB.webMedia.findOne({ uuid: req.params.uuid }).select('uuid filename').lean();
+    if (!doc) {
+      req.flash('error', 'Image not found — it may already have been deleted.');
+      return res.redirect('/website/media');
+    }
+
+    const usages = await usageFor(doc.uuid);
+    if (usages.length && req.body.force !== '1') {
+      const where = usages.map((u) => `${u.title} (${u.label})`).join(', ');
+      req.flash(
+        'error',
+        `"${doc.filename}" is used on ${usages.length} page${usages.length === 1 ? '' : 's'}: ${where}. `
+        + 'Remove it from those pages first, or use “Delete anyway”.',
+      );
+      return res.redirect('/website/media');
+    }
+
+    await mdb.WEB.webMedia.deleteOne({ uuid: doc.uuid });
     notifyWebRevalidate('media deleted');
-    req.flash('success', 'Image deleted.');
+    req.flash('success', usages.length
+      ? `Deleted "${doc.filename}". ${usages.length} page${usages.length === 1 ? '' : 's'} now reference a missing image — fix those next.`
+      : `Deleted "${doc.filename}".`);
     res.redirect('/website/media');
   } catch (err) {
     next(err);
@@ -452,5 +620,5 @@ export default {
   getList, getCreate, postCreate, getEdit, postEdit,
   postPublish, postUnpublish, postDelete,
   getSettings, postSettings,
-  getMedia, getMediaFile, postMediaUpload, postMediaDelete,
+  getMedia, getMediaFile, postMediaUpload, postMediaUpdate, postMediaReplace, postMediaDelete,
 };

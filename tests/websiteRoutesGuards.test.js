@@ -51,6 +51,9 @@ describe('website editor routes / permissions consistency', () => {
       '/website/settings',
       '/website/media',
       '/website/media/:uuid/file',
+      '/website/media/:uuid',
+      '/website/media/:uuid/replace',
+      '/website/media/:uuid/delete',
       '/website/:type',
       '/website/:type/create',
       '/website/:type/:uuid/edit',
@@ -79,18 +82,21 @@ describe('website editor routes / permissions consistency', () => {
     }
   });
 
-  it('validates CSRF after multer on the media upload', () => {
+  it('validates CSRF after multer on the multipart media routes', () => {
     // The global CSRF middleware cannot read a multipart body, so validation
     // has to run again once multer has parsed it — after, never before, or it
-    // reads an empty body and rejects every upload.
-    const uploadArray = controllerSrc.match(/export const postMediaUpload = \[([\s\S]*?)\]/);
-    assert.ok(uploadArray, 'postMediaUpload middleware array not found');
-    const body = uploadArray[1];
-    const multerIdx = body.indexOf("upload.single('image')");
-    const csrfIdx = body.indexOf('csrfService.validate');
-    assert.ok(multerIdx > -1, 'no multer middleware on the upload');
-    assert.ok(csrfIdx > -1, 'no CSRF validation on the upload');
-    assert.ok(multerIdx < csrfIdx, 'csrfService.validate must run AFTER multer');
+    // reads an empty body and rejects every upload. Both multipart handlers
+    // (upload = many files, replace = one) share this ordering.
+    for (const name of ['postMediaUpload', 'postMediaReplace']) {
+      const arr = controllerSrc.match(new RegExp(`export const ${name} = \\[([\\s\\S]*?)\\]`));
+      assert.ok(arr, `${name} middleware array not found`);
+      const body = arr[1];
+      const multerIdx = body.search(/upload\.(single|array)\(/);
+      const csrfIdx = body.indexOf('csrfService.validate');
+      assert.ok(multerIdx > -1, `no multer middleware on ${name}`);
+      assert.ok(csrfIdx > -1, `no CSRF validation on ${name}`);
+      assert.ok(multerIdx < csrfIdx, `csrfService.validate must run AFTER multer in ${name}`);
+    }
   });
 
   it("routeAccess grants '/website' to admin only", () => {

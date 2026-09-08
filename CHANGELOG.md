@@ -2,6 +2,19 @@
 
 All notable changes to hcs-app will be documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [6.36.0] - 2026-09-08
+
+### Added
+- **The website Media Library grew from upload-and-delete into a full editor (website department — admin only).** Six additions, all server-rendered forms and links because the CSP forbids inline scripts:
+  - **Edit alt text in place.** Each image in the grid carries an inline field and `Save` (`POST /website/media/:uuid`), so the default alt the manifest publishes can be corrected without re-uploading. The brief treats alt text as content, not decoration, and the grid still flags images that have none.
+  - **Deletes are guarded against images still in use.** A delete now names every page referencing the image and refuses, unless the editor confirms with the grid's **Delete anyway** (`force=1`). A published page pointing at a deleted uuid renders as a hole on the live site, so this stops that happening by accident — and when forced, the success message still warns which pages now reference a missing image.
+  - **Search and pagination.** The grid takes `?q=` (filename, original name or alt, regex-escaped) and `?page=` at 24 per page, rather than loading every image's metadata at once. The form pickers still receive the full list.
+  - **Replace an image, keeping every page pointed at it.** A replacement is stored as a **new** record with a new uuid — never a rewrite of the old bytes in place — then every case-study, service, gallery and settings field that referenced the old uuid is repointed to the new one and the old record is deleted. This is deliberate: the public API caches `/api/web/media/:uuid` as immutable for a year, so reusing a uuid for different bytes would serve the stale image from any cache in front of `heroncs.co.uk`. The replacement inherits the old image's default alt, so accessibility does not silently regress on a swap.
+  - **Bulk upload.** The upload form takes several files at once (`upload.array('images', 12)`), deduping each by content hash and reporting a summary (`3 uploaded, 1 already in the library, 1 failed`). A single-file upload still accepts the alt field; a batch gets alt text added per image from the grid.
+  - **Usage is visible on every card.** Each image lists the pages that use it, linked straight to their editor, with drafts marked — the read side of the same reverse lookup the delete guard and replace rely on.
+
+  Reference tracking lives in the new `services/webMediaUsageService.js` and is derived from `webContentConfig`, not hardcoded: any `image`, `panel` or `gallery` field added to a content type is scanned automatically. Its pure helpers (`mediaRefsInRecord`, `repointInRecord`) are unit-tested against the live config without a database in `tests/webMediaUsage.test.js`. The two multipart routes (upload, replace) keep the established multer-before-CSRF ordering, pinned in `tests/websiteRoutesGuards.test.js`.
+
 ## [6.35.1] - 2026-09-02
 
 ### Fixed

@@ -29,8 +29,12 @@ router.post('/website/settings', adminOnly, ctrl.postSettings);
 router.get('/website/media', adminOnly, ctrl.getMedia);
 router.get('/website/media/:uuid/file', adminOnly, ctrl.getMediaFile);
 // multer first, then csrfService.validate — the global CSRF middleware runs
-// before a multipart body is parsed and would reject every upload.
+// before a multipart body is parsed and would reject every upload. The upload
+// and replace routes are multipart; update (alt text) and delete are plain
+// urlencoded POSTs the global CSRF middleware already covers.
 router.post('/website/media', adminOnly, ...ctrl.postMediaUpload);
+router.post('/website/media/:uuid', adminOnly, ctrl.postMediaUpdate);
+router.post('/website/media/:uuid/replace', adminOnly, ...ctrl.postMediaReplace);
 router.post('/website/media/:uuid/delete', adminOnly, ctrl.postMediaDelete);
 
 // ── Collection types ────────────────────────────────────────────────────────

@@ -1,3 +1,27 @@
+<%
+  /**
+   * The media library grid.
+   *
+   * Everything here is server-rendered forms and links — the CSP forbids inline
+   * scripts, so search, pagination, alt editing, replace and delete are all
+   * ordinary GET links and POST submits, the same no-JS discipline as _field.ejs.
+   *
+   * Optional locals default below so the view still renders from a bare
+   * { media, maxBytes } — see tests/websiteViews.test.js.
+   */
+  const q = locals.q || '';
+  const usage = locals.usage || {};
+  const page = locals.page || 1;
+  const totalPages = locals.totalPages || 1;
+  const total = typeof locals.total === 'number' ? locals.total : media.length;
+  const kb = (n) => Math.round((n || 0) / 1024);
+  const pageUrl = (p) => `/website/media?${q ? `q=${encodeURIComponent(q)}&` : ''}page=${p}`;
+
+  const INPUT = 'w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 '
+    + 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white '
+    + 'focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent';
+%>
+
 <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
 
   <div class="flex items-center gap-3 mb-6">
@@ -7,7 +31,7 @@
   </div>
 
   <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-4 mb-8">
-    <h2 class="font-semibold text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3">Upload a photograph</h2>
+    <h2 class="font-semibold text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3">Upload photographs</h2>
 
     <%# enctype is what makes this multipart; the route runs multer before
         csrfService.validate for exactly that reason. %>
@@ -16,8 +40,8 @@
 
       <div class="grid gap-3 sm:grid-cols-2">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="image">Image file</label>
-          <input id="image" type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" required
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="images">Image files</label>
+          <input id="images" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/avif" multiple required
             class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2
                    bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                    focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -28,13 +52,14 @@
             class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2
                    bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                    focus:outline-none focus:ring-2 focus:ring-green-500">
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Applied only when you upload a single image. Add alt text per image below for a batch.</p>
         </div>
       </div>
 
       <p class="text-xs text-gray-500 dark:text-gray-400">
-        Upload the photograph straight off the camera or phone — it is resized, converted to WebP and brought under
-        <%= Math.round(maxBytes / 1024) %>KB automatically. Location data is stripped, which matters on photographs
-        taken on customers' estates. JPEG, PNG, WebP and AVIF only.
+        Upload photographs straight off the camera or phone — each is resized, converted to WebP and brought under
+        <%= kb(maxBytes) %>KB automatically. Location data is stripped, which matters on photographs
+        taken on customers' estates. JPEG, PNG, WebP and AVIF only. You can select several at once.
       </p>
 
       <div class="flex justify-end">
@@ -46,37 +71,127 @@
     </form>
   </div>
 
+  <%# ── Search ──────────────────────────────────────────────────────────── %>
+  <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+    <form method="GET" action="/website/media" class="flex gap-2 flex-1">
+      <input type="text" name="q" value="<%= q %>" placeholder="Search filename or alt text"
+        class="<%= INPUT %> max-w-md">
+      <button type="submit"
+        class="text-sm bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg shadow-sm font-medium transition">
+        Search
+      </button>
+      <% if (q) { %>
+        <a href="/website/media" class="text-sm px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">Clear</a>
+      <% } %>
+    </form>
+    <p class="text-xs text-gray-500 dark:text-gray-400">
+      <% if (q) { %><%= total %> match<%= total === 1 ? '' : 'es' %> for “<%= q %>”<% } else { %><%= total %> image<%= total === 1 ? '' : 's' %><% } %>
+    </p>
+  </div>
+
   <% if (!media.length) { %>
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-8 text-center">
-      <p class="text-sm text-gray-700 dark:text-gray-300">No images yet.</p>
+      <p class="text-sm text-gray-700 dark:text-gray-300">
+        <% if (q) { %>No images match “<%= q %>”.<% } else { %>No images yet.<% } %>
+      </p>
     </div>
   <% } else { %>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <% media.forEach(function (m) { %>
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden">
+      <% media.forEach(function (m) { const uses = usage[m.uuid] || []; %>
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden flex flex-col">
           <img src="/website/media/<%= m.uuid %>/file" alt="<%= m.alt %>"
             class="w-full h-40 object-cover border-b border-gray-200 dark:border-gray-700">
-          <div class="p-3 space-y-2">
-            <p class="font-mono text-xs break-all text-gray-700 dark:text-gray-300"><%= m.filename %></p>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
-              <%= m.width %>×<%= m.height %> · <%= Math.round((m.size || 0) / 1024) %>KB
-            </p>
-            <% if (m.alt) { %>
-              <p class="text-xs text-gray-500 dark:text-gray-400"><%= m.alt %></p>
-            <% } else { %>
-              <p class="text-xs text-amber-700 dark:text-amber-400">No alt text</p>
-            <% } %>
-            <form method="POST" action="/website/media/<%= m.uuid %>/delete">
+          <div class="p-3 space-y-3 flex-1 flex flex-col">
+            <div>
+              <p class="font-mono text-xs break-all text-gray-700 dark:text-gray-300"><%= m.filename %></p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                <%= m.width %>×<%= m.height %> · <%= kb(m.size) %>KB
+              </p>
+            </div>
+
+            <%# ── Usage ──────────────────────────────────────────────── %>
+            <div class="text-xs">
+              <% if (uses.length) { %>
+                <p class="font-medium text-gray-600 dark:text-gray-300 mb-1">
+                  <i class="bi bi-link-45deg"></i> Used on <%= uses.length %> page<%= uses.length === 1 ? '' : 's' %>
+                </p>
+                <ul class="space-y-0.5">
+                  <% uses.forEach(function (u) { %>
+                    <li class="truncate">
+                      <a href="<%= u.editUrl %>" class="text-green-700 dark:text-green-400 hover:underline"><%= u.title %></a>
+                      <span class="text-gray-400">· <%= u.label %><%= u.status === 'draft' ? ' (draft)' : '' %></span>
+                    </li>
+                  <% }); %>
+                </ul>
+              <% } else { %>
+                <p class="text-gray-400 dark:text-gray-500"><i class="bi bi-dash-circle"></i> Not used on any page</p>
+              <% } %>
+            </div>
+
+            <%# ── Alt text (editable) ────────────────────────────────── %>
+            <form method="POST" action="/website/media/<%= m.uuid %>" class="space-y-1">
               <%- include('../partials/csrfHidden') %>
-              <button type="submit"
-                class="text-xs px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-sm font-medium transition">
-                Delete
-              </button>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400" for="alt-<%= m.uuid %>">
+                Alt text<% if (!m.alt) { %> <span class="text-amber-700 dark:text-amber-400">— No alt text</span><% } %>
+              </label>
+              <div class="flex gap-2">
+                <input id="alt-<%= m.uuid %>" type="text" name="alt" value="<%= m.alt %>"
+                  placeholder="Describe the photo" class="<%= INPUT %> text-xs py-1.5">
+                <button type="submit"
+                  class="text-xs px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-800 text-white shadow-sm font-medium transition">
+                  Save
+                </button>
+              </div>
             </form>
+
+            <div class="mt-auto pt-2 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-2 items-center">
+              <%# ── Replace ────────────────────────────────────────── %>
+              <form method="POST" action="/website/media/<%= m.uuid %>/replace" enctype="multipart/form-data" class="flex-1 min-w-0 space-y-1">
+                <%- include('../partials/csrfHidden') %>
+                <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" required
+                  class="w-full text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1
+                         bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                <button type="submit"
+                  class="w-full text-xs px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-sm font-medium transition">
+                  Replace
+                </button>
+              </form>
+
+              <%# ── Delete (guarded when in use) ───────────────────── %>
+              <form method="POST" action="/website/media/<%= m.uuid %>/delete">
+                <%- include('../partials/csrfHidden') %>
+                <% if (uses.length) { %>
+                  <input type="hidden" name="force" value="1">
+                  <button type="submit"
+                    class="text-xs px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-800 text-white shadow-sm font-medium transition"
+                    title="This image is in use — deleting it will leave those pages with a missing image">
+                    Delete anyway
+                  </button>
+                <% } else { %>
+                  <button type="submit"
+                    class="text-xs px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-sm font-medium transition">
+                    Delete
+                  </button>
+                <% } %>
+              </form>
+            </div>
           </div>
         </div>
       <% }); %>
     </div>
+
+    <%# ── Pagination ───────────────────────────────────────────────────── %>
+    <% if (totalPages > 1) { %>
+      <div class="flex items-center justify-center gap-2 mt-8 text-sm">
+        <% if (page > 1) { %>
+          <a href="<%= pageUrl(page - 1) %>" class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">← Prev</a>
+        <% } %>
+        <span class="text-gray-500 dark:text-gray-400">Page <%= page %> of <%= totalPages %></span>
+        <% if (page < totalPages) { %>
+          <a href="<%= pageUrl(page + 1) %>" class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">Next →</a>
+        <% } %>
+      </div>
+    <% } %>
   <% } %>
 
 </div>
